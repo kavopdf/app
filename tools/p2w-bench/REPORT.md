@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 02:34
+# Fixer report - 2026-11-24 03:30
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 02:34 → running IST · 1 min**
+**24 Nov 2026 · slot 03:30 → running IST · 12 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -28,7 +28,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 02:34 | **lead** | 0/13 | Four documents converted on this tree; unspendable spacers counted in word/document.xml and matched one-for-one to the four live Google steps the previous slot recorded (14.35 vs -13.0, 9.72/5.02/4.86 |
+| 03:30 | **lead** | 0/None | guard charged 0.75pt/row for a rule an unruled table does not draw; patch saved to FINDINGS, cannot commit - regress refuses an unmeasured engine and p2w.py does not finish 212 docs in one sandbox com |
 
 ## The txt
 
@@ -42,19 +42,17 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-03` | audit the pending gate: which of the 21 closable ite | 02:35 | - | - |
-| `18_dB-01` | table block-top gap and per-row height in DocxWriter | 02:35 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 02:34 → running · 1 min |
+| Slot window | 03:30 → running · 12 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 8 |
-| Silences over 2 min | 0 |
+| Tool beats | 6 |
+| Longest silence | **7.9 min** — from 03:30:35, after `retrying corpus pass with checkpointing` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -62,8 +60,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **0 min** | `#############` |
-| other - not attributed to a tool | **0 min** | `#########` |
+| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `##############` |
+| report - the report and the chain | **4 min** | `########` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -76,7 +74,7 @@
 
 ## Next run
 
-NEXT RUN: (1) 18_displacement is measured and staged - the pair is (first-row cell w:before carries the table gap) + (w:trHeight declared less by the same per-row amount), and 362_price_list_dense is the falsifier because it has a ramp and no step. (2) The 5 ratchet items are very likely stale: benchmarks/STATE.json, RANKING.csv and the engine last changed in the SAME commit b7699196, and both regress.py --check and measure_gate.py pass on this tree (212/212 scored, engine docx == tree). Do not stamp them without checking - a corpus pass that covered them is what closes them, and the honest close is one corpus pass, not five stamps. (3) The 80 remaining pending items are mostly [blocker] rows that say 'this needs a decision, not a patch'.
+NEXT RUN: (1) THE PREVIOUS PAIR IS REFUTED - do not spend a slot on it. content+rule==pitch and hRule=atLeast make a trHeight-only change a no-op, and a cell-level gap escapes fitPage/shaveToFit (FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md). (2) The class is two disjoint halves: a spacer half (the step at each table top = 0.784 x the declared w:line of an unspendable spacer, confirmed on 4 of 4 documents) and a row half (+0.75 pt per row, 21.75 pt over 362_price_list_dense's 29 rows). (3) FIRST MOVE: one Google round trip on 362_price_list_dense with trHeight = max(content, line-15) on rows where line > content only - LO-invariant by construction, and it tells you whether Google lays trHeight+rule or max(trHeight, content+rule). (4) The 4 ratchet rows need one corpus pass (~40 min) - start the slot with it, do not end with it. (5) The 9 REOPEN rows in PENDING-AUDIT.md are decisions with evidence attached.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

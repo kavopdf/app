@@ -3266,3 +3266,12 @@
 {"t": 1795470905.7311382, "ist": "03:25:05", "ev": "beat", "d": "corpus pass to commit guard fix (213 docx+render)"}
 {"t": 1795471212.153509, "ist": "03:30:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795471230.0982869, "ist": "03:30:30", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795471232.1242342, "ist": "03:30:32", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795471232.1877913, "ist": "03:30:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795471232.2881258, "ist": "03:30:32", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795471235.803408, "ist": "03:30:35", "ev": "beat", "d": "retrying corpus pass with checkpointing"}
+{"t": 1795471706.9501238, "ist": "03:38:26", "ev": "beat", "d": "corpus pass chunk 3"}
+{"t": 1795471974.9277892, "ist": "03:42:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795471979.4593163, "ist": "03:42:59", "ev": "beat", "d": "corpus pass chunk 4"}
+{"t": 1795472246.7540078, "ist": "03:47:26", "ev": "beat", "d": "corpus pass chunk 5"}
+{"t": 1795472514.4319646, "ist": "03:51:54", "ev": "beat", "d": "corpus pass chunk 6, conversion finishing"}

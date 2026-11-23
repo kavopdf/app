@@ -1,0 +1,74 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index f0439044..82312cb7 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -816,6 +816,27 @@ public final class DocxWriter {
+          * charge the page's row count, not the one table's.
+          */
+         int pageRowCount;
++        /**
++         * Rows in every RULED table on this page - the only rows that pay the rule.
++         *
++         * <p>THE EXCESS IS THE RULE'S, AND AN UNRULED TABLE DRAWS NO RULE. The row excess the
++         * guard charges is 0.75 pt per row because the renderer adds the row's own rule to it -
++         * the same statement this file already makes where the row height is written: "An
++         * unruled table draws no rule and keeps its full pitch" (see the w:trHeight block in
++         * emitTable). Charging it to a table whose six sides are all w:val="nil" therefore
++         * charges a page for a rule the page does not have. Measured 24 Nov on this corpus:
++         * 68_journal_wide_table_spanning 7 rows, 72_bank_statement_no_rules_right_amounts 18,
++         * bus-timetable-station-left-times-right 33 - all three with all six sides nil, all
++         * three refused a gap they had the room for.
++         *
++         * <p>WHY THE CHARGE IS NOT ALSO DEDUPLICATED PER PAGE. A page with three spacers charges
++         * this count three times, which is over-conservative. It is left that way on purpose:
++         * mobile-bill and insurance-policy-schedule are exactly the pages where spending the gap
++         * unguarded was MEASURED in Google to cost a page (46/47 on one page to 43/47 on two,
++         * slot 23:10 on 22 Nov). Loosening that charge is not supported by any measurement, so
++         * only the rule the page does not draw is removed.
++         */
++        int pageRuledRowCount;
+         /** True when this page's own content fits the sheet, so its white space can be spent. */
+         boolean spendGaps;
+         /**
+@@ -1358,6 +1379,7 @@ public final class DocxWriter {
+         // emitTable: the gap is only worth spending where the page has room for it.
+         ctx.pageInkBottomPt = pageInkBottom(page);
+         ctx.pageRowCount = pageRows(page);
++        ctx.pageRuledRowCount = pageRuledRows(page);
+         ctx.spacerSplitTw = 0;
+         // A page is written more than once by the budget guard; each pass writes its own shapes.
+         ctx.shapeCarrier.setLength(0);
+@@ -2429,6 +2451,24 @@ public final class DocxWriter {
+         return n;
+     }
+ 
++    /**
++     * Rows on this page that belong to a table the page actually ruled.
++     *
++     * <p>An unruled table draws no rule, so it keeps its full pitch and pays no excess - the same
++     * distinction emitTable makes when it writes the row height. Everything else is pageRows.
++     */
++    private static int pageRuledRows(PdfToWord.Page page) {
++        int n = 0;
++        for (Object o : page.blocks) {
++            if (!(o instanceof PdfToWord.Table)) continue;
++            PdfToWord.Table t = (PdfToWord.Table) o;
++            boolean ruled = t.ruled;
++            for (int i = 0; !ruled && i < 6; i++) ruled = t.sideDrawn[i];
++            if (ruled) n += t.rows.size();
++        }
++        return n;
++    }
++
+     private static float pageInkBottom(PdfToWord.Page page) {
+         float b = 0f;
+         for (Object o : page.blocks) {
+@@ -6090,7 +6130,7 @@ public final class DocxWriter {
+             // emission changes. Every document the guard refuses is byte-identical to the engine
+             // before this change.
+             int spacerHairTw = 1;
+-            int rowExcessTw = 15 * Math.max(0, ctx.pageRowCount);
++            int rowExcessTw = 15 * Math.max(0, ctx.pageRuledRowCount);
+             int slackTw = ctx.budgetTw - Math.round(ctx.pageInkBottomPt * (float) TWIPS_PER_PT);
+             int roomWantTw = Math.max(0, spacerTw - 20);
+             int wantTw = Math.max(0, spacerTw - spacerHairTw);

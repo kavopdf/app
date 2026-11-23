@@ -2,10 +2,6 @@
  "plan": "",
  "notes": [
   {
-   "at": "05:13",
-   "text": "agent landed: 00_page_count / B -> FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md"
-  },
-  {
    "at": "05:29",
    "text": "attempt 32 on 18_displacement -> lead"
   },
@@ -240,6 +236,10 @@
   {
    "at": "02:37",
    "text": "agent landed: 18_dB-01 /  -> 18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md"
+  },
+  {
+   "at": "03:30",
+   "text": "attempt 44 on 18_displacement -> lead"
   }
  ],
  "next": "NEXT RUN: (1) THE PREVIOUS PAIR IS REFUTED - do not spend a slot on it. content+rule==pitch and hRule=atLeast make a trHeight-only change a no-op, and a cell-level gap escapes fitPage/shaveToFit (FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md). (2) The class is two disjoint halves: a spacer half (the step at each table top = 0.784 x the declared w:line of an unspendable spacer, confirmed on 4 of 4 documents) and a row half (+0.75 pt per row, 21.75 pt over 362_price_list_dense's 29 rows). (3) FIRST MOVE: one Google round trip on 362_price_list_dense with trHeight = max(content, line-15) on rows where line > content only - LO-invariant by construction, and it tells you whether Google lays trHeight+rule or max(trHeight, content+rule). (4) The 4 ratchet rows need one corpus pass (~40 min) - start the slot with it, do not end with it. (5) The 9 REOPEN rows in PENDING-AUDIT.md are decisions with evidence attached.",

@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 02:19 |
-| ended | 02:37 |
-| how it ended | forced |
+| started | 02:51 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -66,7 +66,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `00:09` attempt 16 on content-present-partly-displaced -> lead (0/13 moved)
 - `00:25` attempt 17 on content-present-partly-displaced -> lead (0/13 moved)
 - `00:30` attempt 18 on content-present-partly-displaced -> lead (0/13 moved)
 - `01:42` attempt 3 on t12_word_invention -> lead (0/213 moved)
@@ -91,6 +90,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `02:35` agent deployed: 18_displacement / B - table block-top gap and per-row height in DocxWriter
 - `02:37` agent landed: 18_dA-03 /  -> PENDING-AUDIT.md
 - `02:37` agent landed: 18_dB-01 /  -> 18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md
+- `03:30` attempt 44 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 
