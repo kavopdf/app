@@ -2613,7 +2613,6 @@
 {"t": 1795435943.8967276, "ist": "17:42:23", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795435944.3314037, "ist": "17:42:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795435944.4591901, "ist": "17:42:24", "ev": "beat", "d": "report.py: building the report"}
-<<<<<<< HEAD
 {"t": 1795437690.2378035, "ist": "18:11:30", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795437749.6330936, "ist": "18:12:29", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795437750.285047, "ist": "18:12:30", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
@@ -2626,7 +2625,6 @@
 {"t": 1795438133.6784732, "ist": "18:18:53", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795438134.0714664, "ist": "18:18:54", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795438182.5881214, "ist": "18:19:42", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-=======
 {"t": 1795436907.5907025, "ist": "17:58:27", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795436907.7847097, "ist": "17:58:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795436916.7576966, "ist": "17:58:36", "ev": "beat", "d": "report.py: building the report"}
@@ -2642,7 +2640,6 @@
 {"t": 1795438983.6406596, "ist": "18:33:03", "ev": "beat", "d": "recording attempt"}
 {"t": 1795438992.992968, "ist": "18:33:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795438996.2738519, "ist": "18:33:16", "ev": "beat", "d": "attempt.py: recording an attempt"}
->>>>>>> 4ab717d0 (attempt: 44_header_footer -> lead (0 of None))
 {"t": 1795439089.2639165, "ist": "18:34:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795440511.7151163, "ist": "18:58:31", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795440512.1143246, "ist": "18:58:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
@@ -2758,3 +2755,12 @@
 {"t": 1795449585.3982484, "ist": "21:29:45", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795449585.8533945, "ist": "21:29:45", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795449586.4008567, "ist": "21:29:46", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795447496.7242985, "ist": "20:54:56", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795447496.8787153, "ist": "20:54:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795447515.291524, "ist": "20:55:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795449031.1785235, "ist": "21:20:31", "ev": "beat", "d": "fetching corpus + building engine (long)"}
+{"t": 1795449185.6296241, "ist": "21:23:05", "ev": "beat", "d": "building variant docx probe"}
+{"t": 1795449300.1987536, "ist": "21:25:00", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795449541.8478048, "ist": "21:29:01", "ev": "beat", "d": "writing findings + report"}
+{"t": 1795449570.141502, "ist": "21:29:30", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795449573.1728978, "ist": "21:29:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
