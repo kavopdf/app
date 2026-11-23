@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 18:58 → running IST · 0 min**
+**23 Nov 2026 · slot 18:58 → running IST · 39 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,18 +11,26 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **0** of the **2** re-measured on this engine - **188** of the 190 scored are still on an older engine, and **30** were clean there |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 188 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **0** of the **7** re-measured on this engine - **183** of the 190 scored are still on an older engine, and **30** were clean there |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 183 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `60_text_column_right_edge` |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 19:31 | **reverted** | 0/0 | table-gap spacer spent PARTIALLY up to the page's remaining slack, instead of the binary whole-or-nothing spend: 49 docs' document.xml changed, and in Google it moved nothing on the two documents pred |
+| 19:34 | **lead** | 0/0 | stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text |
+| 19:36 | **lead** | 0/0 | the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median l |
 
 ## The txt
 
@@ -42,12 +50,23 @@
 
 | | |
 |:--|:--|
-| Slot window | 18:58 → running · 0 min |
+| Slot window | 18:58 → running · 39 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 2 |
-| Silences over 2 min | 0 |
+| Tool beats | 21 |
+| Longest silence | **19.8 min** — from 18:58:36, after `report.py: building the report` |
+| Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| fix - diagnose and change the engine | **7 min** | `####` |
+| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `#############` |
+| record - attempt, handoff, class rows | **2 min** | `##` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **5 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |
