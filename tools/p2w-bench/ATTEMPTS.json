@@ -1316,6 +1316,30 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "t09_page_furniture": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-23 11:00",
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "verify_txt.py only, no engine change: a furniture key with no letter in it is not furniture (_furniture_key folds digits to '#', so 324's numeric table cells invented 18 owed and 1437 present - 66/148",
+    "total": null
+   }
+  ],
+  "last": null,
+  "last_engine": "5beb8b9d",
+  "outcomes": [
+   "kept"
+  ],
+  "reason": "verify_txt.py only, no engine change: a furniture key with no letter in it is not furniture (_furniture_key folds digits to '#', so 324's numeric table cells invented 18 owed and 1437 present - 66/1485 -> 48/48), and owed is now counted per drawn occurrence, not per page (gst-invoice-multipage-item-table draws 'Page N of 4' twice per page: 39/43 -> 43/43). Full 213 re-scored with the real verify_txt.compare() on a fresh conversion: head 197 clean, each fault alone 198, zero ok->fail flips on any check of any document. The two landed together; the combination was bounded but not re-scored - 324 can only hold or stay failing. RANKING-TXT.csv is now stale and needs restamp_txt.py.",
+  "reasons": [
+   "verify_txt.py only, no engine change: a furniture key with no letter in it is not furniture (_furniture_key folds digits to '#', so 324's numeric table cells invented 18 owed and 1437 present - 66/1485 -> 48/48), and owed is now counted per drawn occurrence, not per page (gst-invoice-multipage-item-table draws 'Page N of 4' twice per page: 39/43 -> 43/43). Full 213 re-scored with the real verify_txt.compare() on a fresh conversion: head 197 clean, each fault alone 198, zero ok->fail flips on any check of any document. The two landed together; the combination was bounded but not re-scored - 324 can only hold or stay failing. RANKING-TXT.csv is now stale and needs restamp_txt.py."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "t12_word_invention": {
   "attempts": 2,
   "first_seen": null,

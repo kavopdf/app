@@ -2227,3 +2227,10 @@
 {"t": 1795407990.528923, "ist": "09:56:30", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795407991.170955, "ist": "09:56:31", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795407991.3114636, "ist": "09:56:31", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795409247.6326163, "ist": "10:17:27", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795409247.7667344, "ist": "10:17:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795409254.0365615, "ist": "10:17:34", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795409256.8500037, "ist": "10:17:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795411649.2811532, "ist": "10:57:29", "ev": "beat", "d": "relay: patching t09 furniture key + owed-per-occurrence"}
+{"t": 1795411812.061269, "ist": "11:00:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795411817.16814, "ist": "11:00:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
