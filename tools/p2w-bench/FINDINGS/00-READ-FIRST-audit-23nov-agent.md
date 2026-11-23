@@ -44,9 +44,24 @@ If a class list ranks the table checks high, it was built on the same misreading
 measured, and `isPageColour` now drops only fills within `PAGE_TOL` of the paper. Re-examining fill drops is
 finished work.
 
-**3. Some of this audit repeats an earlier one.** See the note at the top. Attempts 1, 4 and parts of 6 and 9
-restate what `AUDIT-pdf-to-word-deep-2nd-pass-23nov-agent.md` already says. **Only attempts 9 and 10's specific
-mechanisms, 5's `OcrHook`, 11's overrun, 13's census, 14's stamp pattern and 15's 76% are new.**
+**3. Almost all of this audit repeats work that already exists here, and only ONE attempt is new.** Checked by
+grepping this folder for each finding's subject:
+
+    attempt 5  OcrHook returns a String          ONLY my files mention OcrHook   <- new
+    attempt 11 BREAK_WHEN_UNFITTABLE / overrun   4 existing findings already       <- repeat
+               (18_displacement-ROWHEIGHT-CODE-MAP-142000-agentA,
+                itr-slab-the-squeeze-is-not-the-defect-1645, and two more)
+    attempt 13 the census / rewind               already known and used           <- repeat
+               (18_displacement-CENSUS-AND-TWO-INSTRUMENT-FAULTS-0015-relay)
+    attempt 14 the 04/25 mechanism               already measured, 127 docs       <- repeat
+               (04_chars_missing-25_invisible_text-TXBX-IS-RASTERISED-1750-agent)
+    attempts 1,4 writers / app layer             already in AUDIT-...-deep-2nd-pass <- repeat
+
+**And the existing findings are better: `TXBX-IS-RASTERISED` measured 127 documents re-converted with their
+`word/document.xml` read directly. This audit read source and ran almost nothing.**
+
+So: read attempt 5, and read `TXBX-IS-RASTERISED` and `CENSUS-AND-TWO-INSTRUMENT-FAULTS` instead of attempts 13
+and 14. The rest of this folder is context, not new work.
 
 ---
 
