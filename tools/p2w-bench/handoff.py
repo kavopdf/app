@@ -48,8 +48,41 @@ def load():
         return {"plan": "", "notes": [], "next": "", "agents": [], "run": {}, "history": []}
 
 
+# THE HANDOFF GREW WITHOUT A CEILING AND THE COST WAS THE RUN'S OWN TIME.
+#
+# Measured 23 Nov on the 19:57 run: 48 minutes total, of which 23.8 was a single silence that began
+# right after handoff.py ran. The 17:58 run showed the same shape - 20.3 minutes after report.py.
+# HANDOFF.json was 88,754 bytes and 78,270 of that was two lists that only ever grew: `notes` at 314
+# items and `agents` at 78. Every run appends; nothing ever trimmed. A run that reads 78 KB of history
+# spends a fifth of its budget doing it and then has time for one attempt - which is exactly what the
+# user kept seeing.
+#
+# So the lists are capped on the way out, and the overflow is APPENDED TO AN ARCHIVE, never dropped.
+# Nothing is lost: HANDOFF-ARCHIVE.jsonl holds every entry that leaves the live file, oldest first, one
+# JSON object per line. A run that needs older history greps the archive instead of reading all of it.
+KEEP_NOTES = 60      # several runs' worth of the running log
+KEEP_AGENTS = 24     # the last few runs' agents; older ones are in the archive
+ARCHIVE = os.path.join(HERE, "HANDOFF-ARCHIVE.jsonl")
+
+
+def _trim(d):
+    """Cap the two unbounded lists, moving the overflow into the archive rather than losing it."""
+    moved = []
+    for key, keep in (("notes", KEEP_NOTES), ("agents", KEEP_AGENTS)):
+        v = d.get(key)
+        if isinstance(v, list) and len(v) > keep:
+            over = v[:-keep]
+            d[key] = v[-keep:]
+            moved.extend({"_list": key, "_entry": e} for e in over)
+    if moved:
+        with open(ARCHIVE, "a", encoding="utf-8") as fh:
+            for e in moved:
+                fh.write(json.dumps(e, ensure_ascii=False) + "\n")
+    return d
+
+
 def save(d):
-    json.dump(d, open(JS, "w", encoding="utf-8"), indent=1)
+    json.dump(_trim(d), open(JS, "w", encoding="utf-8"), indent=1)
     render(d)
 
 
