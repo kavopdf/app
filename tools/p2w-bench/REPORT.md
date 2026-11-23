@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 03:30
+# Fixer report - 2026-11-24 04:20
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 03:30 → running IST · 27 min**
+**24 Nov 2026 · slot 04:20 → running IST · 18 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -16,19 +16,13 @@
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **27** of the **123** re-measured on this engine - **67** of the 190 scored are still on an older engine, and **30** were clean there |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **2** run(s) for the 67 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **29** of the **186** re-measured on this engine - **4** of the 190 scored are still on an older engine, and **29** were clean there |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **1** run(s) for the 4 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
 | Working on | `-` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 03:30 | **lead** | 0/None | guard charged 0.75pt/row for a rule an unruled table does not draw; patch saved to FINDINGS, cannot commit - regress refuses an unmeasured engine and p2w.py does not finish 212 docs in one sandbox com |
 
 ## The txt
 
@@ -42,17 +36,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-04` | what is settled, refuted and left as a patch on this | 04:38 | - | not recorded |
+| `18_dB-02` | if the table-top step were removed, which documents  | 04:38 | - | not recorded |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 03:30 → running · 27 min |
+| Slot window | 04:20 → running · 18 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 9 |
-| Longest silence | **7.9 min** — from 03:30:35, after `retrying corpus pass with checkpointing` |
-| Silences over 2 min | 5 |
+| Tool beats | 16 |
+| Longest silence | **7.1 min** — from 04:30:56, after `relay: full corpus pass (p2w --force)` |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -60,9 +57,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `######` |
-| report - the report and the chain | **10 min** | `########` |
-| other - not attributed to a tool | **8 min** | `#######` |
+| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `########` |
+| record - attempt, handoff, class rows | **1 min** | `##` |
+| report - the report and the chain | **3 min** | `#####` |
+| other - not attributed to a tool | **6 min** | `#######` |
 ## Best results this round
 
 | Document | Before | After | Change |

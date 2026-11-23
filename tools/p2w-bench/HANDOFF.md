@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 02:51 |
-| ended | 03:58 |
-| how it ended | forced |
+| started | 04:20 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -36,8 +36,6 @@ unfinished work, not as a result.
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 18_dtrheight-emitter-01 | 18_displacement | trheight-emitter | every place the engine emits trHeight/hRule, and whether 0.9634 belong | 10:08 | a unified diff and the list of emitters | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
-| 18_drow-growth-mechanism-01 | 18_displacement | row-growth-mechanism | given the real DocxWriter.java, which emitted number Google ignores wh | 10:09 | the mechanism with arithmetic, one recommended edit, and the rows it must not touch | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
 | 18_dA-05 | 18_displacement | A | consolidated every FINDINGS file and the two row emitters into one dos | 11:23 | 11:19 | landed | FINDINGS/18_displacement-PARTIAL-SPEND-REGRESSES-GOOGLE-1428-relay.md |
 | 18_dB-04 | 18_displacement | B | recomputed leverage from benchmarks/gverify/*.json without classpick.p | 11:23 | 11:20 | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
 | 18_dA-06 | 18_displacement | A | static map of every writer that emits w:trHeight and cell w:spacing, a | 13:57 | expected by 14:30 | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
@@ -60,16 +58,14 @@ unfinished work, not as a result.
 | 04_cB-02 | 04_chars_missing | B | is the missing-char multiset fully explained by anchored text boxes | 02:07 | landed | landed | FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md |
 | 18_dA-03 | 18_displacement | A | audit the pending gate: which of the 21 closable items are still true | 02:35 | 03:05 | landed | PENDING-AUDIT.md |
 | 18_dB-01 | 18_displacement | B | table block-top gap and per-row height in DocxWriter | 02:35 | 03:10 | landed | 18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md |
+| 18_dA-04 | 18_displacement | A | what is settled, refuted and left as a patch on this class | 04:38 | 10 min | landed | FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied) |
+| 18_dB-02 | 18_displacement | B | if the table-top step were removed, which documents become CLEAN | 04:38 | 10 min | landed | step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40 |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `00:25` attempt 17 on content-present-partly-displaced -> lead (0/13 moved)
-- `00:30` attempt 18 on content-present-partly-displaced -> lead (0/13 moved)
-- `01:42` attempt 3 on t12_word_invention -> lead (0/213 moved)
-- `01:43` attempt 6 on 00_page_count -> lead (0/213 moved)
 - `02:00` agent deployed: 18_displacement / A - which single failing Google check, if fixed, makes the most documents CLEAN
 - `02:00` agent deployed: 04_chars_missing / B - is the missing-char multiset fully explained by anchored text boxes on 9 docs
 - `02:07` agent deployed: 18_displacement / A - which single failing Google check, if fixed, makes the most documents CLEAN
@@ -91,6 +87,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `02:37` agent landed: 18_dA-03 /  -> PENDING-AUDIT.md
 - `02:37` agent landed: 18_dB-01 /  -> 18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md
 - `03:30` attempt 44 on 18_displacement -> lead
+- `04:38` agent deployed: 18_displacement / A - what is settled, refuted and left as a patch on this class
+- `04:38` agent deployed: 18_displacement / B - if the table-top step were removed, which documents become CLEAN
+- `04:38` agent landed: 18_displacement / A -> FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied)
+- `04:38` agent landed: 18_displacement / B -> step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40
 
 ## Where the rest of the state lives
 

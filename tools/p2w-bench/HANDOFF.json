@@ -2,22 +2,6 @@
  "plan": "",
  "notes": [
   {
-   "at": "05:29",
-   "text": "attempt 32 on 18_displacement -> lead"
-  },
-  {
-   "at": "06:11",
-   "text": "attempt 33 on 18_displacement -> lead"
-  },
-  {
-   "at": "06:15",
-   "text": "attempt 34 on 18_displacement -> lead"
-  },
-  {
-   "at": "06:17",
-   "text": "agent deployed: 18_d / residual-census - which current-engine documents fail 18_displacement, and what has FINDINGS alrea"
-  },
-  {
    "at": "06:17",
    "text": "agent deployed: 18_d / blast-radius - the exact writer rule for w:trHeight/w:hRule, what the row-pitch patch yields, a"
   },
@@ -240,34 +224,26 @@
   {
    "at": "03:30",
    "text": "attempt 44 on 18_displacement -> lead"
+  },
+  {
+   "at": "04:38",
+   "text": "agent deployed: 18_displacement / A - what is settled, refuted and left as a patch on this class"
+  },
+  {
+   "at": "04:38",
+   "text": "agent deployed: 18_displacement / B - if the table-top step were removed, which documents become CLEAN"
+  },
+  {
+   "at": "04:38",
+   "text": "agent landed: 18_displacement / A -> FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied)"
+  },
+  {
+   "at": "04:38",
+   "text": "agent landed: 18_displacement / B -> step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40"
   }
  ],
  "next": "NEXT RUN: (1) THE PREVIOUS PAIR IS REFUTED - do not spend a slot on it. content+rule==pitch and hRule=atLeast make a trHeight-only change a no-op, and a cell-level gap escapes fitPage/shaveToFit (FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md). (2) The class is two disjoint halves: a spacer half (the step at each table top = 0.784 x the declared w:line of an unspendable spacer, confirmed on 4 of 4 documents) and a row half (+0.75 pt per row, 21.75 pt over 362_price_list_dense's 29 rows). (3) FIRST MOVE: one Google round trip on 362_price_list_dense with trHeight = max(content, line-15) on rows where line > content only - LO-invariant by construction, and it tells you whether Google lays trHeight+rule or max(trHeight, content+rule). (4) The 4 ratchet rows need one corpus pass (~40 min) - start the slot with it, do not end with it. (5) The 9 REOPEN rows in PENDING-AUDIT.md are decisions with evidence attached.",
  "agents": [
-  {
-   "id": "18_dtrheight-emitter-01",
-   "class": "18_displacement",
-   "angle": "trheight-emitter",
-   "question": "every place the engine emits trHeight/hRule, and whether 0.9634 belongs on w:val under atLeast",
-   "expected": "a unified diff and the list of emitters",
-   "deployed": "10:08",
-   "status": "landed",
-   "finding": "FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md",
-   "deployed_at": "2026-11-22T04:38",
-   "landed_at": "2026-11-22T04:38"
-  },
-  {
-   "id": "18_drow-growth-mechanism-01",
-   "class": "18_displacement",
-   "angle": "row-growth-mechanism",
-   "question": "given the real DocxWriter.java, which emitted number Google ignores when it grows a row, and what natural height 19.10 pt is",
-   "expected": "the mechanism with arithmetic, one recommended edit, and the rows it must not touch",
-   "deployed": "10:09",
-   "status": "landed",
-   "finding": "FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md",
-   "deployed_at": "2026-11-22T04:39",
-   "landed_at": "2026-11-22T04:39"
-  },
   {
    "id": "18_dA-05",
    "class": "18_displacement",
@@ -531,12 +507,36 @@
    "finding": "18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md",
    "deployed_at": "2026-11-24T02:35",
    "landed_at": "2026-11-24T02:37"
+  },
+  {
+   "id": "18_dA-04",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "what is settled, refuted and left as a patch on this class",
+   "expected": "10 min",
+   "deployed": "04:38",
+   "status": "landed",
+   "finding": "FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied)",
+   "deployed_at": "2026-11-24T04:38",
+   "landed_at": "2026-11-24T04:38"
+  },
+  {
+   "id": "18_dB-02",
+   "class": "18_displacement",
+   "angle": "B",
+   "question": "if the table-top step were removed, which documents become CLEAN",
+   "expected": "10 min",
+   "deployed": "04:38",
+   "status": "landed",
+   "finding": "step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40",
+   "deployed_at": "2026-11-24T04:38",
+   "landed_at": "2026-11-24T04:38"
   }
  ],
  "run": {
-  "started": "02:51",
-  "ended": "03:58",
-  "ended_how": "forced"
+  "started": "04:20",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {
