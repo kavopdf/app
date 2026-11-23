@@ -2484,6 +2484,11 @@
 {"t": 1795426764.3729022, "ist": "15:09:24", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795426764.8099325, "ist": "15:09:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795426764.9210553, "ist": "15:09:24", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795427180.9661067, "ist": "15:16:20", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795427184.9905925, "ist": "15:16:24", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795429139.8807526, "ist": "15:48:59", "ev": "beat", "d": "relay: building the engine (build-engine.sh)"}
+{"t": 1795430090.1495748, "ist": "16:04:50", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795430117.0012152, "ist": "16:05:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795426772.3713477, "ist": "15:09:32", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795426772.590622, "ist": "15:09:32", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795426811.365923, "ist": "15:10:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
