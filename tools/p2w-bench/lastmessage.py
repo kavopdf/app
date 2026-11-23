@@ -43,13 +43,24 @@ def out_path(cron):
 # Rows of the Progress table that MUST equal report.py's own value. Everything else in the
 # message is the run's to write: the headline, the per-idea verdicts, why the silence
 # happened, the subagent durations. These are not.
+# THE LABELS ARE A CONTRACT WITH report.py, AND A RENAME USED TO SILENTLY DROP A ROW FROM
+# VERIFICATION. The loop below does `if label not in mine: continue`, so when report.py's "Exempt, not
+# measured" became "Exempt from the LibreOffice comparison", this list still named the old label, the
+# row was skipped, and the check went from 7 verified rows to 6 without saying anything. A checker
+# that quietly checks less is worse than one that fails.
+#
+# Two labels per row where a rename happened: the old name is kept so an older LAST-MESSAGE.md still
+# validates, and the new one is added so the row is verified again.
 BACKED_ROWS = (
     "documents improved this run",
     "documents improved, round total",
     "corpus improvement vs 15 nov",
     "regressions",
-    "exempt, not measured",
+    "exempt, not measured",                       # older reports
+    "exempt from the libreoffice comparison",     # report.py, 23 Nov
     "fixed to 99%",
+    "fixed - google, all 42 checks",
+    "not scored - page count did not match",
     "moved but still open",
     "classes solved",
     "committed",
@@ -132,9 +143,14 @@ def verify(text):
         return None, 0
     problems = []
     checked = 0
+    seen_any = False
     for label in BACKED_ROWS:
         if label not in mine:
+            # Two labels may name the same row across a rename, so a miss is only a problem when
+            # NEITHER of them is present. Anything else is a report that dropped a row it used to
+            # carry, and that must be said rather than skipped.
             continue
+        seen_any = True
         if label not in theirs:
             problems.append("%-38s in the message but report.py has no such row" % label)
             continue

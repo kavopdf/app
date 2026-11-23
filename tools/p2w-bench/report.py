@@ -173,13 +173,24 @@ def google_fixed():
     """
     import glob as _g
     now = engine_now()
-    fixed = scored = fixed_cur = scored_cur = 0
+    fixed = scored = fixed_cur = scored_cur = refused = 0
     for f in _g.glob(os.path.join(ROOT, "benchmarks", "gverify", "*.json")):
         try:
             j = json.load(open(f, encoding="utf-8"))
         except Exception:
             continue
         if j.get("status") == "page_count_refused":
+            # COUNTED, NOT SKIPPED. This used to `continue` without a word, and the effect was that
+            # 23 of 213 documents - 11% of the corpus - were absent from every headline number the
+            # report printed, with nothing anywhere saying so. They are absent because the page count
+            # did not match, which is a DEFECT (the user's own words: "original pdf me kai me sirf 1
+            # page hai jabki docs me 2 page hai"), so the skip hid exactly the failure it should have
+            # been loudest about: 041122-Account_Opening_Form drew 14 pages for 9,
+            # 05_round_company_seal_curved_text 2 for 1, 305_vaccination_certificate 2 for 1.
+            #
+            # Such a document cannot be compared line by line, so it still does not enter `scored` -
+            # but the count comes back to the caller, which prints it as its own row.
+            refused += 1
             continue
         scored += 1
         ok = not (j.get("failed") or [])
@@ -189,7 +200,7 @@ def google_fixed():
             scored_cur += 1
             if ok:
                 fixed_cur += 1
-    return fixed, scored, fixed_cur, scored_cur
+    return fixed, scored, fixed_cur, scored_cur, refused
 
 
 
@@ -301,10 +312,11 @@ def corpus():
     # this field was the only one available, and the fixer then copied it into a sentence about the
     # corpus. Both numbers are reported now, each under the name that says what it counts.
     corpus_total = len(c)
-    _gf, _gs, _gfc, _gsc = google_fixed()
+    _gf, _gs, _gfc, _gsc, _grf = google_fixed()
     return {"available": True, "docs": corpus_total, "compared": len(common),
-            "google_fixed": _gf, "google_scored": _gs,
-              "google_fixed_current": _gfc, "google_scored_current": _gsc,
+                "google_fixed": _gf, "google_scored": _gs,
+                  "google_fixed_current": _gfc, "google_scored_current": _gsc,
+                "google_refused": _grf,
             "fixed": len(fixed), "moved_open": len(moved_open),
             "still_open": len([k for k in common if c[k] > FIXED_BAR]),
             "baseline_mean": round(bm, 2), "current_mean": round(cm, 2),
@@ -929,7 +941,13 @@ def main(argv):
         L.append("| Regressions | %s |"
                  % ("**none**" if not co["regressed"] else "**%d** — %s"
                     % (co["regressed"], ", ".join(x["doc"] for x in best[:3]) or "see RANKING.csv")))
-        L.append("| Exempt, not measured | **%d** — %s |" % (len(_exempt()), ", ".join(_exempt()) or "none"))
+        # "Not measured" was true of one population and false of the other: this document is exempt
+        # from the LibreOffice comparison (212 of the 213) and IS in the Google population (190 of
+        # 213). Said without the qualifier, the row contradicted the Google row two lines below it -
+        # one line calling the document unmeasured, the next counting it. The user's rule is that the
+        # corpus total must be the same number everywhere; when it cannot be, each number must say
+        # which population it counts.
+        L.append("| Exempt from the LibreOffice comparison | **%d** — %s |" % (len(_exempt()), ", ".join(_exempt()) or "none"))
         # GOOGLE FIRST. The user's rule: a document is fixed when it matches the original in
         # Google's render at 99% or better. The LibreOffice count is a proxy and is labelled as one,
         # because LibreOffice draws what Google drops and 32-vs-7 on the same corpus is not a rounding
@@ -951,6 +969,20 @@ def main(argv):
         # SAME MIXED DENOMINATOR. `fixed` is also counted over `common` (212), not the corpus (213).
         L.append("| Fixed - LibreOffice proxy | %d of the %d compared - a renderer the user does not open |"
                  % (co.get("fixed", 0), co.get("compared") or co.get("docs", 0)))
+        # THE DOCUMENTS THE HEADLINE CANNOT SCORE, SAID OUT LOUD. These are excluded from
+        # every number above because the page count did not match, and a page count that does
+        # not match is a defect, not a pass. Skipping them silently made 11% of the corpus
+        # invisible and made the headline read better than the corpus is.
+        if co.get("google_refused"):
+            # The denominator is the population gverify actually saw - scored plus refused - and not
+            # `docs`, which is the LibreOffice-compared corpus (212, one document exempt). Using 212
+            # would pair a Google count with a LibreOffice total, which is the mixed denominator this
+            # function was rewritten to stop.
+            _seen = (co.get("google_scored") or 0) + (co.get("google_refused") or 0)
+            L.append("| Not scored - page count did not match | **%d** of the %d gverify saw - a "
+                     "document that drew the wrong number of pages cannot be compared line by line, "
+                     "and it is a defect, not a pass |"
+                     % (co.get("google_refused", 0), _seen))
         L.append("| Moved but still open | **%d** — improved, not fixed |" % co.get("moved_open", 0))
     else:
         L.append("| Corpus improvement | not measurable — %s |" % co.get("why"))
