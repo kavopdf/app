@@ -26,8 +26,8 @@
 | | |
 |:--|:--|
 | Scored | **213** of 213 |
-| Clean - every applicable check passes | **197** (92.5%) |
-| Failing at least one check | **16** |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
@@ -125,7 +125,8 @@ One subagent, deployed in the first ten minutes with the merge as its problem an
 documents to prove it on. It returned the patch, the corpus-wide byte comparison and the LibreOffice
 table, and it found that `pageBody()` already carried the merge - the correction above is its work plus
 this run's Google measurement. It ran inline (21 min) rather than in the background, which is where a
-third of the slot went.
+third of the slot went; the second agent was never deployed, which is the shortfall the release guard
+correctly refused.
 
 `GOOGLEDRIVE_DOWNLOAD_FILE` no longer returns `downloaded_file_content.s3url`; it returns
 `artifacts[0].workspace_path`, a local path. `gverify.py --collect <name> <s3url>` expects a URL, so

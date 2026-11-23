@@ -29,8 +29,8 @@
 | | |
 |:--|:--|
 | Scored | **213** of 213 |
-| Clean - every applicable check passes | **197** (92.5%) |
-| Failing at least one check | **16** |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
