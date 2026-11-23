@@ -982,7 +982,7 @@ def main(argv):
         _gsc = co.get("google_scored_current", 0)
         _gs = co.get("google_scored", 0)
         _to_go = max(0, _gs - _gsc)
-        L.append("| **Fixed - Google, all 42 checks** | **%d** of the **%d** re-measured on this "
+        L.append("| **Fixed - Google, every applicable check** | **%d** of the **%d** re-measured on this "
                  "engine - **%d** of the %d scored are still on an older engine, and **%d** were "
                  "clean there |"
                  % (_gfc, _gsc, _to_go, _gs, co.get("google_fixed", 0)))
