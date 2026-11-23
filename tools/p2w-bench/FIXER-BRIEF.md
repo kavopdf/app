@@ -1058,6 +1058,30 @@ The user's instruction, 20 Nov, in his words:
 > rahe aur jaruri nhi easy class hee choose kare ... class choose karne ki priority set karo jisme
 > sabse jyada documents fix karna ho aur classes ka selection rotation based ho"
 
+### READ THE AUDIT BEFORE THE GAPS
+
+`FINDINGS/AUDIT-pdf-to-word-deep-23nov-agent.md` — a read-only pass over the engine and the instrument. Two
+things in it are worth more than any class:
+
+**One bad page kills the whole document.** `PdfToWord.java:830` calls `readPage` inside the page loop with no
+try/catch. If page 7 of 100 throws, pages 1-6 are discarded, 8-100 are never read, and the user gets an error
+instead of 99 pages. It does not crash — `ToolsActivity.kt:582` catches `Throwable` — so this is not a
+stability bug, it is total loss on a malformed page. **The infrastructure already exists**: `report.skippedPages`
+(PdfToWord:749) is incremented at :1013 and `ToolsActivity` already reports it. The whole fix is a catch that
+increments that counter and continues. **This is the smallest change with the clearest proof in the repo.**
+
+**The instrument cannot see structure.** 50 named checks, 42-47 applied per document, and not one reads
+`numPr`, `headerReference`, `fontTable`, `embedRegular`, `abstractNum` or `footnoteReference` — all zero. Every
+check compares the render to the source. That is a sound primary measure and it is why the four gaps below are
+invisible: a list drawn as an indent renders identically to a list, a header repeated as body text renders
+identically to a header, a font named but not embedded renders identically on the machine that has the font.
+
+Three checks that do read the `.docx` measure the wrong thing: `53_embedded_faces` compares font *families*,
+`38_list_markers` checks marker *text*, `44_header_footer` checks band *text*. Adding three structural checks
+would put the four gaps into the rotation. **It was deliberately not done** — a 43rd check changes the
+catalogue, leaves every existing `gverify` result short of it, and forces a full re-measure. That blast radius
+is your call to make, and it should be made knowingly.
+
 ### BEFORE YOU PICK A CLASS: four architectural gaps the table cannot show you
 
 Read `FINDINGS/ARCHITECTURAL-GAPS-font-embedding-numbering-footnotes-0923-agent.md` once. It is measured,
