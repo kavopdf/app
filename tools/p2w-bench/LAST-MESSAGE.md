@@ -1,5 +1,3 @@
-
-  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
 **23 Nov 2026 · slot 05:58 → 06:18 IST · 19 min**
