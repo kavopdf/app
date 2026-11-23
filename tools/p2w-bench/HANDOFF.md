@@ -19,18 +19,20 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 19:57 |
+| started | 20:54 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> 18_displacement: the trHeight-absorb construct (trHeight=pitch-20tw + tcMar bottom) was applied, built and measured in Google on 2 documents - tnhr 46/47->46/47, mobile-bill 46/47->46/47, same check, nothing clean. Independent PyMuPDF geometry: the patch halves the drift ramp (16.25->8.38 pt, table span 495->482 vs source 478) but the first line of the block sits at -10.16 pt in BOTH renders and mobile-bill at -15.75, so the residual 18_displacement is a per-document TOP-OF-BLOCK OFFSET that no row construct can touch. LO cost of the patch confirmed by two agents (30-36 share@5 on four documents). Reverted, no engine change landed.
+> 18_displacement, 20:54 run, nine live Google renders of table-with-no-header-row: HEAD reads median dy -0.54 pt, rms 1.25 pt, so the -10.16 pt top-of-block offset below IS NOT PRESENT on this engine and that lead is retired. What remains is the row pitch: HEAD declares 360/360/380 twips (atLeast) and Google renders 18/19/20 pt against the page's uniform 18.40, ending 495 pt tall on a 478 pt table. Google DOES honour w:trHeight (600tw -> 30/31 pt, two pages) but quantises the rendered pitch to whole points (352tw->18.0, 354/356tw->19.0, 368tw->19.5), so 18.40 is not on the grid. A dithered 352/354 pattern (2 in 5) reaches span 476 of 478 and still loses the baselines (med dy -9.79): the cell w:before has to be rewritten from the rendered height. See FINDINGS/18_displacement-ROWPITCH-NINE-RENDERS-2054-fixer.md.
+
+> 18_displacement, previous run: the trHeight-absorb construct (trHeight=pitch-20tw + tcMar bottom) was applied, built and measured in Google on 2 documents - tnhr 46/47->46/47, mobile-bill 46/47->46/47, same check, nothing clean. Independent PyMuPDF geometry: the patch halves the drift ramp (16.25->8.38 pt, table span 495->482 vs source 478) but the first line of the block sits at -10.16 pt in BOTH renders and mobile-bill at -15.75, so the residual 18_displacement is a per-document TOP-OF-BLOCK OFFSET that no row construct can touch. LO cost of the patch confirmed by two agents (30-36 share@5 on four documents). Reverted, no engine change landed.
 
 ## What the next run should do first
 
-> 18_displacement: stop spending attempts on row pitch - measure the top of the block. The leading paragraph carries its vertical position in w:spacing w:before=1040 + w:line=13 exact, and the Google column of GVERIFY-BRIEF lists w:spacing as ignored. Build one variant that carries the same position WITHOUT w:spacing (exact-height empty paragraph, or w:ind/w:framePr), round trip table-with-no-header-row, and read the first line's dy: it is -10.16 now, and if it does not move the carrier is not the spacing. Then repeat on mobile-bill (-15.75).
+> 18_displacement: do NOT re-measure the top of the block - HEAD's median dy is -0.54 pt and rms 1.25 pt, the -10.16 pt offset is gone. Take the dithered row-height construct from FINDINGS/18_displacement-ROWPITCH-NINE-RENDERS-2054-fixer.md (352 twips on three rows in five, 354 on two, giving the page's 18.40 pt average) and add the missing half: rewrite each cell paragraph's w:before from the RENDERED row height instead of the declared one. Round trip table-with-no-header-row and read dy.py: the target is median dy inside +-1 pt with n_out under 11 of 215. If the baselines come back, that construct is worth an engine change and a corpus pass; if they do not, the dither is geometry theatre and the class needs a different carrier.
 
 ## Agents deployed and not yet accounted for
 
@@ -120,7 +122,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `06:17` agent landed: 18_dresidual-census-01 /  -> FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - 58 of 213 Google results are on the current engine (98be7c3c); 24 fail 18_displacement, only 2 fail it alone (16_right_aligned_amounts_txtpos, 31_times_body_arial_headings); the 16-document solo population is stamped 462353f9, not current. Killed the row-pitch lead before a round trip was spent.
 - `06:17` agent landed: 18_dblast-radius-01 /  -> FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build.
 - `06:17` agent landed: 18_dB-05 /  -> ANSWERED: the 18.5 pt rung does not exist. The laid pitch ladder is laid = 0.75*(round(declared/0.75)+1), so laid pitch is always a multiple of 0.75 pt and 18.5 is not on it; the nearest rung to an 18.40 pt source is 18.75. No declaration lands 18.5, so this question is closed rather than answered with a value. See FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md.
 - `07:36` attempt 35 on 18_displacement -> lead
@@ -145,6 +146,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `20:44` attempt 40 on 18_displacement -> reverted (0/16 moved)
 - `20:44` agent deployed: 18B-01 / 18_displacement - B
 - `20:45` two agents landed and recorded: 18A-01 LO proxy verdict, 18B-01 trHeight cross-renderer
+- `21:29` attempt 41 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 

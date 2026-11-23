@@ -1,22 +1,5 @@
 [
  {
-  "started_ts": 1795192024.3831508,
-  "started": "21:57",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "t01_word_accuracy",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   "t01_ToUnicode CMap destination-01",
-   "t01_adversarial patch review-01"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795195472.5423703,
   "started": "22:54",
   "ended_ts": null,
@@ -1157,6 +1140,17 @@
  {
   "started": "14:27",
   "started_ts": 1795444038.4937537,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "15:24",
+  "started_ts": 1795447494.157425,
   "ended": "(never)",
   "ended_ts": null,
   "attempts": 0,

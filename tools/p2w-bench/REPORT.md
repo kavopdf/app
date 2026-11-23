@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-23 19:57
+# Fixer report - 2026-11-23 20:54
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 19:57 → running IST · 48 min**
+**23 Nov 2026 · slot 20:54 → running IST · 35 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -28,7 +28,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 20:44 | **reverted** | 0/16 | trHeight-absorb (agent B construct) applied, built, 4 live Google round trips: tnhr 46/47->46/47 and mobile-bill 46/47->46/47, same check; independent PyMuPDF shows the patch halves the drift ramp 16. |
+| 21:29 | **lead** | 0/0 | nine live Google renders of table-with-no-header-row: Google honours w:trHeight (600tw->30/31pt) and quantises the rendered row pitch to whole points (352tw->18.0, 354/356tw->19.0, 368tw->19.5); the 1 |
 
 ## The txt
 
@@ -42,20 +42,17 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18A-01` | is the LO regression on the spacer+trHeight patch a  | 20:15 | - | not recorded |
-| `18B-01` | is there a construct that gives Google the row pitch | 20:44 | - | not recorded |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 19:57 → running · 48 min |
+| Slot window | 20:54 → running · 35 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 22 |
-| Longest silence | **23.8 min** — from 20:15:19, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 2 |
+| Tool beats | 11 |
+| Longest silence | **25.3 min** — from 20:55:15, after `report.py: building the report` |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -63,10 +60,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **42 min** | `###################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **25 min** | `################` |
+| record - attempt, handoff, class rows | **4 min** | `###` |
 | report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **4 min** | `##` |
+| other - not attributed to a tool | **5 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |
