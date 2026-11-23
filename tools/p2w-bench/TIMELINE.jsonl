@@ -2038,3 +2038,16 @@
 {"t": 1795391005.496649, "ist": "05:13:25", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795391005.5153973, "ist": "05:13:25", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1795391981.27238, "ist": "05:29:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795391983.941457, "ist": "05:29:43", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795391984.0091987, "ist": "05:29:44", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795391984.110348, "ist": "05:29:44", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795391985.7772064, "ist": "05:29:45", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795391994.896256, "ist": "05:29:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795392007.8640785, "ist": "05:30:07", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795392008.364074, "ist": "05:30:08", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795392008.6555607, "ist": "05:30:08", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795392009.1776562, "ist": "05:30:09", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795392017.9755766, "ist": "05:30:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795392018.5065508, "ist": "05:30:18", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795392018.813012, "ist": "05:30:18", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795392019.41875, "ist": "05:30:19", "ev": "beat", "d": "report.py: building the report"}

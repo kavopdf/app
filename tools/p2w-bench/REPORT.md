@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 04:56 → running IST · 16 min**
+**23 Nov 2026 · slot 04:56 → 05:13 IST · 16 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,7 +20,7 @@
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `00_page_count` |
+| Working on | `18_displacement` |
 
 ## What was tried
 
@@ -40,15 +40,18 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `00_pA-01` | from the committed gverify JSONs and CENSUS.csv, how | 05:13 | 23:43 | 0 min |
+| `00_pB-01` | re-measure every claim of the page-count finding fro | 05:13 | 23:43 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 04:56 → running · 16 min |
+| Slot window | 04:56 → 05:13 · 16 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 17 |
+| Tool beats | 27 |
 | Longest silence | **9.1 min** — from 05:00:24, after `agent B landed: 12 docs fail 18_displacement alone; fetching corpus` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |

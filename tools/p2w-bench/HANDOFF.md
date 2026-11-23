@@ -112,7 +112,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:27` attempt 13 on 18_displacement -> lead (3/4 moved)
 - `12:06` attempt 15 on content-present-partly-displaced -> lead (1/16 moved)
 - `13:12` attempt 14 on 18_displacement -> lead (0/1 moved)
 - `13:29` attempt 15 on 18_displacement -> lead (0/1 moved)
@@ -137,6 +136,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `05:13` agent deployed: 00_page_count / B - re-measure every claim of the page-count finding from the exported PDFs and docx
 - `05:13` agent landed: 00_page_count / A -> FINDINGS/18disp-prize-sizing-agentA.md
 - `05:13` agent landed: 00_page_count / B -> FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md
+- `05:29` attempt 32 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 
