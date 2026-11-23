@@ -1,8 +1,8 @@
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 15:02 → running IST · 1h 33m**
+**23 Nov 2026 · slot 15:02 → running IST · 1h 34m**
 
-> The column-page shape merge is committed (`0be925ff`). The attempt is recorded **partial** - 2 of 23 moved - because the table this report ranks by cannot see this construct at all.
+> The column-page shape merge is committed (`b7699196`). The attempt is recorded **partial** - 2 of 23 moved - because the table this report ranks by cannot see this construct at all.
 
 ## Progress
 
@@ -13,7 +13,7 @@
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, all 42 checks** | **0** of the **0** re-measured on this engine - **190** of the 190 scored are still on an older engine, and **30** were clean there |
+| **Fixed - Google, every applicable check** | **0** of the **0** re-measured on this engine - **190** of the 190 scored are still on an older engine, and **30** were clean there |
 | Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 190 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
@@ -39,28 +39,33 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `00_pA-02` | which construct costs 350_question_paper its second  | 16:37 | - | not recorded |
+| `gverB-01` | why gverify --collect cannot read the download resul | 16:37 | - | not recorded |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 15:02 → running · 1h 33m |
+| Slot window | 15:02 → running · 1h 34m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 30 |
-| Longest silence | **7.1 min** — from 16:02:53, after `attempt 1: measuring the patched corpus, call 1` |
-| Silences over 2 min | 19 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 51 |
+| Longest silence | **6.1 min** — from 15:28:54, after `attempt 1: forced rebuild of 213 on the patched tree, call 1` |
+| Silences over 2 min | 18 |
+| Obstacles | 2 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | `health.py --stalled` exits 0 and the fix row reads moving, 1 attempt(s) in the last 3 h, stage age 1.2 h. `st |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **37 min** | `#########` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **53 min** | `#############` |
+| build - compiling the engine | **3 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **16 min** | `####` |
+| record - attempt, handoff, class rows | **3 min** | `#` |
+| report - the report and the chain | **12 min** | `###` |
+| other - not attributed to a tool | **58 min** | `##############` |
 ## Best results this round
 
 | Document | Before | After | Change |

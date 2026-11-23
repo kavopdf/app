@@ -7,7 +7,10 @@
  "attempts": 1,
  "kept": 0,
  "docs_improved": 0,
- "agents": [],
+ "agents": [
+  "00_pA-02",
+  "gverB-01"
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0,
  "partial": 1

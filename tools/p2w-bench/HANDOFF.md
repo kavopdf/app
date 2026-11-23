@@ -110,16 +110,14 @@ unfinished work, not as a result.
 | 18_dblast-radius-01 | 18_d | blast-radius | the exact writer rule for w:trHeight/w:hRule, what the row-pitch patch | 06:17 | a blast-radius list and a verdict on whether the 18.5 pt rung is worth a Google round trip | landed | FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build. |
 | A118_displacement-01 | A1 | 18_displacement | writer-construct | 13:21 | Which single .docx writer construct causes the 18_displacement failures that 13+ documents fail alone, and which documents go CLEAN if fixed | running |  |
 | B160_text_column_right_edge-01 | B1 | 60_text_column_right_edge | right-edge+shape_anchor | 13:21 | Is 60_text_column_right_edge the same construct as 59_shape_anchor (they travel together) and what minimal writer change clears both | running |  |
+| 00_pA-02 | 00_page_count | A | which construct costs 350_question_paper its second page in Google - i | 16:37 | a charged line in DocxWriter and one general rule | landed | tools/p2w-bench/FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md |
+| gverB-01 | gverify | B | why gverify --collect cannot read the download result the Drive tool r | 16:37 | a fix with a test | landed | tools/p2w-bench/FINDINGS/gverify-COLLECT-DOWNLOAD-SHAPE-1120-agent.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `00:39` attempt 26 on 18_displacement -> reverted (0/16 moved)
-- `02:31` attempt 29 on 18_displacement -> kept
-- `04:08` attempt 30 on 18_displacement -> lead
-- `04:09` attempt 31 on 18_displacement -> kept
 - `05:09` attempt 2 on 00_page_count -> lead (0/23 moved)
 - `05:13` agent deployed: 00_page_count / A - from the committed gverify JSONs and CENSUS.csv, how many documents does clearin
 - `05:13` agent deployed: 00_page_count / B - re-measure every claim of the page-count finding from the exported PDFs and docx
@@ -141,6 +139,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:03` attempt 36 on 18_displacement -> reverted
 - `14:03` agent landed: 18_displacement / A -> FINDINGS/18_displacement-PARTIAL-SPEND-REGRESSES-GOOGLE-1428-relay.md
 - `16:35` attempt 5 on 00_page_count -> partial (2/23 moved)
+- `16:37` agent deployed: 00_page_count / A - which construct costs 350_question_paper its second page in Google - it has 1 dr
+- `16:37` agent deployed: gverify / B - why gverify --collect cannot read the download result the Drive tool returns now
+- `16:37` agent landed: 00_pA-02 /  -> tools/p2w-bench/FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md
+- `16:37` agent landed: gverB-01 /  -> tools/p2w-bench/FINDINGS/gverify-COLLECT-DOWNLOAD-SHAPE-1120-agent.md
 
 ## Where the rest of the state lives
 
