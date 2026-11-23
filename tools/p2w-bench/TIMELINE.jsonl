@@ -2693,3 +2693,4 @@
 {"t": 1795442882.6911376, "ist": "19:38:02", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795442883.2936525, "ist": "19:38:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795442883.4543219, "ist": "19:38:03", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795442938.1702862, "ist": "19:38:58", "ev": "beat", "d": "attempt.py: recording an attempt"}
