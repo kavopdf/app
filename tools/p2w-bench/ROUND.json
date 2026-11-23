@@ -1,11 +1,9 @@
 {
   "baseline_started": 1795361683.041859,
   "classifier_started": 0,
-  "fixer_doing": "recording attempt",
-  "fixer_doing_since": 1795438983.6411421,
   "fixer_engine_at_claim": "b7699196",
   "fixer_last_beat": 1795438983.6411428,
-  "fixer_started": 1795439091.229051,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
