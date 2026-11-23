@@ -1,24 +1,5 @@
 [
  {
-  "started_ts": 1795256939.3584,
-  "started": "15:58",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "32_stroke_lines",
-  "attempts": 2,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   "32_sA-01",
-   "t02_B-01",
-   "t08_B-01"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "partial": 1,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795267857.3149703,
   "started": "19:00",
   "ended_ts": null,
@@ -1084,5 +1065,22 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795474216.7513058,
+  "started": "04:20",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "00_page_count",
+  "attempts": 1,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   "18_dA-04",
+   "18_dB-02"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

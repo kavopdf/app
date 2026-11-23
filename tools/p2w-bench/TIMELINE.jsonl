@@ -3382,3 +3382,10 @@
 {"t": 1795475325.2484133, "ist": "04:38:45", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795475325.361785, "ist": "04:38:45", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795475345.9466414, "ist": "04:39:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795475348.9706867, "ist": "04:39:08", "ev": "attempt", "d": "00_page_count -> lead"}
+{"t": 1795475349.0394464, "ist": "04:39:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795475349.1478384, "ist": "04:39:09", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795475353.3212214, "ist": "04:39:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795475364.7406044, "ist": "04:39:24", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795475364.806837, "ist": "04:39:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795475364.8207572, "ist": "04:39:24", "ev": "killed", "d": "dead claim cleared by force release"}

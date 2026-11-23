@@ -20,8 +20,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 04:20 |
-| ended | still running |
-| how it ended | - |
+| ended | 04:39 |
+| how it ended | forced |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -66,7 +66,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `02:00` agent deployed: 18_displacement / A - which single failing Google check, if fixed, makes the most documents CLEAN
 - `02:00` agent deployed: 04_chars_missing / B - is the missing-char multiset fully explained by anchored text boxes on 9 docs
 - `02:07` agent deployed: 18_displacement / A - which single failing Google check, if fixed, makes the most documents CLEAN
 - `02:07` agent deployed: 04_chars_missing / B - is the missing-char multiset fully explained by anchored text boxes
@@ -91,6 +90,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `04:38` agent deployed: 18_displacement / B - if the table-top step were removed, which documents become CLEAN
 - `04:38` agent landed: 18_displacement / A -> FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied)
 - `04:38` agent landed: 18_displacement / B -> step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40
+- `04:39` attempt 7 on 00_page_count -> lead
 
 ## Where the rest of the state lives
 
