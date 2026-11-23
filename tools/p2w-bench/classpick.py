@@ -410,26 +410,34 @@ def _pick(fmt, rot, dead):
 
 
 def _pending():
-    """(count, first three lines) from pending.py, or (0, "") when the gate is clear.
+    """(actionable, decision_needed, first few actionable) from pending.py.
 
-    Run as a subprocess rather than imported, for the same reason round.py does it: pending.py is the
-    single authority on what is outstanding, and a second copy of that logic here is how two answers to
-    one question start.
+    ACTIONABLE, NOT TOTAL. pending.py lists 81 items on 23 Nov and 59 of them are blockers whose own
+    "can I fix it" column begins with "no" - they need a decision, not a patch. A gate that waited for
+    all 81 would never open, which is worse than no gate at all. The 22 the fixer can actually close are
+    what must be cleared first: the dead agents, the ratchets, and the blockers that carry a real action.
+
+    Run as a subprocess with --json rather than reimplementing pending.py's rules: pending.py is the single
+    authority on what is outstanding, and a second copy of that logic is how two answers to one question
+    start.
     """
-    import subprocess
+    import subprocess, json as _json
     try:
-        r = subprocess.run([sys.executable, os.path.join(HERE, "pending.py")],
-                           capture_output=True, text=True, timeout=60)
-        out = (r.stdout or "")
-        import re
-        m = re.search(r"PENDING \((\d+)\)", out)
-        if not m:
-            return 0, ""
-        n = int(m.group(1))
-        body = [l.strip() for l in out.split("\n")[1:] if l.strip()][:4]
-        return n, " | ".join(body)
+        r = subprocess.run([sys.executable, os.path.join(HERE, "pending.py"), "--json"],
+                           capture_output=True, text=True, timeout=90)
+        d = _json.loads(r.stdout)
+        items = d.get("pending") or []
     except Exception:
-        return 0, ""
+        return 0, 0, ""
+    act, dec = [], 0
+    for it in items:
+        why = (it.get("why") or "").lower()
+        if it.get("kind") == "blocker" and why.startswith("can i fix it: no"):
+            dec += 1
+        else:
+            act.append(it)
+    head = " | ".join("%s %s" % (i.get("kind"), i.get("who")) for i in act[:3])
+    return len(act), dec, head
 
 
 def decide():
@@ -459,11 +467,12 @@ def decide():
     # outstanding - 72 blockers, 5 ratchets, 4 agents that died 550-700 minutes ago without a finding -
     # while every run went to a class. The user asked for the list to be cleared first. A rule in a brief
     # is not a mechanism, which is the same sentence this file already carries about the alternation.
-    _np, _nw = _pending()
+    _np, _nd, _nw = _pending()
     if _np > 0:
         return (None,
-                "PENDING FIRST: %d item(s) outstanding - take them in the order pending.py gives before "
-                "any new class. %s" % (_np, _nw),
+                "PENDING FIRST: %d item(s) you can close - take them in the order pending.py gives before "
+                "any new class. (%d more need a decision and do not block you.) %s"
+                % (_np, _nd, _nw),
                 rot)
     fmt = rot.get("next") or "docx"
     if fmt not in ("docx", "txt"):
