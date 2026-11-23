@@ -1,8 +1,8 @@
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 15:02 → running IST · 1h 34m**
+**23 Nov 2026 · slot 15:02 → 16:38 IST · 1h 36m**
 
-> The column-page shape merge is committed (`b7699196`). The attempt is recorded **partial** - 2 of 23 moved - because the table this report ranks by cannot see this construct at all.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
@@ -48,9 +48,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 15:02 → running · 1h 34m |
+| Slot window | 15:02 → 16:38 · 1h 36m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 51 |
+| Tool beats | 55 |
 | Longest silence | **6.1 min** — from 15:28:54, after `attempt 1: forced rebuild of 213 on the patched tree, call 1` |
 | Silences over 2 min | 18 |
 | Obstacles | 2 cleared · 1 parked, with the evidence to re-open them |
@@ -64,8 +64,8 @@
 | build - compiling the engine | **3 min** | `#` |
 | measure or build - a conversion, screen or compile writes no beacon | **16 min** | `####` |
 | record - attempt, handoff, class rows | **3 min** | `#` |
-| report - the report and the chain | **12 min** | `###` |
-| other - not attributed to a tool | **58 min** | `##############` |
+| report - the report and the chain | **13 min** | `###` |
+| other - not attributed to a tool | **58 min** | `#############` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -84,52 +84,3 @@
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-## What this run actually did - in prose, because the tables cannot say it
-
-**The column-page shape merge is committed (`0be925ff`).** A page-positioned shape reached from
-inside the column/table pass was written as a paragraph of its own; Google rasterises the shape, keeps
-the paragraph, and bills it ~0.83 pt of flow because it does not honour `w:line="1" exact`. The shapes
-now collect in `Ctx.shapeCarrier` and go out as one paragraph per page. This is the second half of a
-fix whose `pageBody()` half landed at `5beb8b9d`.
-
-**Proved on the document XML, not on a tool this run edited:**
-
-| document | paragraphs before | after | drawings |
-|:--|--:|--:|:--|
-| `361_product_catalogue_grid` | 124 | **40** | 91 -> 91 |
-| `401_trifold_brochure` | 52 | **27** | 26 -> 26 |
-| `301_lab_report_panel` | 85 | 85 | 108 -> 108 (already merged by `pageBody`) |
-| `350_question_paper` | 70 | 70 | 1 -> 1 (not this mechanism) |
-
-The last two rows are the control: a document already fixed is not fixed twice, and the one the
-mechanism does not explain is untouched.
-
-**Why the attempt reads `partial` and not `kept`.** The outcome rule wants a quarter of the class
-(6 of 23); the evidence for this construct is 2 documents in Google, measured on this engine by the
-04:47 run: `361` 2 pages -> 1 at 41/42, and `375` 2 pages -> 1 at 35/42 -> 37/42 with no check that
-passed before failing now. **Zero documents move in the table this report ranks by, and that is the
-finding, not a failure:** LibreOffice honours the exact line rule and Google does not, so the proxy is
-blind to this construct by construction. The corpus pass buys the other half of the claim - the 21
-changed documents are neutral in LibreOffice and nothing else in the corpus moved, so this cannot
-regress anything the proxy can measure. 22 of the 23 page-count-refused documents were scoring **zero
-of 42 known checks** and are now measurable.
-
-**Four instrument defects blocked the last two runs, all fixed here, each with a finding:**
-
-| defect | what it did |
-|:--|:--|
-| `p2w.py --force` read `REPO`'s `PdfToWord.class`, not `ENGINE_SRC`'s | a corpus pass on a patched tree skipped all 213 as fresh - cost this run 22 minutes and a corpus that described the wrong engine. Found by reading the `.docx`, not the run's own log |
-| `measure_gate.py` `expected_docs()` ignored `EXEMPT.json` | demanded 213 rows from the 212-row table `gate.py` publishes -> `NOT READY` on its own publisher's honest table |
-| `regress.py --stamp` against the pre-commit hook | a deadlock: the hook wants the stamp, the stamp wants the commit. **No engine change could land at all** |
-| `gverify.py --collect` expected `downloaded_file_content.s3url` | the tool returns `artifacts[0].workspace_path` now, so the Google cron collected **nothing**; accepts both shapes, 12 passing tests |
-
-**Subagents.** Two, both landed: one charged `350_question_paper`'s remaining refusal to `picture()`
-lines 2542-2564 - an unplaced picture emitted `<wp:inline>` in a paragraph with no `w:pPr`, so it
-inherits `sz=22` and `w:after=120` from the document defaults and `spacingTw()` cannot see it; its
-patch is committed **uncompiled**. The other fixed `gverify --collect` with tests.
-
-**Left for the next run.** `041122-Account_Opening_Form` in Google (2464 drawing-only paragraphs, nine
-pages, the worst score in the corpus at 98.65) is the scale test for the carrier and was not measured.
-`350_question_paper`'s patch needs compiling. `gate.py` cannot forward `--force` to `p2w.py`, so after
-an engine change it re-measures the old `.docx` - the workaround is `p2w.py --force` first.
