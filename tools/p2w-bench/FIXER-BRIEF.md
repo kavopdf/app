@@ -1130,53 +1130,6 @@ the numbers once. That is the cost of starting. Paying it and then doing one att
 **If the engine is genuinely blocked** - the gate refuses, the class list is empty, Drive is down - say so
 with the evidence and release. That is a run that finished. One attempt and a report is a run that stopped.
 
-### FIRST JOB: PROVE THE TWELVE .txt CHECKS ON REAL DOCUMENTS, ONE AT A TIME
-
-**This is the highest-priority open item and it outranks any class work until it is done.** The .txt score is
-quoted as 199 of 213 clean. That number is not currently defensible, and here is the evidence:
-
-    314_tender_rfp_boq   (a bill of quantities - it has amount columns)
-    RANKING-TXT.csv said : applicable=8  passed=8  failed=0  abstained=0
-    a live verify_txt.py : 8/12 applicable, 8 passed, 4 ABSTAINED
-
-Four checks did not run on that document and the table said none had been skipped. `t13_amount_columns`
-abstaining on a bill of quantities is the specific suspect. The `abstained` column was `applicable - passed`,
-which is just `failed` under another name, so it printed 0 for every document that passed everything. That
-formula is fixed; **the applicability decision behind it is not verified.**
-
-**Eleven of the twelve checks have never been proved to fire.** Only the page-count axis has been checked
-(t10, t11 apply when pages > 1 - that held on a partial corpus and nothing more). `t13_amount_columns`,
-`t02_position`, `t04_structure`, `t08_line_order`, `t09_page_furniture`, `t01_word_accuracy`, `t03_symbols`,
-`t06_encoding`, `t07_symbol_counts`, `t12_word_invention` are all unverified.
-
-**THE METHOD IS BY EYE, NOT BY CODE.** The user's rule from the start: visual verification is the only real
-verification. A check can be proved only by opening the source PDF and the produced .txt side by side and
-reading them.
-
-**One document at a time, in this order:**
-
-1. Pick a document where the check **should** fire - `314_tender_rfp_boq` for `t13`, a multi-page document for
-   `t11`, a right-aligned amount column for `t02`.
-2. Run `verify_txt.py <source.pdf> <output.txt>` and read its line: how many applicable, passed, failed,
-   abstained.
-3. Open the PDF and the .txt. Read the thing the check claims to measure - the amount column, the line order,
-   the page furniture - with your own eyes.
-4. Write down, in `FINDINGS/`, one of exactly three outcomes:
-   - **the check fired and was right** - name the document and what you saw;
-   - **the check fired and was wrong** - a false positive, with the line from the .txt that proves it;
-   - **the check abstained where it should have fired** - the silent pass, with the PDF content that proves
-     the feature was there.
-5. Only then move to the next check.
-
-**A CHECK THAT HAS NOT BEEN THROUGH STEP 4 IS NOT COUNTED AS WORKING**, and the score that depends on it is not
-quoted as a result. `docpick.py --next` for .txt work is worthless while the applicability behind it is a guess.
-
-**When all twelve are proved, write one file: `FINDINGS/TXT-CHECKS-PROVED.md`** - a table of check, document,
-outcome, and the evidence. That file becomes the only defensible answer to "how clean is the .txt corpus".
-
-**Do not build a new tool for this.** The verification is a PDF, a .txt, and reading them. A tool that checks
-the checks would need proving too, and that is the loop this instruction exists to break.
-
 ### PICK THE CHECK THAT FINISHES DOCUMENTS, NOT THE CLASS THAT TOUCHES THEM
 
 Measured 23 Nov over 60 runs: **80% improved nothing, 60% made 0 or 1 attempt**, and about 20 documents a day
