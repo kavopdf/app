@@ -1,39 +1,39 @@
-# P2W Watchdog - Run Report
+Watchdog pass, 23 Nov. The pipeline is moving. Two stages are stopped and this run could not move either
+of them.
 
-**23 Nov 2026 · 21:10 IST**
+health.py --stalled exits 1.
 
-> Nothing is stopped. The pipeline is moving: the fixer is making attempts and the Google column - the renderer the phone opens - has gone 23 clean to 30 in a day. The .docx column is flat for a third row-day and that finding stands where it was recorded.
+- measure-google: done, 213 of 212, age 4.2 h
+- matrix: done, 213 of 213, age 4.2 h
+- classify: stopped, age 7.5 h
+- fix: moving, 2 attempt(s) in 3 h, age 0.6 h
+- txt: stopped, 199 clean and 14 failing, age 12.7 h
 
-## Stages
+Trend, today's row against the last: docx open 59 -> 59, txt failing 16 -> 14, google 192 -> 190,
+google clean 23 -> 30. Today's row already existed, so nothing was appended and PROGRESS.md had nothing
+to commit.
 
-| stage | state | progress | age |
-|:--|:--|--:|--:|
-| measure-google | done | 213 of 212 | 1.1 h |
-| matrix | done | 213 of 213 | 1.1 h |
-| classify | moving |  | 4.5 h |
-| fix | moving | 7 attempt(s), three hours | 0.4 h |
-| txt | moving | 199 clean, 14 failing | 9.7 h |
+Round: phase fix, round 1 of 3. The phase is not done, so round.py --reopen does not apply; the class
+count round.py prints was not carried into this report because this checker will not verify it.
 
-## Trend
+Fixer slot: not dead. ROUND.json records the claim twelve minutes before this pass, so --release-fixer
+--force was not run - releasing a slot a run took twelve minutes ago would put a second run into the
+engine. The fixer landed a commit while this pass was running.
 
-| | 2026-11-22 | 2026-11-23 | |
-|:--|--:|--:|:--|
-| .docx open | 59 | **59** | no change |
-| .txt failing | 16 | **14** | -2 |
-| Google measured | 192 | **190** | -2 |
-| Google clean | 23 | **30** | +7 |
+Both stopped stages belong to crons:
 
-## Round
+- classify: the class table is older than the newest Google results it describes. Owner is the
+  classifier cron.
+- txt: the .txt table predates restamp_txt.py, one of the three inputs that can change a score; health
+  reports those inputs 6.8 h old. Owner is the baseline cron, which has made no recorded claim for over
+  a day.
 
-Round one of three, phase fix, 212 of 212 documents scored, classes still open and the fixer working through them.
+This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. I could not
+read next_fire_at, paused status or the run list for either cron. The exact calls I would have made are
+written into BLOCKERS.md: list, then pause and resume on the stalled id in the same run, then runs to
+look for a zombie.
 
-## What this pass did
+What would overturn this: a watchdog run whose tool list contains cron. Until then every pass reports
+the same blind spot, and a paused cron stays silent with nothing in the repository able to notice it.
 
-- Ran health.py, health.py --stalled (nothing stopped), stage.py, progress.py, round.py --phase and status.py.
-- progress.py appended no new row - today already had one - and its --amend mode rewrote today's row from the live tables. That row was written earlier today reading .txt failing 16 and a lower Google clean count; it now reads 14 and 30 and names what it used to say. No past row was touched.
-- round.py --reopen refused, as it should: the phase is fix, not done. The reopen step does not apply.
-- Released no slot. status.py reads the fixer SILENT with its claim inside the stale window, and a force release inside that window is how two runs end up editing one tree. The relay cron owns that case.
-- Moved no cron: this watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. The exact calls are recorded in BLOCKERS.md with the fixer's id from the health brief.
-- Recorded in BLOCKERS.md: the flat .docx column with the fixer's attempt count beside it, the silent-but-live fixer slot, and RUN-LOG.md committed with git conflict markers in it.
-
-Two caveats on the table above, both already on file. Four of the five stage states come from an age comparison that BLOCKERS.md recorded as unable to fire, so "nothing is stopped" is firm evidence for fix and conditional for the rest. And the flat .docx column is the LibreOffice proxy, which the settled decision names as not the cross-renderer measure.
+BLOCKERS.md is updated and pushed.
