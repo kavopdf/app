@@ -93,6 +93,57 @@ def _save_cursor(d):
     os.replace(tmp, CURSOR)
 
 
+def _committed_at(path):
+    """Epoch seconds of the last commit that changed this file. Falls back to mtime if git cannot say."""
+    import subprocess
+    try:
+        # HERE is <repo>/tools/p2w-bench, so the repo root is two levels up. Using dirname(HERE) - which is
+        # <repo>/tools - made the pathspec "p2w-bench/X", git matched nothing, and every report silently fell
+        # back to its mtime, which is the very thing this function exists to avoid.
+        root = os.path.dirname(os.path.dirname(HERE))
+        r = subprocess.run(["git", "-C", root, "log", "-1", "--format=%ct", "--",
+                            os.path.relpath(path, root)],
+                           capture_output=True, text=True, timeout=20)
+        v = (r.stdout or "").strip()
+        if v.isdigit():
+            return float(v)
+    except Exception:
+        pass
+    try:
+        return os.path.getmtime(path)
+    except OSError:
+        return time.time()
+
+
+def _silent(rows):
+    """{name: factor} for reports older than a multiple of the median report age.
+
+    A CRON THAT STOPPED IS NOT AN UNREAD REPORT - IT IS THE ABSENCE OF ONE. --unread cannot see it: a report
+    that never changes is never unread, so a cron that died is invisible to the cursor. Measured 23 Nov:
+    baseline and classifier were both 13 hours old while five others were under 7, and nothing in the repo
+    said so.
+
+    No schedule is hardcoded, because a schedule is a number that moves and this file must not carry one.
+    The median age of the reports present IS the cadence, measured from the data: if five reports are an hour
+    old and one is thirteen, the thirteen is the outlier without anyone deciding that thirteen is a lot.
+    """
+    if len(rows) < 3:
+        return {}
+    # COMMIT TIME, NOT FILE MTIME. `git pull` and `git checkout` rewrite a file's mtime without changing a
+    # byte of it, so a report committed thirteen hours ago reads as "0.8 h old" on any sandbox that has
+    # pulled since. Measured 23 Nov: baseline and classifier were reported fresh for exactly this reason
+    # while their last commit was 22 Nov 18:28. The commit that last changed the file is the only honest
+    # age a report has.
+    ages = sorted((time.time() - _committed_at(p)) for p, _m, _n in rows)
+    median = ages[len(ages) // 2] or 1.0
+    out = {}
+    for p, _mtime, name in rows:
+        f = (time.time() - _committed_at(p)) / median
+        if f >= 3.0:
+            out[name] = f
+    return out
+
+
 def _unread_count(cur, rows):
     n = 0
     for path, mtime, _name in rows:
@@ -115,6 +166,13 @@ def main(argv):
         return 2
 
     now = time.time()
+    silent = _silent(rows)
+    if silent and not only_unread:
+        print("!! %d report(s) are far older than the rest - those crons may not be running:"
+              % len(silent))
+        for _n, _f in sorted(silent.items(), key=lambda x: -x[1]):
+            print("     %-12s %.1fx the median report age" % (_n, _f))
+        print()
     shown = 0
     marked = []
     for path, mtime, name in rows:
