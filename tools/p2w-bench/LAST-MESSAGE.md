@@ -2,7 +2,7 @@
   written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 05:58 → running IST · 13 min**
+**23 Nov 2026 · slot 05:58 → running IST · 17 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -10,7 +10,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,6 +26,7 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 06:11 | **lead** | 0/None | LO census: 7 docs are one check from clean in the measurable renderer and they are 7 distinct mechanisms. Controlled 3-variant experiment on balance-sheet-two-columns-of-figures: w:trHeight is inert o |
+| 06:15 | **lead** | 0/None | Instrumented the row model at DocxWriter.java:6146 (P2W_DBG env, reverted, app/ clean). exactRows is TRUE on all four candidates and the per-row edges ARE used, so the uniform-average path is not the |
 
 ## The txt
 
@@ -45,11 +46,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 05:58 → running · 13 min |
+| Slot window | 05:58 → running · 17 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 10 |
+| Tool beats | 14 |
 | Longest silence | **5.3 min** — from 06:01:27, after `attempt.py: recording an attempt` |
-| Silences over 2 min | 3 |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 3 parked, with the evidence to re-open them |
 | Still a wall | **The `.txt` half is now a stall past a day and nothing moved it: 197 clean, 16 failing, unchanged since 21 No |
 
@@ -58,8 +59,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **6 min** | `###########` |
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `##########` |
+| fix - diagnose and change the engine | **10 min** | `#############` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `#######` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
 | report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
@@ -179,6 +181,35 @@ before it counts.
 `cc3bd149` — `FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md`.
 The census, the three-variant experiment, and the untested explanation with its next experiment spelled
 out. Nothing in `app/` is dirty; `regress.py --check` passes with no document worse in either format.
+
+## Second experiment, same slot
+
+The `w:before` error is not the uniform row average. `DocxWriter.java:6146` computes `exactRows` from
+`t.rowEdge`, and on every candidate this run it is **true** — the per-row edges the page gave are used.
+Instrumented at that statement (`P2W_DBG`, reverted, `app/` clean), `ConvertOne` on four documents:
+
+| document | `t.ruled` | model edges | page's own rules | verdict |
+|:--|:--|:--|:--|:--|
+| `balance-sheet-two-columns-of-figures` | **false** | 115.35, 131.35, 143.35 | **101.35, 119.35**, 302.15 | **row 0 edge 14.0 pt BELOW the header band** |
+| `table-inside-two-column-page` | true | 117.0, 136.0, 154.0 | **117.35**, 135.75, 154.15 | **0.35 pt — correct** |
+| `71_invoice_space_aligned_no_rules` | false | 176.0, 194.0, 212.0 | none drawn | no rules to compare |
+| `363_warranty_card` | false | 124.0, 134.0, 148.0 | none drawn | terms block is not in a table at all |
+
+- **`exactRows` is not the gate.** The uniform `rowTw = extentPt / rowCount` path is not what writes
+  320 tw for `balance-sheet`'s row 0; `rowEdge[1] - rowEdge[0]` is 16.00 pt by itself. Any attempt to
+  "turn exactRows on" aims at a switch that is already on.
+- **The edges are 14.0 pt low on `balance-sheet`, and that is the defect.** The table is borderless
+  (`t.ruled=false`) and its rules are separate floating drawings, so the edges come from the *text* —
+  and the header text sits 5.74 pt **above** the edge the model gave its own row.
+- **The control rules out a general edge fault.** `table-inside-two-column-page` is `ruled=true`, its
+  model edge matches its page rule to 0.35 pt, and it still misses by a uniform −9.06 pt. That is a
+  **placement** fault, not an edge fault, and `71_invoice`'s +9.52 is the same shape.
+- **Next, cheapest pair:** `71_invoice` and `table-inside-two-column-page` place a whole table ~9 pt off
+  in opposite directions with their edges correct, both one check from clean, both measurable in the
+  proxy. `balance-sheet` is a separate build: attach the floating rules to the borderless table so its
+  edges come from the rules the page drew.
+
+Nothing in `app/` changed; the instrumentation was reverted and `regress.py --check` passes.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
