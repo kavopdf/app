@@ -77,6 +77,19 @@ def _write_state(S):
         except Exception as e:
             log("STATE not written to " + p + ": " + str(e))
 
+def _result_files():
+    """The per-document result files, and ONLY those.
+
+    p2w.py keeps a resumable page window for a long document in dist2/<doc>.partial.json
+    ({"first": n, "merged": {...}}). That file is a progress note, not a measurement: it has no
+    "doc", no numbers and no verdict. p2w.py's own results() excludes it for exactly that reason;
+    this glob did not, so a 300-page document that had walked 60 of 300 pages counted as a
+    document measured, and `measured` could reach `of` on a corpus that was never measured.
+    """
+    return [f for f in glob.glob("/scratch/work/p2w/dist2/*.json")
+            if not f.endswith(".partial.json")]
+
+
 def sh(c, t=280):
     try:
         r = subprocess.run(c, shell=True, capture_output=True, text=True, timeout=t)
@@ -158,7 +171,17 @@ def _expected_docs():
     """
     n = 211
     real = 0
-    for d in ("/scratch/work/realworld",
+    # THE CLONE THIS SCRIPT IS RUNNING FROM IS THE FIRST PLACE TO LOOK, AND IT WAS NOT ON THE LIST.
+    #
+    # p2w.py counts the real documents from `HERE/realworld` first (see p2w.py's
+    # _realworld_dirs()). This list was four hard-coded paths that do not include it, so a clone at
+    # /scratch/work/CS reported real=0 and gate.py expected 211 documents while p2w.py measured
+    # 212: 211 synthetic + 2 in benchmarks/realworld - 1 exempt. `complete` was therefore reached
+    # at 211 of 212 and gate.py would publish a table with one document never measured in it, under
+    # a verdict saying the corpus was finished. Two tools counting the same corpus from two
+    # different lists is how that happens; both now start beside the script.
+    for d in (os.path.join(os.path.dirname(os.path.abspath(__file__)), "realworld"),
+              "/scratch/work/realworld",
               "/scratch/work/base/benchmarks/realworld",
               "/scratch/work/p2w/repo/benchmarks/realworld",
               "/scratch/work/cls/benchmarks/realworld",
@@ -226,7 +249,7 @@ def main():
 
     # ---- layer 2: global measurement ----
     rc, out = sh(f"python3 {HERE}/p2w.py --budget {a.budget}", a.budget + 30)
-    measured = len(glob.glob("/scratch/work/p2w/dist2/*.json"))
+    measured = len(_result_files())
     expected = _expected_docs()
     # A run that stopped early is not a success. --budget is a time limit, so exit 0 can
     # mean "measured 13 of 213 and ran out of time", and calling that "ok" is how a
