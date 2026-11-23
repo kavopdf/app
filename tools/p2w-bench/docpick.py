@@ -30,8 +30,30 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 GVERIFY = os.path.join(ROOT, "benchmarks", "gverify")
 
 
-def scored():
-    """[(name, [failed check ids])] for every document Google actually scored."""
+def _engine_now():
+    """The engine commit the corpus is built from right now."""
+    import subprocess
+    try:
+        r = subprocess.run(["git", "-C", ROOT, "log", "-1", "--format=%h", "--",
+                            "app/src/main/java/com/kavopdf/app/engine/"],
+                           capture_output=True, text=True, timeout=20)
+        return (r.stdout or "").strip()
+    except Exception:
+        return ""
+
+
+def scored(current_only=True):
+    """[(name, [failed check ids])] for every document Google scored ON THE CURRENT ENGINE.
+
+    MIXING ENGINES SENDS THE FIXER AFTER PROBLEMS THAT ARE ALREADY GONE. Measured 23 Nov: over all engines
+    `18_displacement` failed 101 documents and looked like the whole job; on the engine the corpus is built
+    from now it fails 20. The other 81 were measured before the fix landed, so ranking on them ranks history.
+
+    gverify.py's own --report already counts only current-engine results for this reason. This now agrees
+    with it. A document with no engine stamp, or an older one, is not counted - the tool that owns the number
+    is gverify, and this reads what it says rather than what happens to be on disk.
+    """
+    now = _engine_now()
     out = []
     for f in glob.glob(os.path.join(GVERIFY, "*.json")):
         try:
@@ -39,6 +61,8 @@ def scored():
         except Exception:
             continue
         if j.get("status") == "page_count_refused":
+            continue
+        if current_only and now and j.get("engine") != now:
             continue
         out.append((os.path.basename(f)[:-5], list(j.get("failed") or [])))
     return out
