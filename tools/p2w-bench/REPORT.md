@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 19:57 → running IST · 0 min**
+**23 Nov 2026 · slot 19:57 → running IST · 48 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,18 +11,24 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **0** of the **7** re-measured on this engine - **183** of the 190 scored are still on an older engine, and **30** were clean there |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 183 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **13** of the **63** re-measured on this engine - **127** of the 190 scored are still on an older engine, and **30** were clean there |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **3** run(s) for the 127 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `18_displacement` |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 20:44 | **reverted** | 0/16 | trHeight-absorb (agent B construct) applied, built, 4 live Google round trips: tnhr 46/47->46/47 and mobile-bill 46/47->46/47, same check; independent PyMuPDF shows the patch halves the drift ramp 16. |
 
 ## The txt
 
@@ -36,18 +42,31 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18A-01` | is the LO regression on the spacer+trHeight patch a  | 20:15 | - | not recorded |
+| `18B-01` | is there a construct that gives Google the row pitch | 20:44 | - | not recorded |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 19:57 → running · 0 min |
+| Slot window | 19:57 → running · 48 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 3 |
-| Silences over 2 min | 0 |
+| Tool beats | 22 |
+| Longest silence | **23.8 min** — from 20:15:19, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| measure or build - a conversion, screen or compile writes no beacon | **42 min** | `###################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **4 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -60,7 +79,7 @@
 
 ## Next run
 
-00_page_count: measure 041122-Account_Opening_Form in Google (2464 drawing-only paragraphs, nine pages, worst score in the corpus at 98.65) - the scale test for the carrier paragraph. Then 350_question_paper: FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md charges picture() lines 2542-2564 (an unplaced picture emitted <wp:inline> in a paragraph with no w:pPr, inheriting sz=22 and w:after=120 from docDefaults, which spacingTw cannot see); the patch beside it is UNCOMPILED. Then w:tcBorders for 32_stroke_lines/05_chars_extra.
+18_displacement: stop spending attempts on row pitch - measure the top of the block. The leading paragraph carries its vertical position in w:spacing w:before=1040 + w:line=13 exact, and the Google column of GVERIFY-BRIEF lists w:spacing as ignored. Build one variant that carries the same position WITHOUT w:spacing (exact-height empty paragraph, or w:ind/w:framePr), round trip table-with-no-header-row, and read the first line's dy: it is -10.16 now, and if it does not move the carrier is not the spacing. Then repeat on mobile-bill (-15.75).
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

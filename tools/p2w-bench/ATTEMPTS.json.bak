@@ -718,7 +718,7 @@
   "status": "OPEN"
  },
  "60_text_column_right_edge": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": null,
   "history": [
    {
@@ -734,18 +734,27 @@
     "outcome": "lead",
     "reason": "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median l",
     "total": 0
+   },
+   {
+    "at": "2026-11-23 19:38",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "font family swap measured: declaring Verdana/Georgia instead of DejaVuSans/DejaVuSerif moved the render's widest line on 316_contract_with_schedules from 480.1 to 518.1 against the source's 538.6 - th",
+    "total": 0
    }
   ],
   "last": null,
   "last_engine": "b7699196",
   "outcomes": [
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect.",
+  "reason": "font family swap measured: declaring Verdana/Georgia instead of DejaVuSans/DejaVuSerif moved the render's widest line on 316_contract_with_schedules from 480.1 to 518.1 against the source's 538.6 - the gap closes from -58.5 to -20.5 - but the deciding column stays 66.8 pt narrow and the document is still 41/42. Right direction, not enough, and the family is not the whole story.",
   "reasons": [
    "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one.",
-   "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect."
+   "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect.",
+   "font family swap measured: declaring Verdana/Georgia instead of DejaVuSans/DejaVuSerif moved the render's widest line on 316_contract_with_schedules from 480.1 to 518.1 against the source's 538.6 - the gap closes from -58.5 to -20.5 - but the deciding column stays 66.8 pt narrow and the document is still 41/42. Right direction, not enough, and the family is not the whole story."
   ],
   "requeues": 0,
   "status": "OPEN"

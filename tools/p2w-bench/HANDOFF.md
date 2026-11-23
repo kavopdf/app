@@ -26,11 +26,11 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> 00_page_count LANDED (0be925ff): the column-page shape merge is in. 21 documents change in document.xml, 361 124->40 paragraphs and 401 52->27, 301 untouched (pageBody already merged it), 350 untouched (not this mechanism). Corpus 212/212 on this tree, 0 documents worse, regress PASS, measure_gate READY. 0 documents move in the LibreOffice table BY CONSTRUCTION - it honours w:line=1 exact and Google does not - the 2 moved are Google moves from the 04:47 run (361 2pp->1 at 41/42, 375 2pp->1 at 35/42->37/42). 22 of 23 page-count-refused documents were scoring 0 of 42 and are now measurable. Instrument defects fixed this run: p2w --force read REPO's PdfToWord.class not ENGINE_SRC's (a patched tree skipped all 213 as fresh - cost 22 min); measure_gate expected 213 rows from the 212-row table gate.py publishes (EXEMPT.json read for blocked, ignored for expected); regress --stamp and the pre-commit hook deadlocked so no engine change could land at all; gverify --collect could not read artifacts[0].workspace_path so the Google cron collects nothing. STILL OPEN: gate.py cannot forward --force to p2w.py (workaround: p2w --force first, then gate.py).
+> 18_displacement: the trHeight-absorb construct (trHeight=pitch-20tw + tcMar bottom) was applied, built and measured in Google on 2 documents - tnhr 46/47->46/47, mobile-bill 46/47->46/47, same check, nothing clean. Independent PyMuPDF geometry: the patch halves the drift ramp (16.25->8.38 pt, table span 495->482 vs source 478) but the first line of the block sits at -10.16 pt in BOTH renders and mobile-bill at -15.75, so the residual 18_displacement is a per-document TOP-OF-BLOCK OFFSET that no row construct can touch. LO cost of the patch confirmed by two agents (30-36 share@5 on four documents). Reverted, no engine change landed.
 
 ## What the next run should do first
 
-> 00_page_count: measure 041122-Account_Opening_Form in Google (2464 drawing-only paragraphs, nine pages, worst score in the corpus at 98.65) - the scale test for the carrier paragraph. Then 350_question_paper: FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md charges picture() lines 2542-2564 (an unplaced picture emitted <wp:inline> in a paragraph with no w:pPr, inheriting sz=22 and w:after=120 from docDefaults, which spacingTw cannot see); the patch beside it is UNCOMPILED. Then w:tcBorders for 32_stroke_lines/05_chars_extra.
+> 18_displacement: stop spending attempts on row pitch - measure the top of the block. The leading paragraph carries its vertical position in w:spacing w:before=1040 + w:line=13 exact, and the Google column of GVERIFY-BRIEF lists w:spacing as ignored. Build one variant that carries the same position WITHOUT w:spacing (exact-height empty paragraph, or w:ind/w:framePr), round trip table-with-no-header-row, and read the first line's dy: it is -10.16 now, and if it does not move the carrier is not the spacing. Then repeat on mobile-bill (-15.75).
 
 ## Agents deployed and not yet accounted for
 
@@ -112,16 +112,14 @@ unfinished work, not as a result.
 | B160_text_column_right_edge-01 | B1 | 60_text_column_right_edge | right-edge+shape_anchor | 13:21 | Is 60_text_column_right_edge the same construct as 59_shape_anchor (they travel together) and what minimal writer change clears both | running |  |
 | 00_pA-02 | 00_page_count | A | which construct costs 350_question_paper its second page in Google - i | 16:37 | a charged line in DocxWriter and one general rule | landed | tools/p2w-bench/FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md |
 | gverB-01 | gverify | B | why gverify --collect cannot read the download result the Drive tool r | 16:37 | a fix with a test | landed | tools/p2w-bench/FINDINGS/gverify-COLLECT-DOWNLOAD-SHAPE-1120-agent.md |
-| 18A-18_displacement-01 | 18A-01 | 18_displacement | A | 20:15 | is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact | running |  |
+| 18A-01 | 18_displacement | A | is the LO regression on the spacer+trHeight patch a real layout change | 20:15 | is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact | landed | FINDINGS/18_displacement-LO-PROXY-VERDICT-2013-agentA.md |
+| 18B-01 | 18_displacement | B | is there a construct that gives Google the row pitch without changing  | 20:44 | is there a construct that gives Google the row pitch without changing what LibreOffice draws | landed | FINDINGS/18_displacement-TRHEIGHT-CROSS-RENDERER-1506-agentB.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `06:15` attempt 34 on 18_displacement -> lead
-- `06:17` agent deployed: 18_d / residual-census - which current-engine documents fail 18_displacement, and what has FINDINGS alrea
-- `06:17` agent deployed: 18_d / blast-radius - the exact writer rule for w:trHeight/w:hRule, what the row-pitch patch yields, a
 - `06:17` agent landed: 18_dresidual-census-01 /  -> FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - 58 of 213 Google results are on the current engine (98be7c3c); 24 fail 18_displacement, only 2 fail it alone (16_right_aligned_amounts_txtpos, 31_times_body_arial_headings); the 16-document solo population is stamped 462353f9, not current. Killed the row-pitch lead before a round trip was spent.
 - `06:17` agent landed: 18_dblast-radius-01 /  -> FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build.
 - `06:17` agent landed: 18_dB-05 /  -> ANSWERED: the 18.5 pt rung does not exist. The laid pitch ladder is laid = 0.75*(round(declared/0.75)+1), so laid pitch is always a multiple of 0.75 pt and 18.5 is not on it; the nearest rung to an 18.40 pt source is 18.75. No declaration lands 18.5, so this question is closed rather than answered with a value. See FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md.
@@ -144,6 +142,9 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `19:36` attempt 2 on 60_text_column_right_edge -> lead
 - `19:39` attempt 3 on 60_text_column_right_edge -> lead
 - `20:15` agent deployed: 18A-01 / 18_displacement - A
+- `20:44` attempt 40 on 18_displacement -> reverted (0/16 moved)
+- `20:44` agent deployed: 18B-01 / 18_displacement - B
+- `20:45` two agents landed and recorded: 18A-01 LO proxy verdict, 18B-01 trHeight cross-renderer
 
 ## Where the rest of the state lives
 

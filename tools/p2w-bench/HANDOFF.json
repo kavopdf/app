@@ -1240,9 +1240,21 @@
   {
    "at": "20:15",
    "text": "agent deployed: 18A-01 / 18_displacement - A"
+  },
+  {
+   "at": "20:44",
+   "text": "attempt 40 on 18_displacement -> reverted (0/16 moved)"
+  },
+  {
+   "at": "20:44",
+   "text": "agent deployed: 18B-01 / 18_displacement - B"
+  },
+  {
+   "at": "20:45",
+   "text": "two agents landed and recorded: 18A-01 LO proxy verdict, 18B-01 trHeight cross-renderer"
   }
  ],
- "next": "00_page_count: measure 041122-Account_Opening_Form in Google (2464 drawing-only paragraphs, nine pages, worst score in the corpus at 98.65) - the scale test for the carrier paragraph. Then 350_question_paper: FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md charges picture() lines 2542-2564 (an unplaced picture emitted <wp:inline> in a paragraph with no w:pPr, inheriting sz=22 and w:after=120 from docDefaults, which spacingTw cannot see); the patch beside it is UNCOMPILED. Then w:tcBorders for 32_stroke_lines/05_chars_extra.",
+ "next": "18_displacement: stop spending attempts on row pitch - measure the top of the block. The leading paragraph carries its vertical position in w:spacing w:before=1040 + w:line=13 exact, and the Google column of GVERIFY-BRIEF lists w:spacing as ignored. Build one variant that carries the same position WITHOUT w:spacing (exact-height empty paragraph, or w:ind/w:framePr), round trip table-with-no-header-row, and read the first line's dy: it is -10.16 now, and if it does not move the carrier is not the spacing. Then repeat on mobile-bill (-15.75).",
  "agents": [
   {
    "id": "contA-01",
@@ -2142,15 +2154,28 @@
    "landed_at": "2026-11-23T16:37"
   },
   {
-   "id": "18A-18_displacement-01",
-   "class": "18A-01",
-   "angle": "18_displacement",
-   "question": "A",
+   "id": "18A-01",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact",
    "expected": "is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact",
    "deployed": "20:15",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-23T20:15"
+   "status": "landed",
+   "finding": "FINDINGS/18_displacement-LO-PROXY-VERDICT-2013-agentA.md",
+   "deployed_at": "2026-11-23T20:15",
+   "landed_at": "2026-11-23T14:44"
+  },
+  {
+   "id": "18B-01",
+   "class": "18_displacement",
+   "angle": "B",
+   "question": "is there a construct that gives Google the row pitch without changing what LibreOffice draws",
+   "expected": "is there a construct that gives Google the row pitch without changing what LibreOffice draws",
+   "deployed": "20:44",
+   "status": "landed",
+   "finding": "FINDINGS/18_displacement-TRHEIGHT-CROSS-RENDERER-1506-agentB.md",
+   "deployed_at": "2026-11-23T20:44",
+   "landed_at": "2026-11-23T14:44"
   }
  ],
  "run": {
@@ -2260,7 +2285,7 @@
    "plan": ""
   }
  ],
- "context": "00_page_count LANDED (0be925ff): the column-page shape merge is in. 21 documents change in document.xml, 361 124->40 paragraphs and 401 52->27, 301 untouched (pageBody already merged it), 350 untouched (not this mechanism). Corpus 212/212 on this tree, 0 documents worse, regress PASS, measure_gate READY. 0 documents move in the LibreOffice table BY CONSTRUCTION - it honours w:line=1 exact and Google does not - the 2 moved are Google moves from the 04:47 run (361 2pp->1 at 41/42, 375 2pp->1 at 35/42->37/42). 22 of 23 page-count-refused documents were scoring 0 of 42 and are now measurable. Instrument defects fixed this run: p2w --force read REPO's PdfToWord.class not ENGINE_SRC's (a patched tree skipped all 213 as fresh - cost 22 min); measure_gate expected 213 rows from the 212-row table gate.py publishes (EXEMPT.json read for blocked, ignored for expected); regress --stamp and the pre-commit hook deadlocked so no engine change could land at all; gverify --collect could not read artifacts[0].workspace_path so the Google cron collects nothing. STILL OPEN: gate.py cannot forward --force to p2w.py (workaround: p2w --force first, then gate.py).",
+ "context": "18_displacement: the trHeight-absorb construct (trHeight=pitch-20tw + tcMar bottom) was applied, built and measured in Google on 2 documents - tnhr 46/47->46/47, mobile-bill 46/47->46/47, same check, nothing clean. Independent PyMuPDF geometry: the patch halves the drift ramp (16.25->8.38 pt, table span 495->482 vs source 478) but the first line of the block sits at -10.16 pt in BOTH renders and mobile-bill at -15.75, so the residual 18_displacement is a per-document TOP-OF-BLOCK OFFSET that no row construct can touch. LO cost of the patch confirmed by two agents (30-36 share@5 on four documents). Reverted, no engine change landed.",
  "needs_human": [
   {
    "at": "10:40",
@@ -2269,5 +2294,5 @@
    "change": "a person must either authorise the trade (a 1.03 rise on a document already at 97.62 for 601 going to 0.00), or give share@5px a companion axis that separates 'more ink, some far' from 'the same ink, further' - see FINDINGS/widget-walk-REFUSED-BY-ONE-DOCUMENT-1050-f1x.md"
   }
  ],
- "next_class": ""
+ "next_class": "table-with-no-header-row"
 }

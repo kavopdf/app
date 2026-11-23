@@ -3,12 +3,13 @@
  "started": "19:57",
  "ended_ts": null,
  "ended": null,
- "class": "",
- "attempts": 0,
+ "class": "18_displacement",
+ "attempts": 1,
  "kept": 0,
  "docs_improved": 0,
  "agents": [
-  "18A-18_displacement-01"
+  "18A-01",
+  "18B-01"
  ],
  "obstacles_cleared": 0,
  "needs_human": 0
