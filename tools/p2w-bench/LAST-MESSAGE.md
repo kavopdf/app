@@ -1,8 +1,6 @@
-
-  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 06:55 → running IST · 1h 24m**
+**23 Nov 2026 · slot 06:55 → running IST · 2h 00m**
 
 > **415_inline_images** fixed — 89.04 → 0.00. Corpus ratchet clean across 212 documents.
 
@@ -15,10 +13,10 @@
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **1** — 416_many_tiny_pages |
-| **Fixed - Google, all 42 checks** | **0**, out of the 0 measured on THIS engine (all engines: 30 of 190) |
+| **Fixed - Google, all 42 checks** | **0**, out of the 2 measured on THIS engine (all engines: 30 of 190) |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
-| Classes solved | 0 of 33 clear — 33 class(es) still have an OPEN document |
+| Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
 | Working on | `00_page_count` |
 
 ## What was tried
@@ -49,22 +47,22 @@
 
 | | |
 |:--|:--|
-| Slot window | 06:55 → running · 1h 24m |
+| Slot window | 06:55 → running · 2h 00m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 11 |
-| Longest silence | **34.2 min** — from 07:37:00, after `pending.py: reading the pending gate` |
+| Longest silence | **41.6 min** — from 08:13:28, after `report.py: building the report` |
 | Silences over 2 min | 2 |
-| Obstacles | 0 cleared · 2 parked, with the evidence to re-open them |
-| Still a wall | The document scores 41/42 in Google on the current engine, failing `18_displacement`; its committed result on  |
+| Obstacles | 0 cleared · 3 parked, with the evidence to re-open them |
+| Still a wall | **The engine on HEAD moved twice after the table was last generated, and no pair in the table is measured on i |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **34 min** | `#################` |
+| fix - diagnose and change the engine | **34 min** | `##########` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **8 min** | `####` |
+| report - the report and the chain | **44 min** | `############` |
 ## Best results this round
 
 | Document | Before | After | Change |
