@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 20:54 → running IST · 35 min**
+**23 Nov 2026 · slot 20:54 → running IST · 1h 47m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -48,22 +48,23 @@
 
 | | |
 |:--|:--|
-| Slot window | 20:54 → running · 35 min |
+| Slot window | 20:54 → running · 1h 47m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 11 |
-| Longest silence | **25.3 min** — from 20:55:15, after `report.py: building the report` |
-| Silences over 2 min | 3 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Longest silence | **72.2 min** — from 21:30:38, after `report.py: building the report` |
+| Silences over 2 min | 4 |
+| Obstacles | 3 cleared · 2 parked, with the evidence to re-open them |
+| Still a wall | **This watchdog has no `cron` tool**, so a paused or zombie cron cannot be moved by automation and STEP 3 cann |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **25 min** | `################` |
-| record - attempt, handoff, class rows | **4 min** | `###` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **5 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **25 min** | `#####` |
+| record - attempt, handoff, class rows | **4 min** | `#` |
+| report - the report and the chain | **1h 12m** | `###############` |
+| other - not attributed to a tool | **5 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
