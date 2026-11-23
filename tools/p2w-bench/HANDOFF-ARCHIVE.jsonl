@@ -316,3 +316,22 @@
 {"_list": "notes", "_entry": {"at": "12:06", "text": "attempt 15 on content-present-partly-displaced -> lead (1/16 moved)"}}
 {"_list": "notes", "_entry": {"at": "13:12", "text": "attempt 14 on 18_displacement -> lead (0/1 moved)"}}
 {"_list": "notes", "_entry": {"at": "13:29", "text": "attempt 15 on 18_displacement -> lead (0/1 moved)"}}
+{"_list": "notes", "_entry": {"at": "13:57", "text": "agent deployed: 18_displacement / A - static map of every writer that emits w:trHeight and cell w:spacing, and the exa"}}
+{"_list": "agents", "_entry": {"id": "32_sB-local-01", "class": "32_stroke_lines", "angle": "B-local", "question": "does the carrier patch damage clean documents when measured in a clean clone", "expected": "4 of 10 controls worse", "deployed": "05:18", "status": "landed", "finding": "FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md", "deployed_at": "2026-11-21T23:48", "landed_at": "2026-11-21T23:48"}}
+{"_list": "notes", "_entry": {"at": "13:57", "text": "agent deployed: 18_displacement / B - from the three measured declared->laid points compute the declaration that lands"}}
+{"_list": "agents", "_entry": {"id": "18_dA-02", "class": "18_displacement", "angle": "A", "question": "what makes a single-page dense table drift in Google - row pitch or the table-top spacer", "expected": "07:38", "deployed": "07:36", "status": "landed", "finding": "FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md", "deployed_at": "2026-11-22T02:06", "landed_at": "2026-11-22T02:06"}}
+{"_list": "notes", "_entry": {"at": "14:19", "text": "attempt 16 on 18_displacement -> lead (0/16 moved)"}}
+{"_list": "agents", "_entry": {"id": "18_dA-03", "class": "18_displacement", "angle": "A", "question": "independently re-derive the sixteen and the spacer premise from the repo", "expected": "08:20", "deployed": "08:31", "status": "landed", "finding": "FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md", "deployed_at": "2026-11-22T03:01", "landed_at": "2026-11-22T03:01"}}
+{"_list": "notes", "_entry": {"at": "14:45", "text": "attempt 17 on 18_displacement -> kept (1/16 moved)"}}
+{"_list": "agents", "_entry": {"id": "18_dB-02", "class": "18_displacement", "angle": "B", "question": "what places a page's first baseline, and is median_pt 0.96 a real offset", "expected": "08:40", "deployed": "08:31", "status": "landed", "finding": "FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md", "deployed_at": "2026-11-22T03:01", "landed_at": "2026-11-22T03:01"}}
+{"_list": "notes", "_entry": {"at": "14:46", "text": "agent landed: 47_mA-02 /  -> FINDINGS/47_margins-CELLPATH-A-150000.md"}}
+{"_list": "notes", "_entry": {"at": "14:46", "text": "agent landed: 47_mB-02 /  -> FINDINGS/47_margins-DIAGNOSE40-B-150000.md"}}
+{"_list": "notes", "_entry": {"at": "15:28", "text": "attempt 18 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "15:40", "text": "attempt 19 on 18_displacement -> lead (0/16 moved)"}}
+{"_list": "notes", "_entry": {"at": "16:36", "text": "attempt 20 on 18_displacement -> lead (0/16 moved)"}}
+{"_list": "notes", "_entry": {"at": "17:34", "text": "attempt 21 on 18_displacement -> lead (0/8 moved)"}}
+{"_list": "notes", "_entry": {"at": "19:10", "text": "attempt 22 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "19:17", "text": "attempt 23 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "00:39", "text": "attempt 26 on 18_displacement -> reverted (0/16 moved)"}}
+{"_list": "notes", "_entry": {"at": "02:31", "text": "attempt 29 on 18_displacement -> kept"}}
+{"_list": "notes", "_entry": {"at": "04:08", "text": "attempt 30 on 18_displacement -> lead"}}

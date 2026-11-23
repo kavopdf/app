@@ -156,3 +156,4 @@
 {"at": "2026-11-24 00:30", "attempt": 18, "class": "content-present-partly-displaced", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-24 01:42", "attempt": 3, "class": "t12_word_invention", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-24 01:43", "attempt": 6, "class": "00_page_count", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-24 02:08", "attempt": 42, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}

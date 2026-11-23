@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 00:56 → running IST · 47 min**
+**24 Nov 2026 · slot 00:56 → running IST · 1h 00m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -16,8 +16,8 @@
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **13** of the **63** re-measured on this engine - **127** of the 190 scored are still on an older engine, and **30** were clean there |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **3** run(s) for the 127 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **27** of the **123** re-measured on this engine - **67** of the 190 scored are still on an older engine, and **30** were clean there |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **2** run(s) for the 67 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
@@ -49,11 +49,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 00:56 → running · 47 min |
+| Slot window | 00:56 → running · 1h 00m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 23 |
 | Longest silence | **24.4 min** — from 00:56:37, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 5 |
+| Silences over 2 min | 6 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -61,10 +61,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **3 min** | `##` |
-| measure or build - a conversion, screen or compile writes no beacon | **27 min** | `#############` |
+| fix - diagnose and change the engine | **3 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **27 min** | `##########` |
 | record - attempt, handoff, class rows | **2 min** | `#` |
-| other - not attributed to a tool | **12 min** | `######` |
+| report - the report and the chain | **13 min** | `#####` |
+| other - not attributed to a tool | **12 min** | `#####` |
 ## Best results this round
 
 | Document | Before | After | Change |

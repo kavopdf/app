@@ -1053,6 +1053,45 @@ def main(argv):
             s2["fixer_doing_since"] = time.time()
         s2["fixer_last_beat"] = time.time()
         save(s2)
+
+        # A LEDGER THAT IS OLDER THAN THE CLAIM IS THE PREVIOUS RUN'S, AND IT IS REPAIRED HERE.
+        #
+        # claim() resets RUN.json when it takes the slot, and that reset is correct. What defeats it
+        # is the documented setup order: the brief tells a run to claim, and THEN to run
+        # `git checkout -- tools/p2w-bench/` and `git pull --rebase origin main`. A checkout of that
+        # path restores RUN.json from HEAD, which is the PREVIOUS run's ledger - so the reset is
+        # undone by the very next command in the instructions, on every run, silently.
+        #
+        # Measured 24 Nov, slot 00:56: the claim printed "fixer claimed at 01:56" and RUN.json still
+        # read started 00:56, attempts 2, agents ["18_dA-01","04_cB-01"] - the run before it. The
+        # report's own header was written from those fields ("Before the claim: not recorded",
+        # "Slot window 00:56"), and the release guard reads the same file to decide whether this run
+        # deployed an agent and made an attempt. Every run in the ledger has been mis-dated by one
+        # slot for as long as this order has been in the brief.
+        #
+        # So the heartbeat repairs it: a RUN.json whose started_ts predates the claim cannot describe
+        # this run, whatever wrote it, and the claim's own timestamp is the authority. Repairing here
+        # rather than in the brief means it holds for every caller - the prompt, a human, a future
+        # cron - and it cannot be skipped by doing the steps in a different order.
+        _claimed = s2.get(key) or 0
+        try:
+            _rp = os.path.join(HERE, "RUN.json")
+            _run = {}
+            try:
+                with open(_rp, encoding="utf-8") as _f:
+                    _run = json.load(_f)
+            except Exception:
+                _run = {}
+            if float(_run.get("started_ts") or 0) < float(_claimed):
+                _fresh = {"started_ts": _claimed,
+                          "started": time.strftime("%H:%M", time.gmtime(float(_claimed) + 5 * 3600 + 30 * 60)),
+                          "ended_ts": None, "ended": None, "attempts": 0, "kept": 0,
+                          "agents": [], "docs_improved": 0}
+                with open(_rp, "w", encoding="utf-8") as _f:
+                    json.dump(_fresh, _f, indent=1)
+                print("run window reset - RUN.json described the run before this claim")
+        except Exception as _e:
+            print("could not repair the run window: %s" % _e)
         if doing:
             print("fixer claim refreshed - doing: %s" % doing)
         else:

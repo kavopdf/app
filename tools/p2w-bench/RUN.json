@@ -1,13 +1,10 @@
 {
- "started_ts": 1795465585.7479422,
- "started": "01:56",
+ "started_ts": 1795466286.2232144,
+ "started": "02:08",
  "ended_ts": null,
  "ended": null,
  "attempts": 0,
  "kept": 0,
- "agents": [
-  "18_dA-02",
-  "04_cB-02"
- ],
+ "agents": [],
  "docs_improved": 0
 }
