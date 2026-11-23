@@ -1101,6 +1101,35 @@ direct write is safe because the app writes a cache file before touching the use
 static state, streams are all try-with-resources, and the checks that pass with `(0, 0, True)` are correct
 because the source had nothing of that kind to preserve. Re-opening any of those is a wasted slot.
 
+### WHEN YOUR ATTEMPT IS DONE, THE NEXT ONE STARTS. THE RUN ENDS WHEN THE PLATFORM ENDS IT.
+
+Measured 23 Nov over 32 completed runs: **median 37 minutes, median 1.0 attempt**, and **52% of every run goes
+to setup and reporting** - 17.3 minutes from the claim to the first attempt, 2.2 from the last attempt to the
+end. Not one of those runs was killed. All 32 ended by calling `round.py --release-fixer` themselves.
+
+**So the run is not being stopped. It stops, one attempt in, because nothing tells it what the second one is.**
+
+`release()` has no clock in it - that was deliberate, and the comment there says why: a minute count is a
+number to stop at. The floor is only "you may not release having recorded nothing". Everything above that
+floor is your decision, and the decision has been "done" after one attempt.
+
+**Three things to do before you consider releasing, in this order:**
+
+1. `python3 tools/p2w-bench/allreports.py --unread` - is there a report no run has read? Read it and decide
+   what it states. That is a second piece of work, already measured by another cron, waiting for you.
+2. `python3 tools/p2w-bench/classpick.py --leverage` - what is the next class worth in CLEAN documents? If
+   your attempt moved its class, the next attempt is the same class with the next construct. If it did not,
+   the next attempt is the class the arithmetic says is worth more.
+3. `python3 tools/p2w-bench/runclock.py` - if it says less than 70 minutes and you are about to write the
+   report, **you are stopping early**. A 90-minute run is four to six attempts.
+
+**The setup is where the time goes, so spend it once and use what it bought.** The brief is 2,193 lines and
+you read it every run; the six reports are now one `--unread` call instead of six opens; `report.py` prints
+the numbers once. That is the cost of starting. Paying it and then doing one attempt is the waste.
+
+**If the engine is genuinely blocked** - the gate refuses, the class list is empty, Drive is down - say so
+with the evidence and release. That is a run that finished. One attempt and a report is a run that stopped.
+
 ### READ WHAT THE OTHER FIVE CRONS FOUND BEFORE YOU PICK A CLASS
 
 Every cron already writes its report into this repo and commits it:
