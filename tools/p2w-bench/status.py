@@ -25,7 +25,22 @@ ROUND = os.path.join(HERE, "ROUND.json")
 RUN = os.path.join(HERE, "RUN.json")
 
 WORKING_MIN = 8      # a beacon younger than this means work is being reported
-SLOW_MIN = 20        # the stale window - past this the slot is up for takeover
+# ONE SOURCE OF TRUTH. This was a second hard-coded copy of the window round.py enforces, so the two
+# drifted: round.py reaped a fixer at 10 minutes while this reported at 20, and a run could be
+# described as "LIKELY DEAD, past the 20-min window" while the reaper had already killed it at 10.
+# Read the value the reaper actually uses.
+def _slow_min(what="fixer"):
+    try:
+        import importlib.util as _iu
+        _s = _iu.spec_from_file_location("round", os.path.join(os.path.dirname(__file__), "round.py"))
+        _m = _iu.module_from_spec(_s)
+        _s.loader.exec_module(_m)
+        return int(_m.CLAIM_STALE_MIN.get(what, 45))
+    except Exception:
+        return 45
+
+
+SLOW_MIN = _slow_min()
 
 
 def _j(p, d):

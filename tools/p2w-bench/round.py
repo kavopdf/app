@@ -185,7 +185,23 @@ def _handoff(*args):
 # of thought. Twenty was chosen when the age meant "time since start", where a dead run blocked the
 # slot for twenty minutes; now that the age means "time since last activity", the window is purely a
 # safety margin and can be as small as that margin allows.
-CLAIM_STALE_MIN = {"fixer": 10, "baseline": 45, "classifier": 20}
+# FIXER 10 -> 45. THE WINDOW WAS MEASURED AGAINST THE WRONG THING.
+#
+# The comment above reasons from the longest single tool call, 290 s, plus a few minutes of thought, and
+# concludes 10 minutes is enough. That is true of a run that only makes tool calls. It is not what a
+# fixer run does: a gverify batch pushes 60 documents through Google upload, PDF export and 42 checks, a
+# corpus rebuild is hours, and two background subagents run for as long as they like. None of that is a
+# 290 s call, and a run inside any of it writes no beacon.
+#
+# The ledger says the window was too tight, and says it without ambiguity: of the last 60 fixer runs,
+# ZERO ended on their own terms. 42 were "killed - slot cleared by a force release" and 18 "killed -
+# never released the slot". Every single run was reaped, and 48 of the 60 kept nothing - not because the
+# class was wrong but because the run died inside its work.
+#
+# 45 is what baseline uses, and it is the window the fixer had before the heartbeat existed. The risk it
+# reintroduces - a dead run holding the slot - is what the :10 relay cron exists to cover, and the relay
+# only has to find the slot free once an hour.
+CLAIM_STALE_MIN = {"fixer": 45, "baseline": 45, "classifier": 20}
 
 
 def load():
