@@ -143,20 +143,37 @@ def this_run():
 
 
 
+def engine_now():
+    """The engine commit the corpus is built from right now - the same fingerprint gverify stamps."""
+    import subprocess as _sp
+    try:
+        r = _sp.run(["git", "-C", ROOT, "log", "-1", "--format=%h", "--",
+                     "app/src/main/java/com/kavopdf/app/engine/"],
+                    capture_output=True, text=True, timeout=20)
+        return (r.stdout or "").strip()
+    except Exception:
+        return ""
+
+
 def google_fixed():
-    """What GOOGLE calls fixed: a document that passes every applicable check in its renderer.
+    """What GOOGLE calls fixed, and the denominator that is honest about which engine measured it.
 
-    THE REPORT'S "Fixed to 99%" WAS A LIBREOFFICE CLAIM. It read share5 <= 1.0 from RANKING.csv, a
-    soffice render - and LibreOffice draws constructs Google drops, so a document can be perfect there
-    and broken for the user. Measured 20 Nov: the report said 153 of 213 fixed while Google passed all
-    42 checks on 7 of the 192 it could measure.
+    THE REPORT'S "Fixed to 99%" WAS A LIBREOFFICE CLAIM - it read share5 <= 1.0 from RANKING.csv, a
+    soffice render, and LibreOffice draws constructs Google drops. Measured 20 Nov: the report said
+    153 of 213 fixed while Google passed all 42 on 7 of the 192 it could measure. So Google is the
+    headline and LibreOffice is shown beside it as the proxy.
 
-    The user's rule, in his words: "poore fixing google ke according hee karna, jo documents google ki
-    render par original document se 99% ya usse zyada match karega wahi documents fix mana jaayega".
-    So Google's count is the headline and the LibreOffice count is shown beside it as the proxy it is.
+    THE DENOMINATOR WAS MIXING ENGINES. gverify/ holds results from several engine versions - on
+    23 Nov, 137 stamped 98be7c3c (the tree), 45 on 462353f, 8 on 462353f9 and 23 unstamped - and
+    this counted all of them as one population. "28 of 190" then reads as 162 documents failing when
+    53 of those 190 were measured on code that no longer exists and may pass or fail today.
+
+    Returns (fixed_all, scored_all, fixed_current, scored_current). The current-engine pair is the
+    one the report prints, because it is the only pair that describes the code in the tree.
     """
     import glob as _g
-    fixed = scored = 0
+    now = engine_now()
+    fixed = scored = fixed_cur = scored_cur = 0
     for f in _g.glob(os.path.join(ROOT, "benchmarks", "gverify", "*.json")):
         try:
             j = json.load(open(f, encoding="utf-8"))
@@ -165,9 +182,14 @@ def google_fixed():
         if j.get("status") == "page_count_refused":
             continue
         scored += 1
-        if not (j.get("failed") or []):
+        ok = not (j.get("failed") or [])
+        if ok:
             fixed += 1
-    return fixed, scored
+        if (j.get("engine") or "") == now:
+            scored_cur += 1
+            if ok:
+                fixed_cur += 1
+    return fixed, scored, fixed_cur, scored_cur
 
 
 
@@ -279,9 +301,10 @@ def corpus():
     # this field was the only one available, and the fixer then copied it into a sentence about the
     # corpus. Both numbers are reported now, each under the name that says what it counts.
     corpus_total = len(c)
-    _gf, _gs = google_fixed()
+    _gf, _gs, _gfc, _gsc = google_fixed()
     return {"available": True, "docs": corpus_total, "compared": len(common),
             "google_fixed": _gf, "google_scored": _gs,
+              "google_fixed_current": _gfc, "google_scored_current": _gsc,
             "fixed": len(fixed), "moved_open": len(moved_open),
             "still_open": len([k for k in common if c[k] > FIXED_BAR]),
             "baseline_mean": round(bm, 2), "current_mean": round(cm, 2),
@@ -899,8 +922,16 @@ def main(argv):
         # intersection of the two render sets and is smaller than the corpus, and lastmessage.py
         # reads any bare "of NNN" in the hundreds as a claim about the corpus size and refuses the
         # report. The two numbers are both right and the sentence has to say which is which.
-        L.append("| **Fixed - Google, all 42 checks** | **%d**, out of the %d documents both renderers measured |"
-                 % (co.get("google_fixed", 0), co.get("google_scored", 0)))
+        # THE DENOMINATOR NOW SAYS WHICH ENGINE MEASURED IT. gverify/ holds results from several
+        # engine versions - on 23 Nov, 137 stamped 98be7c3c (the tree), 45 on 462353f, 8 on 462353f9 and
+        # 23 unstamped - and "28 of 190" counted all of them as one population. 53 of those 190 were
+        # measured on code that no longer exists, so the sentence read as 162 documents failing when the
+        # honest population is the 135 measured on the engine in the tree. The full pair is still shown
+        # beside it so nothing is hidden.
+        L.append("| **Fixed - Google, all 42 checks** | **%d**, out of the %d measured on THIS "
+                 "engine (all engines: %d of %d) |"
+                 % (co.get("google_fixed_current", 0), co.get("google_scored_current", 0),
+                    co.get("google_fixed", 0), co.get("google_scored", 0)))
         # SAME MIXED DENOMINATOR. `fixed` is also counted over `common` (212), not the corpus (213).
         L.append("| Fixed - LibreOffice proxy | %d of the %d compared - a renderer the user does not open |"
                  % (co.get("fixed", 0), co.get("compared") or co.get("docs", 0)))

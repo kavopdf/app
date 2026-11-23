@@ -1,6 +1,5 @@
-# Fixer report - 2026-11-23 05:58
 
-```
+  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
 **23 Nov 2026 · slot 05:58 → 06:18 IST · 19 min**
@@ -16,7 +15,7 @@
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **1** — 416_many_tiny_pages |
-| **Fixed - Google, all 42 checks** | **28**, out of the 190 documents both renderers measured |
+| **Fixed - Google, all 42 checks** | **28**, out of the 135 measured on THIS engine (all engines: 30 of 188) |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
@@ -79,42 +78,9 @@
 
 ## Next run
 
-`18_displacement` - the row-0 construct is MEASURED AND DERIVED, and the fix is refused, not unproven. See
-`FINDINGS/18_displacement-ROW0-TABLE-TOP-DERIVED-CLEARS-ONE-REGRESSES-ANOTHER-0740-relay.md`.
-
-What is established: row 0 of a table is placed from `rowEdge[0] - 0.8 * firstPitch` (`DocxWriter:6403-6409`)
-while the table's own top is `t.rowTopPt`; the gap is `0.8 * (firstPitch - lastPitch)` and is computable per
-table. On `balance-sheet-two-columns-of-figures` it is **+3.52 pt** and the measured first-row error is
-**+3.69 pt** - the same correction the 06:30 run found by tuning, now derived. Applying it takes that document
-from **6 runs out of 94 to 0** (span 4.18 -> 0.89), i.e. 41/42 -> **42/42 in the measurable renderer**.
-
-What kills it: `360_restaurant_menu` goes **share@5 34.43 -> 35.66** (reproduced on a fresh measure of the same
-.docx, and 34.43 again from the reverted engine). `regress.py --check` refused the commit. Guarding the change
-on `spacerTw > 0` does not separate them - `360` spends a spacer too.
-
-Why, and the missing term: for `360` the pitch-derived edge (102.4) is RIGHT and the table's top (104.0) is
-1.6 pt low; for `balance-sheet` the table's top (106.07) is RIGHT and the pitch-derived edge (102.55) is 3.5 pt
-high. **The sign of the correct answer differs between two documents**, so no constant row-0 rule is right for
-both. The deciding number is where the spacer's box **actually landed**, and nothing in the writer knows it:
-the spacer computes a distance and never checks the result. That is D-26, and row 0 is only where it shows.
-
-Cheapest next measurement: for both documents, print the rendered top edge of the table against `t.rowTopPt`
-and against `flowTopPt + spacerTw/20`. If those agree on `360` and disagree on `balance-sheet`, the fix belongs
-in the spacer's split (`spendable`, the `w:line` under-read, `squeeze`), not in the row model.
-
-Also this run, for the next one: the +/-9.52 / -9.06 whole-block pair that the 06:30 run left open is **NOT**
-the `lastPitch` construct - both tables are inert under it (`shift = 0.0` on `71`, and
-`table-inside-two-column-page` has no whitespace table at all, its table is ruled). On `71` the gap before the
-table is `extraAbs = -1.50`, so no spacer is written and the table simply continues the flow 9.52 pt below
-where the page drew it. That is a flow-position defect, not a table-arithmetic one.
+00_page_count: mechanism MEASURED, fix not landed. FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md. Google rasterises each page-positioned floating shape and keeps the paragraph that carries it, and that empty paragraph costs ~0.83 pt of flow (w:line="1" exact is NOT honoured for it): 108 of them = 89.9 pt on 301_lab_report_panel against 44.5 pt of free page, so a 1-page source renders 2 pages. Deleting all 108 -> 1 page at the same text y (the control). 22 of the 23 refused documents emit ALL their drawing-only paragraphs AFTER the last text paragraph; counts 7..2464. 350_question_paper has 1 and is NOT explained by this. Refuted and measured, do not retry: drop-last, prstGeom-rect, wrapSquare, framePr. VOID (my probe bug, never measured): merge-into-one-paragraph and attach-to-text. NEXT LEVER, cheapest in the writer: merge the drawing-only paragraphs of a page into ONE (DocxWriter.shape(), DocxWriter.java:2726) - saves 107 x 0.83 = 88.8 pt against 89.9 pt needed here, a one-point margin, so measure it; then w:tcBorders through the table writer. This is the same construct as 32_stroke_lines and 05_chars_extra: one mechanism, three check families.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-```
-
-Written by report.py from committed files only. Every number above is read from
-ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
-and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
