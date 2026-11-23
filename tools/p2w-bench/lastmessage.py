@@ -94,9 +94,27 @@ def progress_rows(text):
     return out
 
 
+def _beat(what, doing):
+    """Say we are alive. THIS FILE HAD NO BEACON AT ALL.
+
+    The reaper kills a fixer that goes silent past the window, and this is the step a run enters
+    immediately after writing its report - with timeouts of 280, 120, 120 and 180 seconds in front of
+    it. So a run could finish all its work, write a correct report, and die here, 12 minutes silent,
+    before it ever committed or released the slot. Measured 23 Nov from TIMELINE.jsonl: 81 silences
+    over 10 minutes, 30 of them recorded against "report.py: building the report" - the beacon report.py
+    writes and then returns from in one second, leaving this step to run unwatched.
+    """
+    try:
+        from beacon import beat
+        beat(what, doing)
+    except Exception:
+        pass
+
+
 def report_py_rows():
     """Run report.py and read its Progress table. None when it cannot be run."""
     try:
+        _beat("lastmessage.py", "running report.py for the numbers")
         r = subprocess.run([sys.executable, os.path.join(HERE, "report.py")],
                            capture_output=True, text=True, timeout=280)
         if r.returncode != 0 or "## Progress" not in r.stdout:
@@ -144,6 +162,7 @@ def verify(text):
 def _report_md():
     """report.py's own markdown, or None."""
     try:
+        _beat("lastmessage.py", "running report.py for the numbers")
         r = subprocess.run([sys.executable, os.path.join(HERE, "report.py")] + _for_args(),
                            capture_output=True, text=True, timeout=120, cwd=os.path.dirname(HERE))
         return r.stdout if r.returncode == 0 else None
@@ -204,6 +223,7 @@ def _report_json():
     """report.py's own numbers, as a dict. None when it cannot be read."""
     import json
     try:
+        _beat("lastmessage.py", "checking a tool's output")
         r = subprocess.run([sys.executable, os.path.join(HERE, "report.py"), "--json"] + _for_args(),
                            capture_output=True, text=True, timeout=120, cwd=os.path.dirname(HERE))
         if r.returncode != 0 or not r.stdout.strip():
@@ -377,6 +397,7 @@ def _tool_numbers(cmds):
     text = ""
     for cmd in cmds:
         try:
+            _beat("lastmessage.py", "running a tool for its numbers")
             r = subprocess.run(cmd, shell=True, cwd=os.path.dirname(os.path.dirname(HERE)),
                                capture_output=True, text=True,
                                timeout=180)
