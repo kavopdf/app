@@ -1,0 +1,38 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 72ade6d..3661aa7 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6063,9 +6063,31 @@ public final class DocxWriter {
+                         .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+                 ctx.spacerSplitTw += roomWantTw;
+             } else {
++                // THE REFUSED SPACER KEEPS THE EXACT LEVER, NOT THE LINE BOX.
++                //
++                // The spendable branch above already delivers the gap as `w:before`, and the
++                // refused branch used to deliver it as `w:line` exact - a different construct
++                // for the same gap, chosen by the page's room rather than by what the renderer
++                // does with it. Measured in GOOGLE on 23 Nov (relay, 13 probe documents, each a
++                // single page with two identical anchor runs either side of the spacer):
++                // `w:before` delivers its declared value 1:1 with zero loss from 0 to 576 pt,
++                // while `w:line` exact on an sz=2 mark delivers SHORT - 91.0% of declared at
++                // 14.4 pt and 95.3% at 144 pt, a 6.70 pt shortfall at 144 pt. So the refused
++                // spacer was drawing itself high by a fraction of its own height, and the only
++                // documents that showed it were the ones with a gap too large to spend.
++                //
++                // 68_journal_wide_table_spanning is that case: a 144 pt spacer, refused, written
++                // `w:line="2880"`, and scored 41/42 in Google failing 18_displacement alone
++                // (source=0 render=1) on this engine at HEAD. Its whole failure is that 6.70 pt.
++                //
++                // The hairline is the same one twip the spendable branch uses, so `before + line`
++                // still equals the gap to the twip and the model's own accounting does not move.
++                int refusedHairTw = Math.min(1, spacerTw);
+                 sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+-                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")
+-                        .append(spacerTw)
++                        .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
++                        .append(Math.max(0, spacerTw - refusedHairTw))
++                        .append("\" w:after=\"0\" w:line=\"")
++                        .append(refusedHairTw)
+                         .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
+             }
+             // The page is charged the same gap either way: the split moves the gap between
