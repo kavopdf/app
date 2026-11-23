@@ -1130,6 +1130,33 @@ the numbers once. That is the cost of starting. Paying it and then doing one att
 **If the engine is genuinely blocked** - the gate refuses, the class list is empty, Drive is down - say so
 with the evidence and release. That is a run that finished. One attempt and a report is a run that stopped.
 
+### A MEASUREMENT MUST NOT HOLD THE SLOT. RELEASE FIRST, MEASURE, RE-CLAIM.
+
+Measured 23 Nov on the 15:02 run, in its own words: **"the 90-minute window was spent on the measurement,
+not on deciding what to do"**. It ran **~2h48m**, made **1 attempt**, kept **0**, and RUN-HISTORY records it as
+`ended: (never)` with `killed - slot cleared by a force release`. It never released. Something else had to.
+
+That is not one bad run. A corpus measurement is minutes of work that cannot be interrupted, and while it runs
+the slot is held: every other fixer run claims, finds it busy, and exits. Two hours of the pipeline, spent on
+one measurement that one run could have done without owning anything.
+
+**So a measurement is never done while holding the slot.**
+
+    python3 tools/p2w-bench/round.py --release-fixer        # 1. give the slot back
+    python3 /scratch/work/p2w.py --force --budget 250       # 2. measure, no slot held
+    python3 tools/p2w-bench/round.py --claim-fixer          # 3. claim again, carry on
+
+**And before step 1, commit what you have:** the report, the attempt line, the finding. A run that releases
+with nothing written has spent the slot twice - once on the measurement, once on the kill that followed.
+
+**This does not make the measurement optional.** It says the measurement is not a reason to sit on the lock. A
+gate that needs a fresh corpus can be measured by a run that has already put its work down and given the slot
+to whoever comes next.
+
+**What this fixes:** a long run that made one attempt and died unreleased becomes a run that measured, released,
+and left its work on disk. The next run starts in seconds instead of waiting two hours for a corpse to be
+reaped.
+
 ### PICK THE CHECK THAT FINISHES DOCUMENTS, NOT THE CLASS THAT TOUCHES THEM
 
 Measured 23 Nov over 60 runs: **80% improved nothing, 60% made 0 or 1 attempt**, and about 20 documents a day
