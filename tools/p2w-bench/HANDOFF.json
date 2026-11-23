@@ -242,7 +242,7 @@
    "text": "attempt 41 on 18_displacement -> lead"
   }
  ],
- "next": "18_displacement: stop spending attempts on row pitch - measure the top of the block. The leading paragraph carries its vertical position in w:spacing w:before=1040 + w:line=13 exact, and the Google column of GVERIFY-BRIEF lists w:spacing as ignored. Build one variant that carries the same position WITHOUT w:spacing (exact-height empty paragraph, or w:ind/w:framePr), round trip table-with-no-header-row, and read the first line's dy: it is -10.16 now, and if it does not move the carrier is not the spacing. Then repeat on mobile-bill (-15.75).",
+ "next": "PENDING FIRST, FIXING SECOND. 81 items are outstanding and the user has asked for them to be cleared before any new class is taken. Run `python3 tools/p2w-bench/pending.py` - it lists them in the order they should be taken and says so itself: 'this is the work. Do not take a new class until it is empty.' The 81 are 72 [blocker] (accumulated watchdog observations, each with a 'can I fix it' line), 5 [ratchet] and 4 [agent]. The 4 agents were deployed 550-700 minutes ago and never committed a finding - they died with their runs, so check FINDINGS/ for the id and close them as dead rather than re-deploying. Clear them in the order pending.py gives. Only when that list is empty does classpick decide a class.",
  "agents": [
   {
    "id": "32_sB-02",

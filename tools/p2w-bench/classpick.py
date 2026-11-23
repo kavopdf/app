@@ -409,8 +409,38 @@ def _pick(fmt, rot, dead):
                  % (cur, docs[cur], fmt, n, since, moved)), rot
 
 
+def _pending():
+    """(count, first three lines) from pending.py, or (0, "") when the gate is clear.
+
+    Run as a subprocess rather than imported, for the same reason round.py does it: pending.py is the
+    single authority on what is outstanding, and a second copy of that logic here is how two answers to
+    one question start.
+    """
+    import subprocess
+    try:
+        r = subprocess.run([sys.executable, os.path.join(HERE, "pending.py")],
+                           capture_output=True, text=True, timeout=60)
+        out = (r.stdout or "")
+        import re
+        m = re.search(r"PENDING \((\d+)\)", out)
+        if not m:
+            return 0, ""
+        n = int(m.group(1))
+        body = [l.strip() for l in out.split("\n")[1:] if l.strip()][:4]
+        return n, " | ".join(body)
+    except Exception:
+        return 0, ""
+
+
 def decide():
     """Return (class, why, new_state). Alternates the two halves, run about.
+
+    PENDING OUTRANKS THE ROTATION, AND IT IS ENFORCED HERE BECAUSE A RULE IN A BRIEF IS NOT A MECHANISM.
+    The brief has said "nothing new starts while anything is unfinished" since the beginning, and the 23
+    Nov ledger shows 81 items outstanding while runs kept taking classes: 72 blockers, 5 ratchets and 4
+    agents that died 550-700 minutes ago without a finding. The user asked for the pending list to be
+    cleared before any new class. The same argument as the alternation below: it belongs here, where a run
+    cannot skip it.
 
     THE .TXT HALF WAS NEVER REACHED. The brief has said since the beginning to alternate - one run on the
     largest .docx class, the next on the largest .txt check - and no run ever did, because the picker only
@@ -423,6 +453,18 @@ def decide():
     """
     rot = load(ROTATION, {})
     dead = rot.get("exhausted") or {}
+
+    # PENDING OUTRANKS EVERYTHING. The brief has said "nothing new starts while anything is unfinished"
+    # since the beginning and runs kept taking classes anyway: the 23 Nov ledger shows 81 items
+    # outstanding - 72 blockers, 5 ratchets, 4 agents that died 550-700 minutes ago without a finding -
+    # while every run went to a class. The user asked for the list to be cleared first. A rule in a brief
+    # is not a mechanism, which is the same sentence this file already carries about the alternation.
+    _np, _nw = _pending()
+    if _np > 0:
+        return (None,
+                "PENDING FIRST: %d item(s) outstanding - take them in the order pending.py gives before "
+                "any new class. %s" % (_np, _nw),
+                rot)
     fmt = rot.get("next") or "docx"
     if fmt not in ("docx", "txt"):
         fmt = "docx"
