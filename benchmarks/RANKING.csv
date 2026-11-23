@@ -1,6 +1,6 @@
 rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p90_pt,max_pt,text_recall,chars_missing,worst_page,pages,colour_share,coloured_px,tone_share,order_share,font_share
 1,041122-Account_Opening_Form,content-loss,content-missing-partly-replaced,98.72,98.65,98.65,98.65,98.65,477.6,687.84,937.92,99.68,127,9,9,0.00,520621,47.78,79.11,100.00
-2,Account_Opening_Form_Fillable_filled,content-loss,content-missing-partly-replaced,97.9,97.72,97.66,97.62,97.55,138.72,312.0,358.08,99.67,131,7,9,0.00,520618,39.98,78.94,99.77
+2,Account_Opening_Form_Fillable_filled,content-loss,content-missing-partly-replaced,97.9,97.72,97.66,97.62,97.55,138.72,312.0,358.08,99.67,131,7,9,0.00,520618,40.16,78.94,99.77
 3,one-page-rotated-180-degrees,content-loss,content-missing-partly-replaced,81.64,81.64,81.64,81.64,81.64,27.84,156.0,177.6,100.0,0,2,2,,0,42.66,88.67,100.00
 4,600_reviewed_invoice_with_annotations,content-loss,content-missing-partly-replaced,73.32,69.97,67.94,62.46,51.68,11.04,48.96,62.88,100.0,0,1,1,68.65,15927,63.01,93.04,100.00
 5,601_fillable_admission_form,content-loss,content-missing-partly-replaced,61.58,57.93,55.92,52.39,44.76,12.0,24.96,27.84,99.58,2,1,1,,0,61.13,96.47,97.65
@@ -106,7 +106,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 105,05_round_company_seal_curved_text,clean,none,3.56,1.06,0.63,0.19,0.01,0.96,2.4,5.28,100.0,0,1,1,66.22,17796,92.46,71.30,100.00
 106,boq-horizontal-rules-only,clean,none,3.99,2.09,0.75,0.13,0.08,1.44,1.92,8.64,100.0,0,1,1,,0,98.12,100.00,100.00
 107,table-with-rotated-header,clean,none,12.51,1.08,0.44,0.12,0.0,0.96,0.96,3.36,100.0,0,1,1,,0,95.83,94.49,100.00
-108,350_question_paper,clean,none,16.48,0.79,0.16,0.11,0.1,0.96,0.96,16.8,100.0,0,1,1,,0,86.07,93.35,100.00
+108,350_question_paper,clean,none,15.36,0.82,0.19,0.11,0.1,0.96,0.96,16.8,100.0,0,1,1,,0,86.74,93.35,100.00
 109,08_two_overlapping_stamps,clean,none,0.6,0.29,0.2,0.11,0.05,0.96,4.32,11.04,100.0,0,1,1,89.44,53238,94.74,94.56,100.00
 110,391_survey_questionnaire_grid,clean,content-missing-nothing-in-its-place,1.24,0.61,0.28,0.11,0.0,0.96,2.4,4.32,99.58,2,1,1,,0,96.61,100.00,100.00
 111,313_power_of_attorney,clean,none,11.99,3.23,0.96,0.11,0.0,0.96,1.44,3.36,100.0,0,1,1,,0,86.32,100.00,100.00
