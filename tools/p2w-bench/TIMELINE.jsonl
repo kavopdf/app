@@ -2644,3 +2644,14 @@
 {"t": 1795438996.2738519, "ist": "18:33:16", "ev": "beat", "d": "attempt.py: recording an attempt"}
 >>>>>>> 4ab717d0 (attempt: 44_header_footer -> lead (0 of None))
 {"t": 1795439089.2639165, "ist": "18:34:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795440511.7151163, "ist": "18:58:31", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795440512.1143246, "ist": "18:58:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795440516.8207393, "ist": "18:58:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795441704.3738496, "ist": "19:18:24", "ev": "beat", "d": "building engine for a Google round trip"}
+{"t": 1795441764.446514, "ist": "19:19:24", "ev": "beat", "d": "fetching corpus"}
+{"t": 1795441840.373922, "ist": "19:20:40", "ev": "beat", "d": "google round trip on 4 docs"}
+{"t": 1795441893.957771, "ist": "19:21:33", "ev": "beat", "d": "rebuilding patched engine"}
+{"t": 1795442027.0141222, "ist": "19:23:47", "ev": "beat", "d": "re-census with fixed accounting"}
+{"t": 1795442239.9699647, "ist": "19:27:19", "ev": "beat", "d": "rebuild + diff census after fullSpend guard"}
+{"t": 1795442486.7507334, "ist": "19:31:26", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795442494.2756732, "ist": "19:31:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
