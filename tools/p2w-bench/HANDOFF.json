@@ -529,15 +529,10 @@
  ],
  "run": {
   "started": "23:58",
-  "ended": null,
-  "ended_how": null
+  "ended": "00:32",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "07:36",
-   "how": "forced",
-   "plan": "18_displacement: do NOT take the page top for the 16 solo-18 documents - all 16 are single-page PDFs and their converted .docx carries zero page breaks, so the proven page-top construct cannot make one of them clean. Their displacement is row/line pitch inside one dense table or form: start from the -4.3 median / -12.8..+2.9 spread measured on page 1 of bank-statement-5-pages, which is the residual after the page-top fix and sits on a page that was never broken. Land the section margin (w:pgMar w:top) as a SEPARATE build on multi-page documents: DocxWriter.java:1053-1075 already emits a sectPr with nextPage, so it is that path plus beforeTw=0 in the two ctx.newPage branches (3395-3401, 4277-4283) plus the same twips out of ctx.budgetTw (1116) and out of what pageFits is asked - steps 1-2 alone double the gap in LibreOffice, step 3 is what holds the page count. Do NOT retry the 1x1 trHeight row: measured this run, it takes bank-statement-5-pages from 5 pages to 6 and 37/42 to 33/42."
-  },
   {
    "at": "09:34",
    "how": "forced",
@@ -630,6 +625,11 @@
   },
   {
    "at": "22:43",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "00:32",
    "how": "forced",
    "plan": ""
   }
