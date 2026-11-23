@@ -3,14 +3,6 @@
  "notes": [
   {
    "at": "05:13",
-   "text": "agent deployed: 00_page_count / B - re-measure every claim of the page-count finding from the exported PDFs and docx"
-  },
-  {
-   "at": "05:13",
-   "text": "agent landed: 00_page_count / A -> FINDINGS/18disp-prize-sizing-agentA.md"
-  },
-  {
-   "at": "05:13",
    "text": "agent landed: 00_page_count / B -> FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md"
   },
   {
@@ -240,9 +232,17 @@
   {
    "at": "02:35",
    "text": "agent deployed: 18_displacement / B - table block-top gap and per-row height in DocxWriter"
+  },
+  {
+   "at": "02:37",
+   "text": "agent landed: 18_dA-03 /  -> PENDING-AUDIT.md"
+  },
+  {
+   "at": "02:37",
+   "text": "agent landed: 18_dB-01 /  -> 18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md"
   }
  ],
- "next": "NEXT RUN: (1) 18_displacement is measured and staged - the pair is (first-row cell w:before carries the table gap) + (w:trHeight declared less by the same per-row amount), and 362_price_list_dense is the falsifier because it has a ramp and no step. (2) The 5 ratchet items are very likely stale: benchmarks/STATE.json, RANKING.csv and the engine last changed in the SAME commit b7699196, and both regress.py --check and measure_gate.py pass on this tree (212/212 scored, engine docx == tree). Do not stamp them without checking - a corpus pass that covered them is what closes them, and the honest close is one corpus pass, not five stamps. (3) The 80 remaining pending items are mostly [blocker] rows that say 'this needs a decision, not a patch'.",
+ "next": "NEXT RUN: (1) THE PREVIOUS PAIR IS REFUTED - do not spend a slot on it. content+rule==pitch and hRule=atLeast make a trHeight-only change a no-op, and a cell-level gap escapes fitPage/shaveToFit (FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md). (2) The class is two disjoint halves: a spacer half (the step at each table top = 0.784 x the declared w:line of an unspendable spacer, confirmed on 4 of 4 documents) and a row half (+0.75 pt per row, 21.75 pt over 362_price_list_dense's 29 rows). (3) FIRST MOVE: one Google round trip on 362_price_list_dense with trHeight = max(content, line-15) on rows where line > content only - LO-invariant by construction, and it tells you whether Google lays trHeight+rule or max(trHeight, content+rule). (4) The 4 ratchet rows need one corpus pass (~40 min) - start the slot with it, do not end with it. (5) The 9 REOPEN rows in PENDING-AUDIT.md are decisions with evidence attached.",
  "agents": [
   {
    "id": "18_dtrheight-emitter-01",
@@ -515,9 +515,10 @@
    "question": "audit the pending gate: which of the 21 closable items are still true",
    "expected": "03:05",
    "deployed": "02:35",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-24T02:35"
+   "status": "landed",
+   "finding": "PENDING-AUDIT.md",
+   "deployed_at": "2026-11-24T02:35",
+   "landed_at": "2026-11-24T02:37"
   },
   {
    "id": "18_dB-01",
@@ -526,9 +527,10 @@
    "question": "table block-top gap and per-row height in DocxWriter",
    "expected": "03:10",
    "deployed": "02:35",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-24T02:35"
+   "status": "landed",
+   "finding": "18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md",
+   "deployed_at": "2026-11-24T02:35",
+   "landed_at": "2026-11-24T02:37"
   }
  ],
  "run": {
