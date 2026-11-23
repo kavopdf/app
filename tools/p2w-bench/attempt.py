@@ -141,10 +141,26 @@ def load():
                 return json.load(f)
         except (ValueError, OSError):
             pass
+        # A CORRUPT LEDGER MUST NOT READ AS AN EMPTY ONE.
+        #
+        # Measured 23 Nov: ATTEMPTS.json held 0 records while the history held a commit that recorded an
+        # attempt at 11:09. load() caught ValueError/OSError, returned {}, and the next save() truncated the
+        # file to that {}. One bad read wiped every attempt ever recorded, silently, with no error.
+        #
+        # A ledger that cannot be read is a fact to report, not a blank page to write over. So this refuses.
+        raise SystemExit("ATTEMPTS.json exists but cannot be read - refusing to treat it as empty, because "
+                         "the next save would truncate it. Fix or move the file, then retry.")
     return {}
-
-
+    
+    
 def save(d):
+    # Keep the previous file beside it. A write that goes wrong is then recoverable by hand.
+    if os.path.exists(LEDGER):
+        try:
+            import shutil as _sh
+            _sh.copyfile(LEDGER, LEDGER + ".bak")
+        except OSError:
+            pass
     with open(LEDGER, "w", encoding="utf-8") as f:
         json.dump(d, f, indent=1, sort_keys=True)
 
