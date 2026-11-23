@@ -9,7 +9,7 @@
   },
   "instrument": {
     "checks": 47,
-    "sha": "192ed820c33d",
+    "sha": "d12c66648bdb",
     "tool": "verify_google.py"
   },
   "not_compared": {
@@ -1495,5 +1495,5 @@
   "store": "BASELINE.md",
   "verdict": "UNMEASURED",
   "waived": false,
-  "written_at": "2026-11-19T16:41:36+05:30"
+  "written_at": "2026-11-23T07:37:00+05:30"
 }
