@@ -66,7 +66,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `13:21` agent deployed: B1 / 60_text_column_right_edge - right-edge+shape_anchor
 - `14:03` attempt 36 on 18_displacement -> reverted
 - `14:03` agent landed: 18_displacement / A -> FINDINGS/18_displacement-PARTIAL-SPEND-REGRESSES-GOOGLE-1428-relay.md
 - `16:35` attempt 5 on 00_page_count -> partial (2/23 moved)
@@ -91,6 +90,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `00:09` attempt 16 on content-present-partly-displaced -> lead (0/13 moved)
 - `00:25` attempt 17 on content-present-partly-displaced -> lead (0/13 moved)
 - `00:30` attempt 18 on content-present-partly-displaced -> lead (0/13 moved)
+- `01:42` attempt 3 on t12_word_invention -> lead (0/213 moved)
 
 ## Where the rest of the state lives
 

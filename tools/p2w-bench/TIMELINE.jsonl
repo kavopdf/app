@@ -3033,3 +3033,6 @@
 {"t": 1795464533.314709, "ist": "01:38:53", "ev": "beat", "d": "verifying 64 txt docs"}
 {"t": 1795464625.816909, "ist": "01:40:25", "ev": "beat", "d": "patching verify_txt source reader for printed annotations"}
 {"t": 1795464730.5039299, "ist": "01:42:10", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795464733.649583, "ist": "01:42:13", "ev": "attempt", "d": "t12_word_invention -> lead"}
+{"t": 1795464733.7223127, "ist": "01:42:13", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795464733.8183794, "ist": "01:42:13", "ev": "beat", "d": "classrow.py: refreshing the class file"}
