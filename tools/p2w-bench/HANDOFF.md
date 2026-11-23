@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 00:56 |
-| ended | 02:09 |
-| how it ended | forced |
+| started | 02:19 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -66,7 +66,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `20:45` two agents landed and recorded: 18A-01 LO proxy verdict, 18B-01 trHeight cross-renderer
 - `21:29` attempt 41 on 18_displacement -> lead
 - `23:32` attempt 1 on 04_chars_missing -> lead (0/5 moved)
 - `23:32` agent deployed: 04_chars_missing construct: Google drops wps:txbx text; missing multiset fully explained by anchored boxes on 9 docs /  - 
@@ -91,6 +90,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `02:07` agent landed: 18_dA-02 /  -> FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md
 - `02:07` agent landed: 04_cB-02 /  -> FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md
 - `02:08` attempt 42 on 18_displacement -> lead (0/13 moved)
+- `02:34` attempt 43 on 18_displacement -> lead (0/13 moved)
 
 ## Where the rest of the state lives
 

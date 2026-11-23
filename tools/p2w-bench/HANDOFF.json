@@ -2,10 +2,6 @@
  "plan": "",
  "notes": [
   {
-   "at": "04:09",
-   "text": "attempt 31 on 18_displacement -> kept"
-  },
-  {
    "at": "05:09",
    "text": "attempt 2 on 00_page_count -> lead (0/23 moved)"
   },
@@ -240,6 +236,10 @@
   {
    "at": "02:08",
    "text": "attempt 42 on 18_displacement -> lead (0/13 moved)"
+  },
+  {
+   "at": "02:34",
+   "text": "attempt 43 on 18_displacement -> lead (0/13 moved)"
   }
  ],
  "next": "NEXT RUN: (1) 18_displacement is measured and staged - the pair is (first-row cell w:before carries the table gap) + (w:trHeight declared less by the same per-row amount), and 362_price_list_dense is the falsifier because it has a ramp and no step. (2) The 5 ratchet items are very likely stale: benchmarks/STATE.json, RANKING.csv and the engine last changed in the SAME commit b7699196, and both regress.py --check and measure_gate.py pass on this tree (212/212 scored, engine docx == tree). Do not stamp them without checking - a corpus pass that covered them is what closes them, and the honest close is one corpus pass, not five stamps. (3) The 80 remaining pending items are mostly [blocker] rows that say 'this needs a decision, not a patch'.",

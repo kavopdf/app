@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 00:56
+# Fixer report - 2026-11-24 02:19
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 02:08 → 02:09 IST · 1h 13m**
+**24 Nov 2026 · slot 02:19 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -23,14 +23,6 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
 | Working on | `-` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 01:42 | **lead** | 0/213 | t12's 21 invented words on 600 split into 3 faults; source reader now sees printing annotations (21->20, blast radius 1 doc, no verdict moved); remaining 20 are the converter duplicating FreeText text |
-| 01:43 | **lead** | 0/213 | 23 page_count_refused docs: 21 render the RIGHT page count in LibreOffice and one too many in Google (proxy is blind); the 350 inline-picture construct is REFUTED - 0 wp:inline across all 23, the engi |
-| 02:08 | **lead** | 0/13 | Four live Google round trips on the 13 sole-failure documents give the distances this class has never had: med_dy -2.8 / -3.0 / -6.7 / -13.0 pt, worst_dy 5.4 / 4.9 / 10.0 / 28.2, med_dx -0.2..+0.2, ba |
 
 ## The txt
 
@@ -44,33 +36,18 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-02` | which single failing Google check, if fixed, makes t | 02:07 | - | not recorded |
-| `04_cB-02` | is the missing-char multiset fully explained by anch | 02:07 | - | not recorded |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 02:08 → 02:09 · 1h 13m |
+| Slot window | 02:19 → running · 0 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 64 |
-| Longest silence | **24.4 min** — from 00:56:37, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 8 |
+| Tool beats | 2 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **3 min** | `#` |
-| fix - diagnose and change the engine | **3 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **34 min** | `##########` |
-| record - attempt, handoff, class rows | **4 min** | `#` |
-| report - the report and the chain | **14 min** | `####` |
-| other - not attributed to a tool | **13 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -1,6 +1,3 @@
-| 20 Nov 20:58 | fixer | slot claimed - fixer running |
-| 20 Nov 20:59 | fixer | attempt t01_word_accuracy -> reverted (0/10 moved) |
-| 20 Nov 21:22 | fixer | attempt t01_word_accuracy -> kept (3/10 moved) |
 | 20 Nov 21:46 | fixer | attempt t01_word_accuracy -> reverted (0/10 moved) |
 | 20 Nov 21:49 | fixer | attempt t01_word_accuracy -> kept (0/10 moved) |
 | 20 Nov 21:57 | fixer | slot claimed - fixer running |
@@ -199,3 +196,5 @@
 | 24 Nov 01:43 | fixer | attempt 00_page_count -> lead (0/213 moved) |
 | 24 Nov 02:08 | fixer | attempt 18_displacement -> lead (0/13 moved) |
 | 24 Nov 02:09 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 24 Nov 02:19 | fixer | slot claimed - fixer running |
+| 24 Nov 02:34 | fixer | attempt 18_displacement -> lead (0/13 moved) |
