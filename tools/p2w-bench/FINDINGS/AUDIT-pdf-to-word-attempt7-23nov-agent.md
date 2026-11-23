@@ -42,12 +42,14 @@ the difference between a fast app and one that feels hot and slow for a minute a
 
 ---
 
-## G3 — the nine lifecycle guards are all for the UI, none for the work
+## G3 — all nine lifecycle guards are for the UI, none for the work
 
-    ToolsActivity.kt:608, 743, 844, 908
-    PdfActivity.kt:252, 291, 344, 375, 576        (8 sites)
+Counted exactly: **9 lifecycle references, in two shapes.**
 
-Every one of them is `if (isFinishing || isDestroyed) return` before a toast, a dialog or a UI refresh — plus the
+    8 x  if (isFinishing || isDestroyed) return      <- return guards
+    1 x  if (!isFinishing && !isDestroyed) toast()   <- the toast guard, ToolsActivity:608
+
+The eight return guards sit before a toast, a dialog or a UI refresh. The ninth is the
 `runOnUiThread { if (!isFinishing && !isDestroyed) toast(...) }` at ToolsActivity:608, whose comment records that
 it was added because toasting from a worker thread crashed.
 
