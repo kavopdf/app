@@ -1,0 +1,18 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 72ade6dd..2fde5097 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6052,9 +6052,10 @@ public final class DocxWriter {
+             int slackTw = ctx.budgetTw - Math.round(ctx.pageInkBottomPt * (float) TWIPS_PER_PT);
+             int roomWantTw = Math.max(0, spacerTw - 20);
+             int wantTw = Math.max(0, spacerTw - spacerHairTw);
+-            boolean spendable = slackTw > 0
+-                    && ctx.spacerSplitTw + roomWantTw + rowExcessTw <= slackTw;
+-            if (spendable) {
++            int roomTw = slackTw - rowExcessTw - ctx.spacerSplitTw;
++            int spendTw = Math.min(wantTw, Math.max(0, roomTw));
++            int lineTw = spacerTw - spendTw;
++            if (spendTw > 0) {
+                 sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                         .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
+                         .append(wantTw)

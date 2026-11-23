@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-23 12:15
+# Fixer report - 2026-11-23 13:20
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 12:14 → 13:03 IST · 48 min**
+**23 Nov 2026 · slot 13:20 → running IST · 42 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -22,7 +22,13 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `00_page_count` |
+| Working on | `18_displacement` |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 14:02 | **reverted** | 0/None | partial spend of the table-gap spacer: Google 68_journal 41/42 -> 40/42, adds 59_shape_anchor, fixes nothing; flow-invariant so LibreOffice could not have caught it |
 
 ## The txt
 
@@ -36,27 +42,31 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `A118_displacement-01` | writer-construct | 13:21 | - | - |
+| `B160_text_column_right_edge-01` | right-edge+shape_anchor | 13:21 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 12:14 → 13:03 · 48 min |
+| Slot window | 13:20 → running · 42 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 0 |
-| Longest silence | **38.2 min** — from 12:24:40, after `lastmessage.py: running a tool for its numbers` |
-| Silences over 2 min | 2 |
-| Obstacles | 2 cleared · 4 parked, with the evidence to re-open them |
-| Still a wall | **The window closed and the relay took it: this is the pair working, and no force release was needed.** Commit |
+| Tool beats | 22 |
+| Longest silence | **14.4 min** — from 13:21:17, after `handoff.py: reading or writing the handoff` |
+| Silences over 2 min | 5 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **39 min** | `##################` |
-| other - not attributed to a tool | **7 min** | `####` |
+| fix - diagnose and change the engine | **7 min** | `####` |
+| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `############` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **11 min** | `######` |
 ## Best results this round
 
 | Document | Before | After | Change |

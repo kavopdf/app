@@ -135,3 +135,4 @@
 {"at": "2026-11-23 08:11", "attempt": 3, "class": "00_page_count", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-23 11:00", "attempt": 1, "class": "t09_page_furniture", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-23 11:28", "attempt": 4, "class": "00_page_count", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-23 14:02", "attempt": 36, "class": "18_displacement", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
