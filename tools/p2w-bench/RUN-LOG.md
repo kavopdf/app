@@ -211,3 +211,4 @@
 =======
 | 23 Nov 16:35 | fixer | attempt 00_page_count -> partial (2/23 moved) |
 >>>>>>> f3b47658 (run report 23 Nov 15:02: the column-page shape merge landed (partial, 2/23 - the proxy is blind to it))
+| 23 Nov 16:38 | fixer | slot FORCED released - see INCIDENTS.md for why |

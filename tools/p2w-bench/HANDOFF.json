@@ -2116,15 +2116,10 @@
  ],
  "run": {
   "started": "15:02",
-  "ended": null,
-  "ended_how": null
+  "ended": "16:38",
+  "ended_how": "forced"
  },
  "history": [
-  {
-   "at": "04:50",
-   "how": "forced",
-   "plan": "32_stroke_lines: land rule-carrier-horizontal-only-2008 by closing the 38 missing Google results, not by narrowing the predicate"
-  },
   {
    "at": "06:18",
    "how": "forced",
@@ -2217,6 +2212,11 @@
   },
   {
    "at": "06:18",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "16:38",
    "how": "forced",
    "plan": ""
   }
