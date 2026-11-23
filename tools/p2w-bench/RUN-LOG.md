@@ -1,4 +1,3 @@
-| 20 Nov 08:52 | fixer | slot claimed - fixer running |
 | 20 Nov 09:22 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |
 | 20 Nov 09:24 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 20 Nov 09:25 | fixer | slot re-claimed by a status check, then released again - the claim was accidental, no work was done under it |
@@ -198,3 +197,4 @@
 | 23 Nov 13:20 | fixer | slot claimed - fixer running |
 | 23 Nov 14:03 | fixer | attempt 18_displacement -> reverted (0/? moved) |
 | 23 Nov 16:05 | fixer | attempt 00_page_count -> lead (0/? moved) |
+| 23 Nov 16:09 | fixer | attempt 00_page_count -> lead (0/? moved) |

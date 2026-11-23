@@ -92,6 +92,35 @@ Also worth one probe each, because they are separate mechanisms and the class hi
 `401_trifold_brochure` (21 drawing-only paragraphs, landscape) and `361_product_catalogue_grid`
 (91 drawing-only paragraphs, via the column path — the unlanded patch agent A found this run).
 
+
+## 4. The prediction held: 62 shapes -> 2 pages, `w:pgBorders` -> 1 page
+
+Built one variant of `60_page_border`'s `.docx` in place — removed every run carrying a `<w:drawing>` (all
+62, every one `wrapNone`/`behindDoc="1"`) and added a real `w:pgBorders` (single, `sz=8`, `space=24`,
+`offsetFrom="page"`) to the first `sectPr`. Text untouched. LibreOffice: 1 page, 673 chars. Then the same
+Google round trip — upload, convert on import, export, delete:
+
+| variant | LibreOffice | **Google pages** | page 1 chars | page 1 images | page 1 drawings |
+|---|---:|---:|---:|---:|---:|
+| HEAD: 62 `wp:anchor` shapes | 1 | **2** | 689 | **46** | 1 |
+| 0 shapes + `w:pgBorders` | 1 | **1** | **689** | **0** | 1 |
+
+The page count follows the **number of page-positioned floating shapes**, and nothing else: same text, same
+689 characters, same LibreOffice page count, one page in Google instead of two. This is the mechanism, and
+it is not the carrier paragraph.
+
+**What this probe does not establish, and the next run must.** The only drawing in *either* export is a
+single rect at `[0.0, 0.0, 595.5, 842.2]` — the full page — in both the 2-page and the 1-page variant. So
+this probe does **not** show that Google draws the `w:pgBorders` frame. If Google silently drops it, the
+page count is fixed and the page border is lost, which is a document getting worse, not better. `pgBorders`
+is not in `google_safe.py`'s "Google ignores" catalogue (`w:framePr`, `w:w`/`w:spacing`, `.odttf` faces,
+floating `<w:drawing>` rules), but absence from that list is not evidence that Google honours it.
+
+The falsifiable next test is therefore narrow and cheap: render the `pgBorders` variant in Google and check
+that ink exists near all four page edges (four line segments at ~24 twips inset), not just that the page
+count is 1. If the frame is dropped, the fallback is one *composite* shape per page edge instead of 62
+segments — the count is the thing that matters, and 4 is not 62.
+
 ## Two agent findings carried alongside
 
 - `FINDINGS/00_page_count-COLUMN-PAGE-MERGE-1615-agent.md` + `.patch` — the column-page shape merge.

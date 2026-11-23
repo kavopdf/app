@@ -1,9 +1,9 @@
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 13:20 → running IST · 2h 46m**
+**23 Nov 2026 · slot 13:20 → running IST · 2h 48m**
 
-> No change was kept this run. The carried lever was refuted in Google with three probe documents, and the
-> class it was aimed at turned out not to be one class.
+> No change was kept this run. The carried lever was refuted in Google, and the mechanism that replaced it
+> was confirmed by a probe whose prediction was written down before it ran.
 
 ## The class choice, and why
 
@@ -18,40 +18,44 @@ refusals exist.
 ## What the measurement found
 
 The 13:20 report's NEXT LEVER was: *Google keeps the empty paragraph that carries a page-positioned shape,
-it costs ~0.83 pt, merge them into one paragraph.* Measured on HEAD, in this order:
+it costs ~0.83 pt, merge them into one paragraph.* Four measurements on HEAD, in this order:
 
 1. **The carrier paragraphs are not there.** Converted the 23 with `ConvertOne`, one JVM each: **18 of 22
    have zero drawing-only paragraphs**. Only `041122` (2), `401_trifold_brochure` (21) and
    `361_product_catalogue_grid` (91) have any. The 2 464 the 0530 finding cites are not in this tree.
 2. **LibreOffice renders the right page count on 21 of the 22.** Only `041122` is wrong locally (9 → 10).
    So the class is Google-only, and the "fixed-in-LO-only" column is the honest description of it.
-3. **Three Google probes on HEAD** — uploaded, converted on import, exported, deleted. `60_page_border`
-   renders **2 pages with 0 characters on page 2**, and its 62 `wp:anchor` shapes arrive as **62 rasterised
-   images split 46 / 16 across the two pages**. `350_question_paper` also renders 2 pages but page 2 carries
-   8 real characters — a genuine one-line overflow, a different fault wearing the same class name. Adding a
-   trailing empty paragraph to `60_page_border` changed nothing: 2 pages before, 2 pages after.
+3. **The fault is the shape count.** `60_page_border` renders 2 pages in Google with **0 characters on page
+   2**, and its 62 `wp:anchor` shapes (all `wrapNone`, `behindDoc="1"`) arrive as **62 rasterised images
+   split 46 / 16 across the two pages**. `350_question_paper` also renders 2 pages but page 2 carries 8 real
+   characters — a genuine one-line overflow, a different fault wearing the same class name. Adding a
+   trailing empty paragraph changed nothing: 2 pages before, 2 pages after.
+4. **The prediction held.** Written down before the probe ran: *replace the 62 shapes with one section
+   property and Google should render 1 page.* Done — every drawing run removed, a real `w:pgBorders` added,
+   text untouched. Google: **1 page, the same 689 characters, 0 images**. LibreOffice 1 page both ways.
 
 So the mechanism is **Google rasterising N independent page-positioned shapes and laying them out in flow**,
-not the paragraph that carries them. The falsifiable next test is one probe: replace `60_page_border`'s 62
-shapes with one shape, or with `w:pgBorders`, and Google should render 1 page. That is a `DocxWriter` change
-and it was not made in the remaining minutes — an unmeasured engine change is a guess, and rule 2 says a
-guess goes in FINDINGS.
+not the paragraph that carries them. What the probe does *not* show: that Google draws the `w:pgBorders`
+frame. The only drawing in either export is the full-page rect, so the next test must look for ink at the
+four page edges — if the frame is dropped, the fallback is one composite shape per edge, because the count
+is what matters and 4 is not 62. No engine change was made: it is a `DocxWriter` change that wants a before
+and after in Google, and rule 2 puts an unmeasured change in FINDINGS.
 
 ## Note on the run record — a pipeline bug with evidence
 
-`RUN.json` says this run started at **13:20** with **2 attempts**; the claim this run took was stamped at
-**15:16**. The 13:20 run was killed and never released its slot, and `round.py`'s takeover path refreshed the
-claim without calling `_run_record("start")` — the archive-and-restart block at `round.py:512-533` sits in
-the *no-existing-claim* branch, so a stale claim is taken over silently. This run's duration and attempt
-count are therefore reported against the dead run's record. `runclock.py` reads the claim, not `RUN.json`,
-and correctly said 33 min at 16:18. Not fixed — it is a change to the round machine and wants its own
+`RUN.json` says this run started at **13:20**; the claim this run took was stamped at **15:16**. The 13:20
+run was killed and never released its slot, and `round.py`'s takeover path refreshed the claim without
+calling `_run_record("start")` — the archive-and-restart block at `round.py:512-533` sits in the
+*no-existing-claim* branch, so a stale claim is taken over silently. This run's duration and attempt count
+are therefore reported against the dead run's record. `runclock.py` reads the claim, not `RUN.json`, and
+correctly said 33 min at 16:18. Not fixed — it is a change to the round machine and wants its own
 measurement.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -70,6 +74,7 @@ measurement.
 |--:|:--|--:|:--|
 | 14:02 | **reverted** | 0/None | partial spend of the table-gap spacer: Google 68_journal 41/42 -> 40/42, adds 59_shape_anchor, fixes nothing; flow-invariant so LibreOffice could not have caught it |
 | 16:05 | **lead** | 0/None | Measured the 23 page_count_refused documents on HEAD: 18 of 22 have zero drawing-only paragraphs, so the carried 'carrier paragraph costs 0.83pt' lever is dead. 21 of 22 render the correct page count |
+| 16:09 | **lead** | 0/None | Prediction confirmed in Google: 60_page_border's 62 wrapNone/behindDoc anchors render as 62 rasterised images split 46/16 across TWO pages (page 2: 0 chars); the same document with all 62 runs removed |
 
 ## The txt
 
@@ -92,9 +97,9 @@ measurement.
 
 | | |
 |:--|:--|
-| Slot window | 13:20 → running · 2h 46m |
+| Slot window | 13:20 → running · 2h 48m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 30 |
+| Tool beats | 35 |
 | Longest silence | **52.3 min** — from 14:16:06, after `relay: fixer claimed the slot (the :50/:10 slot, found free)` |
 | Silences over 2 min | 10 |
 | Obstacles | 2 cleared · 1 parked, with the evidence to re-open them |
@@ -107,7 +112,7 @@ measurement.
 |:--|--:|:--|
 | fix - diagnose and change the engine | **23 min** | `###` |
 | measure or build - a conversion, screen or compile writes no beacon | **1h 06m** | `#########` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
+| record - attempt, handoff, class rows | **2 min** | `#` |
 | report - the report and the chain | **1h 01m** | `########` |
 | other - not attributed to a tool | **14 min** | `##` |
 ## Best results this round
