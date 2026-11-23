@@ -1,6 +1,6 @@
 {
  "00_page_count": {
-  "attempts": 3,
+  "attempts": 4,
   "first_seen": null,
   "history": [
    {
@@ -16,6 +16,13 @@
     "outcome": "kept",
     "reason": "shape paragraphs -> runs in the existing paragraph: 301_lab_report_panel Google 2 pages (page_count_refused) -> 1 page, 39/42; 375_attendance_register 35/42 with 01_page_count+55 failing -> 37/42, pag",
     "total": null
+   },
+   {
+    "at": "2026-11-23 11:28",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Merged the shape-only paragraphs that columnPage() still emitted one-per-shape. Google A/B (not LibreOffice): 361_product_catalogue_grid 2 pages at HEAD -> 1 page with the patch, 41/42 checks, scorabl",
+    "total": 0
    }
   ],
   "last": null,
@@ -25,13 +32,15 @@
   "outcomes": [
    "error",
    "lead",
-   "kept"
+   "kept",
+   "lead"
   ],
-  "reason": "shape paragraphs -> runs in the existing paragraph: 301_lab_report_panel Google 2 pages (page_count_refused) -> 1 page, 39/42; 375_attendance_register 35/42 with 01_page_count+55 failing -> 37/42, page count 1, no check newly failing (A/B measured with the previous engine built and rendered). Corpus 213 re-measured: 0 worse in LO, share5 identical on all 213 because the proxy cannot see it. Landing it moves 22 page-count-refused documents from 'all 42 unknown' to measurable.",
+  "reason": "Merged the shape-only paragraphs that columnPage() still emitted one-per-shape. Google A/B (not LibreOffice): 361_product_catalogue_grid 2 pages at HEAD -> 1 page with the patch, 41/42 checks, scorable for the first time; 401_trifold_brochure 2->2. Patch committed as FINDINGS/00_page_count-MERGE-SHAPE-PARAGRAPHS.patch. Not landed because the docx table re-measure (benchmarks/gate.py --budget 250) does not finish inside one 290s call; txt half re-measured (213 scored, 0 moved).",
   "reasons": [
    "namespace test",
    "Mechanism measured, fix not landed: Google converts each page-positioned floating shape into an inline image in the flow, ~0.79 pt each; 22 of 23 refused documents emit their shapes AFTER the last text paragraph, so a full page overflows. Six docx-level variants measured through Google (drop last, merge into one paragraph, attach to text paragraphs, prstGeom, wrapSquare, framePr) - all still 2 pages; deleting all shapes is 1 page, which proves the cause. Fix needs the table writer (w:tcBorders). FINDINGS/00_page_count-GOOGLE-INLINES-EVERY-SHAPE-0530-fixer.md",
-   "shape paragraphs -> runs in the existing paragraph: 301_lab_report_panel Google 2 pages (page_count_refused) -> 1 page, 39/42; 375_attendance_register 35/42 with 01_page_count+55 failing -> 37/42, page count 1, no check newly failing (A/B measured with the previous engine built and rendered). Corpus 213 re-measured: 0 worse in LO, share5 identical on all 213 because the proxy cannot see it. Landing it moves 22 page-count-refused documents from 'all 42 unknown' to measurable."
+   "shape paragraphs -> runs in the existing paragraph: 301_lab_report_panel Google 2 pages (page_count_refused) -> 1 page, 39/42; 375_attendance_register 35/42 with 01_page_count+55 failing -> 37/42, page count 1, no check newly failing (A/B measured with the previous engine built and rendered). Corpus 213 re-measured: 0 worse in LO, share5 identical on all 213 because the proxy cannot see it. Landing it moves 22 page-count-refused documents from 'all 42 unknown' to measurable.",
+   "Merged the shape-only paragraphs that columnPage() still emitted one-per-shape. Google A/B (not LibreOffice): 361_product_catalogue_grid 2 pages at HEAD -> 1 page with the patch, 41/42 checks, scorable for the first time; 401_trifold_brochure 2->2. Patch committed as FINDINGS/00_page_count-MERGE-SHAPE-PARAGRAPHS.patch. Not landed because the docx table re-measure (benchmarks/gate.py --budget 250) does not finish inside one 290s call; txt half re-measured (213 scored, 0 moved)."
   ],
   "requeues": 0,
   "status": "OPEN"

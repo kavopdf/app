@@ -2231,6 +2231,7 @@
 {"t": 1795409247.7667344, "ist": "10:17:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795409254.0365615, "ist": "10:17:34", "ev": "beat", "d": "gaps.py: reading the timeline"}
 {"t": 1795409256.8500037, "ist": "10:17:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795411328.9920156, "ist": "10:52:08", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795411649.2811532, "ist": "10:57:29", "ev": "beat", "d": "relay: patching t09 furniture key + owed-per-occurrence"}
 {"t": 1795411812.061269, "ist": "11:00:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795411817.16814, "ist": "11:00:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
@@ -2284,6 +2285,15 @@
 {"t": 1795411955.5188417, "ist": "11:02:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795411959.3974578, "ist": "11:02:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795411966.1140103, "ist": "11:02:46", "ev": "beat", "d": "relay: re-stamping RANKING-TXT.csv (corpus + engine)"}
+{"t": 1795412653.0499735, "ist": "11:14:13", "ev": "beat", "d": "patch applied, building engine for Google A/B"}
+{"t": 1795412727.7247043, "ist": "11:15:27", "ev": "beat", "d": "converting A/B for 361+401"}
+{"t": 1795412748.3422637, "ist": "11:15:48", "ev": "beat", "d": "building HEAD for the before arm"}
+{"t": 1795412846.99716, "ist": "11:17:26", "ev": "beat", "d": "google render: finding the pdf path in the download payload"}
+{"t": 1795412888.2203543, "ist": "11:18:08", "ev": "beat", "d": "google page count measured: 361 2->1, 401 2->2"}
+{"t": 1795412906.3597107, "ist": "11:18:26", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795412926.1002586, "ist": "11:18:46", "ev": "beat", "d": "re-measuring the txt table on the new engine so the gate can stamp"}
+{"t": 1795413008.8975172, "ist": "11:20:08", "ev": "beat", "d": "txt rescore running on 213"}
+{"t": 1795413116.063094, "ist": "11:21:56", "ev": "beat", "d": "re-measuring the docx table (gate.py --budget 250) so the change can land"}
 {"t": 1795413480.800655, "ist": "11:28:00", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795413481.442552, "ist": "11:28:01", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795413481.5519555, "ist": "11:28:01", "ev": "beat", "d": "report.py: building the report"}
@@ -2302,6 +2312,7 @@
 {"t": 1795413491.5120242, "ist": "11:28:11", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795413492.361687, "ist": "11:28:12", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795413492.5506685, "ist": "11:28:12", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795413495.434556, "ist": "11:28:15", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795413514.0870216, "ist": "11:28:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795413516.588483, "ist": "11:28:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795413529.483626, "ist": "11:28:49", "ev": "release", "d": "fixer released (forced)"}
