@@ -1,0 +1,117 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index f0439044..e5e7aa83 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -5739,6 +5739,21 @@ public final class DocxWriter {
+      * the answer for every side: since D-22 a side carries the weight of the rule that lies on
+      * it, and this value only stands in where no rule could be read (see {@link #borders}).
+      */
++    /**
++     * WHAT GOOGLE CHARGES A TABLE ROW ON TOP OF ITS {@code w:trHeight}.
++     *
++     * Measured through Google Docs, not inferred: on mobile-bill rows written
++     * {@code w:trHeight} 360 / 380 twips came back 19.0 / 20.0 pt apart, a flat +1.00 pt on
++     * every row, while LibreOffice laid the same rows at 18.0 / 19.0 - the declared height.
++     * The rule a row draws is therefore OUTSIDE the Google box and INSIDE LibreOffice's
++     * {@code max(w:trHeight, content + rule)}. Two renderers, two models, one number.
++     *
++     * The construct that satisfies both is in {@link #table}: the row's height carries the
++     * pitch LESS this charge, and the cell's bottom margin carries the rest, so that
++     * {@code trHeight + charge} is the pitch in Google and {@code content + margin + rule}
++     * is the pitch in LibreOffice. See FINDINGS/18_displacement-TRHEIGHT-CROSS-RENDERER.
++     */
++    private static final int GOOGLE_RULE_CHARGE_TW = 20;
+     private static final int TABLE_RULE_SZ = 8;
+     /** The colour a side falls back to when the page's own stroke for it was not read. */
+     private static final String TABLE_RULE_COLOUR = "000000";
+@@ -5760,6 +5775,30 @@ public final class DocxWriter {
+      * clamp is a real loss of fidelity at both ends - a 0.1 pt hairline is drawn a quarter point
+      * thick - and it is the narrower loss: a border outside the range is not a border at all.
+      */
++    /**
++     * THE CELL'S SHARE OF THE ROW'S PITCH, AS A BOTTOM MARGIN.
++     *
++     * LibreOffice lays a row at {@code max(w:trHeight, content + rule)}, and the row's
++     * {@code w:trHeight} is now the pitch less Google's charge - so a row whose content does
++     * not reach the pitch is laid a rule short. This margin is what lifts the content back to
++     * the pitch: {@code content + margin + rule = pitch} exactly. It sits BELOW the last line,
++     * so it moves no text, and it is inert wherever the content already fills the row.
++     *
++     * Measured on the two documents this construct was built against (LibreOffice 7.4.7.2,
++     * rule positions read off the rendered PDF): every row of table-with-no-header-row at
++     * 18.40 pt against the page's 18.40, 47/47 on the 47-check instrument, one page; the same
++     * on mobile-bill with 20 of 26 rows exactly 18.40. Both numbers are in
++     * FINDINGS/18_displacement-TRHEIGHT-CROSS-RENDERER-*-agentB.md, with the LO share@5 cost
++     * this construct pays and the reason it pays it.
++     */
++    private static String cellMarTw(int pitchTw, int ruleTw, int contentTw) {
++        if (pitchTw <= 0) return "";
++        int mar = pitchTw - ruleTw - contentTw;
++        if (mar <= 0) return "";
++        return "<w:tcMar><w:top w:w=\"0\" w:type=\"dxa\"/><w:bottom w:w=\"" + mar
++                + "\" w:type=\"dxa\"/></w:tcMar>";
++    }
++
+     private static int szOf(float widthPt) {
+         int sz = Math.round(Math.max(0.1f, widthPt) * 8f);
+         return Math.max(TABLE_RULE_SZ_MIN, Math.min(TABLE_RULE_SZ_MAX, sz));
+@@ -6374,6 +6413,14 @@ public final class DocxWriter {
+                 if (pitchPt > 0.5f && pitchPt < 2000f) {
+                     rowTwHere = (int) Math.round(pitchPt * TWIPS_PER_PT);
+                 }
++                // THE PAGE'S PITCH, NOT THE SNAPPED EDGE. rowEdge is measured to whole points,
++                // so an 18.40 pt table comes back as 18.0 / 19.0 alternating - a 0.4 pt error
++                // per row that reverses every other row and never cancels. rowTw is the table's
++                // own extent over its row count, which on this shape is 368 twips EXACT. When
++                // the two agree to within a point the row is the table's pitch and the
++                // snapping is noise; when they disagree the row really is its own height
++                // (a header, a merged band) and the measurement stands.
++                if (rowTw > 0 && Math.abs(rowTw - rowTwHere) <= 20) rowTwHere = rowTw;
+             }
+             // The row that straddles the paper's bottom edge is cut at it, so the table ends
+             // where the sheet does. The renderer lays a row out at max(trHeight, content+rule),
+@@ -6555,9 +6602,22 @@ public final class DocxWriter {
+             }
+             inner.append("<w:tr>");
+             if (rowTwHere > 0) {
+-                inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
++                // THE ROW'S HEIGHT IS THE PITCH LESS WHAT GOOGLE CHARGES ON TOP OF IT.
++                // Google lays trHeight + the row's rule; LibreOffice lays
++                // max(trHeight, content + rule). Writing the pitch itself here put Google one
++                // rule a row too tall (19.0 / 20.0 pt on mobile-bill's 18.40 pt rows) and
++                // writing the pitch less the rule (the obvious patch) put every LibreOffice
++                // row that its content did not fill one rule too SHORT - measured, 46/47 with
++                // 18_displacement failing. Neither number alone is right; the pair is, and the
++                // margin emitted with each cell below is the other half of it.
++                inner.append("<w:trPr><w:trHeight w:val=\"")
++                     .append(Math.max(1, rowHeightTw - GOOGLE_RULE_CHARGE_TW))
+                      .append("\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
+             }
++            // The rule LibreOffice charges a row: the cell's own bottom edge, at full width.
++            // OOXML's w:sz is in eighths of a point, so sz 4 is 0.5 pt and sz 7 is 0.875 pt.
++            int loRuleTwHere = Math.max(1, (int) Math.round(
++                    (sepSz > 0 ? sepSz : szRuleInside) * TWIPS_PER_PT / 8f));
+             int c = 0;
+             while (c < cols) {
+                 // A slot the page's own rectangle handed to the cell on its left is not a
+@@ -6866,7 +6926,9 @@ public final class DocxWriter {
+                     // slack between the row's trHeight and what it holds - measured on
+                     // 64_newspaper_uneven_columns_ad_boxes as a flat +2.2 pt on all 77 lines,
+                     // which is half of the 3.8 pt its spanning row had spare.
+-                    inner.append("<w:vAlign w:val=\"top\"/></w:tcPr>");
++                    inner.append(cellMarTw(pitchTwHere, loRuleTwHere,
++                                    cellBeforeTw + box0 * cps.size()))
++                         .append("<w:vAlign w:val=\"top\"/></w:tcPr>");
+                     for (int q = 0; q < cps.size(); q++) {
+                         PdfToWord.Table.CellPara cp = cps.get(q);
+                         // THE LINE ADVANCE IS THE BOX, and it is the page's own leading: a
+@@ -6886,7 +6948,8 @@ public final class DocxWriter {
+                     c += span;
+                     continue;
+                 }
+-                inner.append("</w:tcPr>")
++                inner.append(cellMarTw(pitchTwHere, loRuleTwHere, cellBeforeTw + cellBoxTw))
++                     .append("</w:tcPr>")
+                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
+                         .append("<w:snapToGrid w:val=\"0\"/>")
+                         .append(spacing(cellBeforeTw, cellBoxTw, cellSz, autoCellBoxes(), false));
