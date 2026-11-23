@@ -36,8 +36,6 @@ unfinished work, not as a result.
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 18_dA-04 | 18_displacement | A | which clause of the check can fire on a 1.44-2.40 pt document, from th | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
-| 18_dB-03 | 18_displacement | B | do 05/32/59/18 share ONE engine construct in the emitted docx, and nam | 09:20 | landed 09:04 | landed | FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md |
 | 18_dtrheight-emitter-01 | 18_displacement | trheight-emitter | every place the engine emits trHeight/hRule, and whether 0.9634 belong | 10:08 | a unified diff and the list of emitters | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
 | 18_drow-growth-mechanism-01 | 18_displacement | row-growth-mechanism | given the real DocxWriter.java, which emitted number Google ignores wh | 10:09 | the mechanism with arithmetic, one recommended edit, and the rows it must not touch | landed | FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md |
 | 18_dA-05 | 18_displacement | A | consolidated every FINDINGS file and the two row emitters into one dos | 11:23 | 11:19 | landed | FINDINGS/18_displacement-PARTIAL-SPEND-REGRESSES-GOOGLE-1428-relay.md |
@@ -60,14 +58,14 @@ unfinished work, not as a result.
 | 04_cB-01 | 04_chars_missing | B | is the missing-char multiset fully explained by anchored text boxes on | 02:00 | landed | landed | DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those. |
 | 18_dA-02 | 18_displacement | A | which single failing Google check, if fixed, makes the most documents  | 02:07 | landed | landed | FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md |
 | 04_cB-02 | 04_chars_missing | B | is the missing-char multiset fully explained by anchored text boxes | 02:07 | landed | landed | FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md |
+| 18_dA-03 | 18_displacement | A | audit the pending gate: which of the 21 closable items are still true | 02:35 | 03:05 | running |  |
+| 18_dB-01 | 18_displacement | B | table block-top gap and per-row height in DocxWriter | 02:35 | 03:10 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `21:29` attempt 41 on 18_displacement -> lead
-- `23:32` attempt 1 on 04_chars_missing -> lead (0/5 moved)
 - `23:32` agent deployed: 04_chars_missing construct: Google drops wps:txbx text; missing multiset fully explained by anchored boxes on 9 docs /  - 
 - `23:32` agent deployed: 44_header_footer: .txt half clean (0 lost/duplicated across 31); 20 of 28 feet are floating anchors, 8 flow and still fail /  - 
 - `00:09` attempt 16 on content-present-partly-displaced -> lead (0/13 moved)
@@ -91,6 +89,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `02:07` agent landed: 04_cB-02 /  -> FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md
 - `02:08` attempt 42 on 18_displacement -> lead (0/13 moved)
 - `02:34` attempt 43 on 18_displacement -> lead (0/13 moved)
+- `02:35` agent deployed: 18_displacement / A - audit the pending gate: which of the 21 closable items are still true
+- `02:35` agent deployed: 18_displacement / B - table block-top gap and per-row height in DocxWriter
 
 ## Where the rest of the state lives
 

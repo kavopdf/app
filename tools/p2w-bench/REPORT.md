@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 02:19
+# Fixer report - 2026-11-24 02:34
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 02:19 → running IST · 0 min**
+**24 Nov 2026 · slot 02:34 → running IST · 1 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -24,6 +24,12 @@
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
 | Working on | `-` |
 
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 02:34 | **lead** | 0/13 | Four documents converted on this tree; unspendable spacers counted in word/document.xml and matched one-for-one to the four live Google steps the previous slot recorded (14.35 vs -13.0, 9.72/5.02/4.86 |
+
 ## The txt
 
 | | |
@@ -36,18 +42,28 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-03` | audit the pending gate: which of the 21 closable ite | 02:35 | - | - |
+| `18_dB-01` | table block-top gap and per-row height in DocxWriter | 02:35 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 02:19 → running · 0 min |
+| Slot window | 02:34 → running · 1 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 2 |
+| Tool beats | 8 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| report - the report and the chain | **0 min** | `#############` |
+| other - not attributed to a tool | **0 min** | `#########` |
 ## Best results this round
 
 | Document | Before | After | Change |

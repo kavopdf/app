@@ -6,6 +6,9 @@
  "ended": null,
  "attempts": 0,
  "kept": 0,
- "agents": [],
+ "agents": [
+  "18_dA-03",
+  "18_dB-01"
+ ],
  "docs_improved": 0
 }

@@ -336,3 +336,7 @@
 {"_list": "notes", "_entry": {"at": "02:31", "text": "attempt 29 on 18_displacement -> kept"}}
 {"_list": "notes", "_entry": {"at": "04:08", "text": "attempt 30 on 18_displacement -> lead"}}
 {"_list": "notes", "_entry": {"at": "04:09", "text": "attempt 31 on 18_displacement -> kept"}}
+{"_list": "notes", "_entry": {"at": "05:09", "text": "attempt 2 on 00_page_count -> lead (0/23 moved)"}}
+{"_list": "agents", "_entry": {"id": "18_dA-04", "class": "18_displacement", "angle": "A", "question": "which clause of the check can fire on a 1.44-2.40 pt document, from the source code and the emitted XML", "expected": "landed 09:04", "deployed": "09:20", "status": "landed", "finding": "FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md", "deployed_at": "2026-11-22T03:50", "landed_at": "2026-11-22T03:51"}}
+{"_list": "notes", "_entry": {"at": "05:13", "text": "agent deployed: 00_page_count / A - from the committed gverify JSONs and CENSUS.csv, how many documents does clearin"}}
+{"_list": "agents", "_entry": {"id": "18_dB-03", "class": "18_displacement", "angle": "B", "question": "do 05/32/59/18 share ONE engine construct in the emitted docx, and name it", "expected": "landed 09:04", "deployed": "09:20", "status": "landed", "finding": "FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md", "deployed_at": "2026-11-22T03:50", "landed_at": "2026-11-22T03:51"}}
