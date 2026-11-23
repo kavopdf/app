@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 03:30 → running IST · 12 min**
+**24 Nov 2026 · slot 03:30 → running IST · 27 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -48,11 +48,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 03:30 → running · 12 min |
+| Slot window | 03:30 → running · 27 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 6 |
+| Tool beats | 9 |
 | Longest silence | **7.9 min** — from 03:30:35, after `retrying corpus pass with checkpointing` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -60,8 +60,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `##############` |
-| report - the report and the chain | **4 min** | `########` |
+| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `######` |
+| report - the report and the chain | **10 min** | `########` |
+| other - not attributed to a tool | **8 min** | `#######` |
 ## Best results this round
 
 | Document | Before | After | Change |
