@@ -5753,7 +5753,18 @@ def compare(src_path, gd_path, docx_path=None):
         if (n_out > max(2, -(-len(ds) * 5 // 100)) or n_out == len(ds)
                 or worst_here > TAIL_FACTOR):
             bad_pages.append(pg)
-    checks["18_displacement"] = (0, len(bad_pages), not bad_pages)
+    # WHAT THE COUNT IS MADE OF, reported and never scored (the fourth element, see the note in
+    # compare()'s return). med_dy/worst_dy/med_dx have been computed here since the check was
+    # rewritten and were then thrown away: the stored result carried `passed/total/failed` and
+    # nothing else, so every attempt at this class was steering blind - a fixer could not tell a
+    # document 0.5 pt out from one 50 pt out, and could not tell a constant offset from an
+    # accumulating drift. FINDINGS/18_displacement-PARTIAL-SPEND-IS-INERT-AND-COSTS-68-JOURNAL-2315-fixer.md
+    # names this as the highest-value change available to the class. It is an instrument change:
+    # no check's pass/fail can move because of it, only what the result says about itself.
+    checks["18_displacement"] = (0, len(bad_pages), not bad_pages, {
+        "med_dy": med_dy, "worst_dy": worst_dy, "med_dx": med_dx,
+        "bad_pages": bad_pages, "runs_matched": len(pairs),
+    })
     # 21_median_dx RETIRED 13 Nov - folded into 43_within_10pt_x, which now carries its
     # median clause. It was the median-only half of one question, and both of the documents
     # it fired on were already failed by other checks in the same store:

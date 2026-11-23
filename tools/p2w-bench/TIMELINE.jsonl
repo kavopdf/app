@@ -2905,3 +2905,6 @@
 {"t": 1795459043.3182669, "ist": "00:07:23", "ev": "beat", "d": "rebuilding with unruled row-excess quantum"}
 {"t": 1795459140.4865131, "ist": "00:09:00", "ev": "beat", "d": "running regress and measure gate"}
 {"t": 1795459183.5247362, "ist": "00:09:43", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795459187.5977774, "ist": "00:09:47", "ev": "attempt", "d": "content-present-partly-displaced -> lead"}
+{"t": 1795459187.7088797, "ist": "00:09:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795459187.835056, "ist": "00:09:47", "ev": "beat", "d": "classrow.py: refreshing the class file"}

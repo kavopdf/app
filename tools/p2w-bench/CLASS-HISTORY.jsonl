@@ -151,3 +151,4 @@
 {"at": "2026-11-23 20:44", "attempt": 40, "class": "18_displacement", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-23 21:29", "attempt": 41, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-23 23:31", "attempt": 1, "class": "04_chars_missing", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-24 00:09", "attempt": 16, "class": "content-present-partly-displaced", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}

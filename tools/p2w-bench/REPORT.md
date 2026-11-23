@@ -1,13 +1,9 @@
-# Fixer report - 2026-11-23 22:51
+# Fixer report - 2026-11-23 23:58
 
 ```
 # P2W Fixer - Run Report
 
-<<<<<<< HEAD
-**23 Nov 2026 · slot 20:54 → 22:43 IST · 1h 48m**
-=======
-**23 Nov 2026 · slot 22:51 → running IST · 41 min**
->>>>>>> 1d68dbea (fixer: 04_chars_missing lead - Google drops wps:txbx text; foot-band patch proved, Google render is the next measurement)
+**23 Nov 2026 · slot 23:58 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,13 +22,7 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `04_chars_missing` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 23:31 | **lead** | 0/5 | txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - t |
+| Working on | `-` |
 
 ## The txt
 
@@ -46,47 +36,18 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `04_c-01` | 04_chars_missing construct: Google drops wps:txbx te | 23:32 | - | - |
-| `44_h-01` | 44_header_footer: .txt half clean (0 lost/duplicated | 23:32 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-<<<<<<< HEAD
-| Slot window | 20:54 → 22:43 · 1h 48m |
+| Slot window | 23:58 → running · 0 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 15 |
-| Longest silence | **72.2 min** — from 21:30:38, after `report.py: building the report` |
-| Silences over 2 min | 4 |
-| Obstacles | 3 cleared · 2 parked, with the evidence to re-open them |
-| Still a wall | **This watchdog has no `cron` tool**, so a paused or zombie cron cannot be moved by automation and STEP 3 cann |
-=======
-| Slot window | 22:51 → running · 41 min |
-| Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 11 |
-| Longest silence | **23.3 min** — from 22:51:31, after `report.py: building the report` |
-| Silences over 2 min | 2 |
+| Tool beats | 3 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
->>>>>>> 1d68dbea (fixer: 04_chars_missing lead - Google drops wps:txbx text; foot-band patch proved, Google render is the next measurement)
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-<<<<<<< HEAD
-| measure or build - a conversion, screen or compile writes no beacon | **25 min** | `#####` |
-| record - attempt, handoff, class rows | **4 min** | `#` |
-| report - the report and the chain | **1h 13m** | `###############` |
-| other - not attributed to a tool | **5 min** | `#` |
-=======
-| fix - diagnose and change the engine | **16 min** | `#########` |
-| measure or build - a conversion, screen or compile writes no beacon | **24 min** | `#############` |
-| report - the report and the chain | **0 min** | `#` |
->>>>>>> 1d68dbea (fixer: 04_chars_missing lead - Google drops wps:txbx text; foot-band patch proved, Google render is the next measurement)
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -99,7 +60,7 @@
 
 ## Next run
 
-18_displacement: stop spending attempts on row pitch - measure the top of the block. The leading paragraph carries its vertical position in w:spacing w:before=1040 + w:line=13 exact, and the Google column of GVERIFY-BRIEF lists w:spacing as ignored. Build one variant that carries the same position WITHOUT w:spacing (exact-height empty paragraph, or w:ind/w:framePr), round trip table-with-no-header-row, and read the first line's dy: it is -10.16 now, and if it does not move the carrier is not the spacing. Then repeat on mobile-bill (-15.75).
+PENDING FIRST, FIXING SECOND - AND FIXING RESUMES BY ITSELF WHEN THE LIST IS EMPTY. `python3 tools/p2w-bench/pending.py` lists the 22 items you can close, in the order to take them. classpick.py refuses to name a class until those 22 are gone, so a run that tries to pick one is told to work the list instead. Nothing else changes: when the 22 reach zero, decide() returns a class again and the rotation carries on exactly as before - there is no separate mode to switch back on. The 22 are 4 [agent] (deployed 550-700 min ago, no finding committed - they died with their runs: check FINDINGS/ for the id and close them as dead, never re-deploy blind), 5 [ratchet] (fixes that landed on their own class and were never proved across the corpus - these are the cheapest wins, 38 documents already moved) and 13 [blocker] rows whose 'can I fix it' names a real action. THE OTHER 59 ARE NOT YOURS AND THEY DO NOT BLOCK YOU. `python3 tools/p2w-bench/pending.py --decisions` prints them: each says 'no - this needs a decision, not a patch'. They stay in BLOCKERS.md and in that view so a person can decide; they are never a reason to sit still. A gate that waited for them would never open, which is why it does not. After the 22: classpick picks by expected fixes - 05_chars_extra, then 32_stroke_lines, then 04_chars_missing (65 documents, never tried) and 25_invisible_text (48, never tried). 18_displacement is 8th because 20 attempts there moved 4 documents.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

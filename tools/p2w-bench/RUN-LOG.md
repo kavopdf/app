@@ -1,5 +1,3 @@
-| 20 Nov 19:24 | fixer | attempt t13_amount_columns -> kept (1/? moved) |
-| 20 Nov 19:27 | fixer | attempt t12_word_invention -> reverted (0/12 moved) |
 | 20 Nov 19:29 | fixer | attempt t12_word_invention -> reverted (0/12 moved) |
 | 20 Nov 19:33 | fixer | attempt t08_line_order -> reverted (0/10 moved) |
 | 20 Nov 19:33 | fixer | attempt t08_line_order -> reverted (0/10 moved) |
@@ -198,3 +196,5 @@
 | 23 Nov 22:43 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 23 Nov 22:51 | fixer | slot claimed - fixer running |
 | 23 Nov 23:32 | fixer | attempt 04_chars_missing -> lead (0/5 moved) |
+| 23 Nov 23:58 | fixer | slot claimed - fixer running |
+| 24 Nov 00:09 | fixer | attempt content-present-partly-displaced -> lead (0/13 moved) |

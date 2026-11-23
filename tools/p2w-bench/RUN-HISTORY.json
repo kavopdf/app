@@ -1,20 +1,5 @@
 [
  {
-  "started_ts": 1795209725.7643123,
-  "started": "02:52",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "47_margins",
-  "attempts": 2,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "partial": 2,
-  "ended_how": "killed - never released the slot"
- },
- {
   "started_ts": 1795213646.183817,
   "started": "03:57",
   "ended_ts": null,
@@ -1136,6 +1121,17 @@
  {
   "started": "17:21",
   "started_ts": 1795454475.3293996,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "18:28",
+  "started_ts": 1795458528.0664797,
   "ended": "(never)",
   "ended_ts": null,
   "attempts": 0,

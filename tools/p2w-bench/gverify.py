@@ -295,8 +295,17 @@ def collect(name, url):
     d = json.load(open(out_json, encoding="utf-8"))
     fails = sorted(k for k, v in (d.get("checks") or {}).items()
                    if isinstance(v, dict) and v.get("ok") is False)
-    _write(name, {"name": name, "status": "ok", "rc": r.returncode,
-                  "passed": d.get("passed"), "total": d.get("total"), "failed": fails})
+    # THE DISTANCE, NOT JUST THE COUNT. `18_displacement` reports how many pages are out and
+    # never how far out, so a fixer reading this file cannot tell 0.5 pt from 50 pt and cannot
+    # see whether a construct is even large enough to matter. verify_google.py computes
+    # med_dy/worst_dy/med_dx and now carries them as the check's detail; store them here so the
+    # next run steers with a distance. Reported only - `failed` above is what scores.
+    rec = {"name": name, "status": "ok", "rc": r.returncode,
+           "passed": d.get("passed"), "total": d.get("total"), "failed": fails}
+    disp = ((d.get("checks") or {}).get("18_displacement") or {}).get("detail")
+    if disp:
+        rec["displacement"] = disp
+    _write(name, rec)
     print("  %-44s GOOGLE %s/%s%s" % (name[:44], d.get("passed"), d.get("total"),
                                       "" if not fails else "  fail: " + ",".join(fails)))
     lo = collect_lo(name)
