@@ -141,7 +141,15 @@ def this_run():
         return {"present": False}
     end = r.get("ended_ts") or time.time()
     mins = int((end - (r.get("started_ts") or end)) / 60)
-    return {"present": True, "started": r.get("started"), "ended": r.get("ended"),
+    # THE CLOCK AND THE DURATION MUST AGREE. `ended` was passed through as a raw string written by
+    # whoever closed the record, while `minutes` is computed from `ended_ts`. The 17:58 run printed
+    # "17:58 -> 18:37 IST - 35 min": 17:58 to 18:37 is 39 minutes, so the two fields were reading
+    # different clocks and the reader had no way to tell which was true. Derive the label from the
+    # timestamp that the duration already uses, so a wrong `ended` cannot survive into a report.
+    _end_label = r.get("ended")
+    if r.get("ended_ts") and r.get("started_ts"):
+        _end_label = time.strftime("%H:%M", time.localtime(r["ended_ts"]))
+    return {"present": True, "started": r.get("started"), "ended": _end_label,
             "minutes": mins, "class": r.get("class") or "-",
             "attempts": r.get("attempts", 0), "kept": r.get("kept", 0),
             "docs_improved": r.get("docs_improved", 0),
@@ -318,8 +326,13 @@ def corpus():
     # 212. The corpus is 213. Every report for weeks printed "of 212" as the corpus total because
     # this field was the only one available, and the fixer then copied it into a sentence about the
     # corpus. Both numbers are reported now, each under the name that says what it counts.
-    corpus_total = len(c)
     _gf, _gs, _gfc, _gsc, _grf = google_fixed()
+    # THE CORPUS IS EVERY DOCUMENT THAT EXISTS, NOT EVERY ROW IN RANKING.csv. `len(c)` is the ranking
+    # table, and 416_many_tiny_pages is exempt from the round-one baseline, so it is absent from the table
+    # while still being a document. `len(c)` therefore printed 212 as "the corpus" while the corpus is
+    # 213 - the exact lie the comment above warns about. The corpus is what gverify saw: scored plus
+    # refused. Fall back to the table only when gverify has not run.
+    corpus_total = (_gs + _grf) if (_gs + _grf) > 0 else len(c)
     return {"available": True, "docs": corpus_total, "compared": len(common),
                 "google_fixed": _gf, "google_scored": _gs,
                   "google_fixed_current": _gfc, "google_scored_current": _gsc,
