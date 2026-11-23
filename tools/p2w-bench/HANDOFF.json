@@ -2,62 +2,6 @@
  "plan": "",
  "notes": [
   {
-   "at": "13:57",
-   "text": "agent deployed: 18_displacement / A - static map of every writer that emits w:trHeight and cell w:spacing, and the exa"
-  },
-  {
-   "at": "13:57",
-   "text": "agent deployed: 18_displacement / B - from the three measured declared->laid points compute the declaration that lands"
-  },
-  {
-   "at": "14:19",
-   "text": "attempt 16 on 18_displacement -> lead (0/16 moved)"
-  },
-  {
-   "at": "14:45",
-   "text": "attempt 17 on 18_displacement -> kept (1/16 moved)"
-  },
-  {
-   "at": "14:46",
-   "text": "agent landed: 47_mA-02 /  -> FINDINGS/47_margins-CELLPATH-A-150000.md"
-  },
-  {
-   "at": "14:46",
-   "text": "agent landed: 47_mB-02 /  -> FINDINGS/47_margins-DIAGNOSE40-B-150000.md"
-  },
-  {
-   "at": "15:28",
-   "text": "attempt 18 on 18_displacement -> lead"
-  },
-  {
-   "at": "15:40",
-   "text": "attempt 19 on 18_displacement -> lead (0/16 moved)"
-  },
-  {
-   "at": "16:36",
-   "text": "attempt 20 on 18_displacement -> lead (0/16 moved)"
-  },
-  {
-   "at": "17:34",
-   "text": "attempt 21 on 18_displacement -> lead (0/8 moved)"
-  },
-  {
-   "at": "19:10",
-   "text": "attempt 22 on 18_displacement -> lead"
-  },
-  {
-   "at": "19:17",
-   "text": "attempt 23 on 18_displacement -> lead"
-  },
-  {
-   "at": "00:39",
-   "text": "attempt 26 on 18_displacement -> reverted (0/16 moved)"
-  },
-  {
-   "at": "02:31",
-   "text": "attempt 29 on 18_displacement -> kept"
-  },
-  {
    "at": "04:08",
    "text": "attempt 30 on 18_displacement -> lead"
   },
@@ -240,58 +184,66 @@
   {
    "at": "01:43",
    "text": "attempt 6 on 00_page_count -> lead (0/213 moved)"
+  },
+  {
+   "at": "02:00",
+   "text": "agent deployed: 18_displacement / A - which single failing Google check, if fixed, makes the most documents CLEAN"
+  },
+  {
+   "at": "02:00",
+   "text": "agent deployed: 04_chars_missing / B - is the missing-char multiset fully explained by anchored text boxes on 9 docs"
+  },
+  {
+   "at": "02:07",
+   "text": "agent deployed: 18_displacement / A - which single failing Google check, if fixed, makes the most documents CLEAN"
+  },
+  {
+   "at": "02:07",
+   "text": "agent deployed: 04_chars_missing / B - is the missing-char multiset fully explained by anchored text boxes"
+  },
+  {
+   "at": "02:07",
+   "text": "agent landed: 18_dB-04 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed."
+  },
+  {
+   "at": "02:07",
+   "text": "agent landed: 18_dA-06 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed."
+  },
+  {
+   "at": "02:07",
+   "text": "agent landed: A118_displacement-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed."
+  },
+  {
+   "at": "02:07",
+   "text": "agent landed: B160_text_column_right_edge-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed."
+  },
+  {
+   "at": "02:07",
+   "text": "agent landed: 04_c-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed."
+  },
+  {
+   "at": "02:07",
+   "text": "agent landed: 44_h-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed."
+  },
+  {
+   "at": "02:07",
+   "text": "agent landed: 18_dA-01 /  -> DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those."
+  },
+  {
+   "at": "02:07",
+   "text": "agent landed: 04_cB-01 /  -> DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those."
+  },
+  {
+   "at": "02:07",
+   "text": "agent landed: 18_dA-02 /  -> FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md"
+  },
+  {
+   "at": "02:07",
+   "text": "agent landed: 04_cB-02 /  -> FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md"
   }
  ],
  "next": "PENDING FIRST, FIXING SECOND - AND FIXING RESUMES BY ITSELF WHEN THE LIST IS EMPTY. `python3 tools/p2w-bench/pending.py` lists the 22 items you can close, in the order to take them. classpick.py refuses to name a class until those 22 are gone, so a run that tries to pick one is told to work the list instead. Nothing else changes: when the 22 reach zero, decide() returns a class again and the rotation carries on exactly as before - there is no separate mode to switch back on. The 22 are 4 [agent] (deployed 550-700 min ago, no finding committed - they died with their runs: check FINDINGS/ for the id and close them as dead, never re-deploy blind), 5 [ratchet] (fixes that landed on their own class and were never proved across the corpus - these are the cheapest wins, 38 documents already moved) and 13 [blocker] rows whose 'can I fix it' names a real action. THE OTHER 59 ARE NOT YOURS AND THEY DO NOT BLOCK YOU. `python3 tools/p2w-bench/pending.py --decisions` prints them: each says 'no - this needs a decision, not a patch'. They stay in BLOCKERS.md and in that view so a person can decide; they are never a reason to sit still. A gate that waited for them would never open, which is why it does not. After the 22: classpick picks by expected fixes - 05_chars_extra, then 32_stroke_lines, then 04_chars_missing (65 documents, never tried) and 25_invisible_text (48, never tried). 18_displacement is 8th because 20 attempts there moved 4 documents.",
  "agents": [
-  {
-   "id": "32_sB-local-01",
-   "class": "32_stroke_lines",
-   "angle": "B-local",
-   "question": "does the carrier patch damage clean documents when measured in a clean clone",
-   "expected": "4 of 10 controls worse",
-   "deployed": "05:18",
-   "status": "landed",
-   "finding": "FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md",
-   "deployed_at": "2026-11-21T23:48",
-   "landed_at": "2026-11-21T23:48"
-  },
-  {
-   "id": "18_dA-02",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "what makes a single-page dense table drift in Google - row pitch or the table-top spacer",
-   "expected": "07:38",
-   "deployed": "07:36",
-   "status": "landed",
-   "finding": "FINDINGS/18_displacement-single-page-row-pitch-EMITTED-PITCH-IS-EXACT-082000-f1x.md",
-   "deployed_at": "2026-11-22T02:06",
-   "landed_at": "2026-11-22T02:06"
-  },
-  {
-   "id": "18_dA-03",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "independently re-derive the sixteen and the spacer premise from the repo",
-   "expected": "08:20",
-   "deployed": "08:31",
-   "status": "landed",
-   "finding": "FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md",
-   "deployed_at": "2026-11-22T03:01",
-   "landed_at": "2026-11-22T03:01"
-  },
-  {
-   "id": "18_dB-02",
-   "class": "18_displacement",
-   "angle": "B",
-   "question": "what places a page's first baseline, and is median_pt 0.96 a real offset",
-   "expected": "08:40",
-   "deployed": "08:31",
-   "status": "landed",
-   "finding": "FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md",
-   "deployed_at": "2026-11-22T03:01",
-   "landed_at": "2026-11-22T03:01"
-  },
   {
    "id": "18_dA-04",
    "class": "18_displacement",
@@ -359,9 +311,10 @@
    "question": "recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 solo documents, not 38.7",
    "expected": "11:20",
    "deployed": "11:23",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-22T05:53"
+   "status": "landed",
+   "finding": "DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.",
+   "deployed_at": "2026-11-22T05:53",
+   "landed_at": "2026-11-24T02:07"
   },
   {
    "id": "18_dA-06",
@@ -370,9 +323,10 @@
    "question": "static map of every writer that emits w:trHeight and cell w:spacing, and the exact lines to charge the page budget max(declared,1.15*sz) and to strip w:before on continuation paragraphs in wrapped cells",
    "expected": "expected by 14:30",
    "deployed": "13:57",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-22T08:27"
+   "status": "landed",
+   "finding": "DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.",
+   "deployed_at": "2026-11-22T08:27",
+   "landed_at": "2026-11-24T02:07"
   },
   {
    "id": "18_dB-05",
@@ -441,9 +395,10 @@
    "question": "writer-construct",
    "expected": "Which single .docx writer construct causes the 18_displacement failures that 13+ documents fail alone, and which documents go CLEAN if fixed",
    "deployed": "13:21",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-23T13:21"
+   "status": "landed",
+   "finding": "DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.",
+   "deployed_at": "2026-11-23T13:21",
+   "landed_at": "2026-11-24T02:07"
   },
   {
    "id": "B160_text_column_right_edge-01",
@@ -452,9 +407,10 @@
    "question": "right-edge+shape_anchor",
    "expected": "Is 60_text_column_right_edge the same construct as 59_shape_anchor (they travel together) and what minimal writer change clears both",
    "deployed": "13:21",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-23T13:21"
+   "status": "landed",
+   "finding": "DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.",
+   "deployed_at": "2026-11-23T13:21",
+   "landed_at": "2026-11-24T02:07"
   },
   {
    "id": "00_pA-02",
@@ -511,9 +467,10 @@
    "question": "",
    "expected": "",
    "deployed": "23:32",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-23T23:32"
+   "status": "landed",
+   "finding": "DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.",
+   "deployed_at": "2026-11-23T23:32",
+   "landed_at": "2026-11-24T02:07"
   },
   {
    "id": "44_h-01",
@@ -522,9 +479,58 @@
    "question": "",
    "expected": "",
    "deployed": "23:32",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-23T23:32"
+   "status": "landed",
+   "finding": "DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.",
+   "deployed_at": "2026-11-23T23:32",
+   "landed_at": "2026-11-24T02:07"
+  },
+  {
+   "id": "18_dA-01",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "which single failing Google check, if fixed, makes the most documents CLEAN",
+   "expected": "landed",
+   "deployed": "02:00",
+   "status": "landed",
+   "finding": "DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.",
+   "deployed_at": "2026-11-24T02:00",
+   "landed_at": "2026-11-24T02:07"
+  },
+  {
+   "id": "04_cB-01",
+   "class": "04_chars_missing",
+   "angle": "B",
+   "question": "is the missing-char multiset fully explained by anchored text boxes on 9 docs",
+   "expected": "landed",
+   "deployed": "02:00",
+   "status": "landed",
+   "finding": "DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.",
+   "deployed_at": "2026-11-24T02:00",
+   "landed_at": "2026-11-24T02:07"
+  },
+  {
+   "id": "18_dA-02",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "which single failing Google check, if fixed, makes the most documents CLEAN",
+   "expected": "landed",
+   "deployed": "02:07",
+   "status": "landed",
+   "finding": "FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md",
+   "deployed_at": "2026-11-24T02:07",
+   "landed_at": "2026-11-24T02:07"
+  },
+  {
+   "id": "04_cB-02",
+   "class": "04_chars_missing",
+   "angle": "B",
+   "question": "is the missing-char multiset fully explained by anchored text boxes",
+   "expected": "landed",
+   "deployed": "02:07",
+   "status": "landed",
+   "finding": "FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md",
+   "deployed_at": "2026-11-24T02:07",
+   "landed_at": "2026-11-24T02:07"
   }
  ],
  "run": {

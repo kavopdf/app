@@ -3057,3 +3057,32 @@
 {"t": 1795464832.0069737, "ist": "01:43:52", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795464832.4311702, "ist": "01:43:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795464832.5380526, "ist": "01:43:52", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795465604.6177807, "ist": "01:56:44", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795465613.5310204, "ist": "01:56:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795465615.4742677, "ist": "01:56:55", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795465619.2959895, "ist": "01:56:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795465619.4058254, "ist": "01:56:59", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795465825.8598042, "ist": "02:00:25", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795465826.0045888, "ist": "02:00:26", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466214.816363, "ist": "02:06:54", "ev": "beat", "d": "verifying the run-window repair"}
+{"t": 1795466222.1771863, "ist": "02:07:02", "ev": "beat", "d": "retest with the IST fix"}
+{"t": 1795466222.5643837, "ist": "02:07:02", "ev": "beat", "d": "second beat"}
+{"t": 1795466225.875255, "ist": "02:07:05", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466226.0083191, "ist": "02:07:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466226.2574697, "ist": "02:07:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466228.378361, "ist": "02:07:08", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466228.4962206, "ist": "02:07:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795466242.7955208, "ist": "02:07:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466256.6760159, "ist": "02:07:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466256.8117168, "ist": "02:07:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466256.9582684, "ist": "02:07:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466257.0895889, "ist": "02:07:37", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466257.2130396, "ist": "02:07:37", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466257.3636286, "ist": "02:07:37", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466257.4912763, "ist": "02:07:37", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466257.6443758, "ist": "02:07:37", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466257.7852006, "ist": "02:07:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795466260.5840285, "ist": "02:07:40", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466260.7154107, "ist": "02:07:40", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466260.8912508, "ist": "02:07:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795466283.1456914, "ist": "02:08:03", "ev": "beat", "d": "attempt.py: recording an attempt"}
