@@ -7,7 +7,22 @@
  "attempts": 4,
  "kept": 0,
  "docs_improved": 0,
- "agents": [],
+ "agents": [
+  {
+   "role": "census",
+   "brief": "rank the source constructs behind 18_displacement by how many of the affected documents each would fix, with a minimal patch for the top one",
+   "landed": true,
+   "file": "tools/p2w-bench/FINDINGS/18_displacement-CONSTRUCT-RANKING-agent-2310.md",
+   "answered": "population corrected to 100; no stored displacement numbers exist; spacer ranked first; its 3-clean prediction refuted by measurement in attempt 1"
+  },
+  {
+   "role": "census",
+   "brief": "why 23 documents render the wrong page count in Google, and the smallest change that fixes the most",
+   "landed": true,
+   "file": "tools/p2w-bench/FINDINGS/00_page_count-ANCHOR-RASTERISATION-CENSUS-agent-2312.md",
+   "answered": "21 of 23 are correct in LibreOffice; 14 pass every LO check; w:pgBorders is the only construct with a measured Google delta (60_page_border 2->1)"
+  }
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0
 }

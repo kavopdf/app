@@ -83,3 +83,19 @@ check they have — finished documents blocked from scoring by one extra page. I
 (replacing the 62 page-frame shapes) as the one construct with a *measured* Google delta:
 `60_page_border` 2 → 1 page with the same 689 characters. That is a measured, unbuilt fix and it
 converts unscorable documents into scorable ones.
+
+## The class's real prize, counted from the committed table
+
+`benchmarks/gverify/*.json`, scored 190, failing `18_displacement` 100, **failing it and nothing else:
+13**. Those thirteen are:
+
+`16_right_aligned_amounts_txtpos`, `31_times_body_arial_headings`, `362_price_list_dense`,
+`36_embedded_subset_font`, `71_invoice_space_aligned_no_rules`, `72_bank_statement_no_rules_right_amounts`,
+`balance-sheet-two-columns-of-figures`, `bus-timetable-station-left-times-right`,
+`insurance-policy-schedule`, `mobile-bill`, `table-with-no-header-row`, `two-tables-stacked-with-no-gap`,
+`68_journal_wide_table_spanning`.
+
+**Three of the thirteen were measured on the current engine this slot** (`72`, `two-tables-stacked`,
+`68_journal`) and all three still fail it, so the set is real and not stale. `classpick.py --leverage`
+prices this check at **34.5 clean documents**; the committed table supports **13**. The leverage number is
+counting documents that fail other checks too, and the next run should work the thirteen, not the hundred.
