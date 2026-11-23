@@ -7,7 +7,30 @@
  "attempts": 1,
  "kept": 1,
  "docs_improved": 2,
- "agents": [],
+ "agents": [
+  {
+   "id": "18_dA-02",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "the .txt half of 18_displacement: is it the same construct, a different one, or the instrument?",
+   "expected": "10:30",
+   "deployed": "10:20",
+   "status": "landed",
+   "finding": "FINDINGS/t09-NUMERIC-KEYS-AND-OWED-PER-OCCURRENCE-1115-relay.md",
+   "deployed_at": "2026-11-23T10:20:00+05:30"
+  },
+  {
+   "id": "t09_B-01",
+   "class": "t09_page_furniture",
+   "angle": "B",
+   "question": "independent blast-radius census for four proposed verify_txt.py changes, over all 213",
+   "expected": "10:50",
+   "deployed": "10:20",
+   "status": "landed",
+   "finding": "FINDINGS/t09-NUMERIC-KEYS-AND-OWED-PER-OCCURRENCE-1115-relay.md",
+   "deployed_at": "2026-11-23T10:20:00+05:30"
+  }
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0,
  "counted": [

@@ -70,13 +70,16 @@ fresh conversion of all 213 (engine built from this tree, `ConvertOne` per docum
 afterwards (their keys are `'D'`/`'M'`/`'Y'` date boxes, owed 12 against present 125), so
 they are a different fault, not this one.
 
-The two fixes were landed **together**. For the four documents the two touch, the
-combination is bounded and cannot regress against baseline: `041122` and the filled form
-fail before and after; `gst` keeps its `'Page # of #'` key (it has letters) and passes;
-`324` is a pass under fault 1 and can only stay a pass or stay failing under the
-combination, never fall below its baseline. **The combination was not re-scored as a
-combination** - the corpus conversion is 20+ minutes and the slot had 20. The next run
-that re-stamps `RANKING-TXT.csv` should score it and record whether `324` held.
+**The combination was then scored on the whole corpus.** `restamp_txt.py --run` over all
+213, after converting every document with the engine built from this tree:
+
+    213 scored | 2 documents newly clean, 0 newly failing, 211 unchanged
+
+    NEWLY CLEAN (the old check was wrong about these):
+      324_loan_amortisation_schedule     no longer fails t09_page_furniture
+      gst-invoice-multipage-item-table   no longer fails t09_page_furniture
+
+`--apply` wrote `RANKING-TXT.csv`: **199 of 213 clean (93.4%)**, up from 197. `324` held.
 
 ## Not landed, and why
 
@@ -98,7 +101,6 @@ that re-stamps `RANKING-TXT.csv` should score it and record whether `324` held.
 
 ## Consequence for the table
 
-`RANKING-TXT.csv` still carries the 197 scored with the old instrument and is now stale
-against `verify_txt.py`. It must be re-stamped (`restamp_txt.py --run --apply`) by a run
-with the corpus and the engine built. The measured answer is **198** for each fault alone;
-the two together should give 199 if `324` holds under the combination.
+`RANKING-TXT.csv` was re-stamped in this run with the corpus fetched and the engine built
+from this tree: **199 of 213 clean**, 0 newly failing. `RANKING-TXT-BASELINE.csv` moved by
+exactly the two rows that became clean and by nothing else.

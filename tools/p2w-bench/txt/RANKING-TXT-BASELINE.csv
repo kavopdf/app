@@ -51,7 +51,7 @@ document,applicable,passed,failed,abstained,failed_ids
 321_auditors_report,7,7,0,0,
 322_mutual_fund_factsheet,8,8,0,0,
 323_credit_card_statement,8,8,0,0,
-324_loan_amortisation_schedule,10,9,1,1,t09_page_furniture
+324_loan_amortisation_schedule,10,10,0,0,
 325_demat_holdings_statement,8,8,0,0,
 326_itr_computation,7,7,0,0,
 32_serif_nondefault_body,9,9,0,0,
@@ -177,7 +177,7 @@ eway-bill,10,10,0,0,
 form16-part-b,11,11,0,0,
 gst-invoice-3line-items,10,10,0,0,
 gst-invoice-horizontal-rules-only,10,10,0,0,
-gst-invoice-multipage-item-table,12,11,1,1,t09_page_furniture
+gst-invoice-multipage-item-table,12,12,0,0,
 gst-invoice-with-qr-code,10,10,0,0,
 insurance-policy-schedule,10,10,0,0,
 invoice-line-items-qty-rate-amount,10,10,0,0,
