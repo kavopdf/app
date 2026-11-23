@@ -1,54 +1,56 @@
-# gverify - capability table, stage `classify`
+# P2W Google Verify - Run Report
 
-**Stage:** `classify`. The Google measurement is complete on disk, so this run's job was the table, not a
-measurement: no document was measured and no engine code was touched.
+**23 Nov 2026 · 05:30 IST · stage `classify`**
 
-## What this run did
+> 190 of 213 documents scored in Google, 23 refused on page count. Google passes all 42 on 28, LibreOffice on 122.
 
-Regenerated `benchmarks/GOOGLE-VS-LIBREOFFICE.md` from the committed results and committed it. The only
-movement is the three `18_displacement` readings recorded since the last table: Google's pass count rose
-and the documents failing `18_displacement` fell.
+Stage `classify` is the table, not a measurement, so this run measured nothing and touched no engine code. It regenerated the capability table from the committed results and committed it.
 
 ## The corpus
 
 | | |
 |:--|--:|
-| Documents in corpus | 213 |
-| Scored through Google | 192 |
-| Refused (page count) | 21 |
-| Failing at least one check | 166 |
+| documents in corpus | **213** |
+| scored through Google | **190** |
+| refused on page count | **23** |
+| clean in Google | **28** |
+| clean in LibreOffice | **122** |
 
-## Pass rates, same engine, same source
+## The capability table, `benchmarks/GOOGLE-VS-LIBREOFFICE.md`
+
+Regenerated from `gverify.py --matrix`. The five rows where Google is strictest and LibreOffice nearly clean:
+
+| check | LibreOffice fails | Google fails |
+|:--|--:|--:|
+| `18\_displacement` | 20 | **109** |
+| `32\_stroke\_lines` | 1 | **85** |
+| `05\_chars\_extra` | 3 | **79** |
+| `04\_chars\_missing` | 2 | **66** |
+| `25\_invisible\_text` | 0 | **47** |
+
+`32\_stroke\_lines` and `05\_chars\_extra` remain one construct, not two: a rule is emitted as a floating `<w:drawing>`, Google drops the shape and keeps the anchor, and the anchor is counted as a character. The table now says so in a construct section, with the two settled renderer facts and a pointer to the four measured fixes that did not work, so the next attempt starts from evidence.
+
+## The current-engine view
+
+`gverify.py --report` prints a narrower set, because it counts only results carrying the engine stamp of the engine on HEAD:
 
 | | |
 |:--|--:|
-| LibreOffice | 122 of 192 pass all 42 |
-| Google Docs | 26 of 192 pass all 42 |
+| verified | **81** |
+| pass all 42 | **12** |
+| fail at least one | **46** |
+| refused on page count | **23** |
 
-## Top failing checks - fix the class, not the document
+Its five largest failing checks:
 
-| check | LibreOffice fails | Google fails |
-|---|---:|---:|
-| `18_displacement` | 20 | 121 |
-| `32_stroke_lines` | 1 | 113 |
-| `05_chars_extra` | 3 | 109 |
-| `04_chars_missing` | 2 | 66 |
-| `59_shape_anchor` | 9 | 58 |
+| check | documents |
+|:--|--:|
+| `04\_chars\_missing` | **24** |
+| `18\_displacement` | **24** |
+| `59\_shape\_anchor` | **19** |
+| `60\_text\_column\_right\_edge` | **19** |
+| `13\_text\_colours` | **18** |
 
-Seven constructs are honoured by LibreOffice and dropped by Google: `25_invisible_text`,
-`44_header_footer`, `10_font_sizes`, `23_line_pitch`, `31_pages_lost_their_text`,
-`46_text_crossing_rule` and `42_justification_edges`. One runs the other way: `14_filled_shapes`.
+## Stage and next
 
-## Why `--report` prints a smaller number
-
-`gverify.py --report` prints `21 verified | 0 pass all 42 | 0 fail at least one | 21 refused`. That is the
-current-engine view: a result counts only when it carries the engine stamp of the engine on HEAD, and the
-scored results were written before the last engine change, so the instrument sees the page-count refusals
-and nothing else. The table above is computed from the committed results, which is the record the fixer
-reads. Both numbers are real; they answer different questions.
-
-## Next
-
-`stage.py` says `classify`: 166 documents still fail at least one check and the class table is the
-classifier cron's work, not this one's. This cron's measuring work is finished - the table is its last
-deliverable, and it is committed.
+`stage.py`: **classify**, 162 documents still failing, next action "classify 162 failing documents - the table is older than the results". That table is `DEFECT-CLASSES-GOOGLE.md`, the classifier cron's file. The capability table was this cron's last deliverable and it is committed.
