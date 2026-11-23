@@ -2694,3 +2694,15 @@
 {"t": 1795442883.2936525, "ist": "19:38:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795442883.4543219, "ist": "19:38:03", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795442938.1702862, "ist": "19:38:58", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795442941.6289828, "ist": "19:39:01", "ev": "attempt", "d": "60_text_column_right_edge -> lead"}
+{"t": 1795442941.7323503, "ist": "19:39:01", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795442941.8903015, "ist": "19:39:01", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795442953.902081, "ist": "19:39:13", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795442954.8150136, "ist": "19:39:14", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795442954.9327881, "ist": "19:39:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795442955.5234897, "ist": "19:39:15", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795442955.621836, "ist": "19:39:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795442955.89194, "ist": "19:39:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795442956.0075364, "ist": "19:39:16", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795442956.5374868, "ist": "19:39:16", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795442956.662907, "ist": "19:39:16", "ev": "beat", "d": "report.py: building the report"}

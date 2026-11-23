@@ -72,3 +72,20 @@ Measure (2) locally first: take `313_power_of_attorney`, compute the advance wid
 line in DejaVu Serif and in each candidate family, and pick the family within 1 %. Then one round trip
 says whether the column edge closes. **No engine change was made this attempt — 0 moved, recorded as
 `lead`.**
+
+## The family swap, measured — right direction, not enough
+
+Built a probe of `316_contract_with_schedules` with `DejaVuSans → Verdana` and `DejaVuSerif → Georgia`
+in `document.xml`, `styles.xml` and `fontTable.xml` (Verdana is metric-compatible with DejaVu Sans: both
+are Bitstream Vera derivatives), and took it through the same round trip.
+
+| | source | DejaVu declared | Verdana/Georgia declared |
+|:--|--:|--:|--:|
+| page's widest line | 538.6 | 480.1 (**−58.5**) | 518.1 (**−20.5**) |
+| deciding column @56.7 | 538.6 | 480.1 (−58.5) | 471.8 (−66.8) |
+| verdict | — | 41/42 | **41/42** |
+
+The family swap **recovers two thirds of the width deficit on the page** and still fails, because the
+column that decides the check moves the wrong way. So the substitution is real and it is worth 38 pt of
+the 58, and it is **not sufficient on its own** — something else is also narrowing that column. Both
+facts are now measured; neither was before.

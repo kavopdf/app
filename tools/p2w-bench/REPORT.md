@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 18:58 → running IST · 39 min**
+**23 Nov 2026 · slot 18:58 → running IST · 40 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -31,6 +31,7 @@
 | 19:31 | **reverted** | 0/0 | table-gap spacer spent PARTIALLY up to the page's remaining slack, instead of the binary whole-or-nothing spend: 49 docs' document.xml changed, and in Google it moved nothing on the two documents pred |
 | 19:34 | **lead** | 0/0 | stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text |
 | 19:36 | **lead** | 0/0 | the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median l |
+| 19:38 | **lead** | 0/0 | font family swap measured: declaring Verdana/Georgia instead of DejaVuSans/DejaVuSerif moved the render's widest line on 316_contract_with_schedules from 480.1 to 518.1 against the source's 538.6 - th |
 
 ## The txt
 
@@ -50,9 +51,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 18:58 → running · 39 min |
+| Slot window | 18:58 → running · 40 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 21 |
+| Tool beats | 25 |
 | Longest silence | **19.8 min** — from 18:58:36, after `report.py: building the report` |
 | Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -64,8 +65,8 @@
 |:--|--:|:--|
 | fix - diagnose and change the engine | **7 min** | `####` |
 | measure or build - a conversion, screen or compile writes no beacon | **23 min** | `#############` |
-| record - attempt, handoff, class rows | **2 min** | `##` |
-| report - the report and the chain | **0 min** | `#` |
+| record - attempt, handoff, class rows | **3 min** | `##` |
+| report - the report and the chain | **1 min** | `#` |
 | other - not attributed to a tool | **5 min** | `###` |
 ## Best results this round
 
