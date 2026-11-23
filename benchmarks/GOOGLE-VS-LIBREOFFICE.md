@@ -16,42 +16,42 @@ Same source PDF, same .docx, same instrument. Only the renderer differs.
 | `59_shape_anchor` | 9 | 45 | **Google** |
 | `45_char_accuracy` | 2 | 37 | **Google** |
 | `13_text_colours` | 1 | 32 | **Google** |
-| `44_header_footer` | 0 | 31 | **Google** |
+| `44_header_footer` | 0 | 30 | **Google** |
 | `17_matched_runs` | 4 | 30 | **Google** |
 | `27_text_off_page` | 2 | 17 | **Google** |
 | `26_text_overlap` | 2 | 16 | **Google** |
 | `47_margins` | 15 | 25 | **Google** |
-| `32_stroke_lines` | 1 | 11 | **Google** |
+| `32_stroke_lines` | 1 | 9 | **Google** |
 | `10_font_sizes` | 0 | 6 | **Google** |
 | `43_within_10pt_x` | 7 | 12 | **Google** |
-| `05_chars_extra` | 3 | 7 | **Google** |
 | `23_line_pitch` | 0 | 3 | **Google** |
-| `38_list_markers` | 1 | 2 | **Google** |
-| `31_pages_lost_their_text` | 0 | 1 | **Google** |
+| `05_chars_extra` | 3 | 5 | **Google** |
 | `46_text_crossing_rule` | 0 | 1 | **Google** |
-| `35_rotation` | 12 | 12 | same |
-| `37_super_subscript` | 1 | 1 | same |
-| `62_table_columns` | 3 | 3 | same |
-| `51_field_values` | 1 | 1 | same |
-| `63_table_rows` | 3 | 3 | same |
-| `64_table_span_across` | 1 | 1 | same |
-| `34a_span_size_match` | 2 | 2 | same |
-| `52_outline` | 1 | 1 | same |
-| `53_embedded_faces` | 4 | 4 | same |
+| `31_pages_lost_their_text` | 0 | 1 | **Google** |
+| `38_list_markers` | 1 | 2 | **Google** |
 | `28_clipped_at_edge` | 1 | 1 | same |
-| `40_link_targets` | 1 | 1 | same |
-| `65_table_span_down` | 1 | 1 | same |
+| `37_super_subscript` | 1 | 1 | same |
 | `66_table_cell_width` | 4 | 4 | same |
+| `34a_span_size_match` | 2 | 2 | same |
+| `65_table_span_down` | 1 | 1 | same |
+| `64_table_span_across` | 1 | 1 | same |
+| `35_rotation` | 12 | 12 | same |
+| `51_field_values` | 1 | 1 | same |
+| `52_outline` | 1 | 1 | same |
+| `62_table_columns` | 3 | 3 | same |
+| `63_table_rows` | 3 | 3 | same |
+| `40_link_targets` | 1 | 1 | same |
+| `53_embedded_faces` | 4 | 4 | same |
 | `14_filled_shapes` | 2 | 0 | LibreOffice |
 
 ## Constructs LibreOffice honours and Google does not
 
 * `25_invisible_text` - 48 documents
-* `44_header_footer` - 31 documents
+* `44_header_footer` - 30 documents
 * `10_font_sizes` - 6 documents
 * `23_line_pitch` - 3 documents
-* `31_pages_lost_their_text` - 1 documents
 * `46_text_crossing_rule` - 1 documents
+* `31_pages_lost_their_text` - 1 documents
 
 ## Constructs Google honours and LibreOffice does not
 
@@ -59,14 +59,13 @@ Same source PDF, same .docx, same instrument. Only the renderer differs.
 
 ## Engine coverage - what the 190 are measured on
 
-183 of the 190 scored documents carry the current engine stamp `b7699196`. The other 7 were
-measured on an earlier engine commit and are queued for re-measurement; their rows in the table
-above are still counted, because dropping them would understate every check they fail.
+186 of the 190 scored documents carry the current engine stamp `b7699196`. Four do not, and they
+are named here rather than dropped, because dropping them would understate every check they fail:
 
-    15_stamp_on_scanned_page           70_magazine_drop_cap_photo_caption
-    gst-invoice-multipage-item-table   magazine-2col-pullquote-spanning
-    newspaper-2col-fullwidth-headline  table-across-page-break-repeated-header
-    very-long-single-column-table
+    15_stamp_on_scanned_page         765 KB .docx - over the platform upload limit
+    magazine-2col-pullquote-spanning  998 KB .docx - over the platform upload limit
+    newspaper-2col-fullwidth-headline 1.5 MB .docx - over the platform upload limit
+    very-long-single-column-table     the converter produced no .docx for it on this engine
 
 23 further documents are recorded as `page_count_refused`: Google reflowed them onto a different
-page count, which is a recorded outcome, not a pass and not a score.
+page count. That is a recorded outcome, not a pass and not a score, and it is counted separately.

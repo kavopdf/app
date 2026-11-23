@@ -9,5 +9,14 @@
   "18_displacement",
   "44_header_footer"
  ],
- "engine": "98be7c3c"
+ "displacement": {
+  "med_dy": 2.9,
+  "worst_dy": 3.3,
+  "med_dx": -0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 22
+ },
+ "engine": "b7699196"
 }

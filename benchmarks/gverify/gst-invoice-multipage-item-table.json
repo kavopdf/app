@@ -2,16 +2,26 @@
  "name": "gst-invoice-multipage-item-table",
  "status": "ok",
  "rc": 1,
- "passed": 40,
+ "passed": 42,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
   "25_invisible_text",
   "26_text_overlap",
   "27_text_off_page",
-  "32_stroke_lines",
   "44_header_footer"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -59.3,
+  "worst_dy": 175.5,
+  "med_dx": 0.2,
+  "bad_pages": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "runs_matched": 373
+ },
+ "engine": "b7699196"
 }
