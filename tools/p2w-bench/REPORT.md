@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-23 08:55
+# Fixer report - 2026-11-23 12:15
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 08:55 → 09:56 IST · 1h 01m**
+**23 Nov 2026 · slot 12:14 → 13:03 IST · 48 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,18 +11,18 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **1** — 416_many_tiny_pages |
-| **Fixed - Google, all 42 checks** | **0**, out of the 2 measured on THIS engine (all engines: 30 of 190) |
+| **Fixed - Google, all 42 checks** | **0** of the **2** re-measured on this engine - **188** of the 190 scored are still on an older engine, and **30** were clean there |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 188 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
 | Working on | `00_page_count` |
-| Committed | **11** files in 5 commit(s) from `8f87185` — ...18_displacement-PAGE-SHIFT-CENSUS-1015-agent.md, ENGINE-STAMP.json, LAST-MESSAGE.md, RANKING.csv, REPORT.md, ROTATION.json, ROUND.json, RUN.json, TIMELINE.jsonl, TRACE.md, UNMEASURED.json |
 
 ## The txt
 
@@ -42,23 +42,21 @@
 
 | | |
 |:--|:--|
-| Slot window | 08:55 → 09:56 · 1h 01m |
+| Slot window | 12:14 → 13:03 · 48 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 18 |
-| Longest silence | **14.9 min** — from 08:55:53, after `claimed, reading findings` |
-| Silences over 2 min | 11 |
-| Obstacles | 0 cleared · 4 parked, with the evidence to re-open them |
-| Still a wall | **The fixer's claim is 55 min old against a 45-min stale window and no run has beaconed since it claimed at 08 |
+| Tool beats | 0 |
+| Longest silence | **38.2 min** — from 12:24:40, after `lastmessage.py: running a tool for its numbers` |
+| Silences over 2 min | 2 |
+| Obstacles | 2 cleared · 4 parked, with the evidence to re-open them |
+| Still a wall | **The window closed and the relay took it: this is the pair working, and no force release was needed.** Commit |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| build - compiling the engine | **1 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **29 min** | `###########` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **29 min** | `###########` |
+| report - the report and the chain | **39 min** | `##################` |
+| other - not attributed to a tool | **7 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |

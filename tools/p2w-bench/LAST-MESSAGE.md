@@ -1,25 +1,25 @@
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 08:55 → 09:56 IST · 1h 01m**
+**23 Nov 2026 · slot 12:14 → 13:03 IST · 48 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> No document moved this run. One gate defect was fixed, committed and pushed; the table that lands the page-count patch still cannot be produced inside one call, and this run measured why.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **1** — 416_many_tiny_pages |
-| **Fixed - Google, all 42 checks** | **0**, out of the 2 measured on THIS engine (all engines: 30 of 190) |
+| **Fixed - Google, all 42 checks** | **0** of the **2** re-measured on this engine - **188** of the 190 scored are still on an older engine, and **30** were clean there |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 188 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
 | Working on | `00_page_count` |
-| Committed | **11** files in 5 commit(s) from `8f87185` — ...18_displacement-PAGE-SHIFT-CENSUS-1015-agent.md, ENGINE-STAMP.json, LAST-MESSAGE.md, RANKING.csv, REPORT.md, ROTATION.json, ROUND.json, RUN.json, TIMELINE.jsonl, TRACE.md, UNMEASURED.json |
 
 ## The txt
 
@@ -39,23 +39,21 @@
 
 | | |
 |:--|:--|
-| Slot window | 08:55 → 09:56 · 1h 01m |
+| Slot window | 12:14 → 13:03 · 48 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 18 |
-| Longest silence | **14.9 min** — from 08:55:53, after `claimed, reading findings` |
-| Silences over 2 min | 11 |
-| Obstacles | 0 cleared · 4 parked, with the evidence to re-open them |
-| Still a wall | **The fixer's claim is 55 min old against a 45-min stale window and no run has beaconed since it claimed at 08 |
+| Tool beats | 0 |
+| Longest silence | **38.2 min** — from 12:24:40, after `lastmessage.py: running a tool for its numbers` |
+| Silences over 2 min | 2 |
+| Obstacles | 2 cleared · 4 parked, with the evidence to re-open them |
+| Still a wall | **The window closed and the relay took it: this is the pair working, and no force release was needed.** Commit |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| build - compiling the engine | **1 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **29 min** | `###########` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **29 min** | `###########` |
+| report - the report and the chain | **39 min** | `##################` |
+| other - not attributed to a tool | **7 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -72,67 +70,55 @@
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
-## What this run proved - 00_page_count, measured in Google
+## What this run kept: the gate counted 211 of a 212-document corpus
 
-Class picked: `00_page_count`, second in `classpick.py --leverage` at **23.0** clean documents and the
-largest class whose mechanism was already measured. The 0530 finding named `DocxWriter.shape()` as the
-lever; that was half right, and the wrong half is why the previous attempt came back empty. `pageBody()`
-**already** appends every shape as a bare run to the page's last paragraph with one carrier paragraph per
-page, so a merge in `shape()` is a no-op for 301, 375, 341, 390, 403, 405, 351, 333, 305 and the rest.
-The path still emitting one paragraph per shape is `shape()` reached through `emitBlock()` from inside the
-column pass, `columnPage()`. The patch (+47/-5: a `shapeCarrier` StringBuilder, `flushShapes()` at both
-exits of `pageBody()`, and a cell that held only a shape still gets a paragraph) changes that.
+`_expected_docs()` counts the real documents from four hard-coded paths. `p2w.py` looks at
+`HERE/realworld` **first**, and a clone at `/scratch/work/CS` is none of the four — so gate.py found
+`real = 0` and expected **211** while p2w.py measured **212**. `complete` was therefore reachable at
+211 of 212: gate.py would publish `RANKING.csv` with one document never measured in it, under a verdict
+saying the measurement was complete.
 
-Before arm = HEAD, after arm = HEAD plus the patch, both converted in this sandbox and both rendered by
-Drive into `KavoPDF-Test-Outputs`:
+Three independent sources agree the corpus is 212: 213 PDFs in the corpus directory, 1 entry in
+`EXEMPT.json` (`416_many_tiny_pages`), and `report.py`'s own "212 compared". `_expected_docs()` now
+returns **212** from this clone; it returned **211** at HEAD.
 
-| document | source pages | HEAD | + patch | 42 checks (Google, after) |
-|---|--:|--:|--:|:--|
-| `361_product_catalogue_grid` | 1 | **2** | **1** | 41/42 - only `25_invisible_text` |
-| `401_trifold_brochure` | 1 | 2 | 2 | still refused |
+The second fix: `measured` was a bare `glob("dist2/*.json")`, which counts p2w.py's
+`dist2/<doc>.partial.json` page window as a measurement. That file has no `doc`, no numbers and no
+verdict — it is a progress note, and p2w.py's own `results()` excludes it. A probe pair written into
+`dist2/` showed the old glob counting **2** files where `_result_files()` correctly saw **1**.
 
-`361` was one of the 23 documents gverify refuses to score; with the patch it is scorable for the first
-time and reads 41/42. `401` was the coin flip the 0530 finding predicted - 20 x 0.83 = 16.6 pt saved
-against ~0 pt of slack - and it came up short. Nothing got worse: LibreOffice page count identical on all
-21 changed documents with all 42 checks unchanged (it honours `w:line="1"` exact, Google does not), the
-`.txt` byte-identical on 213/213 and re-scored by `restamp_txt.py` as "213 scored, 0 newly clean, 0 newly
-failing, 213 unchanged", `document.xml` byte-identical on 192 of 213.
+Verified: `py_compile` clean, the one-shot path run end to end (`INCOMPLETE: measured 0 of 212`,
+ground truth pass, txt checks available), `benchmarks/STATE.json` restored to the committed run of
+record, `regress.py --check` **PASS — nothing got worse in both formats, and the table matches this
+engine**.
 
-## Why it is not landed, and the order that lands it
+## Why no document moved, in numbers
 
-    ENGINE CHANGED (docx): table measured on 4a607e4b793fb348, the tree is 3e7f7c4475343a35
-    ENGINE CHANGED (txt):  table measured on d20930229132b191, the tree is b97d8172ce642eb0
+The `00_page_count` patch is ready and already measured in Google by the 08:55 run
+(`FINDINGS/00_page_count-MERGE-SHAPE-PARAGRAPHS.patch`: `361_product_catalogue_grid` 2 → 1 page,
+41 of 42 checks). Landing it needs the docx table re-measured, and the table does not fit one 290 s
+call. This run measured the shape of that wall:
 
-The `.txt` half re-measured in 47 s. The `.docx` half is `benchmarks/gate.py --budget 250` and it did not
-finish inside one 290 s call - no output, neither `RANKING.csv` nor `STATE.json` written. That is the
-whole gap: the measurement outlives the call limit, not the evidence. `regress.py --stamp` also refuses
-until the table is committed at or after the engine, so engine and table must travel in one commit.
+| what | measured |
+|:--|--:|
+| `build-engine.sh`, cold | **38 s** |
+| conversion, one JVM per document | **~9–10 s** per document |
+| `p2w.py`'s inner group (`CHUNK`) | **12** documents, rendered *then* measured |
+| `gate.py --resume --budget 110 --chunk 45` | **0 of 212** measured, p2w exit 124 |
+| `gate.py --resume --budget 250 --chunk 200` | **0 of 212** measured, no progress note written |
 
-So the engine edit was reverted, `regress.py --check` re-run on the committed tree (**PASS - nothing got
-worse in both formats, and the table matches this engine**), and the patch committed beside its finding
-so no run derives it again:
+A `--resume`/`--chunk` patch (165 lines) was written and compiles, and was **not landed**. The reason
+is `p2w.py`'s own loop: it prerenders a group of twelve, then abandons the whole group if the clock
+runs out before the first document is measured, so a chunk shorter than one group writes nothing —
+which is what both chunk sizes above did. Resuming needs chunks of ~200 s, i.e. **one chunk per call**,
+and 212 documents at ~12 per call is **~18 calls**, not the 2–3 the previous report planned for.
 
-    tools/p2w-bench/FINDINGS/00_page_count-MERGE-SHAPE-PARAGRAPHS.patch
-    tools/p2w-bench/FINDINGS/00_page_count-MERGE-IN-COLUMN-PAGE-MEASURED-IN-GOOGLE.md
+A second reason it is not in this commit: on one `--resume` invocation whose guard says *do not write
+the repository's copy*, `benchmarks/STATE.json` changed anyway (`c0c27d72…` → `54a0dfad…`, an
+`INCOMPLETE` record, eight seconds after the run's last log line). Restored with `git checkout`. A
+guard that does not hold is worse than no guard.
 
-Next run, in this order: apply the patch, `build-engine.sh`, then `benchmarks/gate.py --budget 250`
-**across two or three calls with a beat between them**, then commit engine + `RANKING.csv` + `STATE.json`
-together, `regress.py --stamp`, commit the stamp, `regress.py --check`, push.
 
-## Subagents and an instrument defect
-
-One subagent, deployed in the first ten minutes with the merge as its problem and 361/401 as the
-documents to prove it on. It returned the patch, the corpus-wide byte comparison and the LibreOffice
-table, and it found that `pageBody()` already carried the merge - the correction above is its work plus
-this run's Google measurement. It ran inline (21 min) rather than in the background, which is where a
-third of the slot went; the second agent was never deployed, which is the shortfall the release guard
-correctly refused.
-
-`GOOGLEDRIVE_DOWNLOAD_FILE` no longer returns `downloaded_file_content.s3url`; it returns
-`artifacts[0].workspace_path`, a local path. `gverify.py --collect <name> <s3url>` expects a URL, so
-`--collect` cannot be called with what the tool now hands back; the page counts and the 42 checks above
-were run directly with `verify_google.py <src> <render> --docx <docx>`. That mismatch will block the next
-gverify run.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
