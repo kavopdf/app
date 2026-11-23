@@ -1157,6 +1157,28 @@ to whoever comes next.
 and left its work on disk. The next run starts in seconds instead of waiting two hours for a corpse to be
 reaped.
 
+### TWO MEASUREMENTS ALREADY IN THE ENGINE, AND NOTHING TURNS THEM ON
+
+`18_displacement` is 100 of 190 scored documents - the largest class by a wide margin. Its mechanism has been
+hunted in code for weeks. **The engine already measures it, per page, in points, and names the writer that caused
+it.** Both switches exist and neither is passed by anything in `p2w-bench` or `benchmarks`:
+
+    -Dp2w.debugFlow          per page: flowTw, budgetTw, overTw     - how far the page overran its budget
+    -Dp2w.census=<file>      per page: rewind, rewindWorst, rewindWho - flow y moved UP the page, by how much,
+                                                                      by which of eight writers
+
+**`rewind` is displacement.** `cenSetY` (DocxWriter 4228) increments it whenever `y < flowY - 0.01`, appends the
+writer's name, and keeps the worst amount. The `one-positioner-per-page` invariant is stated twice in prose and
+enforced nowhere; this census is the only thing that measures it.
+
+**Before writing another patch for 18_displacement, run one document with the census on and read `rewindWho`.**
+That names the writer to fix. Guessing has not worked for weeks; this is one run.
+
+There are **30 `p2w.*` properties** in total. Several are tunables rather than diagnostics (`colMinBand`,
+`colMinFill`, `fitreserve`, `ovf`, `wrapgate`, `ascent`, `zgfloor`, `recut`, `noshave`, `lineRule`, `softmask`,
+`anchorkey`, `autoEm`). **None is documented, so a run cannot tell which of them change output if set.** A file
+listing all 30, marked diagnostic or tunable, is worth writing.
+
 ### PICK THE CHECK THAT FINISHES DOCUMENTS, NOT THE CLASS THAT TOUCHES THEM
 
 Measured 23 Nov over 60 runs: **80% improved nothing, 60% made 0 or 1 attempt**, and about 20 documents a day

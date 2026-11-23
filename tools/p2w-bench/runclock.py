@@ -3,7 +3,9 @@
 
 WHY THIS EXISTS. The brief told a run "it ends when the work does" and never said how long the work was.
 So a run did one attempt, wrote an accurate report, and stopped - which is what it had been told to do.
-Measured over 31 timed fixer runs: median 36 minutes, mean 42, and only 3 of 31 reached 90. Ten finished
+Measured over the 31 timed fixer runs that existed at the time: median 36 minutes, mean 42, and only 3 of
+31 reached 90. THAT WAS A SNAPSHOT AND IT CANNOT BE RECOMPUTED: RUN-HISTORY.json now holds 60 runs and
+none of them carries a duration field, so any later figure has to be derived from TIMELINE.jsonl instead. Ten finished
 inside twenty. The user's target is "har ek run 1.5 hours se zyada ka hona chahiye", and a target nobody
 can measure is not a target.
 
