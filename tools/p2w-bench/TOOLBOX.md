@@ -173,6 +173,41 @@ change: they are the evidence that a commit through a gap was decided, not stumb
 Whether a recorded gap may be committed through is `unmeasured.py`'s decision, never the
 flag's - see the commit-gate.sh section.
 
+### READ THIS BEFORE YOU BELIEVE `ratchet.py` EXITED 3
+
+**`ratchet.py` reads a retired store and cannot compare anything.** `BASELINE.md` and
+`RESULTS.jsonl` are the old check-id pipeline (`RETIRED.md`), the rows are stamped `u59` while
+the live instrument has 47 checks, and `RATCHET.json` is not in the tree. Measured 24 Nov:
+
+```
+documents scored this run : 211 of 211 rows
+compared against a mark   : 0
+UNMEASURED - the bar was not asked: 211 of 211 document(s) could not be compared
+```
+
+211 of 211 UNMEASURED is not a pass and not a failure — it is a gate that cannot be asked, and
+no amount of new measurement reconciles a denominator from another instrument. If you need the
+regression rule asked of the renderer the user opens, that is:
+
+```
+python3 tools/p2w-bench/ratchet_google.py            # check and raise a mark
+python3 tools/p2w-bench/ratchet_google.py --check    # check only, never raise
+python3 tools/p2w-bench/ratchet_google.py --show     # the store, without comparing
+python3 tools/p2w-bench/ratchet_google.py --allow-stale --reason "<which documents you are not comparing>"
+python3 tools/p2w-bench/ratchet_google.py --recut --reason "<why this mark is out of a different universe>"
+```
+
+It reads `benchmarks/gverify/*.json` (Google Docs, one record per document) and compares by
+**check identity, not by count**: a document fell when it now fails a check its mark did not
+fail. Names survive a denominator change, counts do not. Marks live in `RATCHET-GOOGLE.json`,
+the gap in `UNMEASURED-GOOGLE.json`, a waiver in `WAIVER-GOOGLE.json`. Same four exits.
+
+The 23 `page_count_refused` documents cannot be compared at all — that is `00_page_count`, and
+it is why this gate needs a written waiver to go green. See
+`FINDINGS/RATCHET-WAS-GATING-A-RETIRED-PIPELINE-0420-fixer.md` for the before/after and the
+five falsification tests, including the one where a clean `42/42` document is made to fail a
+check and the gate names it.
+
 **Never re-label a mark.** A count out of 59 is not a count out of 56, and a store that
 says otherwise is the drift the denominator guard exists to catch. If a mark's instrument
 has retired, the document must be re-measured; `--recut` re-marks one from a fresh row and

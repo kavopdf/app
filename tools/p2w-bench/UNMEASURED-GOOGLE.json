@@ -1,0 +1,42 @@
+{
+  "counts": {
+    "compared": 190,
+    "fell": 0,
+    "held": 190,
+    "new": 0,
+    "not_compared": 23,
+    "records": 213,
+    "rose": 0
+  },
+  "fell": [],
+  "not_compared": {
+    "041122-Account_Opening_Form": "status page_count_refused",
+    "05_round_company_seal_curved_text": "status page_count_refused",
+    "305_vaccination_certificate": "status page_count_refused",
+    "314_tender_rfp_boq": "status page_count_refused",
+    "320_balance_sheet_statutory": "status page_count_refused",
+    "326_itr_computation": "status page_count_refused",
+    "332_bom_on_drawing": "status page_count_refused",
+    "333_datasheet_spec_tables": "status page_count_refused",
+    "341_shipping_manifest": "status page_count_refused",
+    "350_question_paper": "status page_count_refused",
+    "351_omr_answer_sheet": "status page_count_refused",
+    "353_admit_card": "status page_count_refused",
+    "361_product_catalogue_grid": "status page_count_refused",
+    "390_wide_data_appendix": "status page_count_refused",
+    "401_trifold_brochure": "status page_count_refused",
+    "402_calendar_month_grid": "status page_count_refused",
+    "403_crossword_puzzle": "status page_count_refused",
+    "405_sheet_music_lyrics": "status page_count_refused",
+    "60_page_border": "status page_count_refused",
+    "Account_Opening_Form_Fillable_filled": "status page_count_refused",
+    "bank-statement-horizontal-rules-only": "status page_count_refused",
+    "boq-horizontal-rules-only": "status page_count_refused",
+    "price-list-2col-dense-right-aligned": "status page_count_refused"
+  },
+  "reason": "restore the true reading: 42/42, the 47 above was a test mutation",
+  "store": "benchmarks/gverify",
+  "verdict": "UNMEASURED",
+  "waived": false,
+  "written_at": "2026-11-24T04:36:43+05:30"
+}

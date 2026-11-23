@@ -1,0 +1,2071 @@
+{
+  "01_stamp_rotated_15deg_upright": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "18_displacement",
+      "25_invisible_text",
+      "35_rotation",
+      "59_shape_anchor"
+    ],
+    "passed": 36,
+    "total": 42
+  },
+  "02_stamp_rotated_15deg_upleft": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "18_displacement",
+      "25_invisible_text",
+      "35_rotation",
+      "59_shape_anchor"
+    ],
+    "passed": 36,
+    "total": 42
+  },
+  "03_stamp_vertical_90deg": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "18_displacement",
+      "35_rotation",
+      "59_shape_anchor",
+      "62_table_columns",
+      "63_table_rows"
+    ],
+    "passed": 37,
+    "total": 44
+  },
+  "04_stamp_180deg_upside_down": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "18_displacement",
+      "25_invisible_text",
+      "35_rotation",
+      "59_shape_anchor"
+    ],
+    "passed": 36,
+    "total": 42
+  },
+  "06_rect_paid_stamp_red_transparent": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "35_rotation"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "07_stamp_over_table": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "25_invisible_text",
+      "26_text_overlap",
+      "35_rotation",
+      "43_within_10pt_x",
+      "47_margins"
+    ],
+    "passed": 35,
+    "total": 42
+  },
+  "08_two_overlapping_stamps": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "18_displacement",
+      "25_invisible_text",
+      "35_rotation",
+      "45_char_accuracy"
+    ],
+    "passed": 35,
+    "total": 42
+  },
+  "09_stamp_font_not_embedded": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "35_rotation",
+      "59_shape_anchor"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "10_stamp_as_image": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "25_invisible_text"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "11_stamp_with_signature_image": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "35_rotation",
+      "45_char_accuracy"
+    ],
+    "passed": 37,
+    "total": 42
+  },
+  "12_stamp_across_page_break": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "05_chars_extra",
+      "27_text_off_page"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "13_stamp_non_english": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "18_displacement",
+      "35_rotation",
+      "45_char_accuracy",
+      "59_shape_anchor"
+    ],
+    "passed": 35,
+    "total": 42
+  },
+  "14_stamp_chars_positioned_td": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "25_invisible_text",
+      "45_char_accuracy",
+      "60_text_column_right_edge"
+    ],
+    "passed": 37,
+    "total": 42
+  },
+  "15_stamp_on_scanned_page": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "5beb8b9d",
+    "failed": [
+      "04_chars_missing",
+      "10_font_sizes",
+      "13_text_colours",
+      "17_matched_runs",
+      "31_pages_lost_their_text",
+      "35_rotation",
+      "44_header_footer",
+      "45_char_accuracy",
+      "59_shape_anchor"
+    ],
+    "passed": 33,
+    "total": 42
+  },
+  "16_right_aligned_amounts_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "17_three_column_widths_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "18_centred_heading_left_body_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "19_hanging_indent_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "20_numbered_list_separate_column_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "17_matched_runs",
+      "44_header_footer",
+      "45_char_accuracy"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "21_form_labels_x60_values_x300_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "43_within_10pt_x",
+      "47_margins"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "22_invoice_four_columns_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "23_timetable_grid_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "59_shape_anchor"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "24_address_block_indents_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "25_signature_block_underscores_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "45_char_accuracy",
+      "60_text_column_right_edge"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "26_footnote_marker_bottom_note_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "27_two_column_left_short_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "44_header_footer"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "28_value_overflows_cell_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "43_within_10pt_x",
+      "45_char_accuracy",
+      "47_margins",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 36,
+    "total": 42
+  },
+  "29_dot_leaders_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "300_prescription_rx": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "59_shape_anchor"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "301_lab_report_panel": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "60_text_column_right_edge"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "302_radiology_report": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "60_text_column_right_edge"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "303_discharge_summary": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "304_package_insert_small_print": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "306_clinical_protocol_synopsis": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "59_shape_anchor"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "30_mixed_font_sizes_one_baseline_txtpos": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "59_shape_anchor"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "310_court_judgment": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "43_within_10pt_x",
+      "47_margins",
+      "60_text_column_right_edge"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "311_fir_police_form": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "45_char_accuracy",
+      "60_text_column_right_edge"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "312_affidavit_stamp_paper": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "60_text_column_right_edge"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "313_power_of_attorney": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "60_text_column_right_edge"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "315_gazette_notification": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "316_contract_with_schedules": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "60_text_column_right_edge"
+    ],
+    "passed": 46,
+    "total": 47
+  },
+  "317_rti_response": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "47_margins",
+      "60_text_column_right_edge"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "318_court_summons_form": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "43_within_10pt_x",
+      "45_char_accuracy",
+      "47_margins",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 39,
+    "total": 47
+  },
+  "31_times_body_arial_headings": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "321_auditors_report": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "60_text_column_right_edge"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "322_mutual_fund_factsheet": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "18_displacement",
+      "25_invisible_text",
+      "26_text_overlap",
+      "44_header_footer",
+      "45_char_accuracy",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 37,
+    "total": 47
+  },
+  "323_credit_card_statement": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "18_displacement",
+      "25_invisible_text",
+      "45_char_accuracy",
+      "60_text_column_right_edge",
+      "66_table_cell_width"
+    ],
+    "passed": 39,
+    "total": 47
+  },
+  "324_loan_amortisation_schedule": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "27_text_off_page",
+      "59_shape_anchor"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "325_demat_holdings_statement": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "32_serif_nondefault_body": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "330_cad_drawing_sheet": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "45_char_accuracy",
+      "47_margins"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "331_pid_diagram": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "10_font_sizes",
+      "13_text_colours",
+      "17_matched_runs",
+      "32_stroke_lines",
+      "44_header_footer",
+      "45_char_accuracy",
+      "47_margins",
+      "59_shape_anchor"
+    ],
+    "passed": 33,
+    "total": 42
+  },
+  "334_patent_document": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "335_msds_safety_data_sheet": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "25_invisible_text",
+      "60_text_column_right_edge"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "33_sans_nondefault_body": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "340_bill_of_lading": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "342_packing_list": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "60_text_column_right_edge"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "343_air_waybill": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "344_customs_declaration": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "18_displacement",
+      "25_invisible_text",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 41,
+    "total": 47
+  },
+  "34_monospace_document": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "352_certificate_ornate_border": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "45_char_accuracy",
+      "60_text_column_right_edge"
+    ],
+    "passed": 37,
+    "total": 42
+  },
+  "35_four_typefaces_one_page": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "360_restaurant_menu": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "43_within_10pt_x",
+      "47_margins",
+      "60_text_column_right_edge"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "362_price_list_dense": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "363_warranty_card": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "60_text_column_right_edge"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "364_event_ticket": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "25_invisible_text",
+      "45_char_accuracy",
+      "59_shape_anchor"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "365_recipe_card": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "47_margins",
+      "60_text_column_right_edge"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "36_embedded_subset_font": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "370_offer_letter": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "60_text_column_right_edge"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "371_experience_certificate": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "45_char_accuracy",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 36,
+    "total": 42
+  },
+  "372_timesheet_grid": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "59_shape_anchor"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "373_leave_application_form": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "23_line_pitch",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "374_org_chart": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "26_text_overlap"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "375_attendance_register": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "43_within_10pt_x",
+      "47_margins",
+      "59_shape_anchor"
+    ],
+    "passed": 42,
+    "total": 47
+  },
+  "37_font_not_embedded_substitution": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "380_runbook_terminal_output": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "25_invisible_text",
+      "47_margins"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "381_incident_report_timeline": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "25_invisible_text",
+      "60_text_column_right_edge"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "382_architecture_diagram": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "383_api_docs_page": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "25_invisible_text",
+      "47_margins",
+      "59_shape_anchor",
+      "60_text_column_right_edge",
+      "66_table_cell_width"
+    ],
+    "passed": 40,
+    "total": 47
+  },
+  "38_faux_bold_italic_synthesised": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "60_text_column_right_edge"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "391_survey_questionnaire_grid": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "17_matched_runs"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "392_statistical_console_output": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "47_margins"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "393_spectrum_peak_table": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "394_map_with_legend": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "39_small_caps_letter_spacing": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "25_invisible_text",
+      "26_text_overlap",
+      "43_within_10pt_x",
+      "47_margins"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "400_comic_page_speech_bubbles": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "10_font_sizes",
+      "13_text_colours",
+      "17_matched_runs",
+      "32_stroke_lines",
+      "45_char_accuracy",
+      "59_shape_anchor"
+    ],
+    "passed": 35,
+    "total": 42
+  },
+  "404_sudoku_grid": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "23_line_pitch",
+      "47_margins",
+      "59_shape_anchor"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "406_passport_mrz_page": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "60_text_column_right_edge"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "407_id_card_front_back": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "32_stroke_lines"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "40_devanagari_shaping_font": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "34a_span_size_match",
+      "38_list_markers",
+      "47_margins"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "410_form_xobject_reused": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "411_nested_xobject_transforms": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "17_matched_runs"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "412_page_labels_roman": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "27_text_off_page"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "413_tagged_pdf_actualtext": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "414_transparency_softmask": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "415_inline_images": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "416_many_tiny_pages": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "27_text_off_page"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "417_rotate180_and_mirrored": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "17_matched_runs",
+      "18_displacement",
+      "27_text_off_page"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "41_coloured_headings_white_bg": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "42_table_coloured_header_alternating_rows": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "59_shape_anchor"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "43_red_stamp_over_black_text": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "35_rotation"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "44_coloured_underlined_hyperlinks": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "40_link_targets",
+      "46_text_crossing_rule"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "45_coloured_callout_box": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "46_chart_coloured_labels_body_text": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "44_header_footer",
+      "45_char_accuracy"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "47_grey_body_black_headings": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "48_form_coloured_border_coloured_values": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "59_shape_anchor"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "49_coloured_background_block_paragraph": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "32_stroke_lines"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "50_invoice_coloured_total_row": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "25_invisible_text"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "51_two_cm_margins": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "52_one_cm_margin_wide_body": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "59_shape_anchor"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "53_single_space_body_15_headings": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "54_two_column_body_full_width_header_footer": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "25_invisible_text",
+      "44_header_footer",
+      "45_char_accuracy"
+    ],
+    "passed": 37,
+    "total": 42
+  },
+  "55_sidebar_box_beside_body": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "44_header_footer",
+      "45_char_accuracy"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "56_table_indented_from_margin": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "57_centred_title_page_left_body_pages": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "27_text_off_page",
+      "44_header_footer"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "58_header_rule_footer_rule": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "27_text_off_page",
+      "44_header_footer"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "59_landscape_mixed_portrait": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "600_reviewed_invoice_with_annotations": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "05_chars_extra",
+      "18_displacement",
+      "28_clipped_at_edge",
+      "32_stroke_lines",
+      "45_char_accuracy",
+      "47_margins",
+      "62_table_columns"
+    ],
+    "passed": 37,
+    "total": 44
+  },
+  "601_fillable_admission_form": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "51_field_values",
+      "53_embedded_faces",
+      "59_shape_anchor"
+    ],
+    "passed": 37,
+    "total": 42
+  },
+  "602_bookmarked_annual_report": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "27_text_off_page",
+      "52_outline"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "61_two_col_abstract_spanning": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "44_header_footer"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "62_two_col_newsletter_pull_quote": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "25_invisible_text",
+      "44_header_footer",
+      "45_char_accuracy"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "63_three_column_brochure": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "25_invisible_text"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "64_newspaper_uneven_columns_ad_boxes": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "23_line_pitch",
+      "26_text_overlap"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "65_two_col_full_width_figure_caption": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "44_header_footer",
+      "45_char_accuracy",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 35,
+    "total": 42
+  },
+  "66_two_col_footnotes_bottom": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "17_matched_runs",
+      "44_header_footer",
+      "45_char_accuracy"
+    ],
+    "passed": 37,
+    "total": 42
+  },
+  "67_two_col_with_sidebar": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "44_header_footer",
+      "45_char_accuracy"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "68_journal_wide_table_spanning": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "69_two_col_legal_numbered_clauses": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "10_font_sizes",
+      "13_text_colours",
+      "17_matched_runs",
+      "38_list_markers",
+      "44_header_footer",
+      "45_char_accuracy"
+    ],
+    "passed": 35,
+    "total": 42
+  },
+  "70_magazine_drop_cap_photo_caption": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "44_header_footer"
+    ],
+    "passed": 39,
+    "total": 42
+  },
+  "71_invoice_space_aligned_no_rules": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "72_bank_statement_no_rules_right_amounts": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "73_marksheet_subject_marks_grade": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "74_balance_sheet_indented_subitems": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "75_merged_header_cell_three_columns": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "59_shape_anchor",
+      "64_table_span_across",
+      "65_table_span_down"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "76_devanagari_table": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "17_matched_runs",
+      "18_displacement",
+      "34a_span_size_match",
+      "47_margins"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "77_arabic_rtl_document": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "17_matched_runs",
+      "18_displacement",
+      "26_text_overlap",
+      "43_within_10pt_x",
+      "47_margins",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 40,
+    "total": 47
+  },
+  "78_mixed_english_devanagari_line": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "05_chars_extra",
+      "17_matched_runs",
+      "18_displacement",
+      "26_text_overlap",
+      "43_within_10pt_x",
+      "47_margins"
+    ],
+    "passed": 36,
+    "total": 42
+  },
+  "79_inr_indian_digit_grouping_table": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "60_text_column_right_edge"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "80_gstin_pan_cin_ifsc_table": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "17_matched_runs",
+      "18_displacement",
+      "44_header_footer",
+      "45_char_accuracy",
+      "59_shape_anchor"
+    ],
+    "passed": 36,
+    "total": 42
+  },
+  "academic-paper-ieee-2col-abstract": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "17_matched_runs",
+      "18_displacement",
+      "27_text_off_page",
+      "44_header_footer",
+      "45_char_accuracy",
+      "47_margins",
+      "60_text_column_right_edge"
+    ],
+    "passed": 39,
+    "total": 47
+  },
+  "admission-form-labels-left-boxes-right": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "25_invisible_text"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "admit-card": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "18_displacement",
+      "45_char_accuracy",
+      "59_shape_anchor"
+    ],
+    "passed": 42,
+    "total": 47
+  },
+  "annual-review-2col-uneven-columns": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "25_invisible_text"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "balance-sheet-and-profit-loss": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "27_text_off_page",
+      "60_text_column_right_edge"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "balance-sheet-two-columns-of-figures": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "bank-statement-5-pages": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "27_text_off_page",
+      "44_header_footer",
+      "59_shape_anchor"
+    ],
+    "passed": 42,
+    "total": 47
+  },
+  "boq-tender-bill-of-quantities": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "60_text_column_right_edge"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "brochure-3col-with-sidebar-box": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "59_shape_anchor"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "bus-timetable-station-left-times-right": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 41,
+    "total": 42
+  },
+  "delivery-challan": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "18_displacement",
+      "25_invisible_text",
+      "26_text_overlap",
+      "60_text_column_right_edge"
+    ],
+    "passed": 41,
+    "total": 47
+  },
+  "electricity-bill": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "eway-bill": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "form16-part-b": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "27_text_off_page",
+      "60_text_column_right_edge"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "gst-invoice-3line-items": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "60_text_column_right_edge"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "gst-invoice-horizontal-rules-only": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "26_text_overlap",
+      "44_header_footer",
+      "45_char_accuracy",
+      "60_text_column_right_edge"
+    ],
+    "passed": 36,
+    "total": 42
+  },
+  "gst-invoice-multipage-item-table": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "26_text_overlap",
+      "27_text_off_page",
+      "44_header_footer"
+    ],
+    "passed": 42,
+    "total": 47
+  },
+  "gst-invoice-with-qr-code": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "26_text_overlap",
+      "66_table_cell_width"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "insurance-policy-schedule": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 46,
+    "total": 47
+  },
+  "invoice-line-items-qty-rate-amount": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "26_text_overlap"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "itr-computation-with-slab-table": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "26_text_overlap",
+      "32_stroke_lines",
+      "63_table_rows"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "journal-2col-with-footnotes": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "26_text_overlap",
+      "37_super_subscript"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "landscape-page-inside-portrait-document": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "60_text_column_right_edge"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "magazine-2col-pullquote-spanning": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "462353f",
+    "failed": [
+      "04_chars_missing",
+      "10_font_sizes",
+      "13_text_colours",
+      "17_matched_runs",
+      "32_stroke_lines",
+      "43_within_10pt_x",
+      "44_header_footer",
+      "45_char_accuracy",
+      "47_margins",
+      "60_text_column_right_edge"
+    ],
+    "passed": 32,
+    "total": 42
+  },
+  "marksheet-subject-left-marks-right": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "marksheet-university-consolidated": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "60_text_column_right_edge"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "mobile-bill": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 46,
+    "total": 47
+  },
+  "mutual-fund-statement": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "27_text_off_page",
+      "59_shape_anchor",
+      "60_text_column_right_edge",
+      "66_table_cell_width"
+    ],
+    "passed": 41,
+    "total": 47
+  },
+  "newsletter-3col-header-footer": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "25_invisible_text",
+      "44_header_footer",
+      "45_char_accuracy",
+      "59_shape_anchor"
+    ],
+    "passed": 36,
+    "total": 42
+  },
+  "newspaper-2col-fullwidth-headline": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "462353f",
+    "failed": [
+      "04_chars_missing",
+      "05_chars_extra",
+      "18_displacement",
+      "26_text_overlap",
+      "32_stroke_lines",
+      "45_char_accuracy"
+    ],
+    "passed": 36,
+    "total": 42
+  },
+  "one-page-rotated-180-degrees": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "27_text_off_page",
+      "43_within_10pt_x",
+      "44_header_footer",
+      "60_text_column_right_edge",
+      "62_table_columns",
+      "63_table_rows"
+    ],
+    "passed": 39,
+    "total": 47
+  },
+  "payslip-label-left-amount-right": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "17_matched_runs",
+      "18_displacement",
+      "25_invisible_text",
+      "53_embedded_faces"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "policy-2col-spanning-section-heading": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "10_font_sizes",
+      "13_text_colours",
+      "17_matched_runs",
+      "44_header_footer",
+      "45_char_accuracy",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 34,
+    "total": 42
+  },
+  "price-list-right-aligned-amounts": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "17_matched_runs",
+      "18_displacement",
+      "25_invisible_text",
+      "53_embedded_faces"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "product-catalogue-code-left-price-right": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [],
+    "passed": 42,
+    "total": 42
+  },
+  "property-tax-receipt": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "13_text_colours",
+      "18_displacement"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "purchase-order": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "25_invisible_text",
+      "26_text_overlap",
+      "60_text_column_right_edge"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "question-paper-marks-right-margin": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "60_text_column_right_edge"
+    ],
+    "passed": 40,
+    "total": 42
+  },
+  "report-2col-table-spanning-both-columns": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "44_header_footer"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "salary-slip-corporate": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "17_matched_runs",
+      "18_displacement",
+      "25_invisible_text",
+      "53_embedded_faces"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "salary-slip-factory-wages": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "59_shape_anchor",
+      "60_text_column_right_edge"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "table-across-page-break-repeated-header": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "27_text_off_page",
+      "60_text_column_right_edge"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "table-inside-two-column-page": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "44_header_footer"
+    ],
+    "passed": 44,
+    "total": 47
+  },
+  "table-of-contents-dot-leaders": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "44_header_footer",
+      "45_char_accuracy",
+      "47_margins"
+    ],
+    "passed": 38,
+    "total": 42
+  },
+  "table-with-merged-cells": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement",
+      "60_text_column_right_edge"
+    ],
+    "passed": 45,
+    "total": 47
+  },
+  "table-with-no-header-row": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 46,
+    "total": 47
+  },
+  "table-with-rotated-header": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "04_chars_missing",
+      "18_displacement",
+      "45_char_accuracy",
+      "47_margins",
+      "59_shape_anchor"
+    ],
+    "passed": 42,
+    "total": 47
+  },
+  "text-held-twice-shadow-text": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "13_text_colours",
+      "18_displacement",
+      "25_invisible_text",
+      "60_text_column_right_edge"
+    ],
+    "passed": 43,
+    "total": 47
+  },
+  "two-tables-stacked-with-no-gap": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "b7699196",
+    "failed": [
+      "18_displacement"
+    ],
+    "passed": 46,
+    "total": 47
+  },
+  "very-long-single-column-table": {
+    "at": "2026-11-24T04:36:24+05:30",
+    "engine": "462353f",
+    "failed": [
+      "04_chars_missing",
+      "05_chars_extra",
+      "18_displacement",
+      "27_text_off_page",
+      "32_stroke_lines",
+      "44_header_footer",
+      "60_text_column_right_edge"
+    ],
+    "passed": 40,
+    "total": 47
+  }
+}
