@@ -1,10 +1,10 @@
 {
   "baseline_started": 1795361683.041859,
   "classifier_started": 0,
-  "fixer_doing": "running regress and measure gate",
-  "fixer_doing_since": 1795459140.4868948,
+  "fixer_doing": "measuring dy on two more solo documents",
+  "fixer_doing_since": 1795460286.0868967,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795459140.4868956,
+  "fixer_last_beat": 1795460286.0868971,
   "fixer_started": 1795460101.9637809,
   "history": [
     {

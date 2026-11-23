@@ -2962,3 +2962,5 @@
 {"t": 1795460403.438198, "ist": "00:30:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795460403.8090508, "ist": "00:30:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795460404.3112595, "ist": "00:30:04", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795460286.0862856, "ist": "00:28:06", "ev": "beat", "d": "measuring dy on two more solo documents"}
+{"t": 1795460423.6573474, "ist": "00:30:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
