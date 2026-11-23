@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/400_comic_page_speech_bubbles.pdf",
-  "render": "/tmp/lo-one/400_comic_page_speech_bubbles.pdf",
+  "render": "/scratch/work/lo-pdf/400_comic_page_speech_bubbles.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "14_filled_shapes"
   ],
-  "engine": "98be7c3c",
+  "engine": "5beb8b9d",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -246,5 +246,5 @@
   },
   "document": "400_comic_page_speech_bubbles",
   "source_file": "/scratch/work/p2w/corpus/400_comic_page_speech_bubbles.pdf",
-  "render_file": "/tmp/lo-one/400_comic_page_speech_bubbles.pdf"
+  "render_file": "/scratch/work/lo-pdf/400_comic_page_speech_bubbles.pdf"
 }

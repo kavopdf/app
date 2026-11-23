@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/404_sudoku_grid.pdf",
-  "render": "/tmp/lo-one/404_sudoku_grid.pdf",
+  "render": "/scratch/work/lo-pdf/404_sudoku_grid.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "47_margins"
   ],
-  "engine": "98be7c3c",
+  "engine": "5beb8b9d",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -277,5 +277,5 @@
   },
   "document": "404_sudoku_grid",
   "source_file": "/scratch/work/p2w/corpus/404_sudoku_grid.pdf",
-  "render_file": "/tmp/lo-one/404_sudoku_grid.pdf"
+  "render_file": "/scratch/work/lo-pdf/404_sudoku_grid.pdf"
 }

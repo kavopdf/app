@@ -1,6 +1,6 @@
 {
   "source": "/scratch/work/p2w/corpus/03_stamp_vertical_90deg.pdf",
-  "render": "/tmp/lo-one/03_stamp_vertical_90deg.pdf",
+  "render": "/scratch/work/lo-pdf/03_stamp_vertical_90deg.pdf",
   "passed": 38,
   "total": 44,
   "failed": [
@@ -11,7 +11,7 @@
     "62_table_columns",
     "63_table_rows"
   ],
-  "engine": "98be7c3c",
+  "engine": "5beb8b9d",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -261,5 +261,5 @@
   },
   "document": "03_stamp_vertical_90deg",
   "source_file": "/scratch/work/p2w/corpus/03_stamp_vertical_90deg.pdf",
-  "render_file": "/tmp/lo-one/03_stamp_vertical_90deg.pdf"
+  "render_file": "/scratch/work/lo-pdf/03_stamp_vertical_90deg.pdf"
 }

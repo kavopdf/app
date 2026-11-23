@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/13_stamp_non_english.pdf",
-  "render": "/tmp/lo-one/13_stamp_non_english.pdf",
+  "render": "/scratch/work/lo-pdf/13_stamp_non_english.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
-  "engine": "98be7c3c",
+  "engine": "5beb8b9d",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -246,5 +246,5 @@
   },
   "document": "13_stamp_non_english",
   "source_file": "/scratch/work/p2w/corpus/13_stamp_non_english.pdf",
-  "render_file": "/tmp/lo-one/13_stamp_non_english.pdf"
+  "render_file": "/scratch/work/lo-pdf/13_stamp_non_english.pdf"
 }
