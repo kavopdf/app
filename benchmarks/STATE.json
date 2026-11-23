@@ -1,6 +1,6 @@
 {
- "ran_at": "2026-11-22T22:34:02",
- "engine": "ff060d4c+ff67cfd490",
+ "ran_at": "2026-11-23T02:32:02",
+ "engine": "98be7c3c+86d9281e6d",
  "layers": {
   "ground_truth": {
    "status": "pass",
@@ -12,12 +12,13 @@
   "measurement": {
    "status": "ok",
    "docs_with_result": 212,
-   "of": 210,
+   "of": 212,
    "complete": true
   },
   "txt_checks": {
-   "status": "not-run",
-   "reason": "verify_txt.py not present in this checkout"
+   "status": "available",
+   "exit": 0,
+   "note": "named semantic checks; advisory, not a size"
   },
   "census": {
    "status": "ok",
@@ -31,9 +32,9 @@
   }
  },
  "signatures": [
-  "[22:35:25]   content-loss    16 docs  median share@1px  39.4%",
-  "[22:35:25]   displacement    32 docs  median share@1px  29.6%",
-  "[22:35:25]   clean          153 docs  median share@1px   1.3%"
+  "[02:33:21]   content-loss    16 docs  median share@1px  39.4%",
+  "[02:33:21]   displacement    32 docs  median share@1px  29.6%",
+  "[02:33:21]   clean          153 docs  median share@1px   1.3%"
  ],
  "round": 1,
  "ratchet": {

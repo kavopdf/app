@@ -1349,13 +1349,66 @@ public final class DocxWriter {
         // so must not charge the flow. Decided from the page's own geometry before anything is
         // written, so both of the budget guard's passes see the same answer (see pinShortParas).
         pinShortParas(page);
+        // WHERE A PAGE-POSITIONED SHAPE IS WRITTEN.
+        //
+        // It used to get a paragraph of its own, and Google Docs bills every such paragraph the
+        // line box of its sz=2 run (~0.83 pt) even though w:line="1" exact asks for nothing - so a
+        // page drawing 108 rules paid ~90 pt of flow for them and rendered a second sheet. The
+        // shape is anchored to the PAPER (wp:positionH/V relativeFrom="page", wp:wrapNone): it
+        // does not consult the paragraph it sits in, so the paragraph buys nothing.
+        //
+        // So a shape is written as a bare run, appended to the last paragraph already on this page.
+        // Where the page has no paragraph yet (a rule above every line of text) the runs collect
+        // and are written as ONE paragraph at the end of the page - one line box for the page
+        // instead of one per shape, and the same drawing either way.
+        //
+        // A stamp frame is skipped exactly as emitBlock skipped it: when its text box already
+        // draws the frame, a second copy here would put two frames on the page.
+        StringBuilder pendingShapeRuns = new StringBuilder();
+        StringBuilder orphanShapeRuns = new StringBuilder();
+        int shapeInsertPt = -1;
         for (int bi = 0; bi < page.blocks.size(); bi++) {
             Object block = page.blocks.get(bi);
             ctx.nextIsPara = bi + 1 < page.blocks.size()
                     && page.blocks.get(bi + 1) instanceof PdfToWord.Para;
             ctx.nextIsTable = bi + 1 < page.blocks.size()
                     && page.blocks.get(bi + 1) instanceof PdfToWord.Table;
+            if (block instanceof Shape) {
+                Shape sh = (Shape) block;
+                if (sh.stampFrame
+                        && ctx.stampText.containsKey(sh.mergedHost == null ? sh : sh.mergedHost)) {
+                    continue;
+                }
+                if (sh.consumed) continue;
+                pendingShapeRuns.setLength(0);
+                shapeRun(pendingShapeRuns, sh, ctx);
+                if (shapeInsertPt >= 0) {
+                    sb.insert(shapeInsertPt, pendingShapeRuns);
+                    shapeInsertPt += pendingShapeRuns.length();
+                } else {
+                    // No paragraph to hang it on yet: keep it for the page's own carrier paragraph.
+                    orphanShapeRuns.append(pendingShapeRuns);
+                }
+                continue;
+            }
             emitBlock(sb, block, ctx);
+            shapeInsertPt = -1;
+            if (block instanceof PdfToWord.Para && sb.length() >= 6
+                    && "</w:p>".contentEquals(sb.subSequence(sb.length() - 6, sb.length()))) {
+                shapeInsertPt = sb.length() - 6;
+                // Shapes drawn above the page's first line of text had no paragraph to join yet.
+                // They join this one rather than waiting for a carrier of their own, so the page
+                // still pays a single line box for all of them.
+                if (orphanShapeRuns.length() > 0) {
+                    sb.insert(shapeInsertPt, orphanShapeRuns);
+                    shapeInsertPt += orphanShapeRuns.length();
+                    orphanShapeRuns.setLength(0);
+                }
+            }
+        }
+        if (orphanShapeRuns.length() > 0) {
+            sb.append("<w:p><w:pPr>").append(SHAPE_PARA_PPR).append("</w:pPr>")
+                    .append(orphanShapeRuns).append("</w:p>");
         }
         cenEmit(ctx, page);
     }
@@ -2824,17 +2877,48 @@ public final class DocxWriter {
      * the band carries white words, and a shape in front of them would hide the very title
      * it exists to make visible. A rule drawn behind text is still a rule.
      */
+
+    /**
+     * The paragraph properties a shape-carrying paragraph is written with, and nothing else.
+     *
+     * <p>A constant because the two ways a shape reaches the page - its own paragraph, and a run
+     * appended to a paragraph that already exists - must cost the reader the same line box.
+     */
+    private static final String SHAPE_PARA_PPR =
+            "<w:snapToGrid w:val=\"0\"/>"
+            + "<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\""
+            + " w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>"
+            + "<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr>";
+
     private static void shape(StringBuilder sb, Shape s, Ctx ctx) {
+        sb.append("<w:p><w:pPr>").append(SHAPE_PARA_PPR).append("</w:pPr>");
+        shapeRun(sb, s, ctx);
+        sb.append("</w:p>");
+    }
+
+    /**
+     * The shape as a bare run - no paragraph around it.
+     *
+     * <p>A page-positioned floating shape is anchored to the PAPER, not to the paragraph it is
+     * written in: {@code wp:positionH/V relativeFrom="page"} puts it at an absolute offset and
+     * {@code wp:wrapNone} means it takes no room in the flow. The paragraph that carries it is
+     * therefore pure overhead, and Google Docs charges that overhead once per shape: it
+     * rasterises the shape, keeps the paragraph, and bills the paragraph the line box of its own
+     * {@code sz=2} run - about 0.83 pt - because {@code w:line="1" exact} is not honoured. A page
+     * that draws 108 rules pays ~90 pt of flow for them and lands on a second sheet. Measured:
+     * FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md.
+     *
+     * <p>Written as a run inside a paragraph that already exists, the shape costs no flow at all
+     * and is drawn where the page drew it, because the anchor never consulted the paragraph.
+     */
+    private static void shapeRun(StringBuilder sb, Shape s, Ctx ctx) {
         int id = SHAPE_ID_BASE + (ctx.shapeSeq++);
         long cx = Math.max(1, Math.round(s.wPt * EMU_PER_PT));
         long cy = Math.max(1, Math.round(s.hPt * EMU_PER_PT));
         long offX = Math.round(s.xPt * EMU_PER_PT);
         long offY = Math.round(s.topPt * EMU_PER_PT);
         int relHeight = 100000000 + (id & 0xFFFF);
-        sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
-                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
-                .append("<w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/></w:rPr></w:pPr>")
-                .append("<w:r><w:drawing>")
+        sb.append("<w:r><w:drawing>")
                 .append("<wp:anchor distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"")
                 .append(" simplePos=\"0\" relativeHeight=\"").append(relHeight).append("\"")
                 .append(" behindDoc=\"1\" locked=\"0\" layoutInCell=\"1\" allowOverlap=\"1\">")
@@ -2875,7 +2959,7 @@ public final class DocxWriter {
         }
         sb.append("</wps:spPr><wps:bodyPr anchor=\"t\" anchorCtr=\"0\"><a:noAutofit/></wps:bodyPr>")
                 .append("</wps:wsp></a:graphicData></a:graphic>")
-                .append("</wp:anchor></w:drawing></w:r></w:p>");
+                .append("</wp:anchor></w:drawing></w:r>");
     }
 
     /**
