@@ -26,8 +26,16 @@ ROUND = os.path.join(HERE, "ROUND.json")
 
 # The slot is 90 minutes of work. The report is the last 15 of them, because a report that is written and
 # not committed is worth nothing - and committing, pushing and releasing takes real time.
-BUDGET_MIN = 90
-REPORT_AT_MIN = 75
+# NO STOPPING POINT. There used to be a 90-minute budget with the report due at 75, and the effect was
+# measurable: median 37 minutes, median 1.0 attempt, 32 of 32 runs releasing themselves. The user's rule is
+# that a run works until the platform stops it or a real limit is hit, and that a run with work left never
+# ends on its own. A minute count is a number to stop at, so there is no longer one.
+#
+# What replaces it: the report is refreshed and committed after EVERY attempt, so whichever moment the
+# platform ends the run, the last committed report is current and the next run loses nothing. Writing it once
+# at the end meant the report had to be scheduled, and scheduling it is what created the stopping point.
+BUDGET_MIN = None
+REPORT_AT_MIN = None
 
 
 def _claimed_at():
@@ -66,29 +74,23 @@ def main(argv):
         return 2
 
     elapsed = (time.time() - started) / 60.0
-    left = BUDGET_MIN - elapsed
-    due = elapsed >= REPORT_AT_MIN
+    left = None
+    due = False
 
     if "--json" in argv:
-        print(json.dumps({"elapsed_min": round(elapsed, 1), "budget_min": BUDGET_MIN,
-                          "report_at_min": REPORT_AT_MIN, "left_min": round(left, 1),
-                          "report_due": due}))
-        return 0 if not due else 1
+        print(json.dumps({"elapsed_min": round(elapsed, 1), "stopping_point": None,
+                          "report_due": False}))
+        return 0
 
     print("  claimed        : %s" % time.strftime("%H:%M", time.localtime(started)))
     print("  elapsed        : %.0f min" % elapsed)
-    print("  budget         : %d min   (report due at %d)" % (BUDGET_MIN, REPORT_AT_MIN))
-    print("  left           : %.0f min" % left)
+    print("  stopping point : none. The run ends when the platform ends it, or when the engine")
+    print("                   genuinely blocks you - never because a clock said so.")
     print()
-
-    if due:
-        print("  REPORT IS DUE. Write it, commit it, push it, release the slot.")
-        print("  A report that is written but not committed is worth nothing.")
-        return 1
-
-    print("  KEEP WORKING. You have %.0f minutes before the report is due." % (REPORT_AT_MIN - elapsed))
-    print("  A kept change is a reason for the NEXT attempt, not for a report.")
+    print("  KEEP WORKING.")
+    print("  After every attempt: refresh and commit the report, so a kill loses nothing.")
     print("  Next attempt: python3 tools/p2w-bench/classpick.py --leverage")
+    print("                python3 tools/p2w-bench/allreports.py --unread")
     return 0
 
 

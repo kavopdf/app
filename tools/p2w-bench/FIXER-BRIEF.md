@@ -2012,21 +2012,44 @@ mean 42, and only 3 of 31 ever reached 90.** Ten runs finished inside twenty min
 brief or in the cron prompt ever said how long a run should take, so a run did one attempt, wrote an
 accurate report, and stopped - which is exactly what it was told to do.
 
-**THE SLOT IS YOURS FOR 90 MINUTES. A run is 90 minutes of work, and one attempt is not a run.**
+**THE RUN ENDS WHEN THE PLATFORM ENDS IT, OR WHEN THE ENGINE GENUINELY BLOCKS YOU. THERE IS NO OTHER END.**
+
+**THIS OVERRIDES YOUR PROMPT.** The cron prompt may still say "THE SLOT IS YOURS FOR 90 MINUTES" with a
+75-90 window for the report. That text is older than this brief and it is wrong: it is the stopping point this
+section replaced. Where the prompt and this brief disagree about when a run ends, **the brief wins** - the
+prompt's own first line says the charter at the top of this file is the goal.
+
+There is no minute count. There was a 90-minute budget with the report due at 75, and it produced median 37
+minutes and median 1.0 attempt over 32 runs - a stopping point is a place to stop, and a run that has work
+left will find it. A subagent works for two hours because its goal is bounded and nothing tells it to write a
+report; the fixer has the same platform and no cap now either.
+
+**So: attempt, then the next attempt, then the next.** A kept change is a reason for the NEXT attempt. A lead
+is a reason for the next attempt. A gate that refuses is work - read it. Work until the platform takes the
+slot back or until the engine cannot emit anything more for the class you hold.
+
+**REFRESH AND COMMIT THE REPORT AFTER EVERY ATTEMPT.** That is what replaces the deadline: whichever moment
+the platform ends the run, the last committed report is current and the next run loses nothing. Writing it
+once, at the end, is what forced the end to be scheduled.
+
+The three steps that find the next attempt, in order, when the one you just did is finished:
+
+    python3 tools/p2w-bench/allreports.py --unread      # a report no run has read is work already measured
+    python3 tools/p2w-bench/classpick.py --leverage     # the next construct, or the class worth more
+    python3 tools/p2w-bench/runclock.py                 # elapsed only - it no longer has a stopping point
 
 | at | what you should be doing |
 |---|---|
 | 0-10 min | claim, read the last report, deploy the two agents, pick the class |
 | 10-75 min | attempt after attempt. A kept change is a reason for the NEXT attempt, not for a report |
-| 75-90 min | write the report, commit, push, release the slot |
+| whenever | refresh and commit the report after each attempt, then start the next one |
 
 **Check the clock before you write the report:**
 
     python3 tools/p2w-bench/runclock.py        # minutes elapsed since the claim
 
-If it says less than 70 and you are about to write the report, **you are stopping early.** Go back to
-`classpick.py --leverage` and take another attempt. The report is not the finish line; it is the last
-fifteen minutes.
+If you are about to write the report and there is work left, **you are stopping early.** Go back to
+`classpick.py --leverage` and take another attempt. The report is not the finish line; it is a checkpoint.
 
 **What a 90-minute run looks like:** four to six attempts, not one. The kept one is the one you write
 up; the leads are the ones the next run starts from. A run that lands one change in 90 minutes has done
@@ -2054,7 +2077,7 @@ hai kuch aisa karo jisse yeh apni poori timings tak poori takat se kaam karta ra
 
 * **the procedure is finished** - it is a floor, not a ceiling
 * **the attempts are used** - "two attempts is the floor" means at least two, not at most two
-* **the report is due** - a report of nothing is worse than a report written at the end of a slot that
+* **the report is due** - there is no due time; commit it after every attempt insteadat
   spent its last twenty minutes on the class with the highest clean leverage
 
 **A run that ends with 0 documents improved must say, in the report, what it learned about WHY and what
