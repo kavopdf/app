@@ -619,6 +619,29 @@ exactly that at 46 of 213 and threw away a fix that moved five documents.
 **Every run must leave something behind: a kept fix, a landed finding, or a written root cause. A
 run that leaves none of those is a wasted slot and must say so at the top of its report.**
 
+**IN A SCHEDULED RUN THE RESULT COMES BACK INLINE, AND THAT IS NOT AN EXCUSE TO SKIP THEM.**
+
+A cron run has nobody to answer a later result, so a background subagent returns inside the same turn. The
+10:17 run on 23 Nov said exactly that and ran its two agents inline - which is correct behaviour, not a
+failure. What is not correct is what happened next.
+
+**EVERY AGENT MUST BE IN HANDOFF.json BEFORE YOUR REPORT SAYS IT EXISTED.**
+
+    python3 tools/p2w-bench/handoff.py --agent-add "<id>|<class>|<angle>|<question>"
+
+Measured 23 Nov, by the user reading two reports side by side: the 08:55 run's prose said "I deployed one
+agent, not two" and HANDOFF.json had held no record since 06:17, with RUN.json's agents list empty; the 10:17
+run wrote that its two agents "are recorded by hand in HANDOFF.json" and the ledger has nothing at 07:36 or
+10:20. Neither run deployed an agent as far as any record goes. Two runs, two claims, zero evidence.
+
+`lastmessage.py` now refuses a message that claims more agents than the ledger holds, so this cannot pass
+again - but the refusal is the backstop, not the point. An agent nobody recorded produced nothing the next
+run can build on, and the next run is the only reason the agent existed.
+
+**If the inline cost is too high, deploy one instead of two and say so with the number** - the brief asks for
+two because one agent per run was the measured failure, not because two is a law. What is a law: do not claim
+what you did not record.
+
 **ALWAYS `background=true`. NEVER WAIT.**
 
 This is not a preference, it is the rule that stops runs dying. A subagent deployed with

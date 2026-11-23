@@ -364,6 +364,32 @@ def verify_facts(text, data):
     # ---- 4. THE AGENTS' TIMINGS -----------------------------------------------------------
     agents = data.get("subagents")
     rows = agents if isinstance(agents, list) else (agents or {}).get("agents") or []
+
+    # THE COUNT WAS NEVER CHECKED, ONLY THE STAMPS - so a report could claim agents the ledger
+    # does not have and pass. Measured 23 Nov: the 08:55 run's prose said "I deployed one agent,
+    # not two" while HANDOFF.json held no record after 06:17 and RUN.json's agents list was empty;
+    # the 10:17 run said its two agents were "recorded by hand in HANDOFF.json" and the ledger
+    # has nothing at 07:36 or 10:20. The user spotted both by reading the two reports side by side.
+    #
+    # A run that deploys an agent and does not record it has, for every purpose this pipeline has,
+    # not deployed it. So the message may not claim more agents than the ledger holds. It may claim
+    # fewer - an agent that was never registered is invisible here and cannot be counted either way.
+    _claimed = None
+    for _m in re.finditer(r"\b(one|two|three|four|five|\d+)\s+(?:sub-?)?agents?\b", text, re.I):
+        _w = _m.group(1).lower()
+        _n = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5}.get(_w)
+        if _n is None:
+            try:
+                _n = int(_w)
+            except ValueError:
+                continue
+        _claimed = _n if _claimed is None else max(_claimed, _n)
+    if _claimed is not None and _claimed > len(rows):
+        problems.append(
+            "agents: the message claims %d but the ledger holds %d - an agent that is not in "
+            "HANDOFF.json was not deployed, so either record it with handoff.py --agent-add or "
+            "do not count it" % (_claimed, len(rows)))
+
     for a in rows:
         aid = (a.get("id") or "")[:12]
         if not aid:
