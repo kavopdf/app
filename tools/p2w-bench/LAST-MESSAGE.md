@@ -30,9 +30,9 @@ scored on the whole corpus — corpus fetched, engine built from this tree, all 
 failing. `test_txt_checks.py` 8/8, `regress.py --check` PASS for both formats,
 `measure_gate.py` READY.
 
-Two sub-agent diagnoses ran inside this turn, not in the background (a scheduled run has no
-one to answer a later result), so the tooling records none. Both came back with measurements
-that changed the plan:
+Two sub-agent diagnoses ran inside this turn rather than in the background — a scheduled run
+has no one to answer a later result — so they returned inline and are recorded by hand in
+`HANDOFF.json`. Both came back with measurements that changed the plan:
 
 * **`18_displacement`'s `.txt` half is not `18_displacement`.** Of the **101** documents that
   fail `18` in Google, **95 are `.txt`-clean** (94.1%) against 5.3 expected if the two
