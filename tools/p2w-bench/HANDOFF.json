@@ -1174,8 +1174,8 @@
    "text": "attempt 3 on 00_page_count -> kept"
   },
   {
-   "at": "11:00",
-   "text": "attempt 1 on t09_page_furniture -> kept"
+   "at": "11:28",
+   "text": "attempt 4 on 00_page_count -> lead"
   }
  ],
  "next": "00_page_count: mechanism MEASURED, fix not landed. FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md. Google rasterises each page-positioned floating shape and keeps the paragraph that carries it, and that empty paragraph costs ~0.83 pt of flow (w:line=\"1\" exact is NOT honoured for it): 108 of them = 89.9 pt on 301_lab_report_panel against 44.5 pt of free page, so a 1-page source renders 2 pages. Deleting all 108 -> 1 page at the same text y (the control). 22 of the 23 refused documents emit ALL their drawing-only paragraphs AFTER the last text paragraph; counts 7..2464. 350_question_paper has 1 and is NOT explained by this. Refuted and measured, do not retry: drop-last, prstGeom-rect, wrapSquare, framePr. VOID (my probe bug, never measured): merge-into-one-paragraph and attach-to-text. NEXT LEVER, cheapest in the writer: merge the drawing-only paragraphs of a page into ONE (DocxWriter.shape(), DocxWriter.java:2726) - saves 107 x 0.83 = 88.8 pt against 89.9 pt needed here, a one-point margin, so measure it; then w:tcBorders through the table writer. This is the same construct as 32_stroke_lines and 05_chars_extra: one mechanism, three check families.",
@@ -2029,38 +2029,19 @@
    "finding": "FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build.",
    "deployed_at": "2026-11-23T00:47",
    "landed_at": "2026-11-23T00:47"
-  },
-  {
-   "id": "18_dA-02",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "the .txt half of 18_displacement: same construct, a different one, or the instrument?",
-   "expected": "a verdict with the numbers behind it",
-   "deployed": "10:20",
-   "status": "landed",
-   "finding": "FINDINGS/t09-NUMERIC-KEYS-AND-OWED-PER-OCCURRENCE-1115-relay.md - 95 of the 101 Google-18 documents are .txt-clean (Fisher p=0.752); t08 fails 0 of the 101; the .txt half is not 18_displacement.",
-   "deployed_at": "2026-11-23T10:20",
-   "landed_at": "2026-11-23T10:32"
-  },
-  {
-   "id": "t09_B-01",
-   "class": "t09_page_furniture",
-   "angle": "B",
-   "question": "independent blast-radius census for four proposed verify_txt.py changes over all 213",
-   "expected": "a flip table with a regression list",
-   "deployed": "10:20",
-   "status": "landed",
-   "finding": "five variants of verify_txt.py re-scored over 213 converted documents; refuted its own ZapfDingbats decode fix; the digit/letter word split measured 0 flips.",
-   "deployed_at": "2026-11-23T10:20",
-   "landed_at": "2026-11-23T10:46"
   }
  ],
  "run": {
-  "started": "10:17",
-  "ended": "11:28",
-  "ended_how": "forced"
+  "started": "06:55",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
+  {
+   "at": "04:50",
+   "how": "forced",
+   "plan": "32_stroke_lines: land rule-carrier-horizontal-only-2008 by closing the 38 missing Google results, not by narrowing the predicate"
+  },
   {
    "at": "06:18",
    "how": "forced",
@@ -2153,11 +2134,6 @@
   },
   {
    "at": "06:18",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "11:28",
    "how": "forced",
    "plan": ""
   }

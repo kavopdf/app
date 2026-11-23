@@ -1,3 +1,4 @@
+| 20 Nov 07:13 | fixer | attempt content-partly-lost-and-displaced -> partial (1/6 moved) |
 | 20 Nov 07:59 | fixer | attempt content-partly-lost-and-displaced -> kept (1/6 moved) |
 | 20 Nov 08:00 | fixer | attempt content-partly-lost-and-displaced -> kept (1/6 moved) |
 | 20 Nov 08:52 | fixer | slot claimed - fixer running |
@@ -196,6 +197,4 @@
 | 23 Nov 06:18 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 23 Nov 07:36 | fixer | attempt 18_displacement -> lead (0/? moved) |
 | 23 Nov 08:11 | fixer | attempt 00_page_count -> kept (0/? moved) |
-| 23 Nov 10:17 | fixer | slot claimed - fixer running |
-| 23 Nov 11:00 | fixer | attempt t09_page_furniture -> kept (2/? moved) |
-| 23 Nov 11:28 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 23 Nov 11:28 | fixer | attempt 00_page_count -> lead (0/? moved) |

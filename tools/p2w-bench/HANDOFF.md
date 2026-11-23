@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 10:17 |
-| ended | 11:28 |
-| how it ended | forced |
+| started | 06:55 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -138,7 +138,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `06:17` agent landed: 18_dB-05 /  -> ANSWERED: the 18.5 pt rung does not exist. The laid pitch ladder is laid = 0.75*(round(declared/0.75)+1), so laid pitch is always a multiple of 0.75 pt and 18.5 is not on it; the nearest rung to an 18.40 pt source is 18.75. No declaration lands 18.5, so this question is closed rather than answered with a value. See FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md.
 - `07:36` attempt 35 on 18_displacement -> lead
 - `08:11` attempt 3 on 00_page_count -> kept
-- `11:00` attempt 1 on t09_page_furniture -> kept
+- `11:28` attempt 4 on 00_page_count -> lead
 
 ## Where the rest of the state lives
 

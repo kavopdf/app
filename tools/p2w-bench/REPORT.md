@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-23 10:17
+# Fixer report - 2026-11-23 08:55
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 10:17 → 11:28 IST · 1h 11m**
+**23 Nov 2026 · slot 08:55 → 09:56 IST · 1h 01m**
 
-> **324_loan_amortisation_schedule** improved — 1.00 → 0.00. Corpus ratchet clean across 212 documents.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **2** — 1 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -21,52 +21,44 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `t09_page_furniture` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 11:00 | **kept** | 2/None | verify_txt.py only, no engine change: a furniture key with no letter in it is not furniture (_furniture_key folds digits to '#', so 324's numeric table cells invented 18 owed and 1437 present - 66/148 |
+| Working on | `00_page_count` |
+| Committed | **11** files in 5 commit(s) from `8f87185` — ...18_displacement-PAGE-SHIFT-CENSUS-1015-agent.md, ENGINE-STAMP.json, LAST-MESSAGE.md, RANKING.csv, REPORT.md, ROTATION.json, ROUND.json, RUN.json, TIMELINE.jsonl, TRACE.md, UNMEASURED.json |
 
 ## The txt
 
 | | |
 |:--|:--|
 | Scored | **213** of 213 |
-| Clean - every applicable check passes | **199** (93.4%) |
-| Failing at least one check | **14** |
+| Clean - every applicable check passes | **197** (92.5%) |
+| Failing at least one check | **16** |
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-02` | what makes a single-page dense table drift in Google | 07:36 | - | not recorded |
-| `18_dA-02` | the .txt half of 18_displacement: same construct, a  | 10:20 | 10:32 | 12 min |
-| `t09_B-01` | independent blast-radius census for four proposed ve | 10:20 | 10:46 | 26 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 10:17 → 11:28 · 1h 11m |
+| Slot window | 08:55 → 09:56 · 1h 01m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 17 |
-| Longest silence | **39.9 min** — from 10:17:36, after `report.py: building the report` |
-| Silences over 2 min | 3 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 18 |
+| Longest silence | **14.9 min** — from 08:55:53, after `claimed, reading findings` |
+| Silences over 2 min | 11 |
+| Obstacles | 0 cleared · 4 parked, with the evidence to re-open them |
+| Still a wall | **The fixer's claim is 55 min old against a 45-min stale window and no run has beaconed since it claimed at 08 |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **2 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **39 min** | `############` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **27 min** | `########` |
+| build - compiling the engine | **1 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **29 min** | `###########` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **29 min** | `###########` |
 ## Best results this round
 
 | Document | Before | After | Change |
