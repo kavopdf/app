@@ -60,6 +60,7 @@ BACKED_ROWS = (
     "exempt from the libreoffice comparison",     # report.py, 23 Nov
     "fixed to 99%",
     "fixed - google, all 42 checks",
+    "who re-measures them",
     "not scored - page count did not match",
     "moved but still open",
     "classes solved",

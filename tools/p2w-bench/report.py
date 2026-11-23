@@ -38,6 +38,13 @@ ROUND    = os.path.join(HERE, "ROUND.json")
 HANDOFF  = os.path.join(HERE, "HANDOFF.json")
 
 
+# How many documents the :20 gverify cron pushes through a Google round trip in one run. It is a
+# throughput, not a target: it belongs to that cron's prompt, so if the prompt changes this must
+# change with it. Kept here so there is one place to correct, and used only to say how many runs
+# the outstanding re-measurement is - never to claim anything was measured.
+GVERIFY_PER_RUN = 60
+
+
 def _json(p, default):
     try:
         return json.load(open(p, encoding="utf-8"))
@@ -962,10 +969,28 @@ def main(argv):
         # measured on code that no longer exists, so the sentence read as 162 documents failing when the
         # honest population is the 135 measured on the engine in the tree. The full pair is still shown
         # beside it so nothing is hidden.
-        L.append("| **Fixed - Google, all 42 checks** | **%d**, out of the %d measured on THIS "
-                 "engine (all engines: %d of %d) |"
-                 % (co.get("google_fixed_current", 0), co.get("google_scored_current", 0),
-                    co.get("google_fixed", 0), co.get("google_scored", 0)))
+        # A ZERO WITH NO OWNER IS NOT A NUMBER, IT IS A SHRUG.
+        #
+        # This row read "0, out of the 2 measured on THIS engine (all engines: 30 of 190)". Every
+        # word true, and the sentence still misled: 0 of 2 reads as total failure when what it says
+        # is that 188 documents have not been re-measured since the engine changed, and nothing in
+        # the report said whether anything ever would. The user: "agar napa nhi gya toh usko kaun
+        # napega har zero dikhana aur yeh bolna napa nhi gya yeh sahi nhi hai".
+        #
+        # The row now states the verified count, the gap, and the gap's owner in one line.
+        _gfc = co.get("google_fixed_current", 0)
+        _gsc = co.get("google_scored_current", 0)
+        _gs = co.get("google_scored", 0)
+        _to_go = max(0, _gs - _gsc)
+        L.append("| **Fixed - Google, all 42 checks** | **%d** of the **%d** re-measured on this "
+                 "engine - **%d** of the %d scored are still on an older engine, and **%d** were "
+                 "clean there |"
+                 % (_gfc, _gsc, _to_go, _gs, co.get("google_fixed", 0)))
+        if _to_go:
+            L.append("| Who re-measures them | the **:20 gverify** cron, up to %d documents a run "
+                     "- about **%d** run(s) for the %d outstanding. Until then \"fixed\" means "
+                     "fixed on an engine that is not this one |"
+                     % (GVERIFY_PER_RUN, -(-_to_go // GVERIFY_PER_RUN), _to_go))
         # SAME MIXED DENOMINATOR. `fixed` is also counted over `common` (212), not the corpus (213).
         L.append("| Fixed - LibreOffice proxy | %d of the %d compared - a renderer the user does not open |"
                  % (co.get("fixed", 0), co.get("compared") or co.get("docs", 0)))
