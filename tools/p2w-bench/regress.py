@@ -318,19 +318,58 @@ def load_stamp():
         return {}
 
 
+def _newer_than_engine(relpath):
+    """True when `relpath` was committed after the last change to the engine sources."""
+    def _t(p):
+        r = sh("git log -1 --format=%%ct -- %s" % p, timeout=30)
+        try:
+            return int((r.stdout or "").strip() or 0)
+        except Exception:
+            return 0
+    eng = _t("app/src/main/java/com/kavopdf/app/engine/")
+    tbl = _t(relpath)
+    return bool(eng and tbl and tbl >= eng)
+
+
 def stamp(scope):
-    """Stamp the formats this change can move. A txt-only change does not invalidate the .docx
-    table, because the .docx was not re-measured and its engine did not change either."""
+    """Stamp the formats this change can move - but only if a table was measured on this engine.
+
+    A STAMP IS A CLAIM THAT SOMETHING WAS MEASURED. This wrote the live fingerprint into the stamp
+    file unconditionally, so a commit that changed the engine and ran --stamp in the same breath
+    made the tables claim they had been measured on code that had never been run. Measured 23 Nov:
+    commit 5beb8b9d changed DocxWriter.java by 89 lines AND rewrote this stamp file in the same
+    commit, while benchmarks/RANKING.csv was still the one committed four hours earlier. After that
+    measure_gate printed "engine docx 4a607e4b793fb348, tree 4a607e4b793fb348 - READY" and
+    regress.py printed "the table matches this engine", and neither was true.
+
+    So the stamp now refuses unless the table for that format was committed after the engine it
+    claims to describe. Re-measure, then stamp. --allow-engine-change does not bypass this: it
+    exists for a deliberate unproven change, not for claiming a measurement that never happened.
+    """
     fp = engine_fingerprint()
     rec = load_stamp()
     if not isinstance(rec, dict):
         rec = {}
     rec.pop("engine", None)
+    _refused = []
+    for f in scope:
+        _tbl = "benchmarks/RANKING.csv" if f == "docx" else "tools/p2w-bench/txt/RANKING-TXT.csv"
+        if not _newer_than_engine(_tbl):
+            _refused.append((f, _tbl))
+    if _refused:
+        print("REFUSED to stamp: a stamp says a table was measured on this engine, and it was not.")
+        for f, t in _refused:
+            print("  %s: %s is older than the last engine change" % (f, t))
+        print("Re-measure the corpus on this engine, then stamp. Stamping without measuring makes")
+        print("measure_gate print READY and regress.py print \"the table matches this engine\" for a")
+        print("table measured on code that no longer exists - which is what happened on 23 Nov.")
+        return 2
     for f in scope:
         rec[f] = engine_fingerprint(f)
     os.makedirs(os.path.dirname(STAMP), exist_ok=True)
     json.dump(rec, open(STAMP, "w", encoding="utf-8"), indent=1)
     print("  stamped %s to engine %s" % (", ".join(sorted(scope)), fp))
+    return 0
 
 
 def scope_of_change():
@@ -519,8 +558,7 @@ def main(argv):
         scope, _ = scope_of_change()
         if a.only:
             scope = {"both": {"docx", "txt"}}.get(a.only, {x.strip() for x in a.only.split(",") if x.strip()})
-        stamp(scope or {"docx", "txt"})
-        return 0
+        return stamp(scope or {"docx", "txt"})
     if a.check:
         only = None
         if a.only:

@@ -175,6 +175,15 @@ def main(argv):
             "RANKING.csv was measured on docx engine %s and the tree is %s - the corpus has "
             "not been measured on this engine, so 'every document measured' is not true yet"
             % (_stamp_docx, _live_docx))
+    # A MISSING STAMP IS NOT A PASS. The condition above needs both sides truthy, so an absent stamp
+    # skipped the comparison entirely and the gate printed "READY - every document measured" for a
+    # corpus nobody had claimed to measure. Measured 23 Nov: with the docx stamp removed the gate still
+    # said READY, because "no claim" was read as "no problem". A table with no engine stamp cannot be
+    # known to describe this engine, so it is not ready.
+    if _live_docx and not _stamp_docx:
+        problems.append(
+            "RANKING.csv carries no docx engine stamp - there is no evidence it was measured on this "
+            "engine (%s), so 'every document measured' is not true yet" % _live_docx)
 
     if s["total"] == 0:
         problems.append("RANKING.csv is missing or empty - nothing has been measured")
