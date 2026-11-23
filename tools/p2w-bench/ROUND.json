@@ -1,11 +1,9 @@
 {
   "baseline_started": 1795361683.041859,
   "classifier_started": 0,
-  "fixer_doing": "relay: building the engine (build-engine.sh)",
-  "fixer_doing_since": 1795429139.881315,
   "fixer_engine_at_claim": "5beb8b9d",
   "fixer_last_beat": 1795429139.881316,
-  "fixer_started": 1795430358.8941953,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
