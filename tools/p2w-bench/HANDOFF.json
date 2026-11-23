@@ -1967,9 +1967,9 @@
   }
  ],
  "run": {
-  "started": "04:56",
-  "ended": "05:30",
-  "ended_how": "forced"
+  "started": "05:58",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

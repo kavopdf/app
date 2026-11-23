@@ -2057,3 +2057,11 @@
 {"t": 1795392041.569491, "ist": "05:30:41", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795392041.6532874, "ist": "05:30:41", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795392041.6703253, "ist": "05:30:41", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795393711.050795, "ist": "05:58:31", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795393711.1651568, "ist": "05:58:31", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795393713.5871074, "ist": "05:58:33", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795393727.3921475, "ist": "05:58:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795393887.0623667, "ist": "06:01:27", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795394202.7639554, "ist": "06:06:42", "ev": "beat", "d": "corpus fetch (6 min), then measure 31_times_body page-top offset"}
+{"t": 1795394233.1638372, "ist": "06:07:13", "ev": "beat", "d": "building engine (45s compile)"}
+{"t": 1795394481.7669466, "ist": "06:11:21", "ev": "beat", "d": "attempt.py: recording an attempt"}
