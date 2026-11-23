@@ -2887,3 +2887,21 @@
 {"t": 1795456973.9613702, "ist": "23:32:53", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795456975.000725, "ist": "23:32:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795456975.1907454, "ist": "23:32:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795458530.9580662, "ist": "23:58:50", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795458531.1440916, "ist": "23:58:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795458532.8937554, "ist": "23:58:52", "ev": "beat", "d": "claimed slot, reading charter"}
+{"t": 1795458537.4700398, "ist": "23:58:57", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795458558.0823848, "ist": "23:59:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795458560.1462803, "ist": "23:59:20", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795458738.3728957, "ist": "00:02:18", "ev": "beat", "d": "building engine to convert a document"}
+{"t": 1795458804.2947385, "ist": "00:03:24", "ev": "beat", "d": "fetching corpus"}
+{"t": 1795458848.2188618, "ist": "00:04:08", "ev": "beat", "d": "converting 72_bank_statement_no_rules_right_amounts"}
+{"t": 1795458848.4522421, "ist": "00:04:08", "ev": "beat", "d": "converting two-tables-stacked-with-no-gap"}
+{"t": 1795458848.6496468, "ist": "00:04:08", "ev": "beat", "d": "converting table-with-no-header-row"}
+{"t": 1795458854.2847168, "ist": "00:04:14", "ev": "beat", "d": "converting 72_bank_statement_no_rules_right_amounts"}
+{"t": 1795458854.7790484, "ist": "00:04:14", "ev": "beat", "d": "converting two-tables-stacked-with-no-gap"}
+{"t": 1795458855.306226, "ist": "00:04:15", "ev": "beat", "d": "converting table-with-no-header-row"}
+{"t": 1795458965.5995207, "ist": "00:06:05", "ev": "beat", "d": "rebuilding engine with spacer trace"}
+{"t": 1795459043.3182669, "ist": "00:07:23", "ev": "beat", "d": "rebuilding with unruled row-excess quantum"}
+{"t": 1795459140.4865131, "ist": "00:09:00", "ev": "beat", "d": "running regress and measure gate"}
+{"t": 1795459183.5247362, "ist": "00:09:43", "ev": "beat", "d": "attempt.py: recording an attempt"}

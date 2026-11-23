@@ -997,7 +997,7 @@
   "status": "OPEN"
  },
  "content-present-partly-displaced": {
-  "attempts": 15,
+  "attempts": 16,
   "first_seen": null,
   "history": [
    {
@@ -1104,12 +1104,19 @@
     "outcome": "lead",
     "reason": "18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 cl",
     "total": 16
+   },
+   {
+    "at": "2026-11-24 00:09",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "instrument now prints med_dy/worst_dy/med_dx (KEPT); unruled row-excess quantum 15->5 twips spends the table-gap spacer on 72_bank_statement and takes Google med_dy -13.0->+1.1, worst 28.2->4.8, still",
+    "total": 13
    }
   ],
   "last": null,
-  "last_engine": "462353f9",
-  "last_moved": 1,
-  "last_total": 16,
+  "last_engine": "b7699196",
+  "last_moved": 0,
+  "last_total": 13,
   "outcomes": [
    "reverted",
    "kept",
@@ -1125,11 +1132,12 @@
    "reverted",
    "reverted",
    "reverted",
+   "lead",
    "lead"
   ],
   "ratchet_at": "20 Nov 03:40",
   "ratchet_docs": 213,
-  "reason": "18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 claim does not reproduce. Corpus ratchet still not run.",
+  "reason": "instrument now prints med_dy/worst_dy/med_dx (KEPT); unruled row-excess quantum 15->5 twips spends the table-gap spacer on 72_bank_statement and takes Google med_dy -13.0->+1.1, worst 28.2->4.8, still 41/42 from a 0.25pt/row pitch excess; engine reverted, unmeasured at corpus scale",
   "reasons": [
    "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing.",
    "recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down the page (bank-statement 0.4554 pt x 12 rows = +5.85 pt). Whole corpus 13 improved, 0 worse. Also published the table this engine actually produces - ten rows were stale and had blocked every fixer run since 11:55.",
@@ -1145,7 +1153,8 @@
    "attempt 12: rules flush-by-top re-applied + ctx.flowY residual test (flowY left at s.topPt vs carrier-bottom) on 18_centred",
    "attempt 13: rule as the FOLLOWING paragraph's w:top border, found by a pre-pass, no reordering, no extra paragraph - flow-neutral, measures exactly baseline on 8/8 documents (18_centred 0.00, bank-statement 0.10, gst-invoice 0.38, mobile-bill 1.55) but places pBdr=0 on all of them; where a border IS placed 18_centred goes 0.00->0.53 because regress.py scores share@5 in LibreOffice, where the drawing is already exact. Patch kept in FINDINGS/rules-top-border-FLOW-NEUTRAL-065000-f1x.patch",
    "relaxed the rule-border guard twice and wrote the paragraph indents from the rule so a border lands exactly on it: 3 of 39 rules on bank-statement-horizontal-rules-only now become w:pBdr, but 36 never reach the paragraph path at all because they belong to table rows; screen 23 of 23, 0 better, 8 worse, so reverted - the hook, not the guard, is the ceiling",
-   "18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 claim does not reproduce. Corpus ratchet still not run."
+   "18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 claim does not reproduce. Corpus ratchet still not run.",
+   "instrument now prints med_dy/worst_dy/med_dx (KEPT); unruled row-excess quantum 15->5 twips spends the table-gap spacer on 72_bank_statement and takes Google med_dy -13.0->+1.1, worst 28.2->4.8, still 41/42 from a 0.25pt/row pitch excess; engine reverted, unmeasured at corpus scale"
   ],
   "requeues": 0,
   "status": "OPEN"
