@@ -3166,6 +3166,18 @@
 {"t": 1795466395.7679994, "ist": "02:09:55", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795466396.1744084, "ist": "02:09:56", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795466396.2837846, "ist": "02:09:56", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795466971.579762, "ist": "02:19:31", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795466987.5951018, "ist": "02:19:47", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795466987.6818497, "ist": "02:19:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795466990.4685154, "ist": "02:19:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795466991.0924876, "ist": "02:19:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795466992.4620686, "ist": "02:19:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795467418.1862106, "ist": "02:26:58", "ev": "beat", "d": "p2w: converting one document to inspect spacers"}
+{"t": 1795467437.233255, "ist": "02:27:17", "ev": "beat", "d": "p2w: engine build + first conversion (can take 5 min)"}
+{"t": 1795467732.5402308, "ist": "02:32:12", "ev": "beat", "d": "build-engine: javac the tree (3 min)"}
+{"t": 1795467840.0707617, "ist": "02:34:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795467861.129875, "ist": "02:34:21", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795467864.8407161, "ist": "02:34:24", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795467373.648535, "ist": "02:26:13", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795467374.7766273, "ist": "02:26:14", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795467375.3243241, "ist": "02:26:15", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
