@@ -6,6 +6,7 @@
   "failed": [
     "18_displacement"
   ],
+  "engine": "b7699196",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -51,7 +52,16 @@
     "18_displacement": {
       "source": 0,
       "render": 1,
-      "ok": false
+      "ok": false,
+      "detail": {
+        "med_dy": -5.2,
+        "worst_dy": 9.1,
+        "med_dx": 0.1,
+        "bad_pages": [
+          0
+        ],
+        "runs_matched": 64
+      }
     },
     "23_line_pitch": {
       "source": 11.8,
@@ -258,6 +268,14 @@
       "source": 1,
       "render": 0,
       "ok": true
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.1,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
     }
   },
   "document": "table-inside-two-column-page",

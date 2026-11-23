@@ -8,7 +8,7 @@
     "47_margins",
     "60_text_column_right_edge"
   ],
-  "engine": "5beb8b9d",
+  "engine": "b7699196",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,7 +54,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 0.5,
+        "worst_dy": 0.7,
+        "med_dx": 0.6,
+        "bad_pages": [],
+        "runs_matched": 41
+      }
     },
     "23_line_pitch": {
       "source": 0,

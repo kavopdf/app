@@ -4,6 +4,7 @@
   "passed": 47,
   "total": 47,
   "failed": [],
+  "engine": "b7699196",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -49,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 0.7,
+        "worst_dy": 1.0,
+        "med_dx": 0.6,
+        "bad_pages": [],
+        "runs_matched": 124
+      }
     },
     "23_line_pitch": {
       "source": 18.4,
@@ -256,6 +264,14 @@
       "source": 1,
       "render": 0,
       "ok": true
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.6,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
     }
   },
   "document": "landscape-page-inside-portrait-document",

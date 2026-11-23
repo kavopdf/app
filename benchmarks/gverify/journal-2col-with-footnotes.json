@@ -2,13 +2,18 @@
  "name": "journal-2col-with-footnotes",
  "status": "ok",
  "rc": 1,
- "passed": 38,
+ "passed": 40,
  "total": 42,
  "failed": [
-  "05_chars_extra",
   "26_text_overlap",
-  "32_stroke_lines",
   "37_super_subscript"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": 1.8,
+  "worst_dy": 2.0,
+  "med_dx": -0.6,
+  "bad_pages": [],
+  "runs_matched": 71
+ },
+ "engine": "b7699196"
 }

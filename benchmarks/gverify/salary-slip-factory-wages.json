@@ -2,14 +2,21 @@
  "name": "salary-slip-factory-wages",
  "status": "ok",
  "rc": 1,
- "passed": 42,
+ "passed": 44,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -8.2,
+  "worst_dy": 47.6,
+  "med_dx": -0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 102
+ },
+ "engine": "b7699196"
 }

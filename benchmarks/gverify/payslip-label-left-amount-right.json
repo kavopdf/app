@@ -2,15 +2,22 @@
  "name": "payslip-label-left-amount-right",
  "status": "ok",
  "rc": 1,
- "passed": 36,
+ "passed": 38,
  "total": 42,
  "failed": [
-  "05_chars_extra",
   "17_matched_runs",
   "18_displacement",
   "25_invisible_text",
-  "32_stroke_lines",
   "53_embedded_faces"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": 0.1,
+  "worst_dy": 3.4,
+  "med_dx": -0.7,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 93
+ },
+ "engine": "b7699196"
 }

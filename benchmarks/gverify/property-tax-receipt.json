@@ -2,14 +2,21 @@
  "name": "property-tax-receipt",
  "status": "ok",
  "rc": 1,
- "passed": 42,
+ "passed": 44,
  "total": 47,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "13_text_colours",
-  "18_displacement",
-  "32_stroke_lines"
+  "18_displacement"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -7.3,
+  "worst_dy": 11.0,
+  "med_dx": 0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 104
+ },
+ "engine": "b7699196"
 }

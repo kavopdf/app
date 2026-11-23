@@ -2,16 +2,24 @@
  "name": "newsletter-3col-header-footer",
  "status": "ok",
  "rc": 1,
- "passed": 35,
+ "passed": 36,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
+  "18_displacement",
   "25_invisible_text",
-  "32_stroke_lines",
   "44_header_footer",
   "45_char_accuracy",
   "59_shape_anchor"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": 0.2,
+  "worst_dy": 7.7,
+  "med_dx": -0.2,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 124
+ },
+ "engine": "b7699196"
 }

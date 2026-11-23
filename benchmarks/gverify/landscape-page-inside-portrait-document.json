@@ -2,13 +2,20 @@
  "name": "landscape-page-inside-portrait-document",
  "status": "ok",
  "rc": 1,
- "passed": 43,
+ "passed": 45,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -7.0,
+  "worst_dy": 66.7,
+  "med_dx": 0.5,
+  "bad_pages": [
+   1
+  ],
+  "runs_matched": 124
+ },
+ "engine": "b7699196"
 }

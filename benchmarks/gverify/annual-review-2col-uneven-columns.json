@@ -2,12 +2,17 @@
  "name": "annual-review-2col-uneven-columns",
  "status": "ok",
  "rc": 1,
- "passed": 39,
+ "passed": 41,
  "total": 42,
  "failed": [
-  "05_chars_extra",
-  "25_invisible_text",
-  "32_stroke_lines"
+  "25_invisible_text"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -0.2,
+  "worst_dy": 2.1,
+  "med_dx": -0.7,
+  "bad_pages": [],
+  "runs_matched": 44
+ },
+ "engine": "b7699196"
 }

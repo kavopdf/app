@@ -6,6 +6,7 @@
   "failed": [
     "66_table_cell_width"
   ],
+  "engine": "b7699196",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -51,7 +52,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 0.4,
+        "worst_dy": 1.4,
+        "med_dx": 0.5,
+        "bad_pages": [],
+        "runs_matched": 98
+      }
     },
     "23_line_pitch": {
       "source": 18.4,
@@ -258,6 +266,14 @@
       "source": 1,
       "render": 1,
       "ok": false
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.6,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
     }
   },
   "document": "gst-invoice-with-qr-code",

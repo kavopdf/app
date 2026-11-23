@@ -2,19 +2,24 @@
  "name": "policy-2col-spanning-section-heading",
  "status": "ok",
  "rc": 1,
- "passed": 32,
+ "passed": 34,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "10_font_sizes",
   "13_text_colours",
   "17_matched_runs",
-  "32_stroke_lines",
   "44_header_footer",
   "45_char_accuracy",
   "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -0.4,
+  "worst_dy": 2.2,
+  "med_dx": -0.4,
+  "bad_pages": [],
+  "runs_matched": 7
+ },
+ "engine": "b7699196"
 }

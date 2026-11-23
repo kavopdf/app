@@ -8,6 +8,7 @@
     "32_stroke_lines",
     "63_table_rows"
   ],
+  "engine": "b7699196",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -53,7 +54,16 @@
     "18_displacement": {
       "source": 0,
       "render": 1,
-      "ok": false
+      "ok": false,
+      "detail": {
+        "med_dy": -2.9,
+        "worst_dy": 14.3,
+        "med_dx": 0.6,
+        "bad_pages": [
+          0
+        ],
+        "runs_matched": 114
+      }
     },
     "23_line_pitch": {
       "source": 18.4,
@@ -260,6 +270,14 @@
       "source": 2,
       "render": 0,
       "ok": true
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.6,
+      "worst_unregistered": 2,
+      "margin_bad": [],
+      "indent_bad": []
     }
   },
   "document": "itr-computation-with-slab-table",

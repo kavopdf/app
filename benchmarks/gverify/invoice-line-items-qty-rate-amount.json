@@ -2,14 +2,21 @@
  "name": "invoice-line-items-qty-rate-amount",
  "status": "ok",
  "rc": 1,
- "passed": 42,
+ "passed": 44,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
   "25_invisible_text",
-  "26_text_overlap",
-  "32_stroke_lines"
+  "26_text_overlap"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -10.3,
+  "worst_dy": 51.1,
+  "med_dx": -0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 87
+ },
+ "engine": "b7699196"
 }

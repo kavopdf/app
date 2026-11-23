@@ -2,16 +2,23 @@
  "name": "table-with-rotated-header",
  "status": "ok",
  "rc": 1,
- "passed": 40,
+ "passed": 42,
  "total": 47,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "45_char_accuracy",
   "47_margins",
   "59_shape_anchor"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -4.4,
+  "worst_dy": 8.3,
+  "med_dx": 0.6,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 126
+ },
+ "engine": "b7699196"
 }

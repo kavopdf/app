@@ -13,5 +13,14 @@
   "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 13.2,
+  "worst_dy": 36.3,
+  "med_dx": -0.2,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 22
+ },
+ "engine": "b7699196"
 }

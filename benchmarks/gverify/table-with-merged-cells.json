@@ -2,13 +2,20 @@
  "name": "table-with-merged-cells",
  "status": "ok",
  "rc": 1,
- "passed": 43,
+ "passed": 45,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -7.5,
+  "worst_dy": 14.6,
+  "med_dx": 0.2,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 87
+ },
+ "engine": "b7699196"
 }

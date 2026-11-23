@@ -8,7 +8,7 @@
     "64_table_span_across",
     "65_table_span_down"
   ],
-  "engine": "98be7c3c",
+  "engine": "b7699196",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,7 +54,16 @@
     "18_displacement": {
       "source": 0,
       "render": 1,
-      "ok": false
+      "ok": false,
+      "detail": {
+        "med_dy": 1.8,
+        "worst_dy": 12.2,
+        "med_dx": 0.8,
+        "bad_pages": [
+          0
+        ],
+        "runs_matched": 51
+      }
     },
     "23_line_pitch": {
       "source": 17.0,

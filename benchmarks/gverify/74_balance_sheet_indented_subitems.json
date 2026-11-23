@@ -1,13 +1,20 @@
 {
  "name": "74_balance_sheet_indented_subitems",
  "status": "ok",
- "rc": 0,
- "passed": 42,
+ "rc": 1,
+ "passed": 41,
  "total": 42,
- "failed": [],
- "engine": "462353f9",
- "engine_fingerprint": "462353f9",
- "export_sha256": "6dbe0b72cd72f0a27e39f55e96c70da0bdb8b2d0e622ddf385ce1f2c3fd123f2",
- "measured": "2026-11-22T06:26+05:30 fixer slot 05:56, Google Docs round trip, probe deleted",
- "method": "ConvertOne at HEAD -> GOOGLEDRIVE_CREATE_FILE (application/vnd.google-apps.document, parent KavoPDF-Verify) -> GOOGLEDRIVE_DOWNLOAD_FILE application/pdf -> verify_google.py --json"
+ "failed": [
+  "18_displacement"
+ ],
+ "displacement": {
+  "med_dy": 2.2,
+  "worst_dy": 4.2,
+  "med_dx": -0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 54
+ },
+ "engine": "b7699196"
 }

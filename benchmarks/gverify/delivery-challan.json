@@ -2,17 +2,24 @@
  "name": "delivery-challan",
  "status": "ok",
  "rc": 1,
- "passed": 39,
+ "passed": 41,
  "total": 47,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "13_text_colours",
   "18_displacement",
   "25_invisible_text",
   "26_text_overlap",
-  "32_stroke_lines",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -5.6,
+  "worst_dy": 8.9,
+  "med_dx": 0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 83
+ },
+ "engine": "b7699196"
 }

@@ -2,17 +2,24 @@
  "name": "gst-invoice-horizontal-rules-only",
  "status": "ok",
  "rc": 1,
- "passed": 34,
+ "passed": 36,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "18_displacement",
   "26_text_overlap",
-  "32_stroke_lines",
   "44_header_footer",
   "45_char_accuracy",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": 3.5,
+  "worst_dy": 6.2,
+  "med_dx": -0.4,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 80
+ },
+ "engine": "b7699196"
 }

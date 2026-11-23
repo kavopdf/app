@@ -2,14 +2,22 @@
  "name": "balance-sheet-and-profit-loss",
  "status": "ok",
  "rc": 1,
- "passed": 42,
+ "passed": 44,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
   "27_text_off_page",
-  "32_stroke_lines",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -31.1,
+  "worst_dy": 71.9,
+  "med_dx": -0.1,
+  "bad_pages": [
+   0,
+   1
+  ],
+  "runs_matched": 172
+ },
+ "engine": "b7699196"
 }

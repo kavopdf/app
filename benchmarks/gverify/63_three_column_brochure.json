@@ -7,5 +7,12 @@
  "failed": [
   "25_invisible_text"
  ],
- "engine": "98be7c3c"
+ "displacement": {
+  "med_dy": 0.6,
+  "worst_dy": 0.9,
+  "med_dx": -0.0,
+  "bad_pages": [],
+  "runs_matched": 45
+ },
+ "engine": "b7699196"
 }

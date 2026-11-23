@@ -4,6 +4,7 @@
   "passed": 42,
   "total": 42,
   "failed": [],
+  "engine": "b7699196",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -49,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": -0.3,
+        "worst_dy": 0.6,
+        "med_dx": 0.0,
+        "bad_pages": [],
+        "runs_matched": 177
+      }
     },
     "23_line_pitch": {
       "source": 16.4,
@@ -231,6 +239,14 @@
       "source": 0,
       "render": 0,
       "ok": true
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.0,
+      "worst_unregistered": 0,
+      "margin_bad": [],
+      "indent_bad": []
     }
   },
   "document": "bus-timetable-station-left-times-right",

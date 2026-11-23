@@ -6,7 +6,7 @@
   "failed": [
     "18_displacement"
   ],
-  "engine": "98be7c3c",
+  "engine": "b7699196",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,7 +52,16 @@
     "18_displacement": {
       "source": 0,
       "render": 1,
-      "ok": false
+      "ok": false,
+      "detail": {
+        "med_dy": 2.1,
+        "worst_dy": 4.3,
+        "med_dx": 0.5,
+        "bad_pages": [
+          0
+        ],
+        "runs_matched": 77
+      }
     },
     "23_line_pitch": {
       "source": 9.9,

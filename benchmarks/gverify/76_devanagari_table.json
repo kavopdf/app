@@ -10,5 +10,14 @@
   "34a_span_size_match",
   "47_margins"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 7.4,
+  "worst_dy": 11.8,
+  "med_dx": -0.5,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 56
+ },
+ "engine": "b7699196"
 }

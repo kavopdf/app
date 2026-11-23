@@ -2,13 +2,20 @@
  "name": "brochure-3col-with-sidebar-box",
  "status": "ok",
  "rc": 1,
- "passed": 38,
+ "passed": 40,
  "total": 42,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "59_shape_anchor"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": 0.1,
+  "worst_dy": 3.4,
+  "med_dx": -0.2,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 87
+ },
+ "engine": "b7699196"
 }

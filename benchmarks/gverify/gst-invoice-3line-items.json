@@ -2,14 +2,21 @@
  "name": "gst-invoice-3line-items",
  "status": "ok",
  "rc": 1,
- "passed": 42,
+ "passed": 44,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
   "25_invisible_text",
-  "32_stroke_lines",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -6.9,
+  "worst_dy": 10.2,
+  "med_dx": -0.2,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 106
+ },
+ "engine": "b7699196"
 }

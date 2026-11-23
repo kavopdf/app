@@ -2,15 +2,22 @@
  "name": "salary-slip-corporate",
  "status": "ok",
  "rc": 1,
- "passed": 41,
+ "passed": 43,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "17_matched_runs",
   "18_displacement",
   "25_invisible_text",
-  "32_stroke_lines",
   "53_embedded_faces"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": -9.6,
+  "worst_dy": 12.7,
+  "med_dx": -0.4,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 138
+ },
+ "engine": "b7699196"
 }

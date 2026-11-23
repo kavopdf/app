@@ -10,5 +10,14 @@
   "64_table_span_across",
   "65_table_span_down"
  ],
- "engine": "98be7c3c"
+ "displacement": {
+  "med_dy": 5.0,
+  "worst_dy": 9.2,
+  "med_dx": 0.9,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 50
+ },
+ "engine": "b7699196"
 }

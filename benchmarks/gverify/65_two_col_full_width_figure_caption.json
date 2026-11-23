@@ -13,5 +13,12 @@
   "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "98be7c3c"
+ "displacement": {
+  "med_dy": 0.5,
+  "worst_dy": 1.2,
+  "med_dx": -0.2,
+  "bad_pages": [],
+  "runs_matched": 22
+ },
+ "engine": "b7699196"
 }

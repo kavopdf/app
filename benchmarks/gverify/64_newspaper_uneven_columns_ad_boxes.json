@@ -9,5 +9,14 @@
   "23_line_pitch",
   "26_text_overlap"
  ],
- "engine": "98be7c3c"
+ "displacement": {
+  "med_dy": -22.0,
+  "worst_dy": 57.5,
+  "med_dx": 0.6,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 77
+ },
+ "engine": "b7699196"
 }

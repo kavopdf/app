@@ -2,14 +2,21 @@
  "name": "table-inside-two-column-page",
  "status": "ok",
  "rc": 1,
- "passed": 42,
+ "passed": 44,
  "total": 47,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "44_header_footer"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": 8.2,
+  "worst_dy": 11.3,
+  "med_dx": -0.5,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 62
+ },
+ "engine": "b7699196"
 }
