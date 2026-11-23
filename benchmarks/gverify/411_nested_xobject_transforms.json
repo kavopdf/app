@@ -8,5 +8,12 @@
   "04_chars_missing",
   "17_matched_runs"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 2.6,
+  "worst_dy": 3.1,
+  "med_dx": -0.5,
+  "bad_pages": [],
+  "runs_matched": 2
+ },
+ "engine": "b7699196"
 }

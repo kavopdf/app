@@ -8,5 +8,12 @@
   "25_invisible_text",
   "47_margins"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": -1.2,
+  "worst_dy": 3.0,
+  "med_dx": -0.6,
+  "bad_pages": [],
+  "runs_matched": 20
+ },
+ "engine": "b7699196"
 }

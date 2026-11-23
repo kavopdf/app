@@ -10,5 +10,14 @@
   "27_text_off_page",
   "44_header_footer"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 0.1,
+  "worst_dy": 47.3,
+  "med_dx": -0.1,
+  "bad_pages": [
+   1
+  ],
+  "runs_matched": 19
+ },
+ "engine": "b7699196"
 }

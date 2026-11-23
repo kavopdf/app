@@ -10,5 +10,14 @@
   "38_list_markers",
   "47_margins"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 3.9,
+  "worst_dy": 9.0,
+  "med_dx": 0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 57
+ },
+ "engine": "b7699196"
 }

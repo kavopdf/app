@@ -9,5 +9,12 @@
   "44_header_footer",
   "45_char_accuracy"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 1.0,
+  "worst_dy": 2.0,
+  "med_dx": -0.4,
+  "bad_pages": [],
+  "runs_matched": 41
+ },
+ "engine": "b7699196"
 }

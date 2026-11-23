@@ -10,5 +10,12 @@
   "45_char_accuracy",
   "59_shape_anchor"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": -0.7,
+  "worst_dy": 4.2,
+  "med_dx": -0.6,
+  "bad_pages": [],
+  "runs_matched": 20
+ },
+ "engine": "b7699196"
 }

@@ -10,5 +10,14 @@
   "47_margins",
   "60_text_column_right_edge"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": -1.5,
+  "worst_dy": 109.9,
+  "med_dx": -0.7,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 66
+ },
+ "engine": "b7699196"
 }

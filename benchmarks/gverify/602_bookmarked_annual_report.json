@@ -10,5 +10,15 @@
   "27_text_off_page",
   "52_outline"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": -67.6,
+  "worst_dy": 142.6,
+  "med_dx": -0.5,
+  "bad_pages": [
+   1,
+   2
+  ],
+  "runs_matched": 24
+ },
+ "engine": "b7699196"
 }

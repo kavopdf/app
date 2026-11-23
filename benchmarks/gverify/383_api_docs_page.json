@@ -13,5 +13,14 @@
   "60_text_column_right_edge",
   "66_table_cell_width"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 2.2,
+  "worst_dy": 5.8,
+  "med_dx": -0.6,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 56
+ },
+ "engine": "b7699196"
 }

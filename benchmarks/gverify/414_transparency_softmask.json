@@ -5,5 +5,12 @@
  "passed": 42,
  "total": 42,
  "failed": [],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 2.0,
+  "worst_dy": 2.1,
+  "med_dx": -0.2,
+  "bad_pages": [],
+  "runs_matched": 2
+ },
+ "engine": "b7699196"
 }

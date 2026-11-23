@@ -13,5 +13,14 @@
   "47_margins",
   "62_table_columns"
  ],
- "engine": "98be7c3c"
+ "displacement": {
+  "med_dy": 104.2,
+  "worst_dy": 125.9,
+  "med_dx": 0.0,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 56
+ },
+ "engine": "b7699196"
 }

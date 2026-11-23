@@ -8,5 +8,12 @@
   "40_link_targets",
   "46_text_crossing_rule"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 1.1,
+  "worst_dy": 1.8,
+  "med_dx": -0.1,
+  "bad_pages": [],
+  "runs_matched": 25
+ },
+ "engine": "b7699196"
 }

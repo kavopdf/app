@@ -10,5 +10,12 @@
   "17_matched_runs",
   "35_rotation"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 0.9,
+  "worst_dy": 2.4,
+  "med_dx": -0.1,
+  "bad_pages": [],
+  "runs_matched": 23
+ },
+ "engine": "b7699196"
 }

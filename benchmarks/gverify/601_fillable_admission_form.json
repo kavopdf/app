@@ -11,5 +11,14 @@
   "53_embedded_faces",
   "59_shape_anchor"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 27.3,
+  "worst_dy": 230.4,
+  "med_dx": -0.5,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 21
+ },
+ "engine": "b7699196"
 }

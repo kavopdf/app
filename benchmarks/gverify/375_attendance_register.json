@@ -11,5 +11,14 @@
   "47_margins",
   "59_shape_anchor"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 2.6,
+  "worst_dy": 5.9,
+  "med_dx": 4.9,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 459
+ },
+ "engine": "b7699196"
 }

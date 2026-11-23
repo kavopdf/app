@@ -7,5 +7,12 @@
  "failed": [
   "59_shape_anchor"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 1.4,
+  "worst_dy": 2.6,
+  "med_dx": -0.4,
+  "bad_pages": [],
+  "runs_matched": 33
+ },
+ "engine": "b7699196"
 }

@@ -10,5 +10,12 @@
   "43_within_10pt_x",
   "47_margins"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 1.2,
+  "worst_dy": 1.7,
+  "med_dx": -3.2,
+  "bad_pages": [],
+  "runs_matched": 74
+ },
+ "engine": "b7699196"
 }

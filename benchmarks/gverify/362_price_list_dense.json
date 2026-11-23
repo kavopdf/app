@@ -7,5 +7,14 @@
  "failed": [
   "18_displacement"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": -2.8,
+  "worst_dy": 5.4,
+  "med_dx": -0.2,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 257
+ },
+ "engine": "b7699196"
 }
