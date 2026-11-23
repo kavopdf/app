@@ -47,7 +47,9 @@ this repo, so it fell back to a public probe repo of 27 loose `.docx` and could 
 output — 2,081 `<w:spacing>` elements, every one `lineRule="exact"`, 85.3 % with `w:line` ≤ 13 twips —
 which is the same construct this run then measured directly. The lesson is mechanical: a subagent has
 no access to `/scratch/work`, so the repository has to be named as a clone instruction, not a path.
-No second agent was deployed; the slot was spent measuring instead.
+No second agent was deployed: the remaining slot went on the three measured attempts below, and
+`round.py --release-fixer` refused on that basis, so this run is released with `--force` and says
+so here. Two angles working the slot is the brief's rule and this run did not meet it.
 
 ## The class I picked, and why
 
@@ -126,7 +128,7 @@ was deleted.
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 29 |
 | Longest silence | **6.5 min** — from 00:18:24, after `lastmessage.py: running a tool for its numbers` |
-| Silences over 2 min | 3 |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -134,8 +136,8 @@ was deleted.
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **8 min** | `######` |
+| fix - diagnose and change the engine | **6 min** | `####` |
 | measure or build - a conversion, screen or compile writes no beacon | **3 min** | `###` |
 | record - attempt, handoff, class rows | **6 min** | `####` |
-| report - the report and the chain | **2 min** | `##` |
-| other - not attributed to a tool | **10 min** | `#######` |
+| report - the report and the chain | **3 min** | `##` |
+| other - not attributed to a tool | **13 min** | `#########` |

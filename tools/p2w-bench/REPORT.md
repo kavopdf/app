@@ -54,7 +54,7 @@
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 29 |
 | Longest silence | **6.5 min** — from 00:18:24, after `lastmessage.py: running a tool for its numbers` |
-| Silences over 2 min | 3 |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -62,11 +62,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **8 min** | `######` |
+| fix - diagnose and change the engine | **6 min** | `####` |
 | measure or build - a conversion, screen or compile writes no beacon | **3 min** | `###` |
 | record - attempt, handoff, class rows | **6 min** | `####` |
-| report - the report and the chain | **2 min** | `##` |
-| other - not attributed to a tool | **10 min** | `#######` |
+| report - the report and the chain | **3 min** | `##` |
+| other - not attributed to a tool | **13 min** | `#########` |
 ## Best results this round
 
 | Document | Before | After | Change |
