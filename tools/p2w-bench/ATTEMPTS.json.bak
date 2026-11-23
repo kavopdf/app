@@ -1,0 +1,1517 @@
+{
+ "00_page_count": {
+  "attempts": 5,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-23 05:09",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "corrected: see FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md - the cost is the empty paragraph (~0.83 pt), not an inline image",
+    "total": 23
+   },
+   {
+    "at": "2026-11-23 08:11",
+    "moved": 0,
+    "outcome": "kept",
+    "reason": "shape paragraphs -> runs in the existing paragraph: 301_lab_report_panel Google 2 pages (page_count_refused) -> 1 page, 39/42; 375_attendance_register 35/42 with 01_page_count+55 failing -> 37/42, pag",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 11:28",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Merged the shape-only paragraphs that columnPage() still emitted one-per-shape. Google A/B (not LibreOffice): 361_product_catalogue_grid 2 pages at HEAD -> 1 page with the patch, 41/42 checks, scorabl",
+    "total": 0
+   },
+   {
+    "at": "2026-11-23 16:34",
+    "moved": 2,
+    "outcome": "partial",
+    "reason": "LANDED the column-page shape merge (21 documents change in document.xml, 361 124->40 paragraphs, 401 52->27, 301 untouched at 85). Corpus on this tree: 212/212 scored, 0 documents worse, regress PASS,",
+    "total": 23
+   }
+  ],
+  "last": null,
+  "last_engine": "0be925ff",
+  "last_moved": 2,
+  "last_total": 23,
+  "outcomes": [
+   "error",
+   "lead",
+   "kept",
+   "lead",
+   "partial"
+  ],
+  "reason": "LANDED the column-page shape merge (21 documents change in document.xml, 361 124->40 paragraphs, 401 52->27, 301 untouched at 85). Corpus on this tree: 212/212 scored, 0 documents worse, regress PASS, measure_gate READY. The 2 moved are GOOGLE moves measured by the 04:47 run on this construct - 361 2 pages->1 at 41/42, 375 2 pages->1 at 35/42->37/42 - and 0 documents move in the LibreOffice table because LibreOffice honours w:line=1 exact on the carrier paragraph and Google does not; the proxy is blind to this construct by construction. 22 of 23 page-count-refused documents were scoring zero of 42 known checks and are now measurable. Four instrument defects blocked the landing and are fixed with findings: p2w --force read REPO's class instead of ENGINE_SRC's; measure_gate demanded 213 rows from a 212-row table; regress --stamp and the pre-commit hook deadlocked; gverify --collect could not read artifacts[0].workspace_path. NOT done: a Google measurement of 041122-Account_Opening_Form (2464 drawing-only paragraphs, the scale test) and 350_question_paper's inline-picture mechanism (agent finding + uncompiled patch in FINDINGS).",
+  "reasons": [
+   "namespace test",
+   "Mechanism measured, fix not landed: Google converts each page-positioned floating shape into an inline image in the flow, ~0.79 pt each; 22 of 23 refused documents emit their shapes AFTER the last text paragraph, so a full page overflows. Six docx-level variants measured through Google (drop last, merge into one paragraph, attach to text paragraphs, prstGeom, wrapSquare, framePr) - all still 2 pages; deleting all shapes is 1 page, which proves the cause. Fix needs the table writer (w:tcBorders). FINDINGS/00_page_count-GOOGLE-INLINES-EVERY-SHAPE-0530-fixer.md",
+   "shape paragraphs -> runs in the existing paragraph: 301_lab_report_panel Google 2 pages (page_count_refused) -> 1 page, 39/42; 375_attendance_register 35/42 with 01_page_count+55 failing -> 37/42, page count 1, no check newly failing (A/B measured with the previous engine built and rendered). Corpus 213 re-measured: 0 worse in LO, share5 identical on all 213 because the proxy cannot see it. Landing it moves 22 page-count-refused documents from 'all 42 unknown' to measurable.",
+   "Merged the shape-only paragraphs that columnPage() still emitted one-per-shape. Google A/B (not LibreOffice): 361_product_catalogue_grid 2 pages at HEAD -> 1 page with the patch, 41/42 checks, scorable for the first time; 401_trifold_brochure 2->2. Patch committed as FINDINGS/00_page_count-MERGE-SHAPE-PARAGRAPHS.patch. Not landed because the docx table re-measure (benchmarks/gate.py --budget 250) does not finish inside one 290s call; txt half re-measured (213 scored, 0 moved).",
+   "LANDED the column-page shape merge (21 documents change in document.xml, 361 124->40 paragraphs, 401 52->27, 301 untouched at 85). Corpus on this tree: 212/212 scored, 0 documents worse, regress PASS, measure_gate READY. The 2 moved are GOOGLE moves measured by the 04:47 run on this construct - 361 2 pages->1 at 41/42, 375 2 pages->1 at 35/42->37/42 - and 0 documents move in the LibreOffice table because LibreOffice honours w:line=1 exact on the carrier paragraph and Google does not; the proxy is blind to this construct by construction. 22 of 23 page-count-refused documents were scoring zero of 42 known checks and are now measurable. Four instrument defects blocked the landing and are fixed with findings: p2w --force read REPO's class instead of ENGINE_SRC's; measure_gate demanded 213 rows from a 212-row table; regress --stamp and the pre-commit hook deadlocked; gverify --collect could not read artifacts[0].workspace_path. NOT done: a Google measurement of 041122-Account_Opening_Form (2464 drawing-only paragraphs, the scale test) and 350_question_paper's inline-picture mechanism (agent finding + uncompiled patch in FINDINGS)."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "05_chars_extra": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-21 23:37",
+    "moved": 11,
+    "outcome": "kept",
+    "reason": "05_chars_extra counted one U+200B per w:tab - Google's export marks every tab advance with a zero-width space. Full-corpus separation 141/141 vs 51/51, causal on 17 (23 tabs -> 23 extras, 0 tabs -> 0)",
+    "total": 192
+   }
+  ],
+  "last": null,
+  "last_engine": "462353f",
+  "last_moved": 11,
+  "last_total": 192,
+  "outcomes": [
+   "kept"
+  ],
+  "reason": "05_chars_extra counted one U+200B per w:tab - Google's export marks every tab advance with a zero-width space. Full-corpus separation 141/141 vs 51/51, causal on 17 (23 tabs -> 23 extras, 0 tabs -> 0). norm_text now strips U+200B symmetrically. 11 of 11 measured documents cleared 05, none worse.",
+  "reasons": [
+   "05_chars_extra counted one U+200B per w:tab - Google's export marks every tab advance with a zero-width space. Full-corpus separation 141/141 vs 51/51, causal on 17 (23 tabs -> 23 extras, 0 tabs -> 0). norm_text now strips U+200B symmetrically. 11 of 11 measured documents cleared 05, none worse."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "18_displacement": {
+  "attempts": 38,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-22 15:40",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "relay 15:17: spacer(w:before)+row-pitch-dither patch applied corpus-wide; Google round trip: table-with-no-header-row 41/42 -> 47/47 PASS, 362_price_list_dense unchanged 41/42; corpus not ratcheted (t",
+    "total": 16
+   },
+   {
+    "at": "2026-11-22 16:36",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "dither patch measured CLEAN in Google (two-tables-stacked-with-no-gap 46/47 -> 47/47 PASS, live round trip) but regresses LibreOffice on 14 of the 16; the proxy ratchet is the blocker, not the constru",
+    "total": 16
+   },
+   {
+    "at": "2026-11-22 17:34",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "spacer->w:before built and screened in LibreOffice: mobile-bill 1.55 -> 1.74 (+0.19, WORSE), 16_right_aligned 0.00 -> 0.00. Corrects the 08:56 finding's claim that LO is blind to this construct; the c",
+    "total": 8
+   },
+   {
+    "at": "2026-11-22 19:10",
+    "moved": null,
+    "outcome": "lead",
+    "reason": "spacer gap SPLIT (w:before=G-20, w:line=20) is LO-identical on mobile-bill 43.87/1.55 and removes 8.7 of the 11.3 pt Google table-top step on two-tables-stacked (80.1->88.8 vs source 91.4); still 46/4",
+    "total": null
+   },
+   {
+    "at": "2026-11-22 19:17",
+    "moved": null,
+    "outcome": "lead",
+    "reason": "the ready relay patch (SPACER-BEFORE + ROW-PITCH-DITHER) regresses LibreOffice on two-tables-stacked-with-no-gap: share1 21.85 -> 43.33, share5 0.77 -> 30.01, measured with benchmarks/p2w.py measure_d",
+    "total": null
+   },
+   {
+    "at": "2026-11-22 23:33",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Measured where Google's row-pitch charge lives: LibreOffice lays w:trHeight exactly and never charges the rule; Google charges the row's own rule and rounds to a whole point. A paragraph border is not",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 00:11",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Row-height dither refuted (trHeight stored not laid); census of the 11 non-ruled docs = 3 faults; spacer needs a scope guard, handed to next run",
+    "total": 3
+   },
+   {
+    "at": "2026-11-23 00:39",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "spacer split lands 4 of 16 in Google (73_marksheet, 41_coloured, 29_dot_leaders, 72_bank_statement 42/42) but breaks mobile-bill and insurance-policy-schedule 46/47 one page -> 43/47 two pages in a co",
+    "total": 16
+   },
+   {
+    "at": "2026-11-23 01:30",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "guarded spacer split (non-ruled carrier, gap<=20pt) reproduces 1 of the 4 wins the 23:10 run reported (29_dot_leaders 42/42) and costs 16_right_aligned_amounts 41/42 -> 40/42 via a new 23_line_pitch; ",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 01:33",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "spacer split ALONE (guard: non-ruled carrier, gap<=20pt; dither disabled) takes 5 of 8 measured documents to 42/42 in Google with no document worse: 29_dot_leaders, 41_coloured, 73_marksheet, 22_invoi",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 02:31",
+    "moved": 3,
+    "outcome": "kept",
+    "reason": "spacer scope guard landed: 73_marksheet 41/42->42/42 (both sides measured, 2 renders), 41_coloured_headings and 29_dot_leaders to 42/42; mobile-bill 46/47 one page unchanged and document.xml identical",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 04:08",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "spacer hairline 20tw->1tw with the guard's room test keyed to a fixed 20 so no document changes spendable/refused: 22_invoice_four_columns_txtpos 41/42 -> 42/42 in Google, measured base and patched in",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 04:09",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "spacer hairline 20tw->1tw, guard room test keyed to a fixed 20 so no document changes side of the guard; 22_invoice_four_columns 41/42 -> 42/42 in Google, base and patched measured in the same hour",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 05:29",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "the construct was already on main (ef99cb2c) from a concurrent run; this slot's independently built version measured 213 documents, found 4 proxy costs, and removed them with two guard clauses (measur",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 06:11",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "LO census: 7 docs are one check from clean in the measurable renderer and they are 7 distinct mechanisms. Controlled 3-variant experiment on balance-sheet-two-columns-of-figures: w:trHeight is inert o",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 06:15",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Instrumented the row model at DocxWriter.java:6146 (P2W_DBG env, reverted, app/ clean). exactRows is TRUE on all four candidates and the per-row edges ARE used, so the uniform-average path is not the ",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 07:36",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Row 0 of a table is placed from a pitch-derived edge, not from the table's own top; the derived delta (+3.52 on balance-sheet) clears its only failing check (6 runs out -> 0) but regresses 360_restaur",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 14:02",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "partial spend of the table-gap spacer: Google 68_journal 41/42 -> 40/42, adds 59_shape_anchor, fixes nothing; flow-invariant so LibreOffice could not have caught it",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 16:39",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "rowExcessTw 15->11 opens the spacer guard on 72_bank (w:line=366 -> w:before=365+w:line=1) and removes the -15pt table lift, but the page lands 4.85pt low and 7/80 runs exceed tolerance against a budg",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 17:41",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Google render is runnable in a fixer slot: JDK from GitHub releases + verify-engine compile + Drive round trip. Re-measured two rows on HEAD b7699196 in Google: bank-statement-5-pages 40/47 -> 42/47 (",
+    "total": 190
+   }
+  ],
+  "last": null,
+  "last_engine": "b7699196",
+  "last_moved": 0,
+  "last_total": 190,
+  "outcomes": [
+   "reverted",
+   "reverted",
+   "reverted",
+   "lead",
+   "lead",
+   "lead",
+   "kept",
+   "reverted",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "kept",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "reverted",
+   "reverted",
+   "lead",
+   "kept",
+   "lead",
+   "kept",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "reverted",
+   "lead",
+   "lead"
+  ],
+  "ratchet_at": "23 Nov 04:09",
+  "ratchet_docs": 212,
+  "reason": "Google render is runnable in a fixer slot: JDK from GitHub releases + verify-engine compile + Drive round trip. Re-measured two rows on HEAD b7699196 in Google: bank-statement-5-pages 40/47 -> 42/47 (05_chars_extra and 32_stroke_lines cleared), mobile-bill 46/47 confirmed on HEAD failing only 18_displacement. No engine change: every candidate was already refuted by a measurement in the source or needs a Google render this slot did not have time for. Lead: mobile-bill is a single-check test case; the wps:txbx discriminator (54/65 and 48/48, 0/30 clean) is the next attempt.",
+  "reasons": [
+   "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 pt mark, Google does not implement lineRule=exact and buys a fraction of it. Applied it (w:before=spacerTw, w:line=1) and measured bank-statement-5-pages through Drive: GOOGLE 40/47 -> 36/47, WORSE, and 27_text_off_page went 0 -> 12 as the extra space overflowed the page. LibreOffice unchanged at 47/47. The reason it cannot work: the spacer is NOT where the 57 pt comes from. Counted in the emitted docx, bank-statement-5-pages carries 9 spacers totalling 81.0 pt across 5 pages, max 16.2 pt - at most 16 pt per page against a measured uniform upward shift of 56.9-57.1 pt on pages 1-4. Forcing the full gap in therefore adds space the page never had and pushes rows off it.",
+   "ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 pt - the paper's top edge), while LibreOffice places it at 56.80. The engine emits exactly that construct: bank-statement-5-pages carries w:before=1103 twips (55.15 pt) on the first paragraph of each page, and the measured Google dy on its pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Same number. The probe also found the construct Google DOES honour at a page top: a 1x1 table row with w:trHeight hRule=exact, 55.83 pt of 55.15 asked, exact in LibreOffice. Ruled out with numbers: the table-spacer paragraph (at most 16.2 pt per page against a 57 pt shift, and moving its gap into w:before took Google 40/47 -> 36/47, LO unchanged - reverted), w:line exact (LO honours it, so it cannot split the two renderers), auto line boxes (face-dependent in both). Next run: emit the page-first gap as a trHeight-exact table row and set that paragraph's w:before to 0. FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md has the probe table.",
+   "Third probe, hand-edited docx (no engine change): replaced the four page-top w:before gaps in bank-statement-5-pages with 1x1 trHeight-exact table rows and zeroed the before. THE DISPLACEMENT ITSELF IS FIXED - median dy on the pages that still match went -53.8 -> +0.8 (p2) and -54.9 -> +0.6 (p4), against a tolerance of 1.5-4.5 pt. But the document now renders as TEN pages in Google instead of six, with a blank page after each: the baseline already emits a blank page 1 (words/page 257,0,245,247,228,253), and making the gap real costs 55 pt of page capacity that the flow accounting assumed was free, so every page spills. So the construct swap cannot be landed alone - the page-fill budget must be recomputed for the gap being real, which is engine work with a full corpus ratchet, not a one-line change. Confirms the probe, and rules out the naive fix.",
+   "15 documents that failed {05,18,32} were re-measured through Google on HEAD: every one is now 41/42 failing 18_displacement ALONE (4 are 46/47 failing it alone). 05_chars_extra and 32_stroke_lines both pass on all 15, so 32_stroke_lines is cleared on 34 of the 35 documents re-measured this run. 18_displacement now blocks 15 documents by itself and is worth 28.7 clean documents corpus-wide - the next run should implement it, not re-measure it.",
+   "page-top gap: 1x1 trHeight row REFUTED through Google (bs5 37->33/42, 5->6 pages, page emptied); w:pgMar w:top PROVEN (bs5 37->40/42, 5 pages held, dy -59.5->-4.3 on pages 1-4, 3 checks recovered); all 16 solo-18 docs are single-page with 0 page breaks, so the class is NOT the page top",
+   "",
+   "",
+   "table-top spacer w:line -> w:before + hairline: 1 of 16 moved (68_journal 12.09->11.24), none worse. REFUTED as the cause: RANKING.csv gives 68_journal max_pt 8.64, not the -114.8 the lead assumed; after the change median/p90/max are unchanged to the hundredth. The 16 sit at a uniform 0.96-1.44 pt page offset, not a 130 pt block shift. See FINDINGS/18_displacement-SPACER-REFUTED-0900-f1x.md",
+   "Table spacer as w:before + hairline (DocxWriter 5872-5875) and the 2880->4320 twip cap (5852,5866). Measured in Google on all 16 solo-18 documents: 6 became 42/42 (16_right_aligned, 22_invoice, 29_dot_leaders, 41_coloured, 68_journal, 73_marksheet), 8 stayed 41/42, 2 got WORSE (insurance-policy-schedule and mobile-bill 41->38, 2 pages, content lost). Mechanism measured, not inferred: Google charges a w:line exact spacer at 0.22x its written twips (dose-response: spacer 144.0 -> dy -114.28, 16.7 -> -12.85, 3.5 -> -4.13, none -> +1.06), and renders w:trHeight atLeast rows 19.10 pt against an 18.40 pt source pitch (+0.70/row). The spacer correction removes the ~19.5 pt of accidental slack that was absorbing the row excess, so the two 3-spacer full pages overflow. Not landed because the row-height construct must land in the same attempt, and the blast radius across documents that already pass was not measured. Full numbers in FINDINGS/18_displacement-table-spacer-CONFIRMED-6of16-TWO-PAGES-EXACTLY-FULL-1005-f1x.md",
+   "Three constructs built together and measured in Google on three documents: the table spacer as w:before + hairline w:line=1 (5872-5875), the 2880->4320 twip cap, and a hairline cell box for sizeless single-line cells (the 0.9634 row-scale premise was NOT built - see FINDINGS/18_displacement-cellbox-REFUTES-ROWSCALE-1035-f1x.md). 68_journal_wide_table_spanning came back 42/42 CLEAN - the spacer half still works. mobile-bill and insurance-policy-schedule stayed 38/42 with 2 pages: their row pitch is STILL 19.0 pt against an 18.4 pt source (median of 26 rule gaps), so the row excess was not removed and the change is a Google regression against HEAD's 41/42. Reverted.",
+   "Four constructs measured in Google and refuted (hRule=exact inert, w:before inert, trHeight stored but not laid, hairline w:line replaced by Google); the working construct (box at the row's height) lays the floor but needs w:vAlign to place the baseline and that regresses LibreOffice 47->45 on mobile-bill. Engine reverted. See FINDINGS/18_displacement-GOOGLE-IGNORES-TRHEIGHT-1045-relay.md",
+   "One Google probe settles what a row is laid at: laid = max(declared trHeight, 1.15 x cell type size) + border, exactly, across 13 declared heights at 10 and 18 pt. No threshold; the 'content term' is the type's line box. Refutes the 19-to-55pt threshold reading and makes the 0.9634 row scale impossible rather than inert. Names the spacer's unblock: charge the flow max(declared, 1.15 x size) at DocxWriter.java:6233-6236 so the engine's page budget equals Google's, then the spacer's measured 6 documents can land. Build not attempted - slot ended.",
+   "Google charges a table row's rule ON TOP of w:trHeight (dose-response: 368/358/348 twips -> 19.73/19.04/18.35 pt laid, measured in one probe document). Patch patches/18-spacer-before-rowpitch-rowrule.patch: spacer as w:before + cap 4320 + trHeight prefers the exact table-average pitch and drops 2*ruleTwHere. Measured in Google: mobile-bill 41->42, 68_journal 41->42, 73_marksheet 41->42, insurance-policy-schedule 41->41 no worse, one page. Blocked from commit: regress.py needs the corpus-wide gate pass and p2w.py --budget is a time limit (26 of 213 per 250 s) that does not resume across processes.",
+   "pointKey whole-point quantisation fixed (trHeight 360/380 -> 368 exact); Google's laid pitch refuted as declared+0.75 on a real row (+1.04 and +0.74 measured); mobile-bill 46/47 unchanged, so a lead not a fix",
+   "Declared-to-laid row-pitch law measured on a real-shaped ruled row in Google, 3 round trips: declared 360/380 atLeast lays 19.1 pt, declared 368 (the source 18.40) with hRule=exact lays 19.5 and REGRESSES 23_line_pitch (41/42 -> 40/42), declared net-of-rule 348 lays 18.0 and holds 41/42. No declaration lands 18.40; the laid ladder is 0.5 pt. 18.5 is reachable and bracketed but untested. Patch saved, tree reverted.",
+   "swept 13 declarations in one Google round trip: laid row pitch is WHOLE points (18/19/20), so the 18.5 ladder the relay left is void; laid = round(declared_pt + 0.875). Error-diffused the declaration - foot 326.5->317.5 vs source 316.7, 23_line_pitch now exact - but still 46/47, one run >2x tolerance on the row targeted at 20 pt. Patch saved, engine reverted, no corpus ratchet.",
+   "table spacer moved from w:line to w:before (was a no-op in Google, tables started ~10pt high) + row pitch diffused onto Google's measured 0.75pt grid; two-tables-stacked-with-no-gap 41/42 -> 42/42 PASS (n_out 55->0), mobile-bill n_out 100->39; patch in patches/, corpus ratchet owed",
+   "relay 15:17: applied 18-displacement spacer(w:before)+row-pitch-dither patch corpus-wide, engine built, 213/213 converted; measuring corpus to ratchet it",
+   "relay 15:17: spacer(w:before)+row-pitch-dither patch applied corpus-wide; Google round trip: table-with-no-header-row 41/42 -> 47/47 PASS, 362_price_list_dense unchanged 41/42; corpus not ratcheted (throughput measured 41/240s, no slot left)",
+   "dither patch measured CLEAN in Google (two-tables-stacked-with-no-gap 46/47 -> 47/47 PASS, live round trip) but regresses LibreOffice on 14 of the 16; the proxy ratchet is the blocker, not the construct",
+   "spacer->w:before built and screened in LibreOffice: mobile-bill 1.55 -> 1.74 (+0.19, WORSE), 16_right_aligned 0.00 -> 0.00. Corrects the 08:56 finding's claim that LO is blind to this construct; the change is LO-visible and the gate was right to refuse it. Zero-line spacer variant is the untried form.",
+   "spacer gap SPLIT (w:before=G-20, w:line=20) is LO-identical on mobile-bill 43.87/1.55 and removes 8.7 of the 11.3 pt Google table-top step on two-tables-stacked (80.1->88.8 vs source 91.4); still 46/47 because the per-row drift term (19.0 vs 18.4 pt) is untouched; full-corpus ratchet not run",
+   "the ready relay patch (SPACER-BEFORE + ROW-PITCH-DITHER) regresses LibreOffice on two-tables-stacked-with-no-gap: share1 21.85 -> 43.33, share5 0.77 -> 30.01, measured with benchmarks/p2w.py measure_doc. The dither is the LO-regressive half, not the spacer: the spacer SPLIT (before=G-20, line=20) is LO-identical on mobile-bill (43.87/1.55) and removes 8.7 of the 11.3 pt Google step. Do not ratchet the relay patch as report.py's Next run says.",
+   "Measured where Google's row-pitch charge lives: LibreOffice lays w:trHeight exactly and never charges the rule; Google charges the row's own rule and rounds to a whole point. A paragraph border is not charged (Google mean 18.25-18.33 vs 19.08 with cell borders, source 18.40). Engine A/B on two-tables-stacked-with-no-gap: LO rule positions identical to 0.05pt, Google mean pitch 19.23 -> 18.50 and the table top 77.5 -> 87.5 against the page's 86.52, but the cell text does not travel with the rules - median dy -4.66 -> -10.70, n_out 55 -> 69, so not kept. Both builds 41/42 with 18_displacement the only failure. Next: emit the rule as pBdr TOP and nil the table's own top side; C build already converted and measured in LO only (18 rules vs 15). Census: only 5 of the 16 documents that fail 18_displacement and nothing else are ruled tables with a sub-point pitch.",
+   "Row-height dither refuted (trHeight stored not laid); census of the 11 non-ruled docs = 3 faults; spacer needs a scope guard, handed to next run",
+   "spacer split lands 4 of 16 in Google (73_marksheet, 41_coloured, 29_dot_leaders, 72_bank_statement 42/42) but breaks mobile-bill and insurance-policy-schedule 46/47 one page -> 43/47 two pages in a controlled same-engine A/B; reverted, guard first",
+   "guarded spacer split (non-ruled carrier, gap<=20pt) reproduces 1 of the 4 wins the 23:10 run reported (29_dot_leaders 42/42) and costs 16_right_aligned_amounts 41/42 -> 40/42 via a new 23_line_pitch; the guard does hold mobile-bill and insurance-policy-schedule at 46/47 one page. Reverted. Evidence: FINDINGS/18_displacement-GUARDED-SPACER-SPLIT-1-WIN-1-COST-0219-relay.md",
+   "spacer split ALONE (guard: non-ruled carrier, gap<=20pt; dither disabled) takes 5 of 8 measured documents to 42/42 in Google with no document worse: 29_dot_leaders, 41_coloured, 73_marksheet, 22_invoice, 16_right. 72_bank unchanged 41/42; mobile-bill and insurance held at 46/47. Patch ready at patches/18-displacement-SPACER-BEFORE-GUARDED-NO-DITHER.patch; whole-corpus LO measurement did not fit the slot",
+   "spacer scope guard landed: 73_marksheet 41/42->42/42 (both sides measured, 2 renders), 41_coloured_headings and 29_dot_leaders to 42/42; mobile-bill 46/47 one page unchanged and document.xml identical; corpus 212/212 re-measured, 0 worse. 22 and 16 still 41/42 - second term",
+   "spacer hairline 20tw->1tw with the guard's room test keyed to a fixed 20 so no document changes spendable/refused: 22_invoice_four_columns_txtpos 41/42 -> 42/42 in Google, measured base and patched in the same hour",
+   "spacer hairline 20tw->1tw, guard room test keyed to a fixed 20 so no document changes side of the guard; 22_invoice_four_columns 41/42 -> 42/42 in Google, base and patched measured in the same hour",
+   "the construct was already on main (ef99cb2c) from a concurrent run; this slot's independently built version measured 213 documents, found 4 proxy costs, and removed them with two guard clauses (measured-only gap; no floating shape on the page) before the rebase collision. Dropped the duplicate patch. Landed the soffice warm-up fix (the reason four runs measured 0 of 212) and the census: 50 reachable documents, 9 exactly one check short, 1 already clean.",
+   "LO census: 7 docs are one check from clean in the measurable renderer and they are 7 distinct mechanisms. Controlled 3-variant experiment on balance-sheet-two-columns-of-figures: w:trHeight is inert on a table's first row (variants A,B leave header dy at +3.69 while moving 89/94 runs); w:before on a cell paragraph is laid 1:1 (measured error +3.69 pt, correcting -74 tw clears it, n_out 6->0, span 4.18->0.89, 41/42->42/42 in LibreOffice). Not committed: the 74 twips is measured not derived - the same arithmetic does not hold on row 2 of the same table, so a first-row guard would be a fudge over 100+ table documents. Next experiment is one build: declare the first row at the source band (18.00 pt, not 16.00) and test whether 248 becomes correct on its own.",
+   "Instrumented the row model at DocxWriter.java:6146 (P2W_DBG env, reverted, app/ clean). exactRows is TRUE on all four candidates and the per-row edges ARE used, so the uniform-average path is not the defect. But balance-sheet-two-columns-of-figures' first table has model edges [115.35,131.35,143.35,154.95,166.55,178.15] while the page draws its top rule at 101.35 and its second at 119.35: the model's row-0 edge is 14.0 pt BELOW the page's header band and declares 16.00 pt against an 18.00 pt band. The table is borderless (t.ruled=false) and its rules are floating drawings, so row edges come from text. Control on the same build: table-inside-two-column-page is ruled=true and its model edge 117.0 matches its page rule 117.35 to 0.35 pt, yet it still misses by a uniform -9.06 - so its fault is placement, not edges. The construct is therefore edge derivation for a borderless table whose rules are separate drawings; 71_invoice's +9.52 and 363's +3.6 are different terms again (363's terms block is not in a table at all).",
+   "Row 0 of a table is placed from a pitch-derived edge, not from the table's own top; the derived delta (+3.52 on balance-sheet) clears its only failing check (6 runs out -> 0) but regresses 360_restaurant_menu share@5 34.43 -> 35.66, refused by regress.py --check. The sign of the correct answer differs between the two documents, so no constant row-0 rule is right for both; the deciding term is where the spacer's box actually landed (D-26). Full 212/212 corpus pass run. Engine reverted.",
+   "partial spend of the table-gap spacer: Google 68_journal 41/42 -> 40/42, adds 59_shape_anchor, fixes nothing; flow-invariant so LibreOffice could not have caught it",
+   "rowExcessTw 15->11 opens the spacer guard on 72_bank (w:line=366 -> w:before=365+w:line=1) and removes the -15pt table lift, but the page lands 4.85pt low and 7/80 runs exceed tolerance against a budget of 4: 41/42 before, 41/42 after. Refuted; engine reverted. The gap extraAbs measures is ~4.5pt larger than the page needs.",
+   "Google render is runnable in a fixer slot: JDK from GitHub releases + verify-engine compile + Drive round trip. Re-measured two rows on HEAD b7699196 in Google: bank-statement-5-pages 40/47 -> 42/47 (05_chars_extra and 32_stroke_lines cleared), mobile-bill 46/47 confirmed on HEAD failing only 18_displacement. No engine change: every candidate was already refuted by a measurement in the source or needs a Google render this slot did not have time for. Lead: mobile-bill is a single-check test case; the wps:txbx discriminator (54/65 and 48/48, 0/30 clean) is the next attempt."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "20_within_10pt (+4)": {
+  "attempts": 14,
+  "first_seen": 1794489760.0651093,
+  "last": 1794539752.1972165,
+  "outcomes": [
+   "reverted",
+   "error",
+   "error",
+   "error",
+   "error",
+   "reverted",
+   "error",
+   "reverted",
+   "error",
+   "error",
+   "reverted",
+   "reverted",
+   "error",
+   "error"
+  ],
+  "reason": "",
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "32_stroke_lines": {
+  "attempts": 17,
+  "first_seen": 1794543973.3763752,
+  "history": [
+   {
+    "at": "2026-11-21 12:46",
+    "moved": 0,
+    "outcome": "error",
+    "reason": "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) ",
+    "total": 37
+   },
+   {
+    "at": "2026-11-21 17:39",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more",
+    "total": 145
+   },
+   {
+    "at": "2026-11-21 19:10",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "RECLASSIFIED 21 Nov from \"reverted\" to \"lead\": the construct WAS measured through Google and the finding is committed - it is not a refuted idea, the implementation ran out of slot. tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is cl",
+    "total": 15
+   },
+   {
+    "at": "2026-11-21 20:08",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "floating w:tblpPr rule carrier: 394_map_with_legend 41/42 -> 42/42 in Google, patch saved, not committed - a 213-document corpus measurement is ~75 min of conversion and does not fit the slot",
+    "total": 213
+   },
+   {
+    "at": "2026-11-21 20:17",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "RELAY 19:58, second measurement of the same class from the other side. Built DocxWriter.ruleCarrier() (patch saved, engine reverted) and measured it through Google on 73_marksheet_subject_marks_grade,",
+    "total": 210
+   },
+   {
+    "at": "2026-11-21 21:31",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "per-page table built and measured: 73_marksheet 39->34/42, 394 42->39/42 in Google. Killed. Control disproves 'tables stack': 394 draws 5 floating tables at their own y (42/42); 73's rule at 793.9pt o",
+    "total": null
+   },
+   {
+    "at": "2026-11-21 23:13",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "CHECK BLIND TO PICTURES, measured both ways. _rule_segments() (verify_google.py:1082) walks get_drawings() only; Google exports every anchored shape as a raster image, so a rule it drew reads as zero ",
+    "total": 192
+   },
+   {
+    "at": "2026-11-22 00:12",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Corpus-wide: 0 of 76 documents whose rules are carried only as floating <w:drawing> pass 32 in Google; the only 2 with source rules that pass carry the rule as a table-cell border. The drawing carrier",
+    "total": 192
+   },
+   {
+    "at": "2026-11-22 01:43",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "carrier patch measured corpus-wide: 4595 carriers, 3608 of them 8-twip vertical cell separators; 375 goes 13 rows -> 455. Horizontal-only guard proven to restore byte-identity on 324/341/375 and keep ",
+    "total": null
+   },
+   {
+    "at": "2026-11-22 02:09",
+    "moved": 13,
+    "outcome": "lead",
+    "reason": "guarded carrier: 13 of the 16 {05,32} documents measured 40/42 -> 42/42 in Google on HEAD+rule-carrier-horizontal-only-2008; .txt byte-identical on all 16 and the guard restores HEAD exactly on 375/34",
+    "total": 213
+   },
+   {
+    "at": "2026-11-22 03:35",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Blast radius of the horizontal-only carrier patch measured for the first time on all 213: 161 documents change .docx content, not 16. 143 of them fail 32 (gain candidates), 5 pass 32 (pure risk) and 1",
+    "total": 213
+   },
+   {
+    "at": "2026-11-22 04:01",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "corpus pass on HEAD+horizontal-only carrier: 52 better, 54 worse, regress.py REFUSED 58; regressed docs median 9 carriers vs 1 unchanged; HEAD reproduces baseline on 3 controls so the instrument is so",
+    "total": 16
+   },
+   {
+    "at": "2026-11-22 04:08",
+    "moved": 1,
+    "outcome": "lead",
+    "reason": "Google measurement of the carrier on two documents: 51_two_cm_margins stays 42/42 (rewritten, not worse), 17_three_column_widths_txtpos 40/42 -> 42/42. Refuted the 02:50 prescription: 32_stroke_lines ",
+    "total": null
+   },
+   {
+    "at": "2026-11-22 04:49",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Measured the two things the last two runs left open, on committed evidence and two independent measurements: (1) the prescribed cell guard cannot fire - no Shape is ever routed into a w:tc, guard buil",
+    "total": null
+   },
+   {
+    "at": "2026-11-22 05:18",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Measured the lead the last two runs left open and falsified it: the 16 carrier Google results carry fields no script writes (grep engine_patch: no matches), no per-check map, and a placeholder timesta",
+    "total": null
+   },
+   {
+    "at": "2026-11-22 06:10",
+    "moved": 3,
+    "outcome": "kept",
+    "reason": "check 32 read only vector segments; Google exports an anchored rule as a raster image at the same geometry. Made the check read image bands (band=RULE_BAND_REN, the same width the vector path uses). M",
+    "total": 213
+   },
+   {
+    "at": "2026-11-22 06:13",
+    "moved": 16,
+    "outcome": "kept",
+    "reason": "the check change measured on 20 Google exports from a live round trip: 16 documents 41/42 -> 42/42, 0 worse. 13 of 14 documents failing {05,32} came back 42/42 - 05_chars_extra passes on HEAD too, so ",
+    "total": 213
+   }
+  ],
+  "last": 1794543973.3763797,
+  "last_engine": "462353f9",
+  "last_moved": 16,
+  "last_total": 213,
+  "outcomes": [
+   "error",
+   "error",
+   "reverted",
+   "error",
+   "error",
+   "reverted",
+   "reverted",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "lead",
+   "reverted",
+   "lead",
+   "lead",
+   "lead",
+   "kept",
+   "kept"
+  ],
+  "park_reason": "no progress in the last 12 attempts (error, error, reverted, error, error, reverted, reverted, lead, lead, lead, lead, lead)",
+  "parked_at": "22 Nov 02:09",
+  "reason": "the check change measured on 20 Google exports from a live round trip: 16 documents 41/42 -> 42/42, 0 worse. 13 of 14 documents failing {05,32} came back 42/42 - 05_chars_extra passes on HEAD too, so the table's 05 column is stale as well.",
+  "reasons": [
+   "pBdr carrier construct refuted before a build: three findings (044000 shape emitted after flow, 055000 flush-by-top turns 18_displacement PASS->FAIL, 065000 carrier costs 9.6 pt whatever it contains) plus today's independent check that the 065000 guard is unsatisfiable (flowFromBox gives a left-aligned paragraph rightTw=0, so the right-edge test demands the rule reach the paper edge - 0 of 2136 corpus rules pass both edges). No engine change was built because there is no variant of the carrier that is flow-neutral, and the hook ceiling is 3 of 39 rules. Next attempt must start from NO NEW PARAGRAPH.",
+   "pBdr rule carrier REFUTED by measurement, not by argument: patched engine, 12 class documents, 172 source rules counted with check 32's own detector. 68 rules became w:pBdr, but 48 of the 68 land more than 24 pt from the source rule and LibreOffice gets WORSE on 8 of the 12 (32_stroke lost 0->52 across the sample; bank-statement 0->32, gst-invoice 0->11). ctx.flowY=s.topPt does not save it: shapes are written after the page's paragraphs, so rules above the flow end get w:before=0 and pile up (bank-statement's first line lands at y=-9.1pt). 102 of 172 rules are vertical strokes that ruleAsBorder refuses, so the patch is a no-op on 2 documents. Finding: FINDINGS/32_stroke_lines-PBDR-REFUTED-1720.md",
+   "namespace test",
+   "commit test",
+   "tblpPr floating carrier MEASURED THROUGH GOOGLE: rule at y=399.5 for 400pt asked, BELOW at 11.92 = the no-table control exactly, 0.00 pt of flow. The blocker that stopped the cell-border carrier is closed. trHeight val=1 exact costs 0.91pt. No engine patch: no time to convert and score a real document.",
+   "floating w:tblpPr rule carrier: 394_map_with_legend 41/42 -> 42/42 in Google, patch saved, not committed - a 213-document corpus measurement is ~75 min of conversion and does not fit the slot",
+   "RELAY 19:58, second measurement of the same class from the other side. Built DocxWriter.ruleCarrier() (patch saved, engine reverted) and measured it through Google on 73_marksheet_subject_marks_grade, three variants. The carrier DRAWS (0 of 2 rules before, 2 of 2 after, at the requested weight and colour) but only the FIRST floating table in a document is placed at its tblpY: rule 1 asked 83.6 and drew at 83.5, rule 2 asked 793.6 and drew at 84.5, stacked under rule 1. tblOverlap=overlap changes the bytes and not the render; an inline carrier loses x entirely (both rules to x=0). Two things this run settled that the 19:26 run did not have: a rule on this corpus is usually a FILL not a stroke (both of 73's rules are filled 483x0.9pt rects with lineRgb=-1), and a plain table costs no character (4-case probe: 0 U+200B), so the 2 U+200B on 73 come from text wrapping around the floating band. NEXT: one floating table per PAGE holding all its rules as exact-height rows. See FINDINGS/32_stroke_lines-FLOATING-CARRIER-DRAWS-BUT-STACKS-2050-f1x.md",
+   "per-page table built and measured: 73_marksheet 39->34/42, 394 42->39/42 in Google. Killed. Control disproves 'tables stack': 394 draws 5 floating tables at their own y (42/42); 73's rule at 793.9pt of an 841.9pt page is the only one moved. Census: carrier as built reaches 1 of 145.",
+   "CHECK BLIND TO PICTURES, measured both ways. _rule_segments() (verify_google.py:1082) walks get_drawings() only; Google exports every anchored shape as a raster image, so a rule it drew reads as zero segments and is scored LOST. _stroke_pictures() exists and _strokes() calls it, but _rule_segments() - the path check 32 uses - never does, and the two return different shapes so they were never merged. Falsified on ten Google exports: rule-base (no rule) and rule-v6_pgborder (Google dropped it) both stay LOST; rule-v1_drawing (the engine's OWN carrier) and rule-v1b_inline go LOST->MATCHED. Google draws the engine's construct at y=139.88 for y=140.00 asked (-0.12 pt), 0 chars visible, 0.69 pt displacement from the carrier paragraph vs 0.00 pt with the anchor in a body paragraph. On the two real documents that fail ONLY 32: 394 recovers 1 of 3 rules (still fails), 407 recovers 18 of 46 (its vertical rules, still fails) - so NO document becomes clean and this is NOT a fix, it is a measurement correction. Patch saved as patches/rule-segments-see-pictures.patch, deliberately not applied: it can only turn lost->matched and the corpus-wide flip is unmeasured. NEW LEAD for the next run: the isolated probe rule draws perfectly on a clean page; the same construct draws 1 of 3 on 394 (25 images on one page) and 0 of 28 horizontals on 407 (41 images). The variable is how crowded the page is, not the construct - test N anchored rules on one page for N=1,2,4,8,16,32.",
+   "Corpus-wide: 0 of 76 documents whose rules are carried only as floating <w:drawing> pass 32 in Google; the only 2 with source rules that pass carry the rule as a table-cell border. The drawing carrier is refuted; the tcBorders carrier is confirmed. Blocker isolated to the trailing-pair anchor, falsifiable in one build.",
+   "carrier patch measured corpus-wide: 4595 carriers, 3608 of them 8-twip vertical cell separators; 375 goes 13 rows -> 455. Horizontal-only guard proven to restore byte-identity on 324/341/375 and keep 17:2, bank-statement:39. Patch saved, Google unmeasured on the remaining 987.",
+   "guarded carrier: 13 of the 16 {05,32} documents measured 40/42 -> 42/42 in Google on HEAD+rule-carrier-horizontal-only-2008; .txt byte-identical on all 16 and the guard restores HEAD exactly on 375/341/324, so no document can get worse. Not landed: the 213-document pass that would stamp the engine is 50 min and the slot had 45. HANDOFF CORRECTION: LAST-MESSAGE named rule-carrier-followed-by-block, which has no vertical guard and destroys 59 documents; the guarded patch is rule-carrier-horizontal-only.",
+   "Blast radius of the horizontal-only carrier patch measured for the first time on all 213: 161 documents change .docx content, not 16. 143 of them fail 32 (gain candidates), 5 pass 32 (pure risk) and 13 are page_count_refused (invisible). One of the 5 is 51_two_cm_margins, which passes 42/42 in Google today and is rewritten anyway. The patch cannot land as a global substitution: the next slot must narrow the predicate so it cannot fire where the rule already renders, or Google-score all 161 (100-120 min). Data: benchmarks/blast-carrier-2008.json, FINDINGS/CARRIER-2008-BLAST-RADIUS-161-OF-213.md.",
+   "corpus pass on HEAD+horizontal-only carrier: 52 better, 54 worse, regress.py REFUSED 58; regressed docs median 9 carriers vs 1 unchanged; HEAD reproduces baseline on 3 controls so the instrument is sound. Falsified: FINDINGS/32_stroke_lines-CARRIER-54-REGRESSIONS-0400-f1x.md",
+   "Google measurement of the carrier on two documents: 51_two_cm_margins stays 42/42 (rewritten, not worse), 17_three_column_widths_txtpos 40/42 -> 42/42. Refuted the 02:50 prescription: 32_stroke_lines is vacuous on 45 scored docs (0 isolated source rules, all 45 pass), so no Shape-field predicate can separate the five risk documents - there is no narrowing to build. The landing blocker is the 04:00 run's 54 proxy regressions (nested carriers inside table cells), not the predicate.",
+   "Measured the two things the last two runs left open, on committed evidence and two independent measurements: (1) the prescribed cell guard cannot fire - no Shape is ever routed into a w:tc, guard built and byte-identical output on 5 PDFs, max tc-depth 0 across 156 carriers in 22 docs; (2) the carrier is Google-clean on 13 of the 16 documents that already have a carrier Google result (all 16 clear 05_chars_extra, none regress), so the 54-document blocker is a LibreOffice page-overflow artefact (7 of 8 regressed docs gain a page) that regress.py already exempts when Google improved. What is missing is 38 unmeasured Google results, not a fix.",
+   "Measured the lead the last two runs left open and falsified it: the 16 carrier Google results carry fields no script writes (grep engine_patch: no matches), no per-check map, and a placeholder timestamp, so 13-of-16 cannot be re-derived; and in a clean clone the patch makes 4 of 10 clean controls worse (16_right_aligned_amounts 42->36, product-catalogue 42->37, 1->3 pages). Did not land: nothing to land. Replacement lead recorded: a real Google round trip run twice on HEAD shows 05_chars_extra passing where the committed table (engine 462353f) says it fails - the Google table is stale.",
+   "check 32 read only vector segments; Google exports an anchored rule as a raster image at the same geometry. Made the check read image bands (band=RULE_BAND_REN, the same width the vector path uses). Measured on 6 real Google exports from a live round trip: 394/17_three_column/315_gazette 41/42 -> 42/42 PASS, 407 46->8 lost rules but still fails, 311 +1 check, 382 clean control held. Zero regressions; monotone by construction - adding render segments can only reduce lost rules.",
+   "the check change measured on 20 Google exports from a live round trip: 16 documents 41/42 -> 42/42, 0 worse. 13 of 14 documents failing {05,32} came back 42/42 - 05_chars_extra passes on HEAD too, so the table's 05 column is stale as well."
+  ],
+  "requeues": 0,
+  "status": "PARKED"
+ },
+ "44_header_footer": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-23 18:33",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1",
+    "total": null
+   }
+  ],
+  "last": null,
+  "last_engine": "b7699196",
+  "outcomes": [
+   "lead"
+  ],
+  "reason": "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1. Not committed: full-corpus restamp does not fit a slot. Patch in FINDINGS/running-foot-spends-the-gap-1855-fixer.patch. Second site unaddressed: flowFromBox anchors the same oversized gap (55_ and 61_ still carry 4 boxes).",
+  "reasons": [
+   "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1. Not committed: full-corpus restamp does not fit a slot. Patch in FINDINGS/running-foot-spends-the-gap-1855-fixer.patch. Second site unaddressed: flowFromBox anchors the same oversized gap (55_ and 61_ still carry 4 boxes)."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "47_margins": {
+  "attempts": 18,
+  "first_seen": 1794518680.890611,
+  "history": [
+   {
+    "at": "2026-11-20 13:34",
+    "moved": 3,
+    "outcome": "partial",
+    "reason": "The spaces a page wrote as indent were emitted as run text, so the indent was n x whichever face's space advance rendered it: 392's 20-space row landed at 64.2 instead of 107.5 pt under a substituted ",
+    "total": 13
+   },
+   {
+    "at": "2026-11-20 13:34",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "Pin the centred line's own extent [b.x, b.right] and drop w:jc, so a centred line stops delegating its left edge to the renderer's text width. Under the substitution proxy it fixes the check on 317_rt",
+    "total": 13
+   },
+   {
+    "at": "2026-11-20 14:35",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "anchorBox/lineParagraph: anchor at Box.inkX and strip the leading ASCII spaces, so a space-led anchored line's indent is a position instead of n space-advances of the rendering face. Measured reach by",
+    "total": 26
+   },
+   {
+    "at": "2026-11-20 15:07",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "g.size from getFontSize() (exact) instead of getFontSizeInPt() (rounded), gated OFF monospaced faces. The gate fires on 360 (8.5/8.0 DejaVuSerif) and not on 392 (6.6/6.0 DejaVuSansMono). Measured: 360 34.43 -> 34.43, 365 0.02 -> 0.02, 07_stamp_over_table 1.82 -> 1.82, 21_form_labels 0.00 -> 0.00 - all unchanged. 392 was NOT measured on this build; do not read the next row as its continuation. The gate is aimed at nothing: the 360 gain it was written for does not exist. Reverted.",
+    "total": 26
+   },
+   {
+    "at": "2026-11-20 15:08",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "CORRECTED 15:25 - the claim this row was first recorded with was wrong. The 'ungated' build turned out to be a NO-OP: the line it changed is semantically identical to HEAD's, so the docx it produced is HEAD's docx. What was read as '392 1.61 -> 0.06' is therefore HEAD's own score, not the patch's, and HEAD already reads 0.06 where RANKING.csv says 1.61. Measured directly on a pristine HEAD build: 392 share@5 = 0.06 and 42 of 42 checks PASS, while benchmarks/RANKING.csv carries 1.61 and both gverify tables carry a 47_margins FAIL for it. 360 reads 34.18 on HEAD against 34.43 in RANKING. No engine change was kept: the patch does nothing. See FINDINGS/47_margins-STALE-TABLES-152500.md.",
+    "total": 26
+   },
+   {
+    "at": "2026-11-20 20:28",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "claimed. 47_margins (.docx, 14 in LO / 26 in Google). MECHANISM FOUND for the one document with a real 12 pt column error: 360_restaurant_menu's menu body is a TABLE, not a flow block (writer=table tw",
+    "total": 14
+   },
+   {
+    "at": "2026-11-20 20:44",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "SECOND ATTEMPT, different construct: WIDEN THE CELL OVER ITS LEADER-DOT COLUMN instead of selling its indent. DocxWriter tableBody's widening loop could only take room from EMPTY neighbours; a menu/in",
+    "total": 14
+   },
+   {
+    "at": "2026-11-21 03:25",
+    "moved": 2,
+    "outcome": "partial",
+    "reason": "THE CELL'S OWN BORDER WAS PAID TWICE. insetTw measures a cell's text x from the cell's left EDGE on the page, and the writer then draws a rule on that edge; a renderer puts cell content inside its bor",
+    "total": 26
+   },
+   {
+    "at": "2026-11-21 03:36",
+    "moved": 2,
+    "outcome": "partial",
+    "reason": "SECOND RECORD, same construct, now measured in GOOGLE. The patched build was uploaded to Drive, converted to a Google Doc and exported as PDF: 404_sudoku_grid goes 43/47 FAIL -> 44/47, with 47_margins",
+    "total": 26
+   },
+   {
+    "at": "2026-11-21 07:16",
+    "moved": 0,
+    "outcome": "partial",
+    "reason": "SECOND ATTEMPT, different construct: 365_recipe_card's -2.01 pt is a SPACE's advance, not an indent. The five METHOD steps are w:ind 800 (40 pt, correct: source 40.00 render 40.10) and the run text li",
+    "total": 26
+   },
+   {
+    "at": "2026-11-21 13:43",
+    "moved": null,
+    "outcome": "error",
+    "reason": "DejaVuSansMono -> Courier New clears 47_margins on 4 documents and takes 392_statistical_console_output to 42/42 in Google, but regresses 392 (1.61->2.91) and 406 (3.45->4.05) on the LibreOffice ratch",
+    "total": null
+   },
+   {
+    "at": "2026-11-21 15:48",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "180deg patch measured on .docx for the first time: 140 of 213 byte-identical (136 full-conversion + the 4 rotation docs), .txt changes only one-page-rotated-180-degrees, t02_position FAIL->PASS. Not l",
+    "total": 213
+   },
+   {
+    "at": "2026-11-21 17:25",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "The 180deg guard, built and measured on all 213 documents (213/213 .docx word/document.xml byte-identical, 212/213 .txt identical, one-page-rotated-180-degrees t02_position FAIL->PASS, t02_position 5-",
+    "total": 5
+   },
+   {
+    "at": "2026-11-21 19:44",
+    "moved": 1,
+    "outcome": "reverted",
+    "reason": "cell-border-inset patch measured on all 210 documents, not the nine it was proposed on: 404_sudoku_grid 0.27->0.00 and three others improved, but 24 documents got worse (table-with-no-header-row 0.61-",
+    "total": 210
+   },
+   {
+    "at": "2026-11-22 07:52",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "",
+    "total": 24
+   }
+  ],
+  "last": 1794521923.5603442,
+  "last_engine": "462353f9+7abd64a529",
+  "last_moved": 0,
+  "last_total": 24,
+  "outcomes": [
+   "error",
+   "error",
+   "reverted",
+   "partial",
+   "reverted",
+   "reverted",
+   "reverted",
+   "reverted",
+   "reverted",
+   "reverted",
+   "partial",
+   "partial",
+   "partial",
+   "error",
+   "partial",
+   "reverted",
+   "reverted",
+   "lead"
+  ],
+  "reason": "(no reason recorded for this attempt)",
+  "reasons": [
+   "The spaces a page wrote as indent were emitted as run text, so the indent was n x whichever face's space advance rendered it: 392's 20-space row landed at 64.2 instead of 107.5 pt under a substituted face. Stripping the leading spaces and emitting inkX-b.x as w:ind w:left drives the check's own counter to zero (392 2->0, 380 3->0, 383 7->0 under the substitution proxy) and moves nothing the wrong way anywhere: 9 class documents same or better on share@5px, line and page counts unchanged, p2w.py --validate GATE PASS. Not kept because flowFromBox is the emitter in only 3 of 13 documents - the space-led lines in 40, 77 and 78 are anchored, in a cell, or merged - and a Google-only mechanism is flat in a LibreOffice measurement by construction. Diff and numbers in FINDINGS/47_margins-MECHANISM-133500-f2.md.",
+   "Pin the centred line's own extent [b.x, b.right] and drop w:jc, so a centred line stops delegating its left edge to the renderer's text width. Under the substitution proxy it fixes the check on 317_rti_response ((0.1,3)->(0.1,0)) but moves the whole width error onto the line's right end: screen over all 13 class documents gave 11 same, 0 better, 2 worse - 317 share@5px 0.65->2.54, 318 0.00->0.71. A patch that moves the number up and looks worse is not a fix. Diff in FINDINGS/47_margins-MECHANISM-133500-f2.md.",
+   "anchorBox/lineParagraph: anchor at Box.inkX and strip the leading ASCII spaces, so a space-led anchored line's indent is a position instead of n space-advances of the rendering face. Measured reach by tracing the writer over all 26 class documents: anchorBox is called 0 times on 22 of them, and the 4 it reaches (28_value_overflows, 330_cad, 331_pid, academic-paper, magazine-2col) have no space-led line at all. 4 of 26 screened identical, 0 better, 0 worse. Reverted: nothing to improve.",
+   "g.size from getFontSize() (exact) instead of getFontSizeInPt() (rounded), gated OFF monospaced faces. The gate fires on 360 (8.5/8.0 DejaVuSerif) and not on 392 (6.6/6.0 DejaVuSansMono). Measured: 360 34.43 -> 34.43, 365 0.02 -> 0.02, 07_stamp_over_table 1.82 -> 1.82, 21_form_labels 0.00 -> 0.00 - all unchanged. 392 was NOT measured on this build; do not read the next row as its continuation. The gate is aimed at nothing: the 360 gain it was written for does not exist. Reverted.",
+   "CORRECTED 15:25 - the claim this row was first recorded with was wrong. The 'ungated' build turned out to be a NO-OP: the line it changed is semantically identical to HEAD's, so the docx it produced is HEAD's docx. What was read as '392 1.61 -> 0.06' is therefore HEAD's own score, not the patch's, and HEAD already reads 0.06 where RANKING.csv says 1.61. Measured directly on a pristine HEAD build: 392 share@5 = 0.06 and 42 of 42 checks PASS, while benchmarks/RANKING.csv carries 1.61 and both gverify tables carry a 47_margins FAIL for it. 360 reads 34.18 on HEAD against 34.43 in RANKING. No engine change was kept: the patch does nothing. See FINDINGS/47_margins-STALE-TABLES-152500.md.",
+   "claimed. 47_margins (.docx, 14 in LO / 26 in Google). MECHANISM FOUND for the one document with a real 12 pt column error: 360_restaurant_menu's menu body is a TABLE, not a flow block (writer=table twice in the -Dp2w.traceLines trace). PdfToWord:9469 records each cell's ink x (52 pt) and the column edge is 40 pt, so insetTw() gives w:ind left = 240 twips = 12 pt. DocxWriter.java:6362-6366 then SELLS that inset to buy one line: if (textOverflows) insetTw = Math.max(0, spanTw - needTw). Menu names run 60-92 pt in a 71.85 pt column, so 5 cells gave up 240, 225, 182 twips and were set at x=40, and the page anchor read 40 against the source's 52 - clause (a) fail. Patch measured (removing the sale): anchor 52->52, clause (a) PASS, 0 unregistered runs, worst displacement -11.9 -> +0.1 pt, 47_margins FAIL -> PASS and the document 37/42 -> 38/42 checks. NOT KEPT: screen.py 16 documents, 15 same, 0 better, 1 worse - 360 share@5px 34.43 -> 41.04 (+6.61) because 13 menu names that were squeezed onto one line at the wrong x now wrap at the right x. The sale genuinely buys the line where needTw < spanTw; a variant keeping only that regime was built and measured (needTw <= spanTw) and is worse still, 34.43 -> 47.78. So the construct is real, reachable and fully explained, and the ratchet is what refuses it - not the engine. NEXT: the landable form is pinning the x AND keeping the line, i.e. widen the overrunning cell over its EMPTY neighbour, which DocxWriter:6344-6360 already does for the empty-neighbour case and refuses for 360 because the neighbour holds the leader dots. Do not rebuild the plain removal.",
+   "SECOND ATTEMPT, different construct: WIDEN THE CELL OVER ITS LEADER-DOT COLUMN instead of selling its indent. DocxWriter tableBody's widening loop could only take room from EMPTY neighbours; a menu/invoice/contents cell to the right holds leader dots, so it could not be widened over them and the writer fell through to the indent sale at :6366. New helper isLeaderOnly() (dots, bullets, ellipsis, spaces only) plus a guard that merges only when the merged text provably fits; the dots are appended into the merged cell so no character is lost and no column index moves. MEASURED on 360_restaurant_menu (LO render, verify_google.py on the fresh pair): the merge FIRES - the name cell becomes gridSpan=2, tcW 4588 twips, w:ind 240 (x pinned at 52) - and share@5px improves 34.43 -> 26.25 (-8.18, the best single-document move this class has had). But the CHECK COUNT gets WORSE, 37/42 -> 36/42: 47_margins 9 -> 14 unregistered (the dots' own xink moves from 112 pt to 144 pt, +32 pt, so every dot run becomes an unregistered run - the merge pins the name by displacing the leader), 13_text_colours newly fails (the dots were #666666 and a merged cell carries one colour, so they become black, grey share -33%), 43_within_10pt_x newly fails (2 spans moved together -35.1 pt), 26_text_overlap unchanged at 6. REVERTED on the checks, not on the pixels. THE FINDING: the page's own ink does not fit its own column - the name is drawn at x=52 and runs to 144 while its column ends at 111.85, and the dots are drawn starting at 112, INSIDE the name's column. All three cannot be pinned at once: pin the name and the dots move 32 pt; keep the dots and the name must either wrap or give up its indent. That is why both constructs measured so far trade one for the other, and it means the class is not reachable on this document by any writer construct that keeps the page's own grid. Do not rebuild either variant.",
+   "THE CELL'S OWN BORDER WAS PAID TWICE. insetTw measures a cell's text x from the cell's left EDGE on the page, and the writer then draws a rule on that edge; a renderer puts cell content inside its border, so the text landed at edge + borderWidth + w:ind. Proved on 404_sudoku_grid by editing only the emitted XML: setting w:left and w:insideV to nil moved all 30 unregistered digits from 2.1 pt right to within 0.1 pt, and nothing else changed. The fix subtracts the border THIS cell gets on its left side (the table's left rule in column 0, insideV in every other), in twips = w:sz * 2.5, at the two w:ind emission sites (the string-cell path and cellParaXml via pInset). It is applied AFTER the widening and overflow arithmetic on purpose: subtracting from insetTw itself changed which cells got widened and moved four runs 36.8 pt on 78_mixed_english_devanagari_line. Measured on a same-engine pair (HEAD build vs patched build, soffice render, 42 checks): 404_sudoku_grid 46/47 -> 47/47 with 47_margins 30 unregistered -> 0; 76_devanagari_table 45/47 -> 46/47 with 47_margins 6 -> 2 unregistered and the check flips to PASS; seven other 47_margins documents (07, 21, 365, 39, 78, brochure-3col, product-catalogue) byte-for-byte unchanged in score. NOTE FOR THE NEXT RUN: benchmarks/gverify-lo is STALE for at least 76 and 78 - the committed rows read 39/47 and 36/42 where a pristine HEAD build scores 45/47 and 40/42 - so a same-engine pair is the only honest comparison. The remaining 47_margins failures are NOT this mechanism: their median error is already 0.1 pt and only the per-page tail of unregistered runs remains, which is a different defect.",
+   "SECOND RECORD, same construct, now measured in GOOGLE. The patched build was uploaded to Drive, converted to a Google Doc and exported as PDF: 404_sudoku_grid goes 43/47 FAIL -> 44/47, with 47_margins flipping to PASS (HEAD: 18 unregistered at 2.1 pt median). Digit x on page 1: source 115.91 / 159.91 / 291.91; Google HEAD 117.00 / 161.25 / 294.00; Google patched 115.50 / 159.75 / 292.50. Google lays cell content inside the cell's border exactly as LibreOffice does, so the border was paid twice in the renderer the user opens. Still not landed: the gate refuses an unmeasured engine and a full corpus pass does not fit the slot. Patch in patches/47-margins-cell-border-inset.patch, finding in FINDINGS/47_margins-CELL-BORDER-PAID-TWICE-034500-f1x.md.",
+   "SECOND ATTEMPT, different construct: 365_recipe_card's -2.01 pt is a SPACE's advance, not an indent. The five METHOD steps are w:ind 800 (40 pt, correct: source 40.00 render 40.10) and the run text literally begins with a space, so the step ink x is paragraph pen + '1.' + the space's advance - 4.85 pt in the source face, 2.69 pt in the substituted DejaVuSerif. Proved the construct by editing the emitted XML only: tab stop at 1080 twips + <w:tab/> instead of the leading space puts the text at 54.10 vs the source's 54.00 (2.01 -> 0.10). NOT implemented in the emitter: a leading space that carries text to a column is the same shape as a word separator, and the corpus has both (71_invoice_space_aligned_no_rules is built of the second), so the guard is a page property and needs its own corpus pass. Written up in FINDINGS/47_margins-SPACE-ADVANCE-TAB-STOP-073000-f1x.md with the two earlier space-as-indent attempts named.",
+   "DejaVuSansMono -> Courier New clears 47_margins on 4 documents and takes 392_statistical_console_output to 42/42 in Google, but regresses 392 (1.61->2.91) and 406 (3.45->4.05) on the LibreOffice ratchet. Reverted; lead and the settling test in FINDINGS/47_margins-DEJAVU-MONO-GOOGLE-SUBSTITUTES-VERDANA-081500-f1x.md. Landed instead: p2w soffice warm-up (corpus pass measured 0 of 213 four runs running, now 212 of 213) and gate.py expected-docs exempt fix.",
+   "180deg patch measured on .docx for the first time: 140 of 213 byte-identical (136 full-conversion + the 4 rotation docs), .txt changes only one-page-rotated-180-degrees, t02_position FAIL->PASS. Not landed: regress.py refuses an unstamped engine change and a full .txt corpus re-measure does not fit this slot. Finding committed 09639d0.",
+   "The 180deg guard, built and measured on all 213 documents (213/213 .docx word/document.xml byte-identical, 212/213 .txt identical, one-page-rotated-180-degrees t02_position FAIL->PASS, t02_position 5->4). It is recorded as 0 moved because 462353f had already landed the identical change with the identical proof at 17:00 while this run was still converting; this run's commit was reset away rather than duplicated in the tree. The run's own landed work is tooling: scope.py now judges the last engine commit when the tree is clean (462353f had made every subsequent commit unlandable), and the refuted pBdr carry-over is cleared from HANDOFF.json[next] after four runs read it.",
+   "cell-border-inset patch measured on all 210 documents, not the nine it was proposed on: 404_sudoku_grid 0.27->0.00 and three others improved, but 24 documents got worse (table-with-no-header-row 0.61->0.86, two-tables-stacked 0.77->1.07) and regress.py refused. The nine-document sample was too small, not wrong. Reverted. Next: subtract the border only where w:sz>=8, one 210-document pass, target 2+ improved / 0 worse. Also landed: two p2w.py bugs that made RANKING.csv unwritable - see FINDINGS/p2w-CORPUS-NEVER-COMPLETED-TWO-TOOL-BUGS-195500-f1x.md",
+   ""
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "53_embedded_faces": {
+  "attempts": 1,
+  "first_seen": 1794543907.188078,
+  "last": 1794543907.1880815,
+  "outcomes": [
+   "error"
+  ],
+  "reason": "",
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "content-missing-nothing-in-its-place": {
+  "attempts": 7,
+  "engine_note": "last_engine corrected 8c14e53 -> 5cd9e33: attempt.py derived the hash while the fix was still uncommitted in the working tree, so it recorded the commit BEFORE the change. 5cd9e33 is the commit that touched app/.../engine/ and is exactly the tree the 213-document ratchet measured (212 compared, 0 regressions, 1 improvement).",
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-18 19:07",
+    "moved": 22,
+    "outcome": "kept",
+    "reason": "per-row separator stroke: table interior rules whose weight/colour differs from the table's insideH are emitted as per-cell tcBorders bottom instead of collapsing into one border. salary-slip-factory-",
+    "total": 29
+   }
+  ],
+  "last": null,
+  "last_engine": "2945cb0+0e592953a0",
+  "last_moved": 22,
+  "last_total": 29,
+  "outcomes": [
+   "error",
+   "kept",
+   "kept",
+   "kept",
+   "kept",
+   "reverted",
+   "kept"
+  ],
+  "ratchet_at": "18 Nov 11:49",
+  "ratchet_docs": 213,
+  "reason": "per-row separator stroke: table interior rules whose weight/colour differs from the table's insideH are emitted as per-cell tcBorders bottom instead of collapsing into one border. salary-slip-factory-wages 18.09->0.73, mobile-bill 18.48->1.55, two-tables-stacked 17.20->0.77, marksheet 16.78->0.64, electricity-bill 16.24->1.33. FULL CORPUS 212 measured: 33 better, 179 same, 0 worse.",
+  "reasons": [
+   "CORPUS RATCHET of the 232f622 per-row tcBorders fix, the item HANDOFF.md carried into this run. Full 213-document measurement (213/213 docx, 213/213 measured, 1 MEASURE-ERROR = 416_many_tiny_pages, exempted) then gate.py --ratchet-only: 212 documents compared, 0 regressions, 31 improvements. mobile-bill 18.48->1.55, salary-slip-factory-wages 18.09->0.73, two-tables-stacked-with-no-gap 17.20->0.77, marksheet-university-consolidated 16.78->0.64, electricity-bill 16.24->1.33, insurance-policy-schedule 13.29->0.53, table-inside-two-column-page 42.0->40.05. The fix is now vouched for at corpus scale.",
+   "corpus ratchet committed: benchmarks/RANKING.csv + STATE.json at 10:37, 212 documents compared, 31 improvements, 0 regressions (salary-slip-factory-wages 18.09 -> 0.73, mobile-bill 18.48 -> 1.55). The 232f622 fix had been measured and never put on disk; the measurement itself could not complete until soffice stopped being waited on by pid.",
+   "DeviceGray alpha: pdfbox-android packs a grey sample into all four ARGB lanes (g<<24|g<<16|g<<8|g) so alpha = luminance and every dark pixel of a grey picture is transparent. 415_inline_images drew a correct 120 pt square containing nothing (89.04 share@5px, text_recall 100.0, chars_missing 0). PdfToWord.declaresTransparency() asks the PDF's own dictionary (/SMask, /Mask, SMaskInData, stencil) and forceOpaque() rewrites only the alpha byte when nothing is declared. Full 213-document ratchet: 212 compared, 0 regressions, 1 improvement (415_inline_images 89.04 -> 0.00, now 'clean'). Corpus scan says the blast radius is one document: 415 is the only document of 213 with an inline image and there are zero DeviceGray XObject images - so this is partial (1 of 30), not kept, and the class stays OPEN.",
+   "Table bottom rule: the last row's rule is drawn below its box and charged to nothing, so every table hands the flow below it +0.5 pt and the page becomes a ladder of +0.5 steps per emitted w:tbl (mobile-bill, salary-slip-factory-wages, electricity-bill all measured at rungs -0.02/+0.48/+0.98/+1.48; every border nil returns them to -0.02; w:sz 16 gives steps of exactly 2.00 pt). Built the one-term fix (bottomRulePt added to rowBottomPt and to the flowTw charge), rebuilt, screened 5 documents: mobile-bill 18.48 -> 18.12, electricity-bill 16.24 -> 15.87, salary-slip 18.09 -> 17.85, marksheet 16.78 -> 16.58, two-tables 17.20 -> 17.19 - all FIVE improved and NONE worse, but by 0.01-0.37 share@5px, under the 0.5 the screen counts as moved. share@1px tells the real story (mobile-bill 47.66 -> 37.56): the rung IS gone, and the residual that remains (median 1.44 -> 2.40 pt) is a different, larger defect. REVERTED rather than shipped: a change that moves no document over the line cannot be kept by the ratchet and would spend 45 minutes proving nothing.",
+   "per-row separator stroke: table interior rules whose weight/colour differs from the table's insideH are emitted as per-cell tcBorders bottom instead of collapsing into one border. salary-slip-factory-wages 18.09->0.73, mobile-bill 18.48->1.55, two-tables-stacked 17.20->0.77, marksheet 16.78->0.64, electricity-bill 16.24->1.33. FULL CORPUS 212 measured: 33 better, 179 same, 0 worse."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "content-missing-partly-replaced": {
+  "attempts": 18,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-18 17:00",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "MEASURED AND REVERTED: the run-size-from-sizePt patch (the one SETTLED called 'the best single change available' after it took 360_restaurant_menu 34.43 -> 1.31) does NOT reproduce on the current engi",
+    "total": 16
+   }
+  ],
+  "last": null,
+  "last_engine": "7a95b1c",
+  "last_moved": 0,
+  "last_total": 16,
+  "outcomes": [
+   "reverted",
+   "error",
+   "error",
+   "error",
+   "error",
+   "error",
+   "partial",
+   "reverted",
+   "error",
+   "partial",
+   "partial",
+   "reverted",
+   "reverted",
+   "reverted",
+   "reverted",
+   "partial",
+   "kept",
+   "reverted"
+  ],
+  "ratchet_at": "17 Nov 19:35",
+  "ratchet_docs": 3,
+  "reason": "MEASURED AND REVERTED: the run-size-from-sizePt patch (the one SETTLED called 'the best single change available' after it took 360_restaurant_menu 34.43 -> 1.31) does NOT reproduce on the current engine 7a95b1c. Applied clean, built, screened 4 documents (360_restaurant_menu, 392_statistical_console_output, itr-computation-with-slab-table, 320_balance_sheet_statutory): SCREEN FAIL - 360_restaurant_menu 34.43 -> 34.43 (0.00, the 96% gain does not exist here), 392_statistical_console_output 1.61 -> 13.94 (+12.33, reproduces exactly as recorded), itr and 320 unchanged. So the patch's one real win was a property of the engine state it was measured on, not of the patch: on this engine it is pure loss. Reverted; engine back to 7a95b1c.",
+  "reasons": [
+   "no fix measured. Localised the 9->10 page spill on 041122 with two subagent findings and my own measurement (share5 98.65, pages 10/9, worst_page 9, text_recall 99.68 at HEAD): page 7 is one 24-row table, shaveToFit cannot reach it, and four candidate repairs were each measured to leave the page count at 10. B proved the wrap follows width, not anchor, so the width is ours. Three paths closed, no engine change made - a spill repair needs a content-height reduction and a full ratchet that this slot did not have time for.",
+   "041122 p7: welded heading (inset 9452 twips in a 10636 cell) wrapped to 27 lines x 10pt in a 59pt slot, row declared 84.1pt laid out 270pt, table 186pt taller than the paper -> 9 pages in, 10 out. Per-line paragraphs: p7 share5 73.99 -> 0.00, pages 10 -> 9, every page's line count now equals the source's.",
+   "RETRACTED, and the retraction is the finding. I reported 'p7 share5 73.99 -> 0.00, pages 10 -> 9' from a render of /scratch/work/repro/v2. That directory also held a copy of the SOURCE pdf under the same basename, and my new soffice_pdf() polled for the output path, saw that file, saw its size settle, killed the process and returned it. The 'fixed' render was the source document read as the render: 9 pages, every page's line count equal to the source's, share5 0.00. The engine change itself is a no-op on this document - the .docx it writes is byte-identical to the one before it (all zip entries md5-equal) and still renders to 10 pages on three consecutive renders. Cause not fixed. Instrument fixed twice: soffice_pdf() clears the output paths and requires mtime >= launch, and conv()/prerender() key the render cache by the docx's size+mtime instead of its name (a cache that outlived the engine scored 041122 against a 10:07 render).",
+   "three root causes in the table-cell paragraph path; 041122 98.65->97.62 and median_pt 477.6->138.24; corpus 208 unchanged, 2 improved, 2 small regressions",
+   "MEASURED the 041122 page spill, and it is not a paragraph property. Rendered-row heights vs declared trHeight on table 17 (24 rows, sum 16649tw=832pt): row1 23.2/23.15 ok, row2 93.1/84.1 (+9), rows3-15 ok, row16-18 ok, row19 37.6/29.15 (+8.5), row20 61.7/41 (+20.7), row21-22 ok, row23 340.4/231.5 (+109) -> spills to our p9, row24 41.6/41.35 ok. The growing rows grow by WHOLE LINES, not by w:before or w:line: row23 has 20 source lines and renders 26, each 'before' is 0-4pt and line is exact 240tw=12pt, exactly the source's 12pt pitch. Cause is a WRAP: the reference renderer has no Effra, substitutes Noto Sans, and 'Verification' at 10pt measures 61.24pt against Effra's 52.40pt (+16.9%), while the cell leaves only 2.5pt of slack (source line ends x=568.8, cell edge 571.9 = 0.5%). Every full-width source line therefore wraps its tail. Ruled out: w:before/w:after (sum 24pt, not 109), w:line exact (12pt = source pitch), cantSplit (present but only moves an already-taller row), the pieces index and the sizePt bug (both fixed, re-verified: row1's six heading lines carry 9452/4255/4705/3830/107/2079 and render at declared height). Also measured: our p7 blank page is NOT table 17 - it is page 6's page furniture (blue heading bar + footer rule + page number at y=-7.5) whose anchor paragraphs were pushed off page 6. No engine change yet this attempt.",
+   "Carry-over premise DISPROVED by measurement, not a code change. (1) The source's own pitch in the verification cell of 041122 p7 is exactly 12.00 pt: PyMuPDF baselines 579.61,591.61,603.61,615.61 -> deltas 12.00,12.00,12.00, and the 240 tw w:line we already write IS that pitch. The row's 4630 tw is not '20 lines x 11.6': it is 16 lines at 240 tw + 5 paragraph gaps (w:before sums 562 tw) = 4642 tw written against 4630 declared, i.e. 0.6 pt, exact. Changing the cell box to 231.5/20=11.575 pt would make every line 0.425 pt too tight and the block 6.4 pt short. (2) The rendered overflow is NOT the line box: each of the 16 source lines is re-wrapped into 2 by the reader, so r23 renders 26 lines x 12 pt = 312 pt against 231.5 declared (+80.5). (3) The cause is the face: the PDF names Effra, the reader substitutes NotoSans-Regular, and that string is 10.5 pct wider (source line 'above is true...' 526.5 pt; ours needs ~582 in a 531.8 tw cell with 3.9 pt of slack). RULED OUT this run: w:noWrap on the cell (added to tcPr of the 20-line row, re-rendered: identical 12 pages, identical wraps - LibreOffice ignores it for line breaking); cell pitch (measured exact); trHeight/hRule (atLeast, and content = 4642 vs 4630). The remaining lever is face fidelity (embed the PDF subset, or condense), which is a multi-run change and not a one-line pitch edit.",
+   "The page's own advance widths are now carried in a face the reader has. DocxWriter writes a run in Arial (which LibreOffice supplies as Liberation Sans, metric-identical) with w:w set to the scale that reproduces the width the page drew, whenever the PDF's face is not one the reader is guaranteed to have. Measured on 041122: 12 -> 11 pages; source page 6's folio stays on page 6 (it was at y=-7.5 on a sheet of its own), source page 7's table now fits at 795.2 pt against the page's own 800.4 (it was splitting across two sheets). The twin Account_Opening_Form_Fillable_filled is 11 pages by the same structure. Ruled out by measurement this run: the carry-over's pitch premise (source baselines are 12.00 pt exactly, the 240 tw w:line is right, the 4630 tw row is 16 lines + 562 tw of gaps), an embedded font part (LibreOffice ignores it: 12 pages, NotoSans, identical geometry), w:fitText (ignored), and w:noWrap (ignored for line breaking). Guard: the mechanism is a no-op for any face in the allowlist (Arial/Helvetica/Liberation/DejaVu/Noto/Times/Courier/Calibri/Cambria/Georgia/Verdana/Tahoma/Symbol/Webdings), with PDF subset tags stripped, so the 211-document synthetic corpus - all DejaVu - cannot be touched by construction. NOT YET DONE: gate.py --budget 250 over the whole corpus, so this is not a committed ratchet yet; and the last spurious page on 041122 is the page-7 folio, which the model emits as a TABLE CELL (TableText paragraph), not a flow line - the folio rule added this run only reaches flow lines.",
+   "A page's folio is not a row of the table the page's rules bound. On 041122 page 7 the ruled pass hands the folio '7' back as the table's LAST row (the row between the content rule at y=800.4 and the page's foot frame; its only text is the sheet number). Written as a row it is charged its whole band (827 tw, 41.4 pt) on a page whose content already ends at 800.4 of 842, so the renderer breaks the sheet and the folio costs a page of its own. DocxWriter.table() now detects a trailing row that is only a folio with its baseline in the page's bottom band (>0.88 page height) and emits it as an anchored line at its own x/y (the treatment the flow folio rule already gives), with the table ending at the row edge the page's content ends on. 041122: 11 pages -> 10, source 9. Proof of no regression: all 213 documents re-converted with the patched engine and compared entry-by-entry inside the .docx - 212 of 213 are byte-identical in every zip entry, so their renders and scores are unchanged; only 041122 differs. Doc share5 97.62 -> 86.25 (worst page 7 -> 9), text_recall unchanged. Remaining extra page is the instruction page's 17-line spill (our p9), untouched by this patch.",
+   "narrow cantSplit rule (rowTop+rowHeight <= pageHeight, both row writers) implemented, counted and measured: 210 of 213 docx byte-identical in every zip entry, the 3 that change (041122, the filled form, itr) score identical to the digit and keep their page count; census shows the only rows refused the promise are 3 folio-band rows at top=805 on p2, while the row that costs 041122 its page (atLeast, top=689, written 111pt, real ~250pt) keeps it and is moved whole to p9. Reverted - nothing moved. The page needs the row's real height, not the promise.",
+   "wrap charge at corpus scale: 47/213 .docx change (22%), 0 of 46 measured changed documents improve and 40 get worse (mean share@5px loss 10.66 -> 32.63); 041122 unmoved at 99.02/11 pages. Cause: the charge measures against w:tblGrid, which does not describe the layout on 41_coloured_headings_white_bg (6 grid cols over 2 cells -> 28.5 pt column for 30.6 pt text, every row 360->500 tw). Engine reverted to HEAD; finding in FINDINGS/wrap-charge-corpus-diff.md",
+   "wrap charge v2, metric allowance named (avail x1.08) + grid guards: 32/213 .docx change (15%), 41_coloured_headings back at 360 tw and 041122 moves 6 rows (+12.2 pt max), but 0 of 32 measured improve, 28 worse, 4 flat (mean share@5px loss 13.85 -> 30.36). A charge on rows the renderer already lays out correctly cannot win; next is the differential rule (wrapLines - linesPageDrew). Engine reverted to HEAD",
+   "wrap charge v3 (differential: charge only lines beyond the page's own row height, 8% metric allowance): 24/213 .docx change (11%), 41_coloured untouched, 041122 moves 7 rows (+24.9 pt max) - best calibration of three builds - but 0 of 23 measured improve, 18 worse, 5 flat (mean share@5px loss 16.08 -> 31.52). Three builds, 124 measurements: raising ruled-table rows is not a corpus-wide lever; the page must be re-flowed, not lengthened. Engine reverted to HEAD",
+   "The carry (ARIAL_W character scale) never bound on a SPANNING table cell: DocxWriter passed colTw[c] - the first grid column under the cell - as the width carryScalePct clamps to, and a clamp of zero or less is skipped, so every merged cell went out at the page's drawn ratio unclamped. 041122's instruction cell is merged over 6 columns (11000 tw), was told 360 tw, emitted w:w 95-97 and the renderer wrapped four of the page's nine lines into two, growing the row past the 158 pt the page had left. One-token change (spanTw - pInset, the cell's real width). Corpus diff: 3 of 213 .docx change, all three form documents with merged cells; 210 byte-identical. Measured on the 3 changed: 373_leave_application_form 5.46 -> 4.64 (improved), 041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled both 11 -> 10 pages with share5 unchanged at 99.02 because the last extra page is a folio written as a TABLE ROW (table 17's last row is the bare '7'), which still shifts every page after it. Kept: the scale is now the cell's own width and 89-92 % is the value the renderer needs.",
+   "RATCHET, and here is exactly what was ratcheted so the number can be checked rather than trusted: the change (carryScalePct's ceiling now takes the spanning cell's width, spanTw - pInset, instead of the first grid column's) was converted over all 213 corpus documents and diffed against HEAD entry by entry. 210 of 213 .docx are BYTE-IDENTICAL in every zip entry and therefore cannot render differently, so there is nothing in them to measure. The 3 that differ were all 3 measured, both engines, same JDK, DPI 150: 373_leave_application_form 5.46 -> 4.64 share@5 (improved); 041122-Account_Opening_Form 11 -> 10 pages, share@5 99.02 both; Account_Opening_Form_Fillable_filled 11 -> 10 pages, share@5 99.02 both. 0 of 3 worse. The 3/3 here is 'every document the change can touch', not a quarter of the class - the class metric does not move until the folio row (a table row holding a bare page number, which costs its own sheet and shifts every page after it) is anchored instead of flowed; that is written up as UNTESTED in HYPOTHESES.md and in FINDINGS/carry-ceiling-span-1900.md. The change is kept because it is measured on everything it reaches and regresses nothing.",
+   "MEASURED AND REVERTED: the run-size-from-sizePt patch (the one SETTLED called 'the best single change available' after it took 360_restaurant_menu 34.43 -> 1.31) does NOT reproduce on the current engine 7a95b1c. Applied clean, built, screened 4 documents (360_restaurant_menu, 392_statistical_console_output, itr-computation-with-slab-table, 320_balance_sheet_statutory): SCREEN FAIL - 360_restaurant_menu 34.43 -> 34.43 (0.00, the 96% gain does not exist here), 392_statistical_console_output 1.61 -> 13.94 (+12.33, reproduces exactly as recorded), itr and 320 unchanged. So the patch's one real win was a property of the engine state it was measured on, not of the patch: on this engine it is pure loss. Reverted; engine back to 7a95b1c."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "content-partly-lost": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-19 16:58",
+    "moved": 5,
+    "outcome": "partial",
+    "reason": "justified lines emitted left-aligned: model carries the measured shortfall (Box.stretchPt/Line.stretchPt), writer emits w:spacing in flowFromBox and lineParagraph. SCREEN PASS 5 of 10 better, 0 worse ",
+    "total": 10
+   }
+  ],
+  "last": null,
+  "last_engine": "57a0507",
+  "last_moved": 5,
+  "last_total": 10,
+  "outcomes": [
+   "partial"
+  ],
+  "reason": "justified lines emitted left-aligned: model carries the measured shortfall (Box.stretchPt/Line.stretchPt), writer emits w:spacing in flowFromBox and lineParagraph. SCREEN PASS 5 of 10 better, 0 worse (policy 5.37->1.76, academic 8.09->5.02, magazine 3.49->1.45, 304 3.41->2.47, landscape 1.45->0.62). The corpus ratchet was NOT run - 46 of 213 measured in three calls when the run ended - so this is not a kept fix. The change is patches/PATCH-justified-lines-spacing.patch, unapplied and verified to apply cleanly.",
+  "reasons": [
+   "justified lines emitted left-aligned: model carries the measured shortfall (Box.stretchPt/Line.stretchPt), writer emits w:spacing in flowFromBox and lineParagraph. SCREEN PASS 5 of 10 better, 0 worse (policy 5.37->1.76, academic 8.09->5.02, magazine 3.49->1.45, 304 3.41->2.47, landscape 1.45->0.62). The corpus ratchet was NOT run - 46 of 213 measured in three calls when the run ended - so this is not a kept fix. The change is patches/PATCH-justified-lines-spacing.patch, unapplied and verified to apply cleanly."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "content-partly-lost-and-displaced": {
+  "attempts": 7,
+  "engine_note": "last_engine corrected 7dff436 -> 7dff436+a2261d7b2d: attempt.py records `git log -1 -- engine/`, which is the COMMIT and cannot see the working tree, while round.py's release guard computes commit+worktree. The change was measured uncommitted (screen + the 210-document ratchet), so the hash that names the measured tree is the worktree one.",
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-18 14:51",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "Rows below the paper edge are clipped, not reproduced. itr-computation-with-slab-table draws 3 rules past its 841.9 pt sheet; the engine charged them to the flow (model need=18160 twips vs budget=1683",
+    "total": 7
+   },
+   {
+    "at": "2026-11-18 15:28",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "CORPUS RATCHET over 210 of 213 documents (416_many_tiny_pages, 300 pages, not finished; 77_arabic_rtl_document and 79_inr_indian_digit_grouping_table failed to render this pass): 1 better (itr-computa",
+    "total": 210
+   },
+   {
+    "at": "2026-11-18 16:11",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "TWO IDEAS MEASURED AND BOTH REVERTED. (1) the handoff's anchor rule in the afterTable branch: it never fires on this document - the footer is a ROW of table 3, not a flow line after it (TBLDBG: the ta",
+    "total": 7
+   },
+   {
+    "at": "2026-11-18 16:23",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "THIRD IDEA, ALSO MEASURED AND REVERTED: the cell baseline. cellBeforeTw's fallback is LINE_BASE*(rowLineTw - cellBoxTw) and treats rowLineTw (the cell's LINE, capped at 200 twips) as if it were the ro",
+    "total": 7
+   },
+   {
+    "at": "2026-11-20 07:13",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "attempt 14: a nested table inside a layout cell no longer leaves the cell's afterTablePt pointing at the layout row's top - it is cleared so the first paragraph after the nested table is placed from f",
+    "total": 6
+   },
+   {
+    "at": "2026-11-20 07:59",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "ratchet stamp for attempt 14 (the nested-table cell anchor): 212 of 213 documents re-measured on the new engine (416_many_tiny_pages EXEMPT, carried at its previous value), 1 better, 211 same, 0 worse",
+    "total": 6
+   },
+   {
+    "at": "2026-11-20 08:00",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "ratchet stamp re-pointed after the push rebase: the same measured change, engine commit ea9dfd7. 212 of 213 documents measured (416_many_tiny_pages carried), 1 better, 211 same, 0 worse; regress.py --",
+    "total": 6
+   }
+  ],
+  "last": null,
+  "last_engine": "ea9dfd7",
+  "last_moved": 1,
+  "last_total": 6,
+  "outcomes": [
+   "partial",
+   "kept",
+   "reverted",
+   "reverted",
+   "partial",
+   "kept",
+   "kept"
+  ],
+  "ratchet_at": "20 Nov 08:00",
+  "ratchet_docs": 212,
+  "reason": "ratchet stamp re-pointed after the push rebase: the same measured change, engine commit ea9dfd7. 212 of 213 documents measured (416_many_tiny_pages carried), 1 better, 211 same, 0 worse; regress.py --check PASS on docx and txt; Google result for table-inside-two-column-page identical to the pre-change one (42/47, same five fails).",
+  "reasons": [
+   "Rows below the paper edge are clipped, not reproduced. itr-computation-with-slab-table draws 3 rules past its 841.9 pt sheet; the engine charged them to the flow (model need=18160 twips vs budget=16836), the fitter answered with a global squeeze f=0.875, and the squeeze came off every gap including the top of the page (w:before 1057->392, page 33.6 pt high). DocxWriter.table(): keepRows drops rows whose top edge is below the paper, rowCapTw cuts the straddling row at the edge. 68.82->50.80 share5, median 9.60->4.80, p90 36.96->16.32; other 6 unchanged, 0 worse. No corpus pass: gated -Dp2w.clipDbg census over all 213 conversions says the branch fires on exactly 1 document, and word/document.xml is byte-identical old vs new engine on an 11-document sample (10 SAME, 1 DIFF = the target).",
+   "CORPUS RATCHET over 210 of 213 documents (416_many_tiny_pages, 300 pages, not finished; 77_arabic_rtl_document and 79_inr_indian_digit_grouping_table failed to render this pass): 1 better (itr-computation-with-slab-table 68.82 -> 50.80), 0 worse, 209 unchanged, compared against benchmarks/RANKING.csv. The change: DocxWriter.table() clips table rows whose top edge is below the paper (keepRows) and cuts the straddling row at the edge (rowCapTw). The PDF drew three rules past its own 841.9 pt sheet; the engine charged them to the flow (need=18160 twips vs budget=16836) and the fitter answered with a global squeeze f=0.875 that took 33.6 pt off the page's top gap (w:before 1057 -> 392 twips). Class screen: 7 measured, 1 better, 6 same, 0 worse.",
+   "TWO IDEAS MEASURED AND BOTH REVERTED. (1) the handoff's anchor rule in the afterTable branch: it never fires on this document - the footer is a ROW of table 3, not a flow line after it (TBLDBG: the table is charged 145.4 pt for a 140.9 pt band and the page's own needTw is 17278 against 16836), so the branch is dead code here and was reverted rather than committed. (2) capping the clipped table's charge at the page budget (killing the f=0.974 squeeze): needTw 17278 -> 16836, squeeze 0.974 -> 0.994, and the document went 50.80 -> 70.85. LESS SQUEEZE IS WORSE, so the handoff's premise - that the residual 50.80 is the squeeze - is refuted by measurement: the squeeze is compensating for a page that really is too tall, not inventing the overrun. Reverted; engine back to 1ba86d7 and re-screened at 50.80 (1 same).",
+   "THIRD IDEA, ALSO MEASURED AND REVERTED: the cell baseline. cellBeforeTw's fallback is LINE_BASE*(rowLineTw - cellBoxTw) and treats rowLineTw (the cell's LINE, capped at 200 twips) as if it were the row's pitch. On itr-computation-with-slab-table table 1 the pitch is 13.5 pt and rowLineTw 9.5 pt, so every cell was written 7.6 pt into its row where the page draws it 12.6 pt in - a flat 5.2 pt lift on 100+ cells. Change: where the row is more than 1.3x its own line and the cell was NOT placed from a measured baseline, use the row's pitch as the foot. Built, screened on 4 table documents (itr-computation-with-slab-table, 320_balance_sheet_statutory, 404_sudoku_grid, 42_table_coloured_header_alternating_rows): SCREEN FAIL, 4 measured, 0 better, 0 worse; measured directly on the target it is 50.80 -> 51.18 (share1 92.18 -> 69.91 and invent5 62.48 -> 40.41 improve a lot, but median 4.80 -> 5.28 and share5 up). Not kept - a change that does not move the score is not a change, and it touches every table on the corpus. Reverted; engine back to 1ba86d7.",
+   "attempt 14: a nested table inside a layout cell no longer leaves the cell's afterTablePt pointing at the layout row's top - it is cleared so the first paragraph after the nested table is placed from flowY (the row bottom + carrier). table-inside-two-column-page 38.11 -> 35.87 (share10 29.13 -> 9.70, max_pt 82.08 -> 21.60, p90 64.32 -> 6.24): the caption under the metrics table carried w:before=2600tw where the page drew 4.2pt and sat 115.4pt low; 1 of 6 moved, 0 worse. Corpus ratchet still to run.",
+   "ratchet stamp for attempt 14 (the nested-table cell anchor): 212 of 213 documents re-measured on the new engine (416_many_tiny_pages EXEMPT, carried at its previous value), 1 better, 211 same, 0 worse; regress.py --check PASS on docx and txt; Google result for table-inside-two-column-page identical to the pre-change one (42/47, same five fails).",
+   "ratchet stamp re-pointed after the push rebase: the same measured change, engine commit ea9dfd7. 212 of 213 documents measured (416_many_tiny_pages carried), 1 better, 211 same, 0 worse; regress.py --check PASS on docx and txt; Google result for table-inside-two-column-page identical to the pre-change one (42/47, same five fails)."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "content-present-partly-displaced": {
+  "attempts": 15,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-19 18:40",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them",
+    "total": 18
+   },
+   {
+    "at": "2026-11-19 22:30",
+    "moved": 13,
+    "outcome": "kept",
+    "reason": "recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down th",
+    "total": 18
+   },
+   {
+    "at": "2026-11-19 22:59",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "SUPERSEDED, nothing landed. rowTables is gated out on this page by rowGapOk's floor max(size*2.4,16) - every 18.4 pt row pair was rejected, so bank-statement fell back to flow. patches/rowgapok-run-pi",
+    "total": 24
+   },
+   {
+    "at": "2026-11-19 23:00",
+    "moved": 13,
+    "outcome": "kept",
+    "reason": "ratchet stamp for the 22:30 kept attempt (recordBaseline split-row fix, 13/18 moved): d129d46 measured the whole corpus on engine 13518ff - STATE.json ratchet compared, baseline 213, current 213, 0 re",
+    "total": 18
+   },
+   {
+    "at": "2026-11-19 23:56",
+    "moved": 0,
+    "outcome": "error",
+    "reason": "IN PROGRESS - 75_merged_header_cell_three_columns: emit w:vMerge from spanR + bucket glyphs by their own baseline band instead of the cell top edge (PdfToWord:7846); baseline 27.31 reproduced on this ",
+    "total": 18
+   },
+   {
+    "at": "2026-11-20 00:24",
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "w:vMerge emitted from spanR (DocxWriter) + spanR recorded only on the row a rectangle starts (PdfToWord) + a rectangle spanning rows is a merge only when its text occupies fewer bands than the rows it",
+    "total": 18
+   },
+   {
+    "at": "2026-11-20 02:25",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one. 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 10",
+    "total": 23
+   },
+   {
+    "at": "2026-11-20 03:40",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one (the 'break' at PdfToWord:8666). 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_",
+    "total": 23
+   },
+   {
+    "at": "2026-11-20 04:03",
+    "moved": 0,
+    "outcome": "error",
+    "reason": "no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs (",
+    "total": 23
+   },
+   {
+    "at": "2026-11-20 05:11",
+    "moved": 2,
+    "outcome": "partial",
+    "reason": "flushShapes writes a page's shapes in TOP ORDER among its blocks (DocxWriter.pageXml) and ruleAsBorder turns a horizontal hairline the flow has reached into w:pBdr with a real w:before gap, ctx.flowY=",
+    "total": 23
+   },
+   {
+    "at": "2026-11-20 05:17",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "REVERTS attempt 10. attempt 10 was recorded 'partial 2/23' from the LibreOffice screen before the Google check existed; the Google check then decided against it. flushShapes (top-ordered shape emit in",
+    "total": 23
+   },
+   {
+    "at": "2026-11-20 05:53",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "attempt 12: rules flush-by-top re-applied + ctx.flowY residual test (flowY left at s.topPt vs carrier-bottom) on 18_centred",
+    "total": 23
+   },
+   {
+    "at": "2026-11-20 06:20",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "attempt 13: rule as the FOLLOWING paragraph's w:top border, found by a pre-pass, no reordering, no extra paragraph - flow-neutral, measures exactly baseline on 8/8 documents (18_centred 0.00, bank-sta",
+    "total": 23
+   },
+   {
+    "at": "2026-11-20 09:22",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "relaxed the rule-border guard twice and wrote the paragraph indents from the rule so a border lands exactly on it: 3 of 39 rules on bank-statement-horizontal-rules-only now become w:pBdr, but 36 never",
+    "total": 23
+   },
+   {
+    "at": "2026-11-22 12:06",
+    "moved": 1,
+    "outcome": "lead",
+    "reason": "18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 cl",
+    "total": 16
+   }
+  ],
+  "last": null,
+  "last_engine": "462353f9",
+  "last_moved": 1,
+  "last_total": 16,
+  "outcomes": [
+   "reverted",
+   "kept",
+   "reverted",
+   "kept",
+   "error",
+   "kept",
+   "kept",
+   "kept",
+   "error",
+   "partial",
+   "reverted",
+   "reverted",
+   "reverted",
+   "reverted",
+   "lead"
+  ],
+  "ratchet_at": "20 Nov 03:40",
+  "ratchet_docs": 213,
+  "reason": "18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 claim does not reproduce. Corpus ratchet still not run.",
+  "reasons": [
+   "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing.",
+   "recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down the page (bank-statement 0.4554 pt x 12 rows = +5.85 pt). Whole corpus 13 improved, 0 worse. Also published the table this engine actually produces - ten rows were stale and had blocked every fixer run since 11:55.",
+   "SUPERSEDED, nothing landed. rowTables is gated out on this page by rowGapOk's floor max(size*2.4,16) - every 18.4 pt row pair was rejected, so bank-statement fell back to flow. patches/rowgapok-run-pitch.patch (widened to the run's own pitch) measured 6.89 -> 0.14 on 3abfa85 and 6 other class docs unchanged. While this run measured, 13518ff landed the same defect from the other end (the split-row before/flowY drift) and that document is now clean at 0.10 on main, so the patch is unproven on the current engine and must be re-screened from zero if anyone wants the table. Numbers in FINDINGS/content-present-partly-displaced-rowgapok-225500-fixer.md.",
+   "ratchet stamp for the 22:30 kept attempt (recordBaseline split-row fix, 13/18 moved): d129d46 measured the whole corpus on engine 13518ff - STATE.json ratchet compared, baseline 213, current 213, 0 regressions, 13 improvements, RANKING.csv 213 rows 213 scored. It was never stamped, so pending.py held the class for a ratchet that had already run.",
+   "IN PROGRESS - 75_merged_header_cell_three_columns: emit w:vMerge from spanR + bucket glyphs by their own baseline band instead of the cell top edge (PdfToWord:7846); baseline 27.31 reproduced on this engine",
+   "w:vMerge emitted from spanR (DocxWriter) + spanR recorded only on the row a rectangle starts (PdfToWord) + a rectangle spanning rows is a merge only when its text occupies fewer bands than the rows it covers, else each line goes to its own band and the cell's width is written there. 75_merged_header_cell_three_columns 27.31->7.62 (Google 39/47->41/47), table-with-merged-cells 4.93->0.67 (Google 42/47->43/47, 65_table_span_down now passes). 4 of 213 docx changed, 2 bank forms unchanged in score, 209 identical by content hash. regress.py --check PASS.",
+   "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one. 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 100.0. Screen PASS: 23 measured, 22 same, 1 better, 0 worse. Corpus ratchet pending.",
+   "recutColumnBands: the column row's top edge is the MINIMUM over the columns, not the first non-empty one (the 'break' at PdfToWord:8666). 64_newspaper_uneven_columns_ad_boxes share5 9.11 -> 3.46, max_pt 11.04 -> 6.72, text_recall 100.0. Corpus ratchet: 212/212 measured, 1 better, 0 worse; .txt 213 unchanged. Gate PASS.",
+   "no fix was built or measured, on purpose: the pBdr rule change cannot work until a rule is written before the text below it. PdfToWord.attachShapes appends shapes to page.blocks AFTER the paragraphs (PdfToWord.java:7122) and pageXml writes page.blocks in list order (DocxWriter.java:1324), so ctx.flowY is at the foot of the page when every rule is emitted and w:before can never place a border at the rule's y. That is the cause of the 19 Nov 'both borders at the foot (807/808)' number, computed here from the emitted spacing of the same document (flow 805.9 vs rules at 110.0 and 793.89). Without a guard pBdr is a LibreOffice regression, since the drawing path pins the rule absolutely and LibreOffice fails 32_stroke_lines on zero documents. Written up in FINDINGS/content-present-partly-displaced-rules-cannot-flow-044000-f1x.md with the flush-shapes-by-top change that makes it possible.",
+   "flushShapes writes a page's shapes in TOP ORDER among its blocks (DocxWriter.pageXml) and ruleAsBorder turns a horizontal hairline the flow has reached into w:pBdr with a real w:before gap, ctx.flowY=s.topPt, and a guard that declines when the rule is behind the flow. On 18_centred_heading_left_body_txtpos the emitted XML now carries 2 pBdr and 0 drawings, landing at 110.0 and 793.89 pt - the page's own ys - where the previous engine put both at 807/808. LibreOffice screen (3 of 23): 304 3.41->2.47, 315 1.96->1.91, 27 unchanged; nothing worse. Google check is the deciding evidence and was not complete when this was recorded.",
+   "REVERTS attempt 10. attempt 10 was recorded 'partial 2/23' from the LibreOffice screen before the Google check existed; the Google check then decided against it. flushShapes (top-ordered shape emit in pageXml) + ruleAsBorder (w:pBdr with w:before and ctx.flowY=s.topPt) turned both rules on 18_centred_heading_left_body_txtpos into borders at the page's own ys (110.0 and 793.89, 2 pBdr / 0 drawings) and flipped 32_stroke_lines FAIL->PASS in Google, but made 18_displacement fail where it had passed, in BOTH renderers: LibreOffice 42/42 -> 41/42 on a document that was clean. Reverted. The exact diff is FINDINGS/rules-flush-by-top-WORKS-DISPLACES-055000-f1x.patch and the numbers are in the matching .md. Second blocker: 315_gazette_notification takes columnPage(), which returns before the emit loop, so no multi-column document can be reached by a pageXml-only fix - it measured pBdr 0 / drawings 5 and unchanged 40/42 in Google.",
+   "attempt 12: rules flush-by-top re-applied + ctx.flowY residual test (flowY left at s.topPt vs carrier-bottom) on 18_centred",
+   "attempt 13: rule as the FOLLOWING paragraph's w:top border, found by a pre-pass, no reordering, no extra paragraph - flow-neutral, measures exactly baseline on 8/8 documents (18_centred 0.00, bank-statement 0.10, gst-invoice 0.38, mobile-bill 1.55) but places pBdr=0 on all of them; where a border IS placed 18_centred goes 0.00->0.53 because regress.py scores share@5 in LibreOffice, where the drawing is already exact. Patch kept in FINDINGS/rules-top-border-FLOW-NEUTRAL-065000-f1x.patch",
+   "relaxed the rule-border guard twice and wrote the paragraph indents from the rule so a border lands exactly on it: 3 of 39 rules on bank-statement-horizontal-rules-only now become w:pBdr, but 36 never reach the paragraph path at all because they belong to table rows; screen 23 of 23, 0 better, 8 worse, so reverted - the hook, not the guard, is the ceiling",
+   "18-spacer bundle: 68_journal 41/42 -> 42/42 in Google (live round trip). Blast radius on clean docs measured at 1 of 23, not 13. mobile-bill identical 31/42 with and without the patch, so the 11:27 claim does not reproduce. Corpus ratchet still not run."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "single-element-far-out": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-18 08:14",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "flowY was not advanced to the layout table's bottom edge after columnPage, so the block after the columns was given a spacer equal to the whole stale gap; the stats band landed on the running footer. ",
+    "total": 1
+   }
+  ],
+  "last": null,
+  "last_engine": "67e14a6",
+  "last_moved": 1,
+  "last_total": 1,
+  "outcomes": [
+   "partial"
+  ],
+  "reason": "flowY was not advanced to the layout table's bottom edge after columnPage, so the block after the columns was given a spacer equal to the whole stale gap; the stats band landed on the running footer. newsletter-3col-header-footer share5 3.45->3.13, max_pt 77.28->22.08. Corpus 213: one document moved, none worse.",
+  "reasons": [
+   "flowY was not advanced to the layout table's bottom edge after columnPage, so the block after the columns was given a spacer equal to the whole stale gap; the stats band landed on the running footer. newsletter-3col-header-footer share5 3.45->3.13, max_pt 77.28->22.08. Corpus 213: one document moved, none worse."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "t01_word_accuracy": {
+  "attempts": 19,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-20 20:59",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_sma",
+    "total": 10
+   },
+   {
+    "at": "2026-11-20 21:22",
+    "moved": 3,
+    "outcome": "kept",
+    "reason": "CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words wel",
+    "total": 10
+   },
+   {
+    "at": "2026-11-20 21:46",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0",
+    "total": 10
+   },
+   {
+    "at": "2026-11-20 21:49",
+    "moved": 0,
+    "outcome": "kept",
+    "reason": "CORPUS RATCHET for the control-character fix, not a new idea. All 213 documents were re-converted with this tree's engine and re-scored with the changed verifier (restamp_txt.py --run --force, 213 sco",
+    "total": 10
+   },
+   {
+    "at": "2026-11-20 22:39",
+    "moved": 2,
+    "outcome": "reverted",
+    "reason": "U+FFFD is the /ToUnicode CMap's own destination value (<0124> <FFFD> etc. in REAQAG+Effra-Regular), not a missing or malformed CMap; PdfToWord.processTextPosition trusts it because isJunk() accepts U+",
+    "total": 7
+   },
+   {
+    "at": "2026-11-20 23:16",
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "SOURCE-SIDE HONESTY for a code the font itself cannot name. The two bank forms fail 7 of 10 checks each; 4 of those 7 were the same fault counted four times. pymupdf's /ToUnicode fallback prints the C",
+    "total": 7
+   },
+   {
+    "at": "2026-11-20 23:23",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "SECOND ATTEMPT, measurement only, no code changed. 601_fillable_admission_form loses exactly three tokens - '3', '3' and 'General'. The two '3's are ticked checkboxes: the page's /Resources name only ",
+    "total": 5
+   },
+   {
+    "at": "2026-11-21 00:57",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "claimed (8th attempt). t01_word_accuracy, 5 documents, .txt half. Two bank forms now carry t06/t08/t09 only. Remaining: 38_faux_bold_italic_synthesised, 39_small_caps_letter_spacing, 411_nested_xobjec",
+    "total": 5
+   },
+   {
+    "at": "2026-11-21 01:41",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "SECOND ATTEMPT, measurement only, no engine change. Two subagents on the class. 411_nested_xobject_transforms: the handed diagnosis (matrix disagreement, line off page) is FALSE - both parsers compute",
+    "total": 5
+   },
+   {
+    "at": "2026-11-21 01:47",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "THIRD ATTEMPT, measurement only. 38_faux_bold_italic_synthesised: the page draws each of its two headings THREE times at the identical position (two fill spans + one stroke span, same font, same size,",
+    "total": 5
+   },
+   {
+    "at": "2026-11-21 01:51",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "FOURTH ATTEMPT, read-only census for the next run's engine attempt on 601_fillable_admission_form. Walked every page's /Annots of all 213 PDFs, resolved each /Widget's /AP /N stream and searched for t",
+    "total": 5
+   },
+   {
+    "at": "2026-11-21 04:34",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "widget /AP /N glyph walk: 601 37/42 -> 42/42 docx checks on the same tree; t01 96.4 -> 98.8 (residual is the instrument double-counting 'General'); Account form 21/47 -> 25/47 with two new fails; patc",
+    "total": null
+   },
+   {
+    "at": "2026-11-21 04:34",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "widget /AP /N glyph walk: 601 37/42 -> 42/42 docx checks on the same tree; t01 96.4 -> 98.8 (residual is the instrument double-counting 'General'); Account form 21/47 -> 25/47 with two new fails; patc",
+    "total": 5
+   },
+   {
+    "at": "2026-11-21 10:39",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "Carry-over measured, all three variants, corpus-wide: full widget-AP walk 601 52.39 -> 0.00 share@5px and 38/42 -> 42/42 docx checks, but Account_Opening_Form_Fillable_filled 97.62 -> 98.65 (+1.03) in",
+    "total": 213
+   },
+   {
+    "at": "2026-11-21 11:16",
+    "moved": 0,
+    "outcome": "partial",
+    "reason": "601's last lost word was the reference counting General twice; guard added to glyph_truth (211 docs A/B: 0 newly failing, 1 newly clean on the patched engine). The engine /AP walk that supplies the ot",
+    "total": 5
+   },
+   {
+    "at": "2026-11-21 13:30",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "SIXTEENTH ATTEMPT, measurement only, no code changed. The open question from 23:25 - is the raw-code fallback right, or does it write a ligature as an accented letter - is answered from the rendered p",
+    "total": 6
+   },
+   {
+    "at": "2026-11-21 14:42",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "clip-off: 411_nested_xobject_transforms t01 90.0->100.0, 12_stamp_across_page_break t12 also clean; corpus 186->188, 0 regressions",
+    "total": 5
+   },
+   {
+    "at": "2026-11-21 14:42",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical",
+    "total": 5
+   },
+   {
+    "at": "2026-11-21 14:49",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. ",
+    "total": 3
+   }
+  ],
+  "last": null,
+  "last_engine": "2d44a3a",
+  "last_moved": 0,
+  "last_total": 3,
+  "outcomes": [
+   "reverted",
+   "kept",
+   "reverted",
+   "kept",
+   "reverted",
+   "kept",
+   "reverted",
+   "reverted",
+   "reverted",
+   "reverted",
+   "reverted",
+   "partial",
+   "partial",
+   "reverted",
+   "partial",
+   "reverted",
+   "kept",
+   "kept",
+   "reverted"
+  ],
+  "ratchet_at": "20 Nov 21:49",
+  "ratchet_docs": 4,
+  "reason": "DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. This run did not land it and takes no credit for it - the 411/12_stamp movement belongs to d2ea491. What this run adds is the independent confirmation (a second build, a second harness, 211 documents, same 2 rows, same direction) and the class table that commit left stale: DEFECT-CLASSES-TXT.md still said t01 5 / t12 9 / 25 failing, now 3 / 8 / 24, regenerated from the committed ranking. And two writer changes the agents killed: 39 gs=sizePt->size 97.4->78.8 and 38 dedupe window 40->200 98.0->93.0; the position-aware dedupe that DID clear 38 (2d44a3a) is the version the agent called defensible.",
+  "reasons": [
+   "claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_small_caps_letter_spacing, 406_passport_mrz_page, 411_nested_xobject_transforms, 601_fillable_admission_form, 77_arabic_rtl_document, 79_inr_indian_digit_grouping_table. Check is 'source words all present >= 98%', so the .txt is dropping words the page drew.",
+   "CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words welded to those NULs by r'\\S+', so 'Strongly\\x00agree' and '\\x00\\x00\\x00\\x00PHOTOGRAPH' were single tokens no .txt can ever contain, and t01 charged each one as lost text. _words now splits on control characters instead of treating them as word characters. Measured: 79_inr_indian_digit_grouping_table 91.9 -> 100.0 (9/10 -> 10/10 checks), 391_survey_questionnaire_grid 97.5 -> 100.0 (5/7 -> 7/7), 406_passport_mrz_page 98.5 -> 100.0 (5/7 -> 7/7); all three now PASS every applicable txt check. t12 improved on 391 and 406 for the same reason - a NUL token was counted as an invented word. Scanned all 213 documents with glyph_truth: exactly 6 declare a control character inside a source token, and the other three (balance-sheet-and-profit-loss, 392_statistical_console_output, balance-sheet-two-columns-of-figures) still PASS t01. The change only removes source tokens and adds none, so no document can regress. test_txt_checks.py 8/8.",
+   "SECOND ATTEMPT, both repairs on the source side of verify_txt.py, both restamped over 213 documents. (1) REJECTED: collapse a consecutive trace span whose text and bbox match the previous one within 0.5 pt, so a faux-bold heading drawn three times counts once - 38_faux_bold_italic_synthesised t01 98.0 -> PASS, but its t12 goes PASS -> FAIL with 10 invented words (study, self-compacting, concrete, using, quarry, dust, as, partial, replacement, of), and text-held-twice-shadow-text newly fails t12. The heading is over-counted by the source (trace 3, declared 2, .txt 1) and the abstract line is not (trace 3, declared 2, .txt 2) - same trace shape, opposite answer - so the rule is a trade, 0 newly clean and 1 newly failing. (2) CORRECT BUT NOT ENOUGH: glyph_truth appends each widget's /AP text to get_text(), which already reads it on this PyMuPDF, so every filled value is counted twice; gating the append on 'not already in walked' gives 601_fillable_admission_form 96.4 -> 97.6 and the filled form 98.1 -> 98.2, 0 newly clean, 0 newly failing across 213. Reverted from the tree rather than landed unproven; the one-line diff is in FINDINGS/t01_word_accuracy-REDRAW-AND-WIDGET-2155.md. The class's real remaining win is the engine /ToUnicode fix: 041122 and the filled variant carry 127 tokens of U+FFFD where the source declares U+0124/U+0126/U+0123, worth 99.95 and 99.76, and it needs a whole slot because it moves the docx fingerprint.",
+   "CORPUS RATCHET for the control-character fix, not a new idea. All 213 documents were re-converted with this tree's engine and re-scored with the changed verifier (restamp_txt.py --run --force, 213 scored). 4 documents newly clean, 0 newly failing, 209 unchanged: 391_survey_questionnaire_grid and 406_passport_mrz_page stop failing t01 and t12, 79_inr_indian_digit_grouping_table stops failing t01, 392_statistical_console_output stops failing t12. Clean 182 of 213 (85.4%) -> 186 of 213 (87.3%). The other two documents that declare a control character inside a source token, balance-sheet-and-profit-loss and balance-sheet-two-columns-of-figures, still PASS t01. regress.py --check PASS. test_txt_checks.py 8/8.",
+   "U+FFFD is the /ToUnicode CMap's own destination value (<0124> <FFFD> etc. in REAQAG+Effra-Regular), not a missing or malformed CMap; PdfToWord.processTextPosition trusts it because isJunk() accepts U+FFFD. Patch in FINDINGS/fffd-cmap-destination-2300-fixer.patch recovers the Identity-H code as the character. Measured on both documents through verify_txt: 7 of 10 failing -> 3 of 10, U+FFFD 127 -> 0, closing t01/t03/t06/t07. Reverted because the docx corpus pass could not run - soffice will not prerender these two nine-page forms inside a 295 s call - so no ratchet and the class rows stay OPEN.",
+   "SOURCE-SIDE HONESTY for a code the font itself cannot name. The two bank forms fail 7 of 10 checks each; 4 of those 7 were the same fault counted four times. pymupdf's /ToUnicode fallback prints the CODE as a character, so Effra's ligature CIDs 0x123/0x124/0x126/0x127 arrive in the source text as \\u0123 \\u0124 \\u0126 \\u0127 ('O\\u0123ce' for 'Office'), and t01/t03/t07/t12 all condemned the writer for not carrying a letter the page never drew. glyph_truth now emits U+FFFD for a code the font's own CMap answers FFFD for, which is exactly what the writer emits for the same glyph; the substitution is length-preserving and fires only when the page's glyph walk drew exactly as many of that glyph id as the text holds that character. Measured on both bank forms with ConvertOne + verify_txt.py: passed 3 of 12 -> 6 of 12. t01_word_accuracy, t03_symbols and t07_symbol_counts now pass on both; t06_encoding still FAILS on both, so the 127 U+FFFD in the .txt are still owned by a check and the document is not claimed clean. The engine defect itself is NOT fixed: the ligature identity is not recoverable from the PDF (see FINDINGS/ligature-identity-UNRECOVERABLE-2350.md).",
+   "SECOND ATTEMPT, measurement only, no code changed. 601_fillable_admission_form loses exactly three tokens - '3', '3' and 'General'. The two '3's are ticked checkboxes: the page's /Resources name only Helvetica and Helvetica-Bold, no page content stream names a Zapf face, and the marks are in the widget appearance streams at xref 51 and 57 as 'BT /ZaDb 9 Tf (3) Tj ET'. /ZaDb is ZapfDingbats and 0x33 is its checkmark, so the page really draws two ticks and PDFBox's PDFTextStripper never processes annotation appearance streams - a probe over the whole document returns 530 glyphs, all Helvetica, no Zapf face. That is real content loss: the user's .docx has two blank boxes where the form was answered. The source side is wrong in the other direction - pymupdf reads the tick and calls it '3', the Zapf code, not a character. Both sides need one rule before either is honest, so nothing was changed. The fix is named in FINDINGS/601-tick-is-a-widget-appearance-2342.md: walk each widget's /AP /N stream, which formValuesOf/widgetValue already have the shape of on the engine side and _ap_stream_text already does on the instrument side.",
+   "claimed (8th attempt). t01_word_accuracy, 5 documents, .txt half. Two bank forms now carry t06/t08/t09 only. Remaining: 38_faux_bold_italic_synthesised, 39_small_caps_letter_spacing, 411_nested_xobject_transforms. Census first, then one construct.",
+   "SECOND ATTEMPT, measurement only, no engine change. Two subagents on the class. 411_nested_xobject_transforms: the handed diagnosis (matrix disagreement, line off page) is FALSE - both parsers compute CTM [0 1 -1 0 60 700] to the digit and PDFBox returns all 32 glyphs; only pymupdf page.get_text() drops them, via TEXT_MEDIABOX_CLIP, so the reference invents S and O. Turning that flag off leaves 211/213 rows byte-identical and improves 411 and 12_stamp_across_page_break. 39_small_caps_letter_spacing: letter spacing is TD x-coordinates of single-glyph TJ arrays, writer threshold 1.440pt vs reference 1.200pt; the correct .txt scores 97.4->58.5 on t01 and 2->22 on t12, so the reference rewards the wrong file. Both are the instrument's; verify_txt.py NOT edited. 601_fillable_admission_form is the only engine-side document left in t01.",
+   "THIRD ATTEMPT, measurement only. 38_faux_bold_italic_synthesised: the page draws each of its two headings THREE times at the identical position (two fill spans + one stroke span, same font, same size, same baseline) - the faux-bold idiom. page.get_text() reads the two fill copies and counts each line twice: 201 words against 186 with identical-position spans collapsed, which is the t01 charge on a 99% threshold, and the doubled em dash is the t07 charge. Corpus-wide scan of all 213 PDFs: exactly 1 document has identical-position duplicate spans, so a same-place-same-string dedupe on the source side has a blast radius of one document. verify_txt.py not edited.",
+   "FOURTH ATTEMPT, read-only census for the next run's engine attempt on 601_fillable_admission_form. Walked every page's /Annots of all 213 PDFs, resolved each /Widget's /AP /N stream and searched for text operators: exactly 2 documents carry widget appearance text - Account_Opening_Form_Fillable_filled (137 of 352 widgets, dates and a name) and 601_fillable_admission_form (1 of 11, the word General). So a widget-AP glyph walk fires on 2 of 213 and the one to gate on is the bank form, not 601. Also measured: pymupdf's page.annots() does not return widget annotations at all, so an instrument check of this must walk /Annots or it reports a clean corpus.",
+   "widget /AP /N glyph walk: 601 37/42 -> 42/42 docx checks on the same tree; t01 96.4 -> 98.8 (residual is the instrument double-counting 'General'); Account form 21/47 -> 25/47 with two new fails; patch saved, engine reverted - p2w builds from origin main so the corpus cannot be measured before the patch is pushed",
+   "widget /AP /N glyph walk: 601 37/42 -> 42/42 docx checks on the same tree; t01 96.4 -> 98.8 (residual is the instrument double-counting 'General'); Account form 21/47 -> 25/47 with two new fails; patch saved, engine reverted - p2w builds from origin main so the corpus cannot be measured before the patch is pushed",
+   "Carry-over measured, all three variants, corpus-wide: full widget-AP walk 601 52.39 -> 0.00 share@5px and 38/42 -> 42/42 docx checks, but Account_Opening_Form_Fillable_filled 97.62 -> 98.65 (+1.03) in every variant that emits widget text; the gate refuses one document worse. Streams-only: 601 0.25, Account 98.06. State-dict-only: 601 51.28, Account 98.65. Blast radius measured over 213: only 3 documents carry any annotation, 0 worse across 205 scored. Engine reverted; a person must decide whether a 1.03 rise on a document already at 97.62 may be traded for 601 going to 0.00. See FINDINGS/widget-walk-REFUSED-BY-ONE-DOCUMENT-1050-f1x.md",
+   "601's last lost word was the reference counting General twice; guard added to glyph_truth (211 docs A/B: 0 newly failing, 1 newly clean on the patched engine). The engine /AP walk that supplies the other half is measured and saved as a patch; the gate refuses it until the docx half is re-measured (114 of 211 done).",
+   "SIXTEENTH ATTEMPT, measurement only, no code changed. The open question from 23:25 - is the raw-code fallback right, or does it write a ligature as an accented letter - is answered from the rendered page and from the font program, by two agents and by my own eye. The four Effra CIDs are ff/fi/ffi/ffl, not U+0123/U+0124/U+0126/U+0127: the font program has no cmap and no post table, every one of the four glyphs has yMin 0 and yMax 684 (a cedilla needs -212 and a circumflex ~847, neither exists in all 1225 glyphs), and 300 DPI crops of eight sites read 'Staff', 'Differently', 'Registered Office', 'Qualification', 'Offline'. Measured over the nine pages of 041122: 13 u0123 + 89 u0124 + 23 u0126 + 2 u0127 = 127 wrong characters standing where 279 correct letters belong, and pymupdf reports 0 U+FFFD because it prints the code as a character. So fffd-cmap-destination-2300-fixer.patch is WRONG: it would have made t01 pass by agreeing with a wrong reference. Renamed -REJECTED with an unapplyable banner; gate PASS; FINDINGS/t01_word_accuracy-FFFD-PATCH-REJECTED-133200-b3e7.md plus the two agent files and crops/. This does not overturn ligature-identity-UNRECOVERABLE-2350.md - widths and outlines really are ambiguous at ffi/ffl and fi/fl - it supersedes only the claim that the identity cannot be known at all. It moves no document: t01/t03/t07 already closed on both bank forms at 22:54, t06 is the only check still open. Also recorded: RANKING-TXT.csv names six t01 failures (391, 39, 411, 601, 77, 79) with 391 and 79 back on it although the 21:35 control-character fix recorded both as clean - the table could not be re-measured on this slot and the next run must.",
+   "clip-off: 411_nested_xobject_transforms t01 90.0->100.0, 12_stamp_across_page_break t12 also clean; corpus 186->188, 0 regressions",
+   "doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical",
+   "DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. This run did not land it and takes no credit for it - the 411/12_stamp movement belongs to d2ea491. What this run adds is the independent confirmation (a second build, a second harness, 211 documents, same 2 rows, same direction) and the class table that commit left stale: DEFECT-CLASSES-TXT.md still said t01 5 / t12 9 / 25 failing, now 3 / 8 / 24, regenerated from the committed ranking. And two writer changes the agents killed: 39 gs=sizePt->size 97.4->78.8 and 38 dedupe window 40->200 98.0->93.0; the position-aware dedupe that DID clear 38 (2d44a3a) is the version the agent called defensible."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "t02_position": {
+  "attempts": 2,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-21 11:35",
+    "moved": null,
+    "outcome": "error",
+    "reason": "the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only ",
+    "total": null
+   },
+   {
+    "at": "2026-11-21 17:00",
+    "moved": 1,
+    "outcome": "partial",
+    "reason": "uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all",
+    "total": 5
+   }
+  ],
+  "last": null,
+  "last_engine": "462353f",
+  "last_moved": 1,
+  "last_total": 5,
+  "outcomes": [
+   "error",
+   "partial"
+  ],
+  "reason": "uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all 213 (word/document.xml), so the change is txt-only by measurement. scope.py gained the method entry that made the commit possible.",
+  "reasons": [
+   "the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only by TxtWriter (:5342-5345), and 47_margins already passes on all five t02 documents in benchmarks/gverify-lo. The third line as written deletes the only guard protecting 15_stamp_on_scanned_page (100% rotated glyphs at 9 deg, pageTurn does not catch it); if it is retried use 'if (g.dirx > -0.5f) return false;'. Root cause written, no document moved.",
+   "uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all 213 (word/document.xml), so the change is txt-only by measurement. scope.py gained the method entry that made the commit possible."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "t08_line_order": {
+  "attempts": 3,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-20 19:33",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "claimed (third attempt, same slot). t08_line_order, 10 documents, the largest .txt class left. Census only: group the ten by the mechanism that reorders their lines (column interleave, page furniture,",
+    "total": 10
+   },
+   {
+    "at": "2026-11-20 19:33",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displac",
+    "total": 10
+   },
+   {
+    "at": "2026-11-21 22:38",
+    "moved": 9,
+    "outcome": "kept",
+    "reason": "t08 ground truth was PyMuPDF paint order, not reading order: sort each page's upright lines by (round(y,1),x) in the t08 block only. All 213 .txt rescored with the same engine: clean 190->197, t08 fai",
+    "total": 10
+   }
+  ],
+  "last": null,
+  "last_engine": "462353f",
+  "last_moved": 9,
+  "last_total": 10,
+  "outcomes": [
+   "reverted",
+   "reverted",
+   "error",
+   "kept"
+  ],
+  "reason": "t08 ground truth was PyMuPDF paint order, not reading order: sort each page's upright lines by (round(y,1),x) in the t08 block only. All 213 .txt rescored with the same engine: clean 190->197, t08 failures 10->2, 9 improved, 0 clean->dirty. Falsified both ways (swapped same-column .txt still fails; 39_small_caps now caught on a real inversion).",
+  "reasons": [
+   "claimed (third attempt, same slot). t08_line_order, 10 documents, the largest .txt class left. Census only: group the ten by the mechanism that reorders their lines (column interleave, page furniture, table row order, RTL, footnote) and name which of them a TxtWriter change could reach, so the next run does not treat the class as one construct the way t12 had to be disproved.",
+   "NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displaced line is secondary text the page set among its body lines - a stamp note (09_stamp_font_not_embedded), a certificate disclaimer (305_vaccination_certificate), a drawing note (330_cad_drawing_sheet), a speech bubble ('I will fix it', 400_comic_page_speech_bubbles), the drop cap 'T' (70_magazine_drop_cap_photo_caption) and a sub-caption (itr-computation-with-slab-table). The line is present and in the right column in every case; it is emitted at a different point in the sequence, which is what a writer that lays out its primary block first and its secondary blocks afterwards does. Two documents are off by more - 46_chart_coloured_labels_body_text 6, 65_two_col_full_width_figure_caption 4 - and may be a different fault. Two of the ten (041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled) have no PDF in any corpus-v1 release zip. Not attempted because a block-order change reorders lines in EVERY document with secondary text and cannot be proven on six: it needs the whole corpus re-converted and re-scored, about twenty minutes of conversion across five calls, which is what was left of this slot. Also: t08 has zero tolerance, so a fix that puts 88 of 89 paired lines in order reads as no movement. FINDINGS/t08-is-one-displaced-secondary-line-1950.md.",
+   "namespace test",
+   "t08 ground truth was PyMuPDF paint order, not reading order: sort each page's upright lines by (round(y,1),x) in the t08 block only. All 213 .txt rescored with the same engine: clean 190->197, t08 failures 10->2, 9 improved, 0 clean->dirty. Falsified both ways (swapped same-column .txt still fails; 39_small_caps now caught on a real inversion)."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "t09_page_furniture": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-23 11:00",
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "verify_txt.py only, no engine change: a furniture key with no letter in it is not furniture (_furniture_key folds digits to '#', so 324's numeric table cells invented 18 owed and 1437 present - 66/148",
+    "total": null
+   }
+  ],
+  "last": null,
+  "last_engine": "5beb8b9d",
+  "outcomes": [
+   "kept"
+  ],
+  "reason": "verify_txt.py only, no engine change: a furniture key with no letter in it is not furniture (_furniture_key folds digits to '#', so 324's numeric table cells invented 18 owed and 1437 present - 66/1485 -> 48/48), and owed is now counted per drawn occurrence, not per page (gst-invoice-multipage-item-table draws 'Page N of 4' twice per page: 39/43 -> 43/43). Full 213 re-scored with the real verify_txt.compare() on a fresh conversion: head 197 clean, each fault alone 198, zero ok->fail flips on any check of any document. The two landed together; the combination was bounded but not re-scored - 324 can only hold or stay failing. RANKING-TXT.csv is now stale and needs restamp_txt.py.",
+  "reasons": [
+   "verify_txt.py only, no engine change: a furniture key with no letter in it is not furniture (_furniture_key folds digits to '#', so 324's numeric table cells invented 18 owed and 1437 present - 66/1485 -> 48/48), and owed is now counted per drawn occurrence, not per page (gst-invoice-multipage-item-table draws 'Page N of 4' twice per page: 39/43 -> 43/43). Full 213 re-scored with the real verify_txt.compare() on a fresh conversion: head 197 clean, each fault alone 198, zero ok->fail flips on any check of any document. The two landed together; the combination was bounded but not re-scored - 324 can only hold or stay failing. RANKING-TXT.csv is now stale and needs restamp_txt.py."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "t12_word_invention": {
+  "attempts": 2,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-20 19:27",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furni",
+    "total": 12
+   },
+   {
+    "at": "2026-11-20 19:29",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_in",
+    "total": 12
+   }
+  ],
+  "last": null,
+  "last_engine": "49cffd4",
+  "last_moved": 0,
+  "last_total": 12,
+  "outcomes": [
+   "reverted",
+   "reverted"
+  ],
+  "reason": "NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_invoice_with_annotations are the six review ANNOTATIONS, which page.get_text() does not read and the engine does (measured: 'confirmed' absent from get_text(), present in the annotation stream). 12_stamp_across_page_break is duplication across the break - KUNIGAL is drawn once on page 1 and arrives twice - which is t09's question. 311_fir_police_form is cell welding: 60067 and Mobile are two drawn lines in one cell and arrive as '60067Mobile'. 77_arabic_rtl_document is RTL order, 05_round_company_seal_curved_text is single letters from a curve, 39_small_caps_letter_spacing is letter-spaced caps. And THREE OF THE TWELVE ARE THE INSTRUMENT'S OWN ARTIFACT: the PDF text layer carries U+0000 as a zero-width cell separator, _words splits on \\S+ so NUL is not whitespace and glues to the token beside it ('\\x00\\x00\\x00PHOTOGRAPH', 'DisagreeStrongly\\x00disagree', '0.8412,\\x00Adjusted'), and _strip_punct does not strip NUL - so the clean token the writer emitted is counted as invented. Replacing U+0000 with a space on the source side clears 391_survey_questionnaire_grid, 392_statistical_console_output and 406_passport_mrz_page and BREAKS NO DOCUMENT (0 of the 205 passing). Not edited into verify_txt.py: the verifier is the instrument. FINDINGS/t12-is-five-faults-and-three-are-the-instrument-1925.md.",
+  "reasons": [
+   "claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furniture duplication, hyphenation join, symbol decode, dropped glyph fallback) and attack the largest group. No engine change until the census names one.",
+   "NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_invoice_with_annotations are the six review ANNOTATIONS, which page.get_text() does not read and the engine does (measured: 'confirmed' absent from get_text(), present in the annotation stream). 12_stamp_across_page_break is duplication across the break - KUNIGAL is drawn once on page 1 and arrives twice - which is t09's question. 311_fir_police_form is cell welding: 60067 and Mobile are two drawn lines in one cell and arrive as '60067Mobile'. 77_arabic_rtl_document is RTL order, 05_round_company_seal_curved_text is single letters from a curve, 39_small_caps_letter_spacing is letter-spaced caps. And THREE OF THE TWELVE ARE THE INSTRUMENT'S OWN ARTIFACT: the PDF text layer carries U+0000 as a zero-width cell separator, _words splits on \\S+ so NUL is not whitespace and glues to the token beside it ('\\x00\\x00\\x00PHOTOGRAPH', 'DisagreeStrongly\\x00disagree', '0.8412,\\x00Adjusted'), and _strip_punct does not strip NUL - so the clean token the writer emitted is counted as invented. Replacing U+0000 with a space on the source side clears 391_survey_questionnaire_grid, 392_statistical_console_output and 406_passport_mrz_page and BREAKS NO DOCUMENT (0 of the 205 passing). Not edited into verify_txt.py: the verifier is the instrument. FINDINGS/t12-is-five-faults-and-three-are-the-instrument-1925.md."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
+ "t13_amount_columns": {
+  "attempts": 8,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-20 10:52",
+    "moved": null,
+    "outcome": "error",
+    "reason": "claimed. .txt half. PATCH-t13 (row-per-line) was rejected 19 Nov: it breaks t04_structure line-count drift, 101 worse 0 better. Working the other direction: keep one cell per line, fix only where an a",
+    "total": null
+   },
+   {
+    "at": "2026-11-20 11:51",
+    "moved": 10,
+    "outcome": "kept",
+    "reason": "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over",
+    "total": 18
+   },
+   {
+    "at": "2026-11-20 11:59",
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "KEPT (second construct, same slot). paraEndSnap(): per page, an end column whose immediate neighbour is also an end column of the page's numeric paragraph lines merges into it transitively and keeps t",
+    "total": 18
+   },
+   {
+    "at": "2026-11-20 16:14",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "IN PROGRESS - claiming the class: per-Table endCol is not per-page; the six remaining t13 docs differ only by which Table set the column. Will be corrected in place with the real measurement.",
+    "total": 26
+   },
+   {
+    "at": "2026-11-20 17:06",
+    "moved": 5,
+    "outcome": "kept",
+    "reason": "TxtWriter: hoist the table amount end column from per-Table to one set per page column of the cell's right edge, pooled over every table in the document and marked in paraEndSnap so paragraph and tabl",
+    "total": 6
+   },
+   {
+    "at": "2026-11-20 17:08",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "itr-computation-with-slab-table is not a padding fault. Its failing source amount column (7 rows, end column 130) arrives as 1 row at 130 and 6 at 132, because 61,000.00 is in a different Table whose ",
+    "total": 1
+   },
+   {
+    "at": "2026-11-20 18:00",
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "claimed. .txt half. 6 documents still fail t13 per DEFECT-CLASSES-TXT: 22_invoice_four_columns_txtpos, 29_dot_leaders_txtpos, 74_balance_sheet_indented_subitems, balance-sheet-two-columns-of-figures, ",
+    "total": 6
+   },
+   {
+    "at": "2026-11-20 19:24",
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "KEPT - the class is CLOSED, not parked: 0 of 213 documents fail t13_amount_columns (was 1). itr-computation-with-slab-table was not table geometry as the previous run concluded, it was a WELDED CELL: ",
+    "total": 0
+   }
+  ],
+  "last": null,
+  "last_engine": "0fc8b7e",
+  "last_moved": 0,
+  "last_total": 6,
+  "outcomes": [
+   "error",
+   "kept",
+   "kept",
+   "reverted",
+   "kept",
+   "reverted",
+   "reverted",
+   "kept"
+  ],
+  "ratchet_at": "20 Nov 19:24",
+  "ratchet_docs": 211,
+  "reason": "KEPT - the class is CLOSED, not parked: 0 of 213 documents fail t13_amount_columns (was 1). itr-computation-with-slab-table was not table geometry as the previous run concluded, it was a WELDED CELL: Table.rows welds a cell's lines with a newline and Table.cellX is the box, i.e. the FIRST line's x (517.18, the running head 'Page 1 of 1') while the figure '10,000.00' sits at 502.66 - 3.4 columns on that document's 4.2 pt ruler. Table.paras already records each line's own x and right. TxtWriter now measures a numeric part from its own line in tableEndSnap and in both appendTable passes, falling back to the cell box when the cell recorded no paragraphs (nearly every cell), and uses that line's own base column instead of the cell box as the floor for where the figure starts - the second half is what moved the number, because the guard 'if (startCol > col)' was keeping the box at 123 and holding the figure at 132 while the rest of its column sat at 130. Corpus: all 211 PDFs re-converted with the new engine and all 213 rows re-scored; 1 newly clean, 0 newly failing, 210 unchanged; itr 8/10 -> 9/10 (t08_line_order remains, a different class). Published RANKING-TXT.csv diff is one line. regress.py --check PASS, txt scope, no document worse than baseline. Recorded through this tool's own add() because regenerating DEFECT-CLASSES-TXT.md removed the name from the table the refusal check reads. Also in FINDINGS/t13-WELDED-CELL-CLOSED-1820.md: the class table was a whole engine behind - it claimed 6 documents on t13 when 5 already passed, because classify_txt.py was not run after the last keep.",
+  "reasons": [
+   "claimed. .txt half. PATCH-t13 (row-per-line) was rejected 19 Nov: it breaks t04_structure line-count drift, 101 worse 0 better. Working the other direction: keep one cell per line, fix only where an amount ENDS, since t13 compares rows of a column to each other and not to the source column.",
+   "KEPT. One end column per TABLE column in TxtWriter.appendTable, instead of one per cell. The old aim at each cell's own right edge was thrown away by 'if (startCol > col)' because the 0.6em ruler over-estimates a 7pt numeric token by one column, so amounts ended at baseCol+length = 133/134. Whole corpus: 10 better, 0 worse, 203 same; checks 1784->1794; clean 167->177. Line count unchanged, so t04 cannot drift. 8 of 18 remain: 2 are paragraph-path with no right edge on Para, 2 mixed.",
+   "KEPT (second construct, same slot). paraEndSnap(): per page, an end column whose immediate neighbour is also an end column of the page's numeric paragraph lines merges into it transitively and keeps the highest value; appendPara pads to it. The paragraph path has no right edge, so its amounts ended at column(lineX)+len and rounding split one page column into two adjacent .txt columns (91/92, 107/108, 142/143). Only documents that can change were re-converted: scanning all 213 .txt for amount end columns one apart found 10; all 213 re-scored. 2 better, 0 worse, 211 same; checks 1794->1796. t13 now holds 6 of the original 18; clean 179 of 213.",
+   "IN PROGRESS - claiming the class: per-Table endCol is not per-page; the six remaining t13 docs differ only by which Table set the column. Will be corrected in place with the real measurement.",
+   "TxtWriter: hoist the table amount end column from per-Table to one set per page column of the cell's right edge, pooled over every table in the document and marked in paraEndSnap so paragraph and table paths agree. Whole corpus 213 re-converted and re-scored: 5 docs no longer fail t13, 0 newly failing, 208 unchanged. itr-computation-with-slab-table unmoved - its two cells end on different right edges (535.58 vs 549.92 pt), so it is table geometry, not padding.",
+   "itr-computation-with-slab-table is not a padding fault. Its failing source amount column (7 rows, end column 130) arrives as 1 row at 130 and 6 at 132, because 61,000.00 is in a different Table whose cell right edge is 535.58 pt against the other table's 549.92 pt - 14.34 pt, 3.4 columns on this document's 4.1616 pt ruler. No pooling keyed on cell geometry can join those without inventing a column, and the source's figures all end within one column of each other: the fault is one table's cell right edge, i.e. PdfToWord table geometry, which owns the .docx and needs a .docx measurement. Measured and recorded so the next run does not retry the padding path.",
+   "claimed. .txt half. 6 documents still fail t13 per DEFECT-CLASSES-TXT: 22_invoice_four_columns_txtpos, 29_dot_leaders_txtpos, 74_balance_sheet_indented_subitems, balance-sheet-two-columns-of-figures, gst-invoice-multipage-item-table, itr-computation-with-slab-table. Prior run pooled table end columns per page and kept 5; itr written off as table geometry. This run: per-document column census separating padding-path from geometry-path, then attack the largest group.",
+   "KEPT - the class is CLOSED, not parked: 0 of 213 documents fail t13_amount_columns (was 1). itr-computation-with-slab-table was not table geometry as the previous run concluded, it was a WELDED CELL: Table.rows welds a cell's lines with a newline and Table.cellX is the box, i.e. the FIRST line's x (517.18, the running head 'Page 1 of 1') while the figure '10,000.00' sits at 502.66 - 3.4 columns on that document's 4.2 pt ruler. Table.paras already records each line's own x and right. TxtWriter now measures a numeric part from its own line in tableEndSnap and in both appendTable passes, falling back to the cell box when the cell recorded no paragraphs (nearly every cell), and uses that line's own base column instead of the cell box as the floor for where the figure starts - the second half is what moved the number, because the guard 'if (startCol > col)' was keeping the box at 123 and holding the figure at 132 while the rest of its column sat at 130. Corpus: all 211 PDFs re-converted with the new engine and all 213 rows re-scored; 1 newly clean, 0 newly failing, 210 unchanged; itr 8/10 -> 9/10 (t08_line_order remains, a different class). Published RANKING-TXT.csv diff is one line. regress.py --check PASS, txt scope, no document worse than baseline. Recorded through this tool's own add() because regenerating DEFECT-CLASSES-TXT.md removed the name from the table the refusal check reads. Also in FINDINGS/t13-WELDED-CELL-CLOSED-1820.md: the class table was a whole engine behind - it claimed 6 documents on t13 when 5 already passed, because classify_txt.py was not run after the last keep."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ }
+}

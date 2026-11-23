@@ -19,7 +19,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 17:00 |
+| started | 17:58 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
@@ -118,7 +118,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `05:13` agent deployed: 00_page_count / A - from the committed gverify JSONs and CENSUS.csv, how many documents does clearin
 - `05:13` agent deployed: 00_page_count / B - re-measure every claim of the page-count finding from the exported PDFs and docx
 - `05:13` agent landed: 00_page_count / A -> FINDINGS/18disp-prize-sizing-agentA.md
 - `05:13` agent landed: 00_page_count / B -> FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md
@@ -143,6 +142,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `16:37` agent landed: 00_pA-02 /  -> tools/p2w-bench/FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md
 - `16:37` agent landed: gverB-01 /  -> tools/p2w-bench/FINDINGS/gverify-COLLECT-DOWNLOAD-SHAPE-1120-agent.md
 - `17:41` attempt 38 on 18_displacement -> lead (0/190 moved)
+- `18:34` attempt 2 on 44_header_footer -> lead
 
 ## Where the rest of the state lives
 
