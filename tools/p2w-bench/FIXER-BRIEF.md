@@ -1130,45 +1130,6 @@ the numbers once. That is the cost of starting. Paying it and then doing one att
 **If the engine is genuinely blocked** - the gate refuses, the class list is empty, Drive is down - say so
 with the evidence and release. That is a run that finished. One attempt and a report is a run that stopped.
 
-### THE ONE GAP IN THE .txt INSTRUMENT: APPLICABILITY, FOR TEN OF TWELVE CHECKS
-
-Read the repo before writing anything here, and this is what it holds. **Do not redo any of it.**
-
-**Already proven - leave alone:**
-- `benchmarks/TXT-FALSIFIABILITY.md`: **12 of 12 checks can fail.** Each was broken by a mutation (words
-  deleted, spaces stripped, symbols replaced, lines reversed, page blanked) and each failed. `t09` was blind at
-  21:03 and fixed at 21:23 - `benchmarks/T09-FURNITURE-FIX.md` has the three-row proof. The result is 12 of 12.
-- `FINDINGS/PATCH-t13-REJECTED.md`: the t13 patch was built, run over 213, scored **0 better / 101 worse /
-  112 same**, and reverted. Do not re-propose it.
-- `t02_position` and `t08_line_order` both **abstain on `411_nested_xobject_transforms`**, and that is recorded.
-
-**Not proven - this is the job:**
-Falsifiability asks "can this check fail". Applicability asks "does it run when it should". Only two of the
-twelve have any recorded applicability evidence, and it is one line each. **These ten have none:**
-
-    t01_word_accuracy    t03_symbols      t04_structure    t06_encoding
-    t07_symbol_counts    t09_page_furniture   t10_page_completeness
-    t11_page_breaks      t12_word_invention   t13_amount_columns
-
-**The first real data point, found on 23 Nov and not in any file yet:**
-`314_tender_rfp_boq` - a bill of quantities, the exact document that has amount columns - reports
-**8/12 applicable, 8 passed, 4 abstained**. Four checks did not run on a document that has the feature they
-measure. `t13_amount_columns` is the suspect. That is one document and one check; the other nine are unknown.
-
-**What to do, per check, and it is reading, not building:**
-1. Pick a document where that check **must** fire. `t13` -> a BOQ or an invoice with a right-aligned amount
-   column. `t11`/`t10` -> any multi-page document. `t09` -> one with a running head.
-2. Run `verify_txt.py <source.pdf> <output.txt>` and read the applicable/abstained counts.
-3. Open the PDF and the .txt and look at the thing with your own eyes.
-4. Record it in `FINDINGS/TXT-APPLICABILITY.md` - one row per check: fired and right / fired and wrong /
-   **abstained where it should have fired**. The third is the silent pass and it is the one that matters.
-
-**Do not build a tool for this.** A checker that checks the checks would need proving too, and that is the loop
-this exists to break. It is a PDF, a .txt, and reading them.
-
-Until that file exists, the `.txt` clean count is a count of the checks that ran, not of the checks that
-should have. Quote it that way or not at all.
-
 ### PICK THE CHECK THAT FINISHES DOCUMENTS, NOT THE CLASS THAT TOUCHES THEM
 
 Measured 23 Nov over 60 runs: **80% improved nothing, 60% made 0 or 1 attempt**, and about 20 documents a day
