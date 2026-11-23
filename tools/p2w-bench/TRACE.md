@@ -6,11 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 21 Nov 08:49 | fixer | build-engine | engine unchanged, compile skipped |
-| 21 Nov 08:54 | fixer | build-engine | started |
-| 21 Nov 08:54 | fixer | build-engine | engine unchanged, compile skipped |
-| 21 Nov 08:58 | fixer | build-engine | started |
-| 21 Nov 08:58 | fixer | build-engine | engine unchanged, compile skipped |
 | 21 Nov 09:03 | fixer | build-engine | started |
 | 21 Nov 09:03 | fixer | build-engine | engine unchanged, compile skipped |
 | 21 Nov 09:08 | fixer | build-engine | started |
@@ -406,3 +401,8 @@
 | 23 Nov 06:15 | fixer | attempt | 18_displacement -> lead (0/? moved) |
 | 23 Nov 07:36 | fixer | attempt | 18_displacement -> lead (0/? moved) |
 | 23 Nov 07:37 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
+| 23 Nov 08:08 | fixer | build-engine | started |
+| 23 Nov 08:09 | fixer | build-engine | engine built in 36s |
+| 23 Nov 08:10 | fixer | build-engine | started |
+| 23 Nov 08:10 | fixer | build-engine | engine built in 37s |
+| 23 Nov 08:11 | fixer | attempt | 00_page_count -> kept (0/? moved) |

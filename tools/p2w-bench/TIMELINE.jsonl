@@ -2133,3 +2133,6 @@
 {"t": 1795399613.3614273, "ist": "07:36:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795399620.343129, "ist": "07:37:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795401670.9628446, "ist": "08:11:10", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795401672.90483, "ist": "08:11:12", "ev": "attempt", "d": "00_page_count -> kept"}
+{"t": 1795401673.0140655, "ist": "08:11:13", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795401673.126733, "ist": "08:11:13", "ev": "beat", "d": "classrow.py: refreshing the class file"}

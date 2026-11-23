@@ -114,7 +114,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `14:46` agent landed: 47_mB-02 /  -> FINDINGS/47_margins-DIAGNOSE40-B-150000.md
 - `15:28` attempt 18 on 18_displacement -> lead
 - `15:40` attempt 19 on 18_displacement -> lead (0/16 moved)
 - `16:36` attempt 20 on 18_displacement -> lead (0/16 moved)
@@ -139,6 +138,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `06:17` agent landed: 18_dblast-radius-01 /  -> FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build.
 - `06:17` agent landed: 18_dB-05 /  -> ANSWERED: the 18.5 pt rung does not exist. The laid pitch ladder is laid = 0.75*(round(declared/0.75)+1), so laid pitch is always a multiple of 0.75 pt and 18.5 is not on it; the nearest rung to an 18.40 pt source is 18.75. No declaration lands 18.5, so this question is closed rather than answered with a value. See FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md.
 - `07:36` attempt 35 on 18_displacement -> lead
+- `08:11` attempt 3 on 00_page_count -> kept
 
 ## Where the rest of the state lives
 

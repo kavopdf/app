@@ -3,14 +3,20 @@
  "started": "05:58",
  "ended_ts": 1795394890.5849142,
  "ended": "06:18",
- "class": "18_displacement",
- "attempts": 3,
- "kept": 0,
+ "class": "00_page_count",
+ "attempts": 4,
+ "kept": 1,
  "docs_improved": 0,
  "agents": [
   "18_dresidual-census-01",
   "18_dblast-radius-01"
  ],
  "obstacles_cleared": 0,
- "needs_human": 0
+ "needs_human": 0,
+ "counted": [
+  [
+   "00_page_count",
+   0
+  ]
+ ]
 }

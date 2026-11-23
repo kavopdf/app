@@ -87,3 +87,41 @@ unmeasurable and 42 checks from anything.
    drawing-only paragraph and is not explained by this mechanism (its refusal is a separate cause).
 3. `w:tcBorders`/`w:tblBorders` through the table writer is still the second lever for `32_stroke_lines`
    and `05_chars_extra` — the same construct as this one, one mechanism three check families.
+
+## Second document, and the A/B that attributes the residual
+
+`375_attendance_register` carries **456** drawing-only paragraphs (916 paragraphs before, 460 after).
+Both engines were built and rendered through Google on the same source, so this is a controlled pair,
+not a before-and-after across time:
+
+| | previous engine | this engine |
+|:--|--:|--:|
+| paragraphs in document.xml | 916 | **460** |
+| drawing-only paragraphs | 456 | **0** |
+| Google pages | **2** | **1** |
+| page-1 images / drawings | 37 / 51, page 2: 419 | **456 / 51 on page 1** |
+| Google 42 checks | 35/42 | **37/42** |
+
+Failing set, previous engine: `01_page_count`, `18_displacement`, `25_invisible_text`,
+`43_within_10pt_x`, `47_margins`, `55_orientation_mix`, `59_shape_anchor`.
+Failing set, this engine: `18_displacement`, `25_invisible_text`, `43_within_10pt_x`, `47_margins`,
+`59_shape_anchor`.
+
+**No check that passed before fails now.** The two that disappear are `01_page_count` and
+`55_orientation_mix`, and `55` disappears because the second sheet is gone, not because anything was
+hidden. The five that remain were already failing on the previous engine with the same values
+(`47_margins` render 382 both times) — they are other constructs, not this one, and this measurement is
+the attribution. `301_lab_report_panel`'s three residual failures are the same population
+(`18_displacement`, `25_invisible_text`, `60_text_column_right_edge`).
+
+## What this buys, stated as documents
+
+22 of the 23 `page_count_refused` documents carry drawing-only paragraphs and every one of them emits
+them after the last text paragraph. Each of those documents was scoring **zero of 42 known checks**
+because `gverify.py --collect` refuses a page-count mismatch. After this change the page count is a
+function of the flow the page actually needs, so they become measurable — two of them are now measured
+and both are 1 page.
+
+This is not yet "clean": the class moves from *unmeasurable* to *2–5 checks from clean*, which is the
+only way those 22 documents can ever be scored at all. `350_question_paper` (1 drawing-only paragraph) is
+**not** explained by this mechanism and is still refused.
