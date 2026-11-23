@@ -198,3 +198,4 @@
 | 23 Nov 14:03 | fixer | attempt 18_displacement -> reverted (0/? moved) |
 | 23 Nov 16:05 | fixer | attempt 00_page_count -> lead (0/? moved) |
 | 23 Nov 16:09 | fixer | attempt 00_page_count -> lead (0/? moved) |
+| 23 Nov 16:10 | fixer | slot FORCED released - see INCIDENTS.md for why |
