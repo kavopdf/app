@@ -54,6 +54,32 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "04_chars_missing": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-23 23:31",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - t",
+    "total": 5
+   }
+  ],
+  "last": null,
+  "last_engine": "b7699196",
+  "last_moved": 0,
+  "last_total": 5,
+  "outcomes": [
+   "lead"
+  ],
+  "reason": "txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - the proxy is blind to this class in both directions; patch saved to patches/foot-band-spend-the-gap.patch, Google render is the next run's measurement",
+  "reasons": [
+   "txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - the proxy is blind to this class in both directions; patch saved to patches/foot-band-spend-the-gap.patch, Google render is the next run's measurement"
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "05_chars_extra": {
   "attempts": 1,
   "first_seen": null,

@@ -2840,3 +2840,10 @@
 {"t": 1795456454.5300884, "ist": "23:24:14", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795456454.9180655, "ist": "23:24:14", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795456455.403323, "ist": "23:24:15", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795454488.89951, "ist": "22:51:28", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795454489.340475, "ist": "22:51:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795454491.8690848, "ist": "22:51:31", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795455890.9586284, "ist": "23:14:50", "ev": "beat", "d": "fetching corpus for measurement"}
+{"t": 1795455934.6601183, "ist": "23:15:34", "ev": "beat", "d": "building engine with foot-band guard"}
+{"t": 1795456912.5632334, "ist": "23:31:52", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795456916.318166, "ist": "23:31:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
