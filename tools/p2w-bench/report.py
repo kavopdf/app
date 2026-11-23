@@ -148,7 +148,11 @@ def this_run():
     # timestamp that the duration already uses, so a wrong `ended` cannot survive into a report.
     _end_label = r.get("ended")
     if r.get("ended_ts") and r.get("started_ts"):
-        _end_label = time.strftime("%H:%M", time.localtime(r["ended_ts"]))
+        # IST, LIKE EVERY OTHER STAMP IN THIS FILE. time.localtime() is the sandbox's clock, which is
+        # UTC, while `started` is written as IST - so deriving the label with localtime printed
+        # "started 20:54, ended 17:13": an end before its own start, which is worse than the mismatch it
+        # was meant to fix. 19800 s is the same +5:30 this file already uses at 370 and 662.
+        _end_label = time.strftime("%H:%M", time.gmtime(r["ended_ts"] + 19800))
     return {"present": True, "started": r.get("started"), "ended": _end_label,
             "minutes": mins, "class": r.get("class") or "-",
             "attempts": r.get("attempts", 0), "kept": r.get("kept", 0),
