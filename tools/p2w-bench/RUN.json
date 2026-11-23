@@ -1,8 +1,6 @@
 {
- "started_ts": 1795393711.178966,
- "started": "05:58",
- "ended_ts": 1795394890.5849142,
- "ended": "06:18",
+ "started_ts": 1795397100.0,
+ "started": "06:55",
  "class": "00_page_count",
  "attempts": 4,
  "kept": 1,

@@ -1,33 +1,33 @@
-# Fixer report - 2026-11-23 05:58
+# Fixer report - 2026-11-23 06:55
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 05:58 → 06:18 IST · 19 min**
+**23 Nov 2026 · slot 06:55 → running IST · 1h 18m**
 
-> No change was kept this run. The numbers below say what was tried.
+> **415_inline_images** fixed — 89.04 → 0.00. Corpus ratchet clean across 212 documents.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 4 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt, not measured | **1** — 416_many_tiny_pages |
-| **Fixed - Google, all 42 checks** | **28**, out of the 190 documents both renderers measured |
+| **Fixed - Google, all 42 checks** | **0**, out of the 0 measured on THIS engine (all engines: 30 of 190) |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
-| Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
+| Classes solved | 0 of 33 clear — 33 class(es) still have an OPEN document |
+| Working on | `00_page_count` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 06:11 | **lead** | 0/None | LO census: 7 docs are one check from clean in the measurable renderer and they are 7 distinct mechanisms. Controlled 3-variant experiment on balance-sheet-two-columns-of-figures: w:trHeight is inert o |
-| 06:15 | **lead** | 0/None | Instrumented the row model at DocxWriter.java:6146 (P2W_DBG env, reverted, app/ clean). exactRows is TRUE on all four candidates and the per-row edges ARE used, so the uniform-average path is not the |
+| 07:36 | **lead** | 0/None | Row 0 of a table is placed from a pitch-derived edge, not from the table's own top; the derived delta (+3.52 on balance-sheet) clears its only failing check (6 runs out -> 0) but regresses 360_restaur |
+| 08:11 | **kept** | 0/None | shape paragraphs -> runs in the existing paragraph: 301_lab_report_panel Google 2 pages (page_count_refused) -> 1 page, 39/42; 375_attendance_register 35/42 with 01_page_count+55 failing -> 37/42, pag |
 
 ## The txt
 
@@ -50,23 +50,22 @@
 
 | | |
 |:--|:--|
-| Slot window | 05:58 → 06:18 · 19 min |
+| Slot window | 06:55 → running · 1h 18m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 29 |
-| Longest silence | **5.3 min** — from 06:01:27, after `attempt.py: recording an attempt` |
-| Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 4 parked, with the evidence to re-open them |
-| Still a wall | **`stage.py` calls the corpus measured, but most of it is not measured on the engine that is on HEAD.** `measu |
+| Tool beats | 11 |
+| Longest silence | **34.2 min** — from 07:37:00, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 1 |
+| Obstacles | 0 cleared · 2 parked, with the evidence to re-open them |
+| Still a wall | The document scores 41/42 in Google on the current engine, failing `18_displacement`; its committed result on  |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **10 min** | `############` |
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `#######` |
+| fix - diagnose and change the engine | **34 min** | `####################` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **2 min** | `##` |
+| report - the report and the chain | **2 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

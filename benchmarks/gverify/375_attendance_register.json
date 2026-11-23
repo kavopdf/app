@@ -1,6 +1,14 @@
 {
  "name": "375_attendance_register",
- "status": "page_count_refused",
- "pages": 2,
- "want": 1
+ "status": "ok",
+ "rc": 1,
+ "passed": 42,
+ "total": 47,
+ "failed": [
+  "18_displacement",
+  "25_invisible_text",
+  "43_within_10pt_x",
+  "47_margins",
+  "59_shape_anchor"
+ ]
 }

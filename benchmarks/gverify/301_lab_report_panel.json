@@ -1,6 +1,12 @@
 {
  "name": "301_lab_report_panel",
- "status": "page_count_refused",
- "pages": 2,
- "want": 1
+ "status": "ok",
+ "rc": 1,
+ "passed": 44,
+ "total": 47,
+ "failed": [
+  "18_displacement",
+  "25_invisible_text",
+  "60_text_column_right_edge"
+ ]
 }
