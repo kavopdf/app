@@ -244,6 +244,18 @@ def collect_lo(name):
 
 
 def _write(name, rec):
+    """Write one document's result, stamped with the engine that produced it.
+
+    A RESULT WITH NO ENGINE STAMP CAN NEVER BE COUNTED. Every reader - report.py,
+    classify_google.py, measure_gate, the fixer's own table - asks "was this measured on the engine
+    in the tree?" and answers by comparing this field. It was written by some paths and not by this
+    one, so 23 of 213 results carried no stamp and were invisible as measurements of anything: on
+    23 Nov the fixer landed a real page-count fix, gverify scored 301_lab_report_panel and
+    375_attendance_register on the new engine, and the report still said "0 of 0 measured on THIS
+    engine" because neither record said which engine it was.
+    """
+    if isinstance(rec, dict) and not rec.get("engine"):
+        rec["engine"] = _engine_now()
     os.makedirs(RES, exist_ok=True)
     with open(os.path.join(RES, name + ".json"), "w", encoding="utf-8") as f:
         json.dump(rec, f, indent=1)
