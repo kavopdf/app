@@ -2,10 +2,6 @@
  "plan": "",
  "notes": [
   {
-   "at": "12:06",
-   "text": "attempt 15 on content-present-partly-displaced -> lead (1/16 moved)"
-  },
-  {
    "at": "13:12",
    "text": "attempt 14 on 18_displacement -> lead (0/1 moved)"
   },
@@ -240,6 +236,10 @@
   {
    "at": "00:25",
    "text": "attempt 17 on content-present-partly-displaced -> lead (0/13 moved)"
+  },
+  {
+   "at": "00:30",
+   "text": "attempt 18 on content-present-partly-displaced -> lead (0/13 moved)"
   }
  ],
  "next": "PENDING FIRST, FIXING SECOND - AND FIXING RESUMES BY ITSELF WHEN THE LIST IS EMPTY. `python3 tools/p2w-bench/pending.py` lists the 22 items you can close, in the order to take them. classpick.py refuses to name a class until those 22 are gone, so a run that tries to pick one is told to work the list instead. Nothing else changes: when the 22 reach zero, decide() returns a class again and the rotation carries on exactly as before - there is no separate mode to switch back on. The 22 are 4 [agent] (deployed 550-700 min ago, no finding committed - they died with their runs: check FINDINGS/ for the id and close them as dead, never re-deploy blind), 5 [ratchet] (fixes that landed on their own class and were never proved across the corpus - these are the cheapest wins, 38 documents already moved) and 13 [blocker] rows whose 'can I fix it' names a real action. THE OTHER 59 ARE NOT YOURS AND THEY DO NOT BLOCK YOU. `python3 tools/p2w-bench/pending.py --decisions` prints them: each says 'no - this needs a decision, not a patch'. They stay in BLOCKERS.md and in that view so a person can decide; they are never a reason to sit still. A gate that waited for them would never open, which is why it does not. After the 22: classpick picks by expected fixes - 05_chars_extra, then 32_stroke_lines, then 04_chars_missing (65 documents, never tried) and 25_invisible_text (48, never tried). 18_displacement is 8th because 20 attempts there moved 4 documents.",

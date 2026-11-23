@@ -153,3 +153,4 @@
 {"at": "2026-11-23 23:31", "attempt": 1, "class": "04_chars_missing", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-24 00:09", "attempt": 16, "class": "content-present-partly-displaced", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-24 00:24", "attempt": 17, "class": "content-present-partly-displaced", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-24 00:30", "attempt": 18, "class": "content-present-partly-displaced", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}

@@ -155,3 +155,30 @@ check the rate before committing to a pass.
    split will say whether the quantum fix reaches them.
 5. `dy.py` and the new detail report the same quantity from the same matcher; the independent PyMuPDF
    match in §1 is the cross-check to keep using.
+
+## 8 — Two more solo documents measured with the new instrument
+
+The instrument's first real job is to tell the next run which of the 13 the spacer construct can reach.
+Two more, converted on the **HEAD** engine (no changes) and scored on a live Google round trip:
+
+| document | Google | `med_dy` | `worst_dy` | spacer in the docx? |
+|:--|:--|--:|--:|:--|
+| `72_bank_statement_no_rules_right_amounts` | 41/42 | **-13.0** | **28.2** | yes — 18.30 pt, `w:before="0"` |
+| `71_invoice_space_aligned_no_rules` | 41/42 | **+1.1** | **6.7** | **no spacer at all** |
+| `table-with-no-header-row` | 46/47 | **-0.5** | **9.0** | yes — 12.35 pt, ruled, guard correctly refuses |
+
+Two things follow, and both are new:
+
+1. **The spacer is not the class's construct.** `71_invoice_space_aligned_no_rules` carries no
+   table-gap spacer and still fails `18_displacement`; `table-with-no-header-row`'s spacer is refused
+   by the room test and the document is 46/47 with `med_dy -0.5`. So the §4 change reaches
+   `72_bank_statement` and the other documents shaped like it, and **nothing else**. The census's
+   "53 of the 100" is presence, not causation — on this evidence the causal set is smaller.
+2. **What is left on all three is LOCALISED, not a page-wide offset.** Once the step is removed,
+   `med_dy` sits at |1.1| pt or better on every document measured, while `worst_dy` stays 4.8–9.0. A
+   median that good with a tail that bad is a handful of runs, not a block — which points at
+   individual cells and rows, not at the flow or the page. The next run should read `worst_dy` first
+   and find *which runs*, not re-measure the page.
+
+That is the shape of the remaining prize on this class: small, localised, and visible only now that the
+check prints a distance.
