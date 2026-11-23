@@ -112,3 +112,44 @@ it — but it means **this run's 42/42 is a lead, not a clean document.**
 The variant harness is the 30-line `exp.py` described in the table above: unzip the .docx, rewrite
 `w:trHeight` or `w:before` in row 0 of the first `<w:tbl>`, rezip, render, score. No engine source was
 changed and nothing in `app/` is dirty.
+
+---
+
+## Second experiment, same slot: the row model is not the defect — the EDGE DERIVATION is
+
+The `w:before` error above is not explained by the uniform row average. `DocxWriter.java:6146`
+computes `exactRows` from `t.rowEdge`, and on every candidate measured this run it is **true** — the
+per-row edges the page gave are used, and the average is not. Instrumented at that statement
+(`P2W_DBG`, reverted, `app/` clean), `ConvertOne` on four documents:
+
+| document | rows | `t.ruled` | model edges (first three) | page's own rules | model vs page |
+|:--|--:|:--|:--|:--|:--|
+| `balance-sheet-two-columns-of-figures` | 5 | **false** | 115.35, 131.35, 143.35 | **101.35, 119.35**, 302.15 | **row 0 edge 14.0 pt BELOW the header band** |
+| `table-inside-two-column-page` | 6 | true | 117.0, 136.0, 154.0 | **117.35**, 135.75, 154.15 | **0.35 pt — correct** |
+| `71_invoice_space_aligned_no_rules` | 10 | false | 176.0, 194.0, 212.0 | none (84.0, 793.89 only) | no rules to compare |
+| `363_warranty_card` | 6 | false | 124.0, 134.0, 148.0 | none | terms block is not in a table at all |
+
+Three things this settles, and one it opens:
+
+1. **`exactRows` is not the gate.** The uniform `rowTw = extentPt / rowCount` path
+   (`DocxWriter.java:6100`) is not what writes 320 tw for `balance-sheet`'s row 0 — `rowEdge[1] -
+   rowEdge[0]` is 16.00 pt on its own. Any attempt to "turn exactRows on" is aimed at a switch that is
+   already on.
+2. **The edges are 14.0 pt low on `balance-sheet`, and that is the defect.** The model's first edge is
+   115.35 where the page's top rule is 101.35, and its second is 131.35 where the page's second rule is
+   119.35 — a constant 12–14 pt offset, and the header row comes out 16.00 pt tall against an 18.00 pt
+   page band. The table is **borderless** (`t.ruled=false`) and its rules are separate floating
+   drawings, so the edges are derived from the *text*, and the header text sits 5.74 pt ABOVE the edge
+   the model gave its own row.
+3. **The control rules out a general edge fault.** `table-inside-two-column-page` is `ruled=true`, its
+   model edge matches its page rule to 0.35 pt, and it still misses by a uniform −9.06 pt. Its fault is
+   **placement of the table**, not its edges. `71_invoice`'s +9.52 is a placement offset of the same
+   shape. So the seven documents remain at least three mechanisms, now with the boundary named.
+4. **Open, and the next experiment:** `71_invoice` and `table-inside-two-column-page` both place a
+   whole table ~9 pt off in opposite directions with their edges correct, and both are 41/42 and 46/47.
+   That is the cheapest remaining pair — one construct, two documents, and the proxy can measure it.
+   `balance-sheet` is a separate build: attach the floating rules to the borderless table so its edges
+   come from the rules the page drew, which is what `ruled=true` already does for `table-inside`.
+
+Nothing in `app/` was changed; the instrumentation was reverted and `regress.py --check` passes with no
+document worse in either format.
