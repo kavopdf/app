@@ -1,35 +1,56 @@
-## Is the pipeline moving?
+# P2W Watchdog - Run Report
 
-Yes. Nothing is stopped. health.py --stalled exits 0.
+**23 Nov 2026 · 18:15 IST**
 
-| stage | state | age |
-|---|---|---|
-| measure-google | done, 213 of 213 | 6.8 h |
-| matrix | done, 213 of 213 | 7.4 h |
-| classify | superseded | 6.7 h |
-| fix | moving | 1.2 h |
-| txt | superseded, 199 clean, 14 failing | 3.8 h |
+> Nothing is stopped.
 
-## What moved, and when
+## Stages
 
-At 09:32 UTC a fixer run took the slot, measured a lever in Google, found it regressed a document, reverted it and released the slot at 09:39. The relay wrote its report. The attempt did not add a clean document, but the stage is working.
+| stage | state | progress | age |
+|:--|:--|--:|--:|
+| measure-google | done | 213 of 212 | 0.5 h |
+| matrix | done | 213 of 213 | 1.0 h |
+| classify | moving |  | 1.6 h |
+| fix | moving |  | 0.6 h |
+| txt | moving | 199 clean, 14 failing | 6.8 h |
 
-This pass first read the fix stage as stopped, with the run record reading likely dead and the slot free. That reading was taken 15 seconds before the claim landed, and it was true of the slot and false of the pipeline. I pulled the three commits that landed after my clone, re-ran every tool, and corrected the reading rather than committing it.
+## Trend
 
-## The trend
+| | 2026-11-22 | 2026-11-23 | |
+|:--|--:|--:|:--|
+| .docx open | 59 | **59** | no change |
+| .txt failing | 16 | **16** | no change |
+| Google measured | 192 | **190** | -2 |
+| Google clean | 23 | **28** | +5 |
 
-Today already had a row, so progress.py appended nothing. Row against row: docx open 59 -> 59, no change. txt failing 16 -> 16, no change. google 192 -> 190, google clean 23 -> 28. Live readings are docx open 59, txt failing 14, google 190.
+## What this pass did
 
-So measurement is alive, the fixer is alive, and the number the fixer exists to move has not moved: 59 open for the third daily row in a row. That is recorded in BLOCKERS.md with the attempt beside it.
+* Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
+* Nothing needed moving.
 
-## What I did not do, and why
+Live now, past the row appended earlier today: 14 .txt failing, so the next row carries the fall.
 
-I have no cron tool. Its absence is written into BLOCKERS.md with the exact calls I would have made. It did not cost anything this time: the two fixer crons sharing one slot took it without any cron call, which is the mechanism that survives a dead run working as designed.
+## Round
 
-I did not force-release the slot: there is no claim on it now.
+Phase fix.
 
-I did not run round.py --reopen: the phase is fix, not done.
+## What I decided
 
-## One correction to the record
+Nothing is stopped, so nothing was moved: no slot released, no reopen, no stage advanced, no cron touched.
 
-The 12:20 decision said the corpus re-measure restarts at zero every call and must be chunked. p2w.py's own source records that defect and its repair, measured on 21 Nov: --force skips documents this build has already rewritten, so repeating the call advances. The wedge that is left is gate.py's budget arithmetic - its two layers ask for more seconds than one tool call allows - and the next step is one timed measurement, not a decision. Written into BLOCKERS.md with what would overturn it.
+The .docx column is flat - 59 again, the same as the previous row - while the fixer reads moving with
+attempts inside its window. That is written into BLOCKERS.md with the attempt count beside it rather
+than left as a silence.
+
+status.py reads the run now holding the slot SILENT: no beacon inside its window, the claim inside the
+stale limit, one attempt this run. So the slot was left to the relay cron rather than force-released -
+a release inside the window is how two runs end up on one tree.
+
+## Platform
+
+This watchdog has no cron tool, so no cron was read, paused, resumed or recreated, and no id changed.
+The calls it would have made, ids taken from HEALTH-BRIEF's table and never from memory: cron(action="list")
+for status and next_fire_at on the fixer and on the relay; cron(action="runs", cron_id=...) on a stage
+that reads stopped for longer than its threshold; then, only for a zombie older than an hour, delete and
+create with the new id written back into HEALTH-BRIEF's table. None of that was needed here: the slot
+was claimed by a live fixer run and the newest commits are the audit series, minutes old.
