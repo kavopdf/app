@@ -3036,3 +3036,4 @@
 {"t": 1795464733.649583, "ist": "01:42:13", "ev": "attempt", "d": "t12_word_invention -> lead"}
 {"t": 1795464733.7223127, "ist": "01:42:13", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795464733.8183794, "ist": "01:42:13", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795464786.8206391, "ist": "01:43:06", "ev": "beat", "d": "attempt.py: recording an attempt"}
