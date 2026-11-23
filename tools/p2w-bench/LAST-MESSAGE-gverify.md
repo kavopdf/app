@@ -1,25 +1,32 @@
-# Google verification pass
+# P2W Google Verify - Run Report
 
-**Stage.** `stage.py` reports `fix`, but it counts every result file on disk, including ones written by earlier engines. `gverify.py --report` counts only the results that carry the current engine stamp, and by that count the Google side is not finished — so measuring is still this cron's work. This run took a full batch: 60 documents.
+**24 Nov 2026 · 02:26 IST · stage classify**
 
-| measured | value |
-|---|---:|
-| documents in corpus | 213 |
-| Google results on the current engine | 146 |
-| pass all 42 checks | 27 |
-| fail at least one | 96 |
-| refused, page count did not match | 23 |
+> 190 of 213 measured in Google, 23 refused on page count. Google passes all 42 on 30; LibreOffice on 122.
 
-**What failed, top five** (documents, from `gverify.py --report`):
+The measuring is finished, so this run measured nothing new. It regenerated the capability table from the committed results and pushed it; the classifier cron picks it up from there.
 
-| check | documents |
-|---|---:|
-| `18\_displacement` | 52 |
-| `04\_chars\_missing` | 40 |
-| `59\_shape\_anchor` | 33 |
-| `60\_text\_column\_right\_edge` | 33 |
-| `25\_invisible\_text` | 29 |
+## Measured
 
-Both renderers are now measured for every document that has a Google result: the LibreOffice side holds a committed result for all 213, so no backlog is left on that half.
+| | |
+|:--|--:|
+| scored | **190** |
+| refused on page count | **23** |
+| clean in Google | **30** |
+| clean in LibreOffice | **122** |
 
-**Next.** A full batch finished comfortably inside the run, so the next run takes 60 again rather than fewer, and the remaining documents follow over the next runs.
+## Checks Google fails and LibreOffice does not
+
+| check | Google | LibreOffice |
+|:--|--:|--:|
+| `18\_displacement` | **101** | 20 |
+| `04\_chars\_missing` | **65** | 2 |
+| `25\_invisible\_text` | **48** | 0 |
+| `32\_stroke\_lines` | **47** | 1 |
+| `05\_chars\_extra` | **43** | 3 |
+| `60\_text\_column\_right\_edge` | **56** | 18 |
+| `59\_shape\_anchor` | **45** | 9 |
+| `45\_char\_accuracy` | **37** | 2 |
+
+The first row is the class to take: `18\_displacement`, 101 documents in Google against 20 in LibreOffice.
+
