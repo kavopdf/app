@@ -2,15 +2,13 @@
  "name": "62_two_col_newsletter_pull_quote",
  "status": "ok",
  "rc": 1,
- "passed": 36,
+ "passed": 38,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "25_invisible_text",
-  "32_stroke_lines",
   "44_header_footer",
   "45_char_accuracy"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

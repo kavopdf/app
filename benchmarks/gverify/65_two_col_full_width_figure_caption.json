@@ -2,18 +2,16 @@
  "name": "65_two_col_full_width_figure_caption",
  "status": "ok",
  "rc": 1,
- "passed": 33,
+ "passed": 35,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "13_text_colours",
   "17_matched_runs",
-  "32_stroke_lines",
   "44_header_footer",
   "45_char_accuracy",
   "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

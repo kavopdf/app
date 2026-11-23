@@ -2,15 +2,13 @@
  "name": "75_merged_header_cell_three_columns",
  "status": "ok",
  "rc": 1,
- "passed": 41,
+ "passed": 43,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "59_shape_anchor",
   "64_table_span_across",
   "65_table_span_down"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

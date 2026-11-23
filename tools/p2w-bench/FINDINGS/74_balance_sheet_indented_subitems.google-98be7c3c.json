@@ -1,0 +1,10 @@
+{
+ "name": "74_balance_sheet_indented_subitems",
+ "status": "ok",
+ "rc": 1,
+ "passed": 41,
+ "total": 42,
+ "failed": [
+  "18_displacement"
+ ]
+}
