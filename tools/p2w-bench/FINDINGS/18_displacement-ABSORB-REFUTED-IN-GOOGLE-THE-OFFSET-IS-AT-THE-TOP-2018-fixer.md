@@ -84,3 +84,12 @@ empty paragraph with an explicit exact line height, or `w:ind`/`w:framePr` — a
 first line's dy does not move from −10.16, the carrier is not the spacing and this lead is dead. If it
 moves, the same change should be measured on `mobile-bill` (−15.75 pt) before anything is committed,
 because a per-document offset is not a construct.
+
+## Instrument defect, found at release time
+
+`round.py --release-fixer` refuses with **"this run has recorded no attempt at all"** while
+`_attempts_this_run()` counted 1 (`TRACE.md` has the claim at 19:57 and the attempt at 20:44). The
+branch is `if done < 3 and not force:` — the threshold is three, the message says zero, and a run
+that has done its one attempt is told it did nothing. A run that believes the message goes looking
+for a missing ledger entry that is not missing. Either the threshold drops to 1 (which is what the
+surrounding comment says it is) or the message says three.
