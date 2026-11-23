@@ -717,6 +717,30 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "60_text_column_right_edge": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-23 19:34",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text",
+    "total": 0
+   }
+  ],
+  "last": null,
+  "last_engine": "b7699196",
+  "outcomes": [
+   "lead"
+  ],
+  "reason": "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one.",
+  "reasons": [
+   "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "content-missing-nothing-in-its-place": {
   "attempts": 7,
   "engine_note": "last_engine corrected 8c14e53 -> 5cd9e33: attempt.py derived the hash while the fix was still uncommitted in the working tree, so it recorded the commit BEFORE the change. 5cd9e33 is the commit that touched app/.../engine/ and is exactly the tree the 213-document ratchet measured (212 compared, 0 regressions, 1 improvement).",

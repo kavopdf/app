@@ -2655,3 +2655,7 @@
 {"t": 1795442239.9699647, "ist": "19:27:19", "ev": "beat", "d": "rebuild + diff census after fullSpend guard"}
 {"t": 1795442486.7507334, "ist": "19:31:26", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795442494.2756732, "ist": "19:31:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795442496.3021212, "ist": "19:31:36", "ev": "attempt", "d": "18_displacement -> reverted"}
+{"t": 1795442496.4071028, "ist": "19:31:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795442496.5074596, "ist": "19:31:36", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795442683.1848195, "ist": "19:34:43", "ev": "beat", "d": "attempt.py: recording an attempt"}
