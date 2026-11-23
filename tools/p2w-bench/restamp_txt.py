@@ -211,7 +211,17 @@ def apply():
             print("  REFUSED: %s errored (%s)" % (d, r["error"]))
             return 3
         rows.append({"document": d, "applicable": r["applicable"], "passed": r["passed"],
-                     "failed": r["failed"], "abstained": r["applicable"] - r["passed"],
+                     "failed": r["failed"],
+                       # ABSTAINED IS total - applicable, NOT applicable - passed.
+                       # `applicable` is the number of checks that actually RAN, and `passed` + `failed`
+                       # already add up to it - so `applicable - passed` was a second copy of the failure
+                       # count wearing another name, and it read 0 whenever a document passed everything,
+                       # however many checks had not run at all. Measured 23 Nov on 314_tender_rfp_boq:
+                       # the ranking said 8 applicable, 8 passed, 0 abstained, and a live verify_txt.py
+                       # run on the same pair said "8/12 applicable, 8 passed, 4 abstained". Four checks
+                       # did not run on a bill of quantities. 12 - 8 = 4, which is what it now writes.
+                       "abstained": max(0, (r.get("total") or (r["applicable"] + r.get("abstained", 0)))
+                                        - r["applicable"]),
                      "failed_ids": r["failed_ids"]})
     for path, tag in ((RANK, "RANKING-TXT.csv"), (BASELINE, "RANKING-TXT-BASELINE.csv")):
         # Write to a temp beside the target and replace, so a crash mid-write cannot leave an
