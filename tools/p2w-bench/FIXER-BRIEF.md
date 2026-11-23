@@ -1058,6 +1058,37 @@ The user's instruction, 20 Nov, in his words:
 > rahe aur jaruri nhi easy class hee choose kare ... class choose karne ki priority set karo jisme
 > sabse jyada documents fix karna ho aur classes ka selection rotation based ho"
 
+### BEFORE YOU PICK A CLASS: three architectural gaps the table cannot show you
+
+Read `FINDINGS/ARCHITECTURAL-GAPS-font-embedding-numbering-footnotes-0923-agent.md` once. It is measured,
+it is not a wish list, and each gap is fixable offline with no model and no network.
+
+**The one that may be your answer.** 199 of 213 documents use a face no phone has - `Effra` alone carries
+1191 runs - and this engine names its fonts and embeds none (`word/fontTable.xml`: 0). Position is decided
+by glyph advance widths, and advance widths belong to the face. DocxWriter already compensates for the
+substitute's line height, which is why vertical drift is survivable; it cannot reproduce the widths, which
+is the shape of the residual.
+
+`18_displacement` is 101 documents and 23 attempts, every one a `lead`. **If that residual is font
+substitution, no geometry construct will ever close it.** Three `Effra` documents, one live round trip
+each, with and without embedding, answers it either way. If embedding moves them you have found the
+construct behind 101 documents. If it does not, you have eliminated it - worth as much after 23 attempts.
+
+**The two that are cheap.** Lists are detected (`isListMarker`, `p.indent`) and then written as an indent:
+`word/numbering.xml` has 0 references, so a list is body text in Word. And footnotes have no
+`word/footnotes.xml`, so a note becomes a paragraph at the end of the body.
+
+| gap | documents affected | difficulty |
+|---|---|---|
+| font embedding | **199 of 213** | medium - a binary payload and the `.odttf` obfuscation |
+| `numbering.xml` | every document with a list | low - pure writing, detection already exists |
+| footnotes + outline | every document with a note | high - the pairing is geometry |
+
+**Why they are not in the class table:** `53_embedded_faces` compares font *families*, not embedding, so
+it passes a document that names a face nobody has. `38_list_markers` checks the marker text, not whether
+the list is a list. The gaps are real and the checks do not see them - which is exactly why a run reading
+only `classpick.py` will never pick them up.
+
 ### THE CLASS IS YOUR DECISION. THE TOOL ADVISES.
 
     python3 tools/p2w-bench/classpick.py            # evidence and a suggestion
