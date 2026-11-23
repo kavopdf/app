@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 00:56 → running IST · 1h 00m**
+**24 Nov 2026 · slot 02:08 → 02:09 IST · 1h 13m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -22,7 +22,7 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `00_page_count` |
+| Working on | `-` |
 
 ## What was tried
 
@@ -30,6 +30,7 @@
 |--:|:--|--:|:--|
 | 01:42 | **lead** | 0/213 | t12's 21 invented words on 600 split into 3 faults; source reader now sees printing annotations (21->20, blast radius 1 doc, no verdict moved); remaining 20 are the converter duplicating FreeText text |
 | 01:43 | **lead** | 0/213 | 23 page_count_refused docs: 21 render the RIGHT page count in LibreOffice and one too many in Google (proxy is blind); the 350 inline-picture construct is REFUTED - 0 wp:inline across all 23, the engi |
+| 02:08 | **lead** | 0/13 | Four live Google round trips on the 13 sole-failure documents give the distances this class has never had: med_dy -2.8 / -3.0 / -6.7 / -13.0 pt, worst_dy 5.4 / 4.9 / 10.0 / 28.2, med_dx -0.2..+0.2, ba |
 
 ## The txt
 
@@ -43,17 +44,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-02` | which single failing Google check, if fixed, makes t | 02:07 | - | not recorded |
+| `04_cB-02` | is the missing-char multiset fully explained by anch | 02:07 | - | not recorded |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 00:56 → running · 1h 00m |
+| Slot window | 02:08 → 02:09 · 1h 13m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 23 |
+| Tool beats | 64 |
 | Longest silence | **24.4 min** — from 00:56:37, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 6 |
+| Silences over 2 min | 8 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -61,11 +65,12 @@
 
 | Phase | Time | |
 |:--|--:|:--|
+| setup - claim, housekeeping, reading the gate | **3 min** | `#` |
 | fix - diagnose and change the engine | **3 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **27 min** | `##########` |
-| record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **13 min** | `#####` |
-| other - not attributed to a tool | **12 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **34 min** | `##########` |
+| record - attempt, handoff, class rows | **4 min** | `#` |
+| report - the report and the chain | **14 min** | `####` |
+| other - not attributed to a tool | **13 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -78,7 +83,7 @@
 
 ## Next run
 
-PENDING FIRST, FIXING SECOND - AND FIXING RESUMES BY ITSELF WHEN THE LIST IS EMPTY. `python3 tools/p2w-bench/pending.py` lists the 22 items you can close, in the order to take them. classpick.py refuses to name a class until those 22 are gone, so a run that tries to pick one is told to work the list instead. Nothing else changes: when the 22 reach zero, decide() returns a class again and the rotation carries on exactly as before - there is no separate mode to switch back on. The 22 are 4 [agent] (deployed 550-700 min ago, no finding committed - they died with their runs: check FINDINGS/ for the id and close them as dead, never re-deploy blind), 5 [ratchet] (fixes that landed on their own class and were never proved across the corpus - these are the cheapest wins, 38 documents already moved) and 13 [blocker] rows whose 'can I fix it' names a real action. THE OTHER 59 ARE NOT YOURS AND THEY DO NOT BLOCK YOU. `python3 tools/p2w-bench/pending.py --decisions` prints them: each says 'no - this needs a decision, not a patch'. They stay in BLOCKERS.md and in that view so a person can decide; they are never a reason to sit still. A gate that waited for them would never open, which is why it does not. After the 22: classpick picks by expected fixes - 05_chars_extra, then 32_stroke_lines, then 04_chars_missing (65 documents, never tried) and 25_invisible_text (48, never tried). 18_displacement is 8th because 20 attempts there moved 4 documents.
+NEXT RUN: (1) 18_displacement is measured and staged - the pair is (first-row cell w:before carries the table gap) + (w:trHeight declared less by the same per-row amount), and 362_price_list_dense is the falsifier because it has a ramp and no step. (2) The 5 ratchet items are very likely stale: benchmarks/STATE.json, RANKING.csv and the engine last changed in the SAME commit b7699196, and both regress.py --check and measure_gate.py pass on this tree (212/212 scored, engine docx == tree). Do not stamp them without checking - a corpus pass that covered them is what closes them, and the honest close is one corpus pass, not five stamps. (3) The 80 remaining pending items are mostly [blocker] rows that say 'this needs a decision, not a patch'.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

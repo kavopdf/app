@@ -1082,9 +1082,11 @@ def main(argv):
                     _run = json.load(_f)
             except Exception:
                 _run = {}
-            if float(_run.get("started_ts") or 0) < float(_claimed):
+            if float(_run.get("started_ts") or 0) < float(_claimed) and \
+                    float(_run.get("window_for_claim") or 0) != float(_claimed):
                 _fresh = {"started_ts": _claimed,
                           "started": time.strftime("%H:%M", time.gmtime(float(_claimed) + 5 * 3600 + 30 * 60)),
+                          "window_for_claim": float(_claimed),
                           "ended_ts": None, "ended": None, "attempts": 0, "kept": 0,
                           "agents": [], "docs_improved": 0}
                 with open(_rp, "w", encoding="utf-8") as _f:

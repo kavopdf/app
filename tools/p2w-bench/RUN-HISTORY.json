@@ -1,38 +1,5 @@
 [
  {
-  "started_ts": 1795228110.8924727,
-  "started": "07:58",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "t01_word_accuracy",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   {
-    "id": "684N7DBKF88E7AP7DZN6N2CWXZ",
-    "class": "47_margins",
-    "angle": "A",
-    "question": "which of the 47_margins documents fail on the .txt path, which engine construct owns each, and what is the smallest candidate change with its blast radius",
-    "deployed": "08:00",
-    "status": "landed",
-    "finding": "FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md"
-   },
-   {
-    "id": "5WFHH5ZB8F8TXRDE8AMQ64RA8R",
-    "class": "t01_word_accuracy",
-    "angle": "B",
-    "question": "are the 127 U+FFFD sites on 041122-Account_Opening_Form ligatures - settled by rendering and looking, not by extraction",
-    "deployed": "08:00",
-    "status": "landed",
-    "finding": "FINDINGS/fffd-IS-A-LIGATURE-1100-f1x.md"
-   }
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 1,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795240115.4342377,
   "started": "11:18",
   "ended_ts": null,
@@ -1131,5 +1098,20 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795461988.0,
+  "started": "02:08",
+  "window_for_claim": 1795466286.2232144,
+  "ended_ts": null,
+  "ended": "(never)",
+  "attempts": 1,
+  "kept": 0,
+  "agents": [
+   "18_dA-02",
+   "04_cB-02"
+  ],
+  "docs_improved": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
