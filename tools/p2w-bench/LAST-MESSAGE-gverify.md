@@ -1,32 +1,34 @@
-# P2W Google Verify - Run Report
+# P2W Google Verify — Run Report
 
-**23 Nov 2026 · 06:26 IST · stage classify**
+**23 Nov 2026 · stage classify**
 
-> 190 of 213 measured in Google, 23 refused on page count. Google passes all 42 on 28; LibreOffice on 122.
-
-This run did the table, not the measuring: the LibreOffice half was already complete, so it regenerated the capability table from the committed results and committed it. The table now carries the engine coverage it is computed over, because most pairs in it were rendered on older engines and a pair from two engines names the engines, not a construct. Recorded in BLOCKERS; the classifier cron takes the next slot.
-
-## Measured
+160 of 213 documents now carry a Google result measured on the current engine stamp: 28 pass all 42 checks, 107 fail at least one, 25 were refused on page count and are counted separately, never as passes.
 
 | | |
 |:--|--:|
-| scored | **190** |
-| refused on page count | **23** |
-| clean in Google | **28** |
-| clean in LibreOffice | **122** |
+| verified on the current engine | 160 |
+| pass all 42 | 28 |
+| fail at least one | 107 |
+| refused on page count | 25 |
 
-## Checks Google fails and LibreOffice does not
+Top failing checks in Google, by document count:
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `18\_displacement` | **109** | 20 |
-| `32\_stroke\_lines` | **85** | 1 |
-| `05\_chars\_extra` | **79** | 3 |
-| `04\_chars\_missing` | **66** | 2 |
-| `25\_invisible\_text` | **47** | 0 |
-| `59\_shape\_anchor` | **52** | 9 |
-| `60\_text\_column\_right\_edge` | **56** | 18 |
-| `45\_char\_accuracy` | **37** | 2 |
+| check | Google |
+|:--|--:|
+| 18\_displacement | 56 |
+| 04\_chars\_missing | 47 |
+| 59\_shape\_anchor | 35 |
+| 60\_text\_column\_right\_edge | 34 |
+| 25\_invisible\_text | 28 |
 
-The first row is the class to take: `18\_displacement`, 109 documents in Google against 20 in LibreOffice.
+## What this run did
 
+Measured the next block of the corpus through both renderers on engine 98be7c3c — Google Doc upload, PDF export, the 42 checks, and the LibreOffice render of the same .docx for the pair. Results for both directories are committed and pushed.
+
+One document did not land. 74\_balance\_sheet\_indented\_subitems now fails 18\_displacement in Google on this engine, where its committed result was clean. The commit gate refused it as a Google regression and has no override, which is the gate working. That document's committed result was left as it was so the rest of the batch could land, and the refused measurement is written up in full in FINDINGS with its result file beside it. It is the fixer's class, not this cron's.
+
+## Why the capability table was not written
+
+stage.py says classify, but that count comes from result files, not from results stamped with the current engine — the fault BLOCKERS already records against it. The documents outside the 160 verified above still carry a result from an older engine, so a matrix over them would print a Google/LibreOffice pair measured on two different engines and call it "same engine". That is a table the fixer would act on wrongly, so it was not generated.
+
+Next: keep measuring. The remaining documents need a Google result on this engine before the table is worth writing.
