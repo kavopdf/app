@@ -1,5 +1,5 @@
 # Defect classes - round 1
-Documents measured: **212 of 213** - 1 exempt (`416_many_tiny_pages`), counted in the total and never scored.
+Documents measured: **212 of 212** - 1 exempt (`416_many_tiny_pages`), counted in the total and never scored.
 
 
 Grouped and ranked from `benchmarks/RANKING.csv` only: `signature` and `problem` are the

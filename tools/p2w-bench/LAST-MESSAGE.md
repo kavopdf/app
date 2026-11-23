@@ -1,8 +1,8 @@
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 13:20 → running IST · 1h 35m**
+**23 Nov 2026 · slot 15:02 → running IST · 1h 33m**
 
-> No change was kept this run. The numbers below say what was tried.
+> The column-page shape merge is committed (`0be925ff`). The attempt is recorded **partial** - 2 of 23 moved - because the table this report ranks by cannot see this construct at all.
 
 ## Progress
 
@@ -12,20 +12,20 @@
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
-| Exempt from the LibreOffice comparison | **1** — 416_many_tiny_pages |
-| **Fixed - Google, all 42 checks** | **0** of the **2** re-measured on this engine - **188** of the 190 scored are still on an older engine, and **30** were clean there |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 188 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| Exempt from the LibreOffice comparison | **0** — none |
+| **Fixed - Google, all 42 checks** | **0** of the **0** re-measured on this engine - **190** of the 190 scored are still on an older engine, and **30** were clean there |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 190 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
+| Working on | `00_page_count` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 14:02 | **reverted** | 0/None | partial spend of the table-gap spacer: Google 68_journal 41/42 -> 40/42, adds 59_shape_anchor, fixes nothing; flow-invariant so LibreOffice could not have caught it |
+| 16:34 | **partial** | 2/23 | LANDED the column-page shape merge (21 documents change in document.xml, 361 124->40 paragraphs, 401 52->27, 301 untouched at 85). Corpus on this tree: 212/212 scored, 0 documents worse, regress PASS, |
 
 ## The txt
 
@@ -39,20 +39,17 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `A118_displacement-01` | writer-construct | 13:21 | - | - |
-| `B160_text_column_right_edge-01` | right-edge+shape_anchor | 13:21 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:20 → running · 1h 35m |
+| Slot window | 15:02 → running · 1h 33m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 22 |
-| Longest silence | **52.7 min** — from 14:03:42, after `report.py: building the report` |
-| Silences over 2 min | 6 |
+| Tool beats | 30 |
+| Longest silence | **7.1 min** — from 16:02:53, after `attempt 1: measuring the patched corpus, call 1` |
+| Silences over 2 min | 19 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -60,10 +57,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **7 min** | `##` |
-| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `#####` |
-| report - the report and the chain | **53 min** | `############` |
-| other - not attributed to a tool | **11 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **37 min** | `#########` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **53 min** | `#############` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -76,9 +73,58 @@
 
 ## Next run
 
-00_page_count: mechanism MEASURED, fix not landed. FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md. Google rasterises each page-positioned floating shape and keeps the paragraph that carries it, and that empty paragraph costs ~0.83 pt of flow (w:line="1" exact is NOT honoured for it): 108 of them = 89.9 pt on 301_lab_report_panel against 44.5 pt of free page, so a 1-page source renders 2 pages. Deleting all 108 -> 1 page at the same text y (the control). 22 of the 23 refused documents emit ALL their drawing-only paragraphs AFTER the last text paragraph; counts 7..2464. 350_question_paper has 1 and is NOT explained by this. Refuted and measured, do not retry: drop-last, prstGeom-rect, wrapSquare, framePr. VOID (my probe bug, never measured): merge-into-one-paragraph and attach-to-text. NEXT LEVER, cheapest in the writer: merge the drawing-only paragraphs of a page into ONE (DocxWriter.shape(), DocxWriter.java:2726) - saves 107 x 0.83 = 88.8 pt against 89.9 pt needed here, a one-point margin, so measure it; then w:tcBorders through the table writer. This is the same construct as 32_stroke_lines and 05_chars_extra: one mechanism, three check families.
+00_page_count: measure 041122-Account_Opening_Form in Google (2464 drawing-only paragraphs, nine pages, worst score in the corpus at 98.65) - the scale test for the carrier paragraph. Then 350_question_paper: FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md charges picture() lines 2542-2564 (an unplaced picture emitted <wp:inline> in a paragraph with no w:pPr, inheriting sz=22 and w:after=120 from docDefaults, which spacingTw cannot see); the patch beside it is UNCOMPILED. Then w:tcBorders for 32_stroke_lines/05_chars_extra.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+## What this run actually did - in prose, because the tables cannot say it
+
+**The column-page shape merge is committed (`0be925ff`).** A page-positioned shape reached from
+inside the column/table pass was written as a paragraph of its own; Google rasterises the shape, keeps
+the paragraph, and bills it ~0.83 pt of flow because it does not honour `w:line="1" exact`. The shapes
+now collect in `Ctx.shapeCarrier` and go out as one paragraph per page. This is the second half of a
+fix whose `pageBody()` half landed at `5beb8b9d`.
+
+**Proved on the document XML, not on a tool this run edited:**
+
+| document | paragraphs before | after | drawings |
+|:--|--:|--:|:--|
+| `361_product_catalogue_grid` | 124 | **40** | 91 -> 91 |
+| `401_trifold_brochure` | 52 | **27** | 26 -> 26 |
+| `301_lab_report_panel` | 85 | 85 | 108 -> 108 (already merged by `pageBody`) |
+| `350_question_paper` | 70 | 70 | 1 -> 1 (not this mechanism) |
+
+The last two rows are the control: a document already fixed is not fixed twice, and the one the
+mechanism does not explain is untouched.
+
+**Why the attempt reads `partial` and not `kept`.** The outcome rule wants a quarter of the class
+(6 of 23); the evidence for this construct is 2 documents in Google, measured on this engine by the
+04:47 run: `361` 2 pages -> 1 at 41/42, and `375` 2 pages -> 1 at 35/42 -> 37/42 with no check that
+passed before failing now. **Zero documents move in the table this report ranks by, and that is the
+finding, not a failure:** LibreOffice honours the exact line rule and Google does not, so the proxy is
+blind to this construct by construction. The corpus pass buys the other half of the claim - the 21
+changed documents are neutral in LibreOffice and nothing else in the corpus moved, so this cannot
+regress anything the proxy can measure. 22 of the 23 page-count-refused documents were scoring **zero
+of 42 known checks** and are now measurable.
+
+**Four instrument defects blocked the last two runs, all fixed here, each with a finding:**
+
+| defect | what it did |
+|:--|:--|
+| `p2w.py --force` read `REPO`'s `PdfToWord.class`, not `ENGINE_SRC`'s | a corpus pass on a patched tree skipped all 213 as fresh - cost this run 22 minutes and a corpus that described the wrong engine. Found by reading the `.docx`, not the run's own log |
+| `measure_gate.py` `expected_docs()` ignored `EXEMPT.json` | demanded 213 rows from the 212-row table `gate.py` publishes -> `NOT READY` on its own publisher's honest table |
+| `regress.py --stamp` against the pre-commit hook | a deadlock: the hook wants the stamp, the stamp wants the commit. **No engine change could land at all** |
+| `gverify.py --collect` expected `downloaded_file_content.s3url` | the tool returns `artifacts[0].workspace_path` now, so the Google cron collected **nothing**; accepts both shapes, 12 passing tests |
+
+**Subagents.** Two, both landed: one charged `350_question_paper`'s remaining refusal to `picture()`
+lines 2542-2564 - an unplaced picture emitted `<wp:inline>` in a paragraph with no `w:pPr`, so it
+inherits `sz=22` and `w:after=120` from the document defaults and `spacingTw()` cannot see it; its
+patch is committed **uncompiled**. The other fixed `gverify --collect` with tests.
+
+**Left for the next run.** `041122-Account_Opening_Form` in Google (2464 drawing-only paragraphs, nine
+pages, the worst score in the corpus at 98.65) is the scale test for the carrier and was not measured.
+`350_question_paper`'s patch needs compiling. `gate.py` cannot forward `--force` to `p2w.py`, so after
+an engine change it re-measures the old `.docx` - the workaround is `p2w.py --force` first.

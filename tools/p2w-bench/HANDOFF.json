@@ -1192,9 +1192,13 @@
   {
    "at": "14:03",
    "text": "agent landed: 18_displacement / A -> FINDINGS/18_displacement-PARTIAL-SPEND-REGRESSES-GOOGLE-1428-relay.md"
+  },
+  {
+   "at": "16:35",
+   "text": "attempt 5 on 00_page_count -> partial (2/23 moved)"
   }
  ],
- "next": "00_page_count: mechanism MEASURED, fix not landed. FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md. Google rasterises each page-positioned floating shape and keeps the paragraph that carries it, and that empty paragraph costs ~0.83 pt of flow (w:line=\"1\" exact is NOT honoured for it): 108 of them = 89.9 pt on 301_lab_report_panel against 44.5 pt of free page, so a 1-page source renders 2 pages. Deleting all 108 -> 1 page at the same text y (the control). 22 of the 23 refused documents emit ALL their drawing-only paragraphs AFTER the last text paragraph; counts 7..2464. 350_question_paper has 1 and is NOT explained by this. Refuted and measured, do not retry: drop-last, prstGeom-rect, wrapSquare, framePr. VOID (my probe bug, never measured): merge-into-one-paragraph and attach-to-text. NEXT LEVER, cheapest in the writer: merge the drawing-only paragraphs of a page into ONE (DocxWriter.shape(), DocxWriter.java:2726) - saves 107 x 0.83 = 88.8 pt against 89.9 pt needed here, a one-point margin, so measure it; then w:tcBorders through the table writer. This is the same construct as 32_stroke_lines and 05_chars_extra: one mechanism, three check families.",
+ "next": "00_page_count: measure 041122-Account_Opening_Form in Google (2464 drawing-only paragraphs, nine pages, worst score in the corpus at 98.65) - the scale test for the carrier paragraph. Then 350_question_paper: FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md charges picture() lines 2542-2564 (an unplaced picture emitted <wp:inline> in a paragraph with no w:pPr, inheriting sz=22 and w:after=120 from docDefaults, which spacingTw cannot see); the patch beside it is UNCOMPILED. Then w:tcBorders for 32_stroke_lines/05_chars_extra.",
  "agents": [
   {
    "id": "contA-01",
@@ -2177,7 +2181,7 @@
    "plan": ""
   }
  ],
- "context": "This slot took the first of the two open leads on 18_displacement. Two subagent-style diagnoses were produced locally: the hairline arithmetic (landed) and the cell line box (not landed). The dither is still refuted - do not apply it. The corpus table is stamped on the current engine (e92e795f). gate.py dropped the exempt row from RANKING.csv and measure_gate refused the table; the row was restored by hand and the defect is in BLOCKERS.md - if a future gate.py run publishes 212 rows again, restore 213,416_many_tiny_pages,exempt,exempt,,,,,,,,,,,,300,,,,, before committing.",
+ "context": "00_page_count LANDED (0be925ff): the column-page shape merge is in. 21 documents change in document.xml, 361 124->40 paragraphs and 401 52->27, 301 untouched (pageBody already merged it), 350 untouched (not this mechanism). Corpus 212/212 on this tree, 0 documents worse, regress PASS, measure_gate READY. 0 documents move in the LibreOffice table BY CONSTRUCTION - it honours w:line=1 exact and Google does not - the 2 moved are Google moves from the 04:47 run (361 2pp->1 at 41/42, 375 2pp->1 at 35/42->37/42). 22 of 23 page-count-refused documents were scoring 0 of 42 and are now measurable. Instrument defects fixed this run: p2w --force read REPO's PdfToWord.class not ENGINE_SRC's (a patched tree skipped all 213 as fresh - cost 22 min); measure_gate expected 213 rows from the 212-row table gate.py publishes (EXEMPT.json read for blocked, ignored for expected); regress --stamp and the pre-commit hook deadlocked so no engine change could land at all; gverify --collect could not read artifacts[0].workspace_path so the Google cron collects nothing. STILL OPEN: gate.py cannot forward --force to p2w.py (workaround: p2w --force first, then gate.py).",
  "needs_human": [
   {
    "at": "10:40",
