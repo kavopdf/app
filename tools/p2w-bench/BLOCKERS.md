@@ -361,3 +361,24 @@ minutes ago is a working run, so `round.py --release-fixer --force` was not run:
 put a second run into the engine. `round.py --phase` prints `fix`, so `round.py --reopen` does not apply
 either - it refuses when nothing is failing and is only for a phase of `done` with documents still
 failing.
+
+## 2026-11-24 03:25 — `18_displacement`: every candidate fix is LO-visible, so the gate and the goal conflict
+
+**What blocks it.** The class splits into two halves (measured this slot, `FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md`).
+The spacer half needs page room to spend a gap; the row half needs `w:trHeight` declared 15 twips
+lower to stop Google laying every ruled row 0.75 pt tall. Spending needs the room the row excess has
+taken, and repaying the row excess lowers LibreOffice's laid height on every pitch-bound row by up to
+18 pt on a 24-row page. `regress.py` compares LibreOffice, so it refuses the row half — and without
+it the spacer half has no room. There is no free parameter: for an unspendable spacer every split of
+`w:before`/`w:line` is LO-identical, and only `before = gap - 1` delivers the gap in Google.
+
+**can I fix it:** not as a patch. Two candidates, both need a decision:
+1. one Google round trip on `362_price_list_dense` with `trHeight = max(content, line - 15)` on rows
+   where `line > content` only — LO-invariant by construction, and it discriminates whether Google
+   lays `trHeight + rule` or `max(trHeight, content + rule)`;
+2. if (1) shows `max`, the class needs `regress.py` to allow a measured Google win that moves the
+   LibreOffice proxy, or a construct that LibreOffice and Google disagree on by design — which
+   `google_safe.py` exists to refuse.
+
+**needed:** a decision on whether a Google-measured win may move the LibreOffice proxy on a document
+where the proxy and Google disagree, which is every document in this class.
