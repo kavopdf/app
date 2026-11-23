@@ -56,7 +56,7 @@ Allowed, because they are coordination and not engine work:
 **Not allowed:**
 
 * change anything under `app/src/main/java/.../engine/` — that is the fixer's, alone
-* edit `verify_google.py`, `verify_txt.py` or `regress.py` to make a number look better
+* edit `verify\_google.py`, `verify\_txt.py` or `regress.py` to make a number look better
 * advance `stage.py --set` past what the evidence supports
 * delete anything in the user's Drive
 
@@ -79,15 +79,15 @@ by hand. If nothing is stopped, one line saying so.
 ## THE STUCK-CRON FIX: pause then resume
 
 Verified 19 Nov. A fixer run started 18:52, hung with no beacon, and the platform still called it
-running - so `next_fire_at` stayed at 18:50, in the past, and the cron never fired again. Three hours
+running - so `next\_fire\_at` stayed at 18:50, in the past, and the cron never fired again. Three hours
 of the only cron allowed to change the engine, gone, with nothing to show.
 
 **A run cannot be cancelled through the `cron` tool. It can be cleared:**
 
-    cron(action="pause",  cron_id="<id>")
-    cron(action="resume", cron_id="<id>")
+    cron(action="pause",  cron\_id="<id>")
+    cron(action="resume", cron\_id="<id>")
 
-The resume recomputes the next fire. On the fixer that took `next_fire_at` from 18:50 in the past to
+The resume recomputes the next fire. On the fixer that took `next\_fire\_at` from 18:50 in the past to
 22:50, and the pipeline moved again.
 
 **This is the watchdog's one real power and it should use it whenever `health.py --stalled` names the
@@ -125,7 +125,7 @@ A paused cron is silent and nothing else in the system reports that it is paused
 
 `health.py` reads files. It cannot see the cron platform. Two things it will never catch:
 
-1. **A cron that is enabled but not firing** - `next_fire_at` in the past while the stage is stopped.
+1. **A cron that is enabled but not firing** - `next\_fire\_at` in the past while the stage is stopped.
    Read it with `cron(action="list")`.
 2. **A cron that is paused** - `status` reads `paused`. Nothing else in the repo knows.
 
@@ -178,19 +178,19 @@ wrong because a table was regenerated, append a new row with a note; do not rewr
 
 Found 19 Nov, hours after the first fix. A fixer run started 18:52, released its slot, and stayed
 `status: running` on the platform for over three hours. `pause` then `resume` recomputed
-`next_fire_at` correctly and the pipeline looked healthy - **but the zombie was still there, and the
+`next\_fire\_at` correctly and the pipeline looked healthy - **but the zombie was still there, and the
 cron still would not fire.** Every later run was blocked by a run that had already finished its work
 and never exited.
 
-**`pause`/`resume` clears a stale `next_fire_at`. It does not clear a zombie run.** Those are two
+**`pause`/`resume` clears a stale `next\_fire\_at`. It does not clear a zombie run.** Those are two
 different faults and only one of them is fixed by pause/resume.
 
-    cron(action="runs", cron_id="<id>")     # is the OLD run still listed `running`?
+    cron(action="runs", cron\_id="<id>")     # is the OLD run still listed `running`?
 
 If a run has been `running` for more than an hour with `ended_at: null` and the slot is free, it is a
 zombie. **The only way to clear it is to recreate the cron:**
 
-    cron(action="delete", cron_id="<id>")     # then create it again with the same prompt
+    cron(action="delete", cron\_id="<id>")     # then create it again with the same prompt
     cron(action="create", name=..., schedule=..., prompt=...)
 
 Deleting a cron does not delete the repository, the state or the work - only the schedule and its run
@@ -224,7 +224,7 @@ cron and a zombie run - are not automatable at all.
 **The watchdog must therefore check its own tool list first and say which world it is in.**
 
     **Measured 21 Nov: it has it.** The watchdog's own prompt carries
-    `cron(action="delete", cron_id="<id>")` and `cron(action="create", ...)`, so STEP 4 A and B are
+    `cron(action="delete", cron\_id="<id>")` and `cron(action="create", ...)`, so STEP 4 A and B are
     executable and a zombie can be cleared without anyone being asked. This brief said the opposite
     for two days while it was not true, and the watchdog was told to write "a person has to look" into
     BLOCKERS.md instead of doing the one thing it exists for.
