@@ -1832,6 +1832,42 @@ that no document got closer to 99%.**
 
 ### So the run does not end when the steps end. It ends when the work does.
 
+### And "the work" now has a number, because it did not have one.
+
+The user: *"hona toh yeh chahiye tha inka har ek run 1.5 hours se zyada ka hona chahiye"*.
+
+He is right, and the ledger proves he is right. Measured over 31 timed fixer runs: **median 36 minutes,
+mean 42, and only 3 of 31 ever reached 90.** Ten runs finished inside twenty minutes. Nothing in this
+brief or in the cron prompt ever said how long a run should take, so a run did one attempt, wrote an
+accurate report, and stopped - which is exactly what it was told to do.
+
+**THE SLOT IS YOURS FOR 90 MINUTES. A run is 90 minutes of work, and one attempt is not a run.**
+
+| at | what you should be doing |
+|---|---|
+| 0-10 min | claim, read the last report, deploy the two agents, pick the class |
+| 10-75 min | attempt after attempt. A kept change is a reason for the NEXT attempt, not for a report |
+| 75-90 min | write the report, commit, push, release the slot |
+
+**Check the clock before you write the report:**
+
+    python3 tools/p2w-bench/runclock.py        # minutes elapsed since the claim
+
+If it says less than 70 and you are about to write the report, **you are stopping early.** Go back to
+`classpick.py --leverage` and take another attempt. The report is not the finish line; it is the last
+fifteen minutes.
+
+**What a 90-minute run looks like:** four to six attempts, not one. The kept one is the one you write
+up; the leads are the ones the next run starts from. A run that lands one change in 90 minutes has done
+a fifth of its job.
+
+**This does not mean pad the time.** If the engine is genuinely blocked, say so in the report and stop -
+but say it with the evidence, and check `regress.py --check` and `measure_gate.py` first, because a
+blocked gate is work, not an excuse.
+
+The beacon rule is what makes 90 minutes safe: as long as you beat before each long step, the 45-minute
+silence window never fires and nothing kills you mid-render.
+
 **Before you stop, answer this in one line: what moved?** If the answer is "nothing", you are not finished -
 you have used your attempts on the wrong thing, and the evidence to find the right thing is one command
 away:

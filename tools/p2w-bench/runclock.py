@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""How long has this run been going - and is it time to write the report yet?
+
+WHY THIS EXISTS. The brief told a run "it ends when the work does" and never said how long the work was.
+So a run did one attempt, wrote an accurate report, and stopped - which is what it had been told to do.
+Measured over 31 timed fixer runs: median 36 minutes, mean 42, and only 3 of 31 reached 90. Ten finished
+inside twenty. The user's target is "har ek run 1.5 hours se zyada ka hona chahiye", and a target nobody
+can measure is not a target.
+
+This prints the clock. Nothing else. A run reads it before writing its report and knows whether it is
+finishing or quitting early.
+
+    python3 tools/p2w-bench/runclock.py          # the verdict
+    python3 tools/p2w-bench/runclock.py --json   # the numbers
+
+Exit 0 = keep working. Exit 1 = the report is due now.
+"""
+import json
+import os
+import sys
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(HERE))
+ROUND = os.path.join(HERE, "ROUND.json")
+
+# The slot is 90 minutes of work. The report is the last 15 of them, because a report that is written and
+# not committed is worth nothing - and committing, pushing and releasing takes real time.
+BUDGET_MIN = 90
+REPORT_AT_MIN = 75
+
+
+def _claimed_at():
+    """When the current claim was made, as an epoch second. None if there is no claim.
+
+    THE FIELD IS fixer_started. ROUND.json keeps a flat record - fixer_started, fixer_last_beat,
+    fixer_engine_at_claim - and not a nested "fixer" object, so the first version of this tool read
+    nothing and told every run it held no slot. Read what is there.
+    """
+    try:
+        d = json.load(open(ROUND, encoding="utf-8"))
+    except Exception:
+        return None
+    for key in ("fixer_started", "fixer_claimed_ts", "fixer_at_ts"):
+        v = d.get(key)
+        if isinstance(v, (int, float)) and v > 0:
+            return float(v)
+    # older records carry only an HH:MM string; fall back to today
+    v = d.get("fixer_started")
+    if isinstance(v, str) and ":" in v:
+        try:
+            hh, mm = (v.split(":") + ["0"])[:2]
+            lt = time.localtime()
+            return time.mktime((lt.tm_year, lt.tm_mon, lt.tm_mday,
+                                int(hh), int(mm), 0, 0, 0, -1))
+        except Exception:
+            return None
+    return None
+
+
+def main(argv):
+    started = _claimed_at()
+    if not started:
+        print("no claim in ROUND.json - this run does not hold the slot, so there is no clock to read")
+        print("claim first: python3 tools/p2w-bench/round.py --claim-fixer")
+        return 2
+
+    elapsed = (time.time() - started) / 60.0
+    left = BUDGET_MIN - elapsed
+    due = elapsed >= REPORT_AT_MIN
+
+    if "--json" in argv:
+        print(json.dumps({"elapsed_min": round(elapsed, 1), "budget_min": BUDGET_MIN,
+                          "report_at_min": REPORT_AT_MIN, "left_min": round(left, 1),
+                          "report_due": due}))
+        return 0 if not due else 1
+
+    print("  claimed        : %s" % time.strftime("%H:%M", time.localtime(started)))
+    print("  elapsed        : %.0f min" % elapsed)
+    print("  budget         : %d min   (report due at %d)" % (BUDGET_MIN, REPORT_AT_MIN))
+    print("  left           : %.0f min" % left)
+    print()
+
+    if due:
+        print("  REPORT IS DUE. Write it, commit it, push it, release the slot.")
+        print("  A report that is written but not committed is worth nothing.")
+        return 1
+
+    print("  KEEP WORKING. You have %.0f minutes before the report is due." % (REPORT_AT_MIN - elapsed))
+    print("  A kept change is a reason for the NEXT attempt, not for a report.")
+    print("  Next attempt: python3 tools/p2w-bench/classpick.py --leverage")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
