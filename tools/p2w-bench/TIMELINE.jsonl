@@ -2815,3 +2815,13 @@
 {"t": 1795454007.9568222, "ist": "22:43:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795454007.9734664, "ist": "22:43:27", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1795454872.0512967, "ist": "22:57:52", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795455530.7674644, "ist": "23:08:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795455537.896613, "ist": "23:08:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795455538.0974584, "ist": "23:08:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795455538.3359861, "ist": "23:08:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795455538.552277, "ist": "23:08:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795455542.4313962, "ist": "23:09:02", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795455574.9159706, "ist": "23:09:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795455582.7658126, "ist": "23:09:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795455587.803076, "ist": "23:09:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795455588.1810498, "ist": "23:09:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
