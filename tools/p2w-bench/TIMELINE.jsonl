@@ -2121,3 +2121,11 @@
 {"t": 1795394890.566942, "ist": "06:18:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795394890.5844, "ist": "06:18:10", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1795399568.464485, "ist": "07:36:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795399570.550035, "ist": "07:36:10", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795399570.664429, "ist": "07:36:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795399570.8105137, "ist": "07:36:10", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795399573.1975667, "ist": "07:36:13", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795399574.1328394, "ist": "07:36:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795399574.759305, "ist": "07:36:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795399575.1122413, "ist": "07:36:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795399576.0545812, "ist": "07:36:16", "ev": "beat", "d": "report.py: building the report"}

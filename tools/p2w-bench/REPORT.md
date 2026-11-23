@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 05:58 → running IST · 19 min**
+**23 Nov 2026 · slot 05:58 → 06:18 IST · 19 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -50,13 +50,13 @@
 
 | | |
 |:--|:--|
-| Slot window | 05:58 → running · 19 min |
+| Slot window | 05:58 → 06:18 · 19 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 25 |
+| Tool beats | 29 |
 | Longest silence | **5.3 min** — from 06:01:27, after `attempt.py: recording an attempt` |
 | Silences over 2 min | 4 |
-| Obstacles | 0 cleared · 3 parked, with the evidence to re-open them |
-| Still a wall | **The `.txt` half is now a stall past a day and nothing moved it: 197 clean, 16 failing, unchanged since 21 No |
+| Obstacles | 0 cleared · 4 parked, with the evidence to re-open them |
+| Still a wall | **`stage.py` calls the corpus measured, but most of it is not measured on the engine that is on HEAD.** `measu |
 
 
 ### Where the time went
@@ -66,7 +66,7 @@
 | fix - diagnose and change the engine | **10 min** | `############` |
 | measure or build - a conversion, screen or compile writes no beacon | **5 min** | `#######` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `##` |
+| report - the report and the chain | **2 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
