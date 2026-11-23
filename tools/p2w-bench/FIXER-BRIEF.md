@@ -1130,6 +1130,37 @@ the numbers once. That is the cost of starting. Paying it and then doing one att
 **If the engine is genuinely blocked** - the gate refuses, the class list is empty, Drive is down - say so
 with the evidence and release. That is a run that finished. One attempt and a report is a run that stopped.
 
+### PICK THE CHECK THAT FINISHES DOCUMENTS, NOT THE CLASS THAT TOUCHES THEM
+
+Measured 23 Nov over 60 runs: **80% improved nothing, 60% made 0 or 1 attempt**, and about 20 documents a day
+"improved" while the clean count sat at **30 of 190 for days**. Both facts are true at once because a moved
+check is not a finished document. A run that moves one check on one document has changed a number that looks
+like progress and left the score where it was.
+
+**The score is documents clean. So the unit of work is the document, and the question is which check is
+standing in front of the most of them:**
+
+    python3 tools/p2w-bench/docpick.py --next      # the one thing to do now
+    python3 tools/p2w-bench/docpick.py             # the whole lever table
+    python3 tools/p2w-bench/docpick.py --doc NAME  # what still blocks one document
+
+It ranks checks by **documents they would turn CLEAN**, not by documents they affect. On 23 Nov:
+
+    18_displacement            101 docs fail it    13 would go CLEAN
+    60_text_column_right_edge   56 docs fail it     4 would go CLEAN
+    25_invisible_text           48 docs fail it     3 would go CLEAN
+
+So closing `18_displacement` takes the clean count from 30 to 43 in one move. No class table showed that,
+because a class table counts documents touched and the score counts documents finished.
+
+**Work one document all the way to clean, then the next.** `docpick.py --next` names the proof document; the
+attempt is not finished until that document passes all 42 checks, or you can say with evidence which of its
+remaining checks the engine cannot currently emit. "I moved 18_displacement on one document" is the shape of
+the 80% that improved nothing.
+
+`classpick.py --leverage` still has a use - when the top check is one the engine genuinely cannot emit yet,
+its ranking tells you what is worth building. But it is the second question, not the first.
+
 ### READ WHAT THE OTHER FIVE CRONS FOUND BEFORE YOU PICK A CLASS
 
 Every cron already writes its report into this repo and commits it:
