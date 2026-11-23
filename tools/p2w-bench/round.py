@@ -706,7 +706,7 @@ def release(name, force=False):
         #
         # pending.py is the gate and it already knows whether anything is outstanding. If it is, the
         # run is not finished, whatever it thinks - and the platform's own limit is what ends it, not
-        # the run's guess about how long it has worked. A killed run frees the slot ten minutes after
+        # the run's guess about how long it has worked. A killed run frees the slot CLAIM_STALE_MIN minutes after
         # its last activity, so this cannot wedge: the slot always comes back.
         #
         # --force still bypasses everything, and the round-finished bypass above still applies.
@@ -882,6 +882,22 @@ def release(name, force=False):
     s.pop("%s_doing" % name, None)
     s.pop("%s_doing_since" % name, None)
     save(s)
+    # PUSH THE RELEASE, OR THE SLOT IS NOT ACTUALLY FREE.
+    #
+    # claim() pushes ROUND.json (line 482) and this did not, so the remote kept the claim after the run
+    # had released it. The next run clones, reads a live claim, and stands aside until the stale window
+    # expires - which was 10 minutes and is now 45, so this omission cost 35 more idle minutes per cycle
+    # than it did before. The release was real on the releasing sandbox's disk and invisible everywhere
+    # else, which is the one thing the claim protocol exists to prevent.
+    #
+    # A rejected push is not an error here: it means another run pushed a claim in between, and its
+    # claim is the one that should win. Pull and let the next run sort it out from the file.
+    _rel = sh("git add tools/p2w-bench/ROUND.json && "
+              "git -c user.email=320240581+Onyx-Node@users.noreply.github.com "
+              "-c user.name=Onyx-Node commit -q -m 'release: %s frees the slot' ; "
+              "git push -q origin main" % name, timeout=120)
+    if _rel[0] != 0:
+        sh("git pull -q --rebase origin main", timeout=120)
     _timeline("release", "%s released%s" % (name, " (forced)" if force else ""))
     if name == "fixer":
         _handoff("--run-end", "forced" if force else "released")
