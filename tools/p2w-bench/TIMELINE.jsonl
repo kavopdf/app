@@ -2313,7 +2313,6 @@
 {"t": 1795413492.361687, "ist": "11:28:12", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795413492.5506685, "ist": "11:28:12", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795413495.434556, "ist": "11:28:15", "ev": "beat", "d": "attempt.py: recording an attempt"}
-<<<<<<< HEAD
 {"t": 1795413514.0870216, "ist": "11:28:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795413516.588483, "ist": "11:28:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795413529.483626, "ist": "11:28:49", "ev": "release", "d": "fixer released (forced)"}
@@ -2328,7 +2327,6 @@
 {"t": 1795413549.1201727, "ist": "11:29:09", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795413550.008576, "ist": "11:29:10", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795413550.192696, "ist": "11:29:10", "ev": "beat", "d": "report.py: building the report"}
-=======
 {"t": 1795413499.6492362, "ist": "11:28:19", "ev": "attempt", "d": "00_page_count -> lead"}
 {"t": 1795413499.9524634, "ist": "11:28:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795413500.2625308, "ist": "11:28:20", "ev": "beat", "d": "classrow.py: refreshing the class file"}
@@ -2350,4 +2348,3 @@
 {"t": 1795413565.231962, "ist": "11:29:25", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795413566.8210506, "ist": "11:29:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795413567.1332703, "ist": "11:29:27", "ev": "beat", "d": "report.py: building the report"}
->>>>>>> be51b25e (fixer run 23 Nov: 00_page_count lead recorded, LAST-MESSAGE and REPORT)
