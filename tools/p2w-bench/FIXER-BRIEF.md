@@ -1058,6 +1058,26 @@ The user's instruction, 20 Nov, in his words:
 > rahe aur jaruri nhi easy class hee choose kare ... class choose karne ki priority set karo jisme
 > sabse jyada documents fix karna ho aur classes ka selection rotation based ho"
 
+### THE PROTOCOL. NO EXCEPTIONS, FOR ANY FINDING.
+
+A finding in an audit file is a **claim**, not a fact. The reproduction is the fact. So:
+
+1. **VERIFY FIRST.** Reproduce the finding before you open the editor. If it does not reproduce, say so in
+   your report and **change nothing** — a false finding recorded as fixed is worse than an unfixed true one,
+   because it stops anyone looking again.
+2. **CHANGE ONE THING.** One construct, one place. Two changes in one commit cannot be attributed.
+3. **REGRESSION CHECK ON THE WHOLE CORPUS.** `regress.py --check` and `measure_gate.py`. A change that moves
+   one document forward and another back is not a fix, and the gate refuses it.
+4. **COMMIT ONLY AFTER 3 PASSES.** A change that is not committed does not exist. `attempt.py` already refuses
+   a moved count when `app/` or an instrument is dirty — that refusal is correct.
+5. **THEN COUNT IT.** Nothing goes in the report as an improvement until it is committed and measured.
+
+**And do not fix what the audit cleared.** Five things in the second audit looked like bugs and are not:
+XML escaping is complete (every text-carrying `w:t` calls `esc()`; the rest are literal spaces), `TxtWriter`'s
+direct write is safe because the app writes a cache file before touching the user's Uri, there is no mutable
+static state, streams are all try-with-resources, and the checks that pass with `(0, 0, True)` are correct
+because the source had nothing of that kind to preserve. Re-opening any of those is a wasted slot.
+
 ### READ THE AUDIT BEFORE THE GAPS
 
 `FINDINGS/AUDIT-pdf-to-word-deep-23nov-agent.md` — a read-only pass over the engine and the instrument. Two
