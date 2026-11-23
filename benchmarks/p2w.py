@@ -1456,7 +1456,16 @@ def main():
     try:
         _c = os.path.join(os.path.dirname(os.path.abspath(__file__)), "census.py")
         if os.path.exists(_c):
-            _r = sh("%s %s" % (sys.executable, _c), 240)
+            # PASS THE RANKING PATH, DO NOT LET census.py GUESS IT.
+            #
+            # census.py defaults --ranking to "benchmarks/RANKING.csv", a path relative to the
+            # repo root. This call inherited whatever cwd p2w.py was started in, and the
+            # documented sequence starts it from benchmarks/ - so the default resolved to
+            # benchmarks/benchmarks/RANKING.csv, census.py died with FileNotFoundError, and every
+            # run logged "census: failed" with no clue why. Verified 23 Nov: from the repo root
+            # census.py exits 0 and censuses 7 documents; from benchmarks/ it raises.
+            _rank = os.path.join(os.path.dirname(os.path.abspath(__file__)), "RANKING.csv")
+            _r = sh("%s %s --ranking %s" % (sys.executable, _c, _rank), 240)
             log("census: %s" % ("ok" if _r and _r.returncode == 0 else "failed"))
     except Exception as _e:
         log("census: skipped (%s)" % type(_e).__name__)
