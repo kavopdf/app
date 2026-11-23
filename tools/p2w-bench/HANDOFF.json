@@ -2,18 +2,6 @@
  "plan": "",
  "notes": [
   {
-   "at": "10:37",
-   "text": "attempt 11 on 18_displacement -> lead (0/3 moved)"
-  },
-  {
-   "at": "11:21",
-   "text": "attempt 12 on 18_displacement -> lead (0/3 moved)"
-  },
-  {
-   "at": "11:23",
-   "text": "agent deployed: 18_displacement / A - consolidated every FINDINGS file and the two row emitters into one dossier - ref"
-  },
-  {
    "at": "11:23",
    "text": "agent deployed: 18_displacement / B - recomputed leverage from benchmarks/gverify/*.json without classpick.py - 16 sol"
   },
@@ -240,34 +228,22 @@
   {
    "at": "21:29",
    "text": "attempt 41 on 18_displacement -> lead"
+  },
+  {
+   "at": "23:32",
+   "text": "attempt 1 on 04_chars_missing -> lead (0/5 moved)"
+  },
+  {
+   "at": "23:32",
+   "text": "agent deployed: 04_chars_missing construct: Google drops wps:txbx text; missing multiset fully explained by anchored boxes on 9 docs /  - "
+  },
+  {
+   "at": "23:32",
+   "text": "agent deployed: 44_header_footer: .txt half clean (0 lost/duplicated across 31); 20 of 28 feet are floating anchors, 8 flow and still fail /  - "
   }
  ],
  "next": "PENDING FIRST, FIXING SECOND - AND FIXING RESUMES BY ITSELF WHEN THE LIST IS EMPTY. `python3 tools/p2w-bench/pending.py` lists the 22 items you can close, in the order to take them. classpick.py refuses to name a class until those 22 are gone, so a run that tries to pick one is told to work the list instead. Nothing else changes: when the 22 reach zero, decide() returns a class again and the rotation carries on exactly as before - there is no separate mode to switch back on. The 22 are 4 [agent] (deployed 550-700 min ago, no finding committed - they died with their runs: check FINDINGS/ for the id and close them as dead, never re-deploy blind), 5 [ratchet] (fixes that landed on their own class and were never proved across the corpus - these are the cheapest wins, 38 documents already moved) and 13 [blocker] rows whose 'can I fix it' names a real action. THE OTHER 59 ARE NOT YOURS AND THEY DO NOT BLOCK YOU. `python3 tools/p2w-bench/pending.py --decisions` prints them: each says 'no - this needs a decision, not a patch'. They stay in BLOCKERS.md and in that view so a person can decide; they are never a reason to sit still. A gate that waited for them would never open, which is why it does not. After the 22: classpick picks by expected fixes - 05_chars_extra, then 32_stroke_lines, then 04_chars_missing (65 documents, never tried) and 25_invisible_text (48, never tried). 18_displacement is 8th because 20 attempts there moved 4 documents.",
  "agents": [
-  {
-   "id": "32_sB-02",
-   "class": "32_stroke_lines",
-   "angle": "B",
-   "question": "is the 54-document carrier regression cell nesting or body-flow page overflow",
-   "expected": "04:20",
-   "deployed": "04:49",
-   "status": "landed",
-   "finding": "FINDINGS/32_stroke_lines-CARRIER-REGRESSION-IS-PAGE-OVERFLOW-0450-f1x.md",
-   "deployed_at": "2026-11-21T23:19",
-   "landed_at": "2026-11-21T23:19"
-  },
-  {
-   "id": "32_sA-audit-01",
-   "class": "32_stroke_lines",
-   "angle": "A-audit",
-   "question": "are the 16 carrier Google results genuine measurement artifacts or hand-authored summaries",
-   "expected": "a per-check map, an export hash, a real timestamp",
-   "deployed": "05:18",
-   "status": "landed",
-   "finding": "FINDINGS/32_stroke_lines-CARRIER-GOOGLE-EVIDENCE-IS-NOT-A-MEASUREMENT-0525-f1x.md",
-   "deployed_at": "2026-11-21T23:48",
-   "landed_at": "2026-11-21T23:48"
-  },
   {
    "id": "32_sB-local-01",
    "class": "32_stroke_lines",
@@ -527,6 +503,28 @@
    "finding": "FINDINGS/18_displacement-TRHEIGHT-CROSS-RENDERER-1506-agentB.md",
    "deployed_at": "2026-11-23T20:44",
    "landed_at": "2026-11-23T14:44"
+  },
+  {
+   "id": "04_c-01",
+   "class": "04_chars_missing construct: Google drops wps:txbx text; missing multiset fully explained by anchored boxes on 9 docs",
+   "angle": "",
+   "question": "",
+   "expected": "",
+   "deployed": "23:32",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-23T23:32"
+  },
+  {
+   "id": "44_h-01",
+   "class": "44_header_footer: .txt half clean (0 lost/duplicated across 31); 20 of 28 feet are floating anchors, 8 flow and still fail",
+   "angle": "",
+   "question": "",
+   "expected": "",
+   "deployed": "23:32",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-23T23:32"
   }
  ],
  "run": {

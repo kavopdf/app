@@ -1,9 +1,9 @@
 {
  "exhausted": {},
- "next": "docx",
+ "next": "txt",
  "docx": {
-  "class": "18_displacement",
-  "since": "2026-11-23 18:58"
+  "class": "44_header_footer",
+  "since": "2026-11-23 22:51"
  },
  "txt": {
   "class": "t08_line_order",

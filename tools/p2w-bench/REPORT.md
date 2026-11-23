@@ -1,9 +1,13 @@
-# Fixer report - 2026-11-23 20:54
+# Fixer report - 2026-11-23 22:51
 
 ```
 # P2W Fixer - Run Report
 
+<<<<<<< HEAD
 **23 Nov 2026 · slot 20:54 → 22:43 IST · 1h 48m**
+=======
+**23 Nov 2026 · slot 22:51 → running IST · 41 min**
+>>>>>>> 1d68dbea (fixer: 04_chars_missing lead - Google drops wps:txbx text; foot-band patch proved, Google render is the next measurement)
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -22,13 +26,13 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
+| Working on | `04_chars_missing` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 21:29 | **lead** | 0/0 | nine live Google renders of table-with-no-header-row: Google honours w:trHeight (600tw->30/31pt) and quantises the rendered row pitch to whole points (352tw->18.0, 354/356tw->19.0, 368tw->19.5); the 1 |
+| 23:31 | **lead** | 0/5 | txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - t |
 
 ## The txt
 
@@ -42,12 +46,16 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `04_c-01` | 04_chars_missing construct: Google drops wps:txbx te | 23:32 | - | - |
+| `44_h-01` | 44_header_footer: .txt half clean (0 lost/duplicated | 23:32 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
+<<<<<<< HEAD
 | Slot window | 20:54 → 22:43 · 1h 48m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 15 |
@@ -55,16 +63,30 @@
 | Silences over 2 min | 4 |
 | Obstacles | 3 cleared · 2 parked, with the evidence to re-open them |
 | Still a wall | **This watchdog has no `cron` tool**, so a paused or zombie cron cannot be moved by automation and STEP 3 cann |
+=======
+| Slot window | 22:51 → running · 41 min |
+| Before the claim | not recorded - nothing writes a beat until step.py runs |
+| Tool beats | 11 |
+| Longest silence | **23.3 min** — from 22:51:31, after `report.py: building the report` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+>>>>>>> 1d68dbea (fixer: 04_chars_missing lead - Google drops wps:txbx text; foot-band patch proved, Google render is the next measurement)
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
+<<<<<<< HEAD
 | measure or build - a conversion, screen or compile writes no beacon | **25 min** | `#####` |
 | record - attempt, handoff, class rows | **4 min** | `#` |
 | report - the report and the chain | **1h 13m** | `###############` |
 | other - not attributed to a tool | **5 min** | `#` |
+=======
+| fix - diagnose and change the engine | **16 min** | `#########` |
+| measure or build - a conversion, screen or compile writes no beacon | **24 min** | `#############` |
+| report - the report and the chain | **0 min** | `#` |
+>>>>>>> 1d68dbea (fixer: 04_chars_missing lead - Google drops wps:txbx text; foot-band patch proved, Google render is the next measurement)
 ## Best results this round
 
 | Document | Before | After | Change |

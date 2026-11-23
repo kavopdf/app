@@ -3,11 +3,14 @@
  "started": "22:51",
  "ended_ts": null,
  "ended": null,
- "class": "",
- "attempts": 0,
+ "class": "04_chars_missing",
+ "attempts": 1,
  "kept": 0,
  "docs_improved": 0,
- "agents": [],
+ "agents": [
+  "04_c-01",
+  "44_h-01"
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0
 }
