@@ -212,6 +212,10 @@ def clean_leverage():
     return out
 
 
+LEAD_ATTEMPT_BUDGET = 3   # fruitless attempts before a lead stops outranking the rotation
+STALE = {}
+
+
 def open_leads():
     """{class: reason} for every class holding an unlanded lead, most recent first.
 
@@ -235,14 +239,69 @@ def open_leads():
         if not isinstance(v, dict):
             continue
         h = v.get("history") or []
+        # A LEAD THAT NOTHING LANDS ON IS NOT A LEAD, IT IS A LOOP.
+        #
+        # This closed a lead only on "kept" or "partial", so a class whose every attempt was refuted
+        # or reverted held an open lead for ever - and _pick returns an open lead before it consults
+        # the rotation at all. Measured 23 Nov: 18_displacement held a lead from 06:17, twenty
+        # attempts had been spent on it, four documents had moved, and every run still answered
+        # "18_displacement holds an open LEAD and nothing outranks it". Behind it sat
+        # 04_chars_missing with 65 documents and 25_invisible_text with 48, both at zero attempts.
+        #
+        # A lead now expires after LEAD_ATTEMPT_BUDGET attempts that landed nothing. It is not
+        # forgotten - it is reported as STALE so the next run still sees what was tried and why it
+        # failed - but it stops outranking work that has never been attempted.
+        # COUNT ATTEMPTS SINCE SOMETHING LAST LANDED, NOT SINCE THE LEAD WAS WRITTEN. A run ends by
+        # recording a lead, so the lead is always the newest entry and a counter that stopped at it
+        # would read zero for ever. What matters is how many attempts have gone by without a "kept" or
+        # "partial" - that is the user's own rule: multiple attempts and not one document improved.
+        since_landed = 0
+        found = None
         for x in reversed(h):
             o = (x.get("outcome") or "")
             if o in ("kept", "partial"):
-                break            # something landed after the lead - it is closed
-            if o == "lead":
-                out[cls] = "%s - %s" % (x.get("at") or "?", str(x.get("reason") or "")[:120])
-                break
+                break            # something landed - the class is not stalled
+            if o == "lead" and found is None:
+                found = x
+            since_landed += 1    # an attempt that landed nothing
+        if found is not None:
+            _r = str(found.get("reason") or "")
+            if since_landed < LEAD_ATTEMPT_BUDGET:
+                out[cls] = "%s - %s" % (found.get("at") or "?", _r[:120])
+            else:
+                STALE[cls] = "%s - %s (STALE: %d attempts since it landed nothing)" % (
+                    found.get("at") or "?", _r[:90], since_landed)
     return out
+
+
+def by_expected_fixes(rows):
+    """Order classes by how many documents are likely to be FIXED, not by how many are broken.
+
+    THE RANKING WAS BY DOCUMENT COUNT, AND THAT IS WHY NOTHING GOT FIXED. Measured 23 Nov, the order read
+    18_displacement 101 documents first, and that class had taken 20 attempts and moved 4. Behind it sat
+    04_chars_missing with 65 documents and 25_invisible_text with 48, both at ZERO attempts - never tried,
+    because the biggest class was always first and it never finished. A run that keeps taking the largest
+    class spends every attempt where the yield is 0.2 documents per attempt instead of where it is 1.9.
+
+    The user's instruction was "jisme sabse jyada documents fix karna ho" - where the most documents can be
+    FIXED - and document count is not that number.
+
+    score = documents x yield, where yield is moved/attempts shrunk toward the corpus's own average by
+    attempt count (K=3). The shrinkage stops a class that moved 11 documents in its single attempt from
+    taking the top on one observation, and it gives an untried class the corpus's average yield rather than
+    a zero: "we have not measured it" is not "it does not work".
+
+    rows: (name, docs, attempts, moved). Returns (name, docs, attempts, moved, score, yield), best first.
+    """
+    A = sum(r[2] for r in rows)
+    M = sum(r[3] for r in rows)
+    g = (M / A) if A else 1.0
+    K = 3.0
+    out = []
+    for name, docs, att, moved in rows:
+        y = (moved + g * K) / (att + K)
+        out.append((name, docs, att, moved, docs * y, y))
+    return sorted(out, key=lambda x: (-x[4], -x[1]))
 
 
 def _pick(fmt, rot, dead):
@@ -250,6 +309,12 @@ def _pick(fmt, rot, dead):
     rank = ranking() if fmt == "docx" else ranking_txt()
     if not rank:
         return None, "no class table for the .%s half" % fmt, rot
+    # ORDER BY EXPECTED FIXES, NOT BY SIZE. See by_expected_fixes() for the measurement.
+    _rows = []
+    for _n, _d in rank:
+        _h = attempts_for(_n)
+        _rows.append((_n, _d, len(_h), moved_of(_h)))
+    rank = [(r[0], r[1]) for r in by_expected_fixes(_rows)]
     names = [n for n, _ in rank]
     docs = dict(rank)
     cur = rot.get("class")
@@ -457,7 +522,13 @@ def main(argv):
         return 0
     if "--status" in argv:
         rot = load(ROTATION, {})
-        rank = ranking()
+        # THE DISPLAY MUST SHOW THE ORDER THE PICKER ACTUALLY USES. It printed ranking(), which is by
+        # document count, while _pick had already been changed to order by expected fixes - so a run
+        # reading this status would see 18_displacement at number 1 and go there by hand, which is
+        # exactly the loop the reordering exists to break.
+        _r0 = ranking()
+        _rows0 = [(n, d, len(attempts_for(n)), moved_of(attempts_for(n))) for n, d in _r0]
+        rank = [(r[0], r[1]) for r in by_expected_fixes(_rows0)] if _rows0 else _r0
         print("rotation")
         print("  current : %s" % (rot.get("class") or "-"))
         print("  since   : %s" % (rot.get("since") or "-"))
