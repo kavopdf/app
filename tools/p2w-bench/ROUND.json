@@ -1,11 +1,9 @@
 {
   "baseline_started": 1795361683.041859,
   "classifier_started": 0,
-  "fixer_doing": "report: writing /tmp/report.md",
-  "fixer_doing_since": 1795467881.0700114,
   "fixer_engine_at_claim": "b7699196",
   "fixer_last_beat": 1795467881.070012,
-  "fixer_started": 1795467866.823617,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
