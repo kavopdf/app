@@ -1,28 +1,5 @@
 [
  {
-  "started_ts": 1795249458.5973158,
-  "started": "13:54",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "t01_word_accuracy",
-  "attempts": 3,
-  "kept": 2,
-  "docs_improved": 1,
-  "agents": [
-   "t01lostwords-01",
-   "t01blastradius-01"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "counted": [
-   [
-    "t01_word_accuracy",
-    1
-   ]
-  ],
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795254464.5765238,
   "started": "15:17",
   "ended_ts": null,
@@ -1102,5 +1079,17 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795471232.1246567,
+  "started": "03:30",
+  "window_for_claim": 1795471232.1246567,
+  "ended_ts": null,
+  "ended": "(never)",
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
