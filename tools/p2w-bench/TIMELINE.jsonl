@@ -2438,3 +2438,48 @@
 {"t": 1795422821.8695185, "ist": "14:03:41", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795422822.229263, "ist": "14:03:42", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795422822.3601716, "ist": "14:03:42", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426704.0677478, "ist": "15:08:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426704.176843, "ist": "15:08:24", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426704.6501389, "ist": "15:08:24", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795426704.7651994, "ist": "15:08:24", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426705.0291672, "ist": "15:08:25", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426705.1524603, "ist": "15:08:25", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426705.6399043, "ist": "15:08:25", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426705.7703578, "ist": "15:08:25", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426710.2812726, "ist": "15:08:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426717.4911134, "ist": "15:08:37", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426717.6064098, "ist": "15:08:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426718.0609949, "ist": "15:08:38", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795426718.1659095, "ist": "15:08:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426718.3647187, "ist": "15:08:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426718.4780624, "ist": "15:08:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426718.910678, "ist": "15:08:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426719.0202289, "ist": "15:08:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426724.851532, "ist": "15:08:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426724.9528193, "ist": "15:08:44", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426725.403285, "ist": "15:08:45", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795426725.5185409, "ist": "15:08:45", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426725.7528665, "ist": "15:08:45", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426725.870002, "ist": "15:08:45", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426726.3401968, "ist": "15:08:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426726.4444103, "ist": "15:08:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426737.7601538, "ist": "15:08:57", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426738.3911564, "ist": "15:08:58", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795423566, "ist": "14:16:06", "ev": "claim", "d": "relay: fixer claimed the slot (the :50/:10 slot, found free)"}
+{"t": 1795426751.5952497, "ist": "15:09:11", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426755.742644, "ist": "15:09:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426755.847002, "ist": "15:09:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426756.2973166, "ist": "15:09:16", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795426756.4034479, "ist": "15:09:16", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426756.594332, "ist": "15:09:16", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426756.710676, "ist": "15:09:16", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426757.173071, "ist": "15:09:17", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426757.2959936, "ist": "15:09:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426763.4045637, "ist": "15:09:23", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426763.51392, "ist": "15:09:23", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426763.9599903, "ist": "15:09:23", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795426764.0684545, "ist": "15:09:24", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426764.2640076, "ist": "15:09:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426764.3729022, "ist": "15:09:24", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795426764.8099325, "ist": "15:09:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795426764.9210553, "ist": "15:09:24", "ev": "beat", "d": "report.py: building the report"}

@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 13:20 → running IST · 42 min**
+**23 Nov 2026 · slot 13:20 → running IST · 1h 48m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -16,8 +16,8 @@
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **1** — 416_many_tiny_pages |
-| **Fixed - Google, all 42 checks** | **0** of the **2** re-measured on this engine - **188** of the 190 scored are still on an older engine, and **30** were clean there |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 188 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, all 42 checks** | **0** of the **0** re-measured on this engine - **190** of the 190 scored are still on an older engine, and **30** were clean there |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 190 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
@@ -51,11 +51,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 13:20 → running · 42 min |
+| Slot window | 13:20 → running · 1h 48m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 22 |
-| Longest silence | **14.4 min** — from 13:21:17, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 5 |
+| Tool beats | 23 |
+| Longest silence | **52.3 min** — from 14:16:06, after `relay: fixer claimed the slot (the :50/:10 slot, found free)` |
+| Silences over 2 min | 7 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -63,10 +63,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **7 min** | `####` |
-| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `############` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **11 min** | `######` |
+| fix - diagnose and change the engine | **7 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **35 min** | `#######` |
+| report - the report and the chain | **54 min** | `###########` |
+| other - not attributed to a tool | **11 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
