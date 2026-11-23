@@ -1058,7 +1058,7 @@ The user's instruction, 20 Nov, in his words:
 > rahe aur jaruri nhi easy class hee choose kare ... class choose karne ki priority set karo jisme
 > sabse jyada documents fix karna ho aur classes ka selection rotation based ho"
 
-### BEFORE YOU PICK A CLASS: three architectural gaps the table cannot show you
+### BEFORE YOU PICK A CLASS: four architectural gaps the table cannot show you
 
 Read `FINDINGS/ARCHITECTURAL-GAPS-font-embedding-numbering-footnotes-0923-agent.md` once. It is measured,
 it is not a wish list, and each gap is fixable offline with no model and no network.
@@ -1074,14 +1074,19 @@ substitution, no geometry construct will ever close it.** Three `Effra` document
 each, with and without embedding, answers it either way. If embedding moves them you have found the
 construct behind 101 documents. If it does not, you have eliminated it - worth as much after 23 attempts.
 
-**The two that are cheap.** Lists are detected (`isListMarker`, `p.indent`) and then written as an indent:
-`word/numbering.xml` has 0 references, so a list is body text in Word. And footnotes have no
-`word/footnotes.xml`, so a note becomes a paragraph at the end of the body.
+**The three that are cheap, and all three are editing defects** — which is half the goal.
+
+Lists are detected (`isListMarker`, `p.indent`) and then written as an indent: `word/numbering.xml` has 0
+references, so a list is body text in Word — no renumber, no nesting. Headers are body text too: `w:hdr` and
+`w:headerReference` have 0 references, so a 200-page report carries 200 literal copies of its own header and
+changing the company name means changing it 200 times. And footnotes have no `word/footnotes.xml`, so a note
+becomes a paragraph at the end of the body, attached to nothing.
 
 | gap | documents affected | difficulty |
 |---|---|---|
 | font embedding | **199 of 213** | medium - a binary payload and the `.odttf` obfuscation |
 | `numbering.xml` | every document with a list | low - pure writing, detection already exists |
+| header/footer parts | every document with a header | medium - a counting pass, then a margin |
 | footnotes + outline | every document with a note | high - the pairing is geometry |
 
 **Why they are not in the class table:** `53_embedded_faces` compares font *families*, not embedding, so

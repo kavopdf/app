@@ -1,4 +1,4 @@
-# The three architectural gaps — what they are, how to close them, and why they are not in the class table
+# The four architectural gaps — what they are, how to close them, and why they are not in the class table
 
 **Measured 23 Nov 2026 by the agent. Nothing here is fixed. This is the specification the fixer works from.**
 
@@ -148,13 +148,68 @@ This is the hardest of the three because the pairing is geometry, and it is the 
 
 ---
 
+## Gap 4 — a header is body text repeated on every page, not a header part.
+
+### The measurement
+
+    w:hdr             0 references
+    w:ftr             0 references
+    w:headerReference 0 references
+    w:titlePg         0 references
+    header1.xml       not written
+    footer1.xml       not written
+
+There is no notion of a repeating element anywhere in the engine — no `pageFurniture`, no `runningHead`, no
+`repeat`. A page's top band and bottom band are read as ordinary paragraphs like any other, so a 200-page
+report carries 200 literal copies of its own header.
+
+`44_header_footer` is a class in the table, and it measures whether the band's text survived into the
+`.docx` — not whether it became a header. So the structure is lost and the check does not look for it, the
+same shape as gaps 1 and 2.
+
+### Why it costs the user two things
+
+**Completeness.** A header that is body text is not a header: it does not repeat, it does not survive an edit
+on page 1, and it is not what the document says it is. If the user changes the company name, they change it
+200 times.
+
+**Editing.** In a real document the header is edited once and appears everywhere. Here the user must find
+every copy, and the moment a paragraph is added the header drifts out of its band.
+
+### How to close it
+
+1. **Find the repeating lines.** A line is page furniture when the same text, at the same y band and the same
+   x, appears on three or more pages. The engine already knows every line's x, y and text — this is a
+   counting pass over the page list, not new geometry.
+2. **Split them out.** Write `word/header1.xml` and `word/footer1.xml`, reference them from `w:sectPr` with
+   `w:headerReference` / `w:footerReference`, and set `w:titlePg` where page 1 differs (most invoices and
+   letters draw their first page differently).
+3. **Take them out of the body**, and give the section a top and bottom margin that leaves room for the
+   header and footer — otherwise the body text and the header will overlap.
+
+**Page numbers are the interesting case.** A footer that says "Page 3" on page 3 is not repeating text, it is
+a field. Emit `PAGE` and `NUMPAGES` fields where the digits are, so the number stays right when the document
+is edited — a literal "3" becomes wrong the moment a page is inserted.
+
+### What to measure
+
+`44_header_footer` should ask whether the band element landed in a header part referenced from `w:sectPr`,
+not whether its text is present. Before: every document with a header fails the structural question. After:
+it passes, and the body gets shorter by one copy of the header per page.
+
+---
+
 ## The order to take them
 
 | | gap | documents affected | risk of the change | do it |
 |---|---|---|---|---|
 | 1 | font embedding | **199 of 213** | medium — binary payload, obfuscation | **first** |
 | 2 | `numbering.xml` | every document with a list | low — pure writing | second |
-| 3 | footnotes + outline | every document with a note | high — geometry pairing | third |
+| 3 | header/footer parts | every document with a header | medium — a counting pass and a margin | third |
+| 4 | footnotes + outline | every document with a note | high — geometry pairing | fourth |
+
+**Gaps 2 and 3 are the cheap ones and both are editing defects**, which is half the user's goal. Take them
+when the class you are on has gone quiet, before spending another slot on a lead that has not moved.
 
 **Gap 1 first, and not because it is the largest number — because it may be the answer to the class you are
 already stuck on.** If embedding three `Effra` documents moves `18_displacement`, you have found the construct
