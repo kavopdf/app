@@ -31,7 +31,32 @@ L = os.path.join(ROOT, "benchmarks", "gverify-lo")
 IST = timezone(timedelta(hours=5, minutes=30))
 
 
-def load(d):
+def _engine_now():
+    """The engine commit the corpus is built from right now."""
+    import subprocess as _sp
+    try:
+        r = _sp.run(["git", "-C", ROOT, "log", "-1", "--format=%h", "--",
+                     "app/src/main/java/com/kavopdf/app/engine/"],
+                    capture_output=True, text=True, timeout=20)
+        return (r.stdout or "").strip()
+    except Exception:
+        return ""
+
+
+def load(d, engine=None):
+    """Results from one directory, optionally only those measured on one engine.
+
+    THE TABLE CLAIMED "same engine" AND COUNTED FOUR. On 23 Nov gverify/ held results stamped
+    98be7c3c (the tree), 462353f, 462353f9, and 23 with no stamp - and this loader took all of them,
+    so the capability table ranked a population whose rows were measured on code that no longer
+    exists. gverify's own report refused to write that table for exactly this reason: "a matrix over
+    them would print a Google/LibreOffice pair measured on two different engines and call it same
+    engine".
+
+    With `engine` set, only results stamped with it are returned. A document measured on an older
+    engine is not counted as failing and not counted as passing - it is not counted, and the header
+    says how many were left out.
+    """
     out = {}
     for f in glob.glob(os.path.join(d, "*.json")):
         try:
@@ -39,6 +64,8 @@ def load(d):
         except Exception:
             continue
         if j.get("status") == "page_count_refused":
+            continue
+        if engine and (j.get("engine") or "") != engine:
             continue
         out[j.get("name") or os.path.basename(f)[:-5]] = j
     return out
@@ -48,7 +75,8 @@ PAGE_CLASS = "00_page_count"
 
 
 def counts():
-    g, l = load(G), load(L)
+    _eng = _engine_now()
+    g, l = load(G, _eng), load(L)
     paired = sorted(set(g) & set(l))
     gf, lf = {}, {}
     # A PAGE-COUNT MISMATCH IS THE WORST DEFECT THERE IS, AND IT WAS BEING THROWN AWAY.
