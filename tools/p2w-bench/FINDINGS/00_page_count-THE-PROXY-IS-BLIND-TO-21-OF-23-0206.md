@@ -82,3 +82,53 @@ splits it and the split is now measured:
 3. The two bank forms are a **different** class: they are wrong in LibreOffice too (10 and
    11 against 9), so they are a genuine engine pagination fault and belong with
    `18_displacement`, not here.
+
+## REFUTED: the inline-picture construct, for the whole class
+
+The `350` finding above charges `DocxWriter.java:2549`'s `<wp:inline>` picture branch, and
+its premise is stated as a code fact plus one labelled inference - "one drawing-only
+paragraph and nothing else", read off the source because the PDF and the `.docx` were not
+available to it. **I have both. The premise is false and the construct does not occur.**
+
+The finding prescribes its own discriminating greps. Run on the `.docx` the HEAD engine
+wrote for all 23 refused documents:
+
+| document | paragraphs | `<wp:inline>` | `<wp:anchor>` |
+|---|---|---|---|
+| 350_question_paper | **70** | **0** | 1 |
+| 305_vaccination_certificate | 130 | **0** | 276 |
+| 041122-Account_Opening_Form | 1451 | **0** | 2653 |
+| Account_Opening_Form_Fillable_filled | 1460 | **0** | 2653 |
+| 60_page_border | 109 | **0** | 62 |
+| ...19 more | | **0** | 26-400 |
+| **total over all 23** | | **0** | |
+
+**Zero inline pictures in the entire class.** The "no drawing is ever in the flow" rule the
+finding wants to introduce is already true for every one of these documents - the engine
+takes `anchoredPicture()` on all of them. And `350` is not a drawing-only page at all: it has
+70 paragraphs of real text, and its single anchor is a 539.3 x 0.7 pt rule, not a scan.
+
+So `probe-350.java.patch` must **not** be applied for this class: it changes the emission
+path for every unplaced picture in the corpus, and it would move none of the 23. That is a
+global blast radius for zero measured gain.
+
+## What the census does say
+
+Every one of the 23 is anchored-shape-dense, and two of them anchor a picture at the full
+page height:
+
+| document | largest anchored `cy` |
+|---|---|
+| 041122-Account_Opening_Form | **842.1 pt** (the page is 841.9 pt) |
+| Account_Opening_Form_Fillable_filled | **842.1 pt** |
+| 60_page_border | 796.3 pt |
+| 351_omr_answer_sheet | 802.9 pt |
+| 401_trifold_brochure | 595.3 pt (= the page width) |
+
+An anchored picture **taller than the sheet** (842.1 > 841.9) is the two bank forms' fault
+and it is visible in LibreOffice too (10 and 11 pages against 9) - that is a pagination
+fault, not a Google-only one, and it belongs with `18_displacement`.
+
+For the 21 that are Google-only, the next probe is `305_vaccination_certificate`: 58.29 pt of
+bottom slack, 276 anchored shapes, no inline picture. Whatever Google charges there, there is
+58 pt of room for it to live in, so it is measurable by subtraction rather than by guess.
