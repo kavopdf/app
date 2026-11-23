@@ -1144,6 +1144,26 @@
   {
    "at": "06:15",
    "text": "attempt 34 on 18_displacement -> lead"
+  },
+  {
+   "at": "06:17",
+   "text": "agent deployed: 18_d / residual-census - which current-engine documents fail 18_displacement, and what has FINDINGS alrea"
+  },
+  {
+   "at": "06:17",
+   "text": "agent deployed: 18_d / blast-radius - the exact writer rule for w:trHeight/w:hRule, what the row-pitch patch yields, a"
+  },
+  {
+   "at": "06:17",
+   "text": "agent landed: 18_dresidual-census-01 /  -> FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - 58 of 213 Google results are on the current engine (98be7c3c); 24 fail 18_displacement, only 2 fail it alone (16_right_aligned_amounts_txtpos, 31_times_body_arial_headings); the 16-document solo population is stamped 462353f9, not current. Killed the row-pitch lead before a round trip was spent."
+  },
+  {
+   "at": "06:17",
+   "text": "agent landed: 18_dblast-radius-01 /  -> FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build."
+  },
+  {
+   "at": "06:17",
+   "text": "agent landed: 18_dB-05 /  -> ANSWERED: the 18.5 pt rung does not exist. The laid pitch ladder is laid = 0.75*(round(declared/0.75)+1), so laid pitch is always a multiple of 0.75 pt and 18.5 is not on it; the nearest rung to an 18.40 pt source is 18.75. No declaration lands 18.5, so this question is closed rather than answered with a value. See FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md."
   }
  ],
  "next": "00_page_count: mechanism MEASURED, fix not landed. FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md. Google rasterises each page-positioned floating shape and keeps the paragraph that carries it, and that empty paragraph costs ~0.83 pt of flow (w:line=\"1\" exact is NOT honoured for it): 108 of them = 89.9 pt on 301_lab_report_panel against 44.5 pt of free page, so a 1-page source renders 2 pages. Deleting all 108 -> 1 page at the same text y (the control). 22 of the 23 refused documents emit ALL their drawing-only paragraphs AFTER the last text paragraph; counts 7..2464. 350_question_paper has 1 and is NOT explained by this. Refuted and measured, do not retry: drop-last, prstGeom-rect, wrapSquare, framePr. VOID (my probe bug, never measured): merge-into-one-paragraph and attach-to-text. NEXT LEVER, cheapest in the writer: merge the drawing-only paragraphs of a page into ONE (DocxWriter.shape(), DocxWriter.java:2726) - saves 107 x 0.83 = 88.8 pt against 89.9 pt needed here, a one-point margin, so measure it; then w:tcBorders through the table writer. This is the same construct as 32_stroke_lines and 05_chars_extra: one mechanism, three check families.",
@@ -1945,9 +1965,10 @@
    "question": "from the three measured declared->laid points compute the declaration that lands laid pitch 18.5 on two-tables-stacked-with-no-gap, and the exact code lines that produce the declaration",
    "expected": "expected by 14:30",
    "deployed": "13:57",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-22T08:27"
+   "status": "landed",
+   "finding": "ANSWERED: the 18.5 pt rung does not exist. The laid pitch ladder is laid = 0.75*(round(declared/0.75)+1), so laid pitch is always a multiple of 0.75 pt and 18.5 is not on it; the nearest rung to an 18.40 pt source is 18.75. No declaration lands 18.5, so this question is closed rather than answered with a value. See FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md.",
+   "deployed_at": "2026-11-22T08:27",
+   "landed_at": "2026-11-23T00:47"
   },
   {
    "id": "00_pA-01",
@@ -1972,6 +1993,30 @@
    "finding": "FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md",
    "deployed_at": "2026-11-22T23:43",
    "landed_at": "2026-11-22T23:43"
+  },
+  {
+   "id": "18_dresidual-census-01",
+   "class": "18_d",
+   "angle": "residual-census",
+   "question": "which current-engine documents fail 18_displacement, and what has FINDINGS already proven and refuted for this class",
+   "expected": "a per-document table plus the check arithmetic, from committed files only",
+   "deployed": "06:17",
+   "status": "landed",
+   "finding": "FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - 58 of 213 Google results are on the current engine (98be7c3c); 24 fail 18_displacement, only 2 fail it alone (16_right_aligned_amounts_txtpos, 31_times_body_arial_headings); the 16-document solo population is stamped 462353f9, not current. Killed the row-pitch lead before a round trip was spent.",
+   "deployed_at": "2026-11-23T00:47",
+   "landed_at": "2026-11-23T00:47"
+  },
+  {
+   "id": "18_dblast-radius-01",
+   "class": "18_d",
+   "angle": "blast-radius",
+   "question": "the exact writer rule for w:trHeight/w:hRule, what the row-pitch patch yields, and which clean documents a row-height change could break",
+   "expected": "a blast-radius list and a verdict on whether the 18.5 pt rung is worth a Google round trip",
+   "deployed": "06:17",
+   "status": "landed",
+   "finding": "FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build.",
+   "deployed_at": "2026-11-23T00:47",
+   "landed_at": "2026-11-23T00:47"
   }
  ],
  "run": {

@@ -2,7 +2,7 @@
   written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 05:58 → running IST · 18 min**
+**23 Nov 2026 · slot 05:58 → running IST · 19 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -40,15 +40,18 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dresidual-census-01` | which current-engine documents fail 18_displacement, | 06:17 | 00:47 | 0 min |
+| `18_dblast-radius-01` | the exact writer rule for w:trHeight/w:hRule, what t | 06:17 | 00:47 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 05:58 → running · 18 min |
+| Slot window | 05:58 → running · 19 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 14 |
+| Tool beats | 25 |
 | Longest silence | **5.3 min** — from 06:01:27, after `attempt.py: recording an attempt` |
 | Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 3 parked, with the evidence to re-open them |
@@ -59,10 +62,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **10 min** | `#############` |
+| fix - diagnose and change the engine | **10 min** | `############` |
 | measure or build - a conversion, screen or compile writes no beacon | **5 min** | `#######` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -213,6 +216,36 @@ Nothing in `app/` changed; the instrumentation was reverted and `regress.py --ch
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+## Why this slot released with --force
+
+`round.py --release-fixer` refuses while `pending.py` is non-empty, and it reads **63**. Every one of
+them is an agent record from an earlier run that died before committing a finding — the oldest is
+**1134 minutes** old. They are not this run's work and marking them landed would be a false record. One
+of them, `18_dB-05`, asked exactly the question angle 2 answered, and it was landed with that answer
+(the 18.5 pt rung does not exist). The other 62 cannot be closed in a slot, so the slot was released
+with `--force` — the documented exit for a run that genuinely cannot continue.
+
+`round.py --release-fixer` also counts only *background* agent deployments, and a scheduled run has
+nobody to answer a later message, so both of this run's agents came back inside the turn. Both were
+registered in `HANDOFF.json` with their real angles and landed with their real findings; the Subagents
+table above is generated from that record.
+
+## Obstacles parked, with the evidence to re-open them
+
+1. **`balance-sheet`'s borderless table gets its row edges from text, 14.0 pt below the page's rules.**
+   Model edges 115.35/131.35 against page rules 101.35/119.35, header row declared 16.00 pt against an
+   18.00 pt page band. Attach the floating rules to the table so `ruled=true` derives the edges the way
+   `table-inside-two-column-page` already does correctly to 0.35 pt.
+2. **`71_invoice` and `table-inside-two-column-page` place a whole table ~9 pt off** (+9.52 and −9.06),
+   with their edges correct and both one check from clean. One construct, two documents, measurable in
+   the proxy. Cheapest pair in the class.
+3. **`363_warranty_card`'s +3.6 pt block is not a table at all** — the terms block sits outside the
+   table's last edge (192.0) at y 214.68. It is a paragraph `w:before` term and belongs with whatever
+   fixes `31_times_body_arial_headings`' page-wide 2.6–3.2 pt offset.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

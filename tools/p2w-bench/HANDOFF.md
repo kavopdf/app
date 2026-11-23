@@ -103,20 +103,17 @@ unfinished work, not as a result.
 | 18_dA-05 | 18_displacement | A | consolidated every FINDINGS file and the two row emitters into one dos | 11:23 | 11:19 | running |  |
 | 18_dB-04 | 18_displacement | B | recomputed leverage from benchmarks/gverify/*.json without classpick.p | 11:23 | 11:20 | running |  |
 | 18_dA-06 | 18_displacement | A | static map of every writer that emits w:trHeight and cell w:spacing, a | 13:57 | expected by 14:30 | running |  |
-| 18_dB-05 | 18_displacement | B | from the three measured declared->laid points compute the declaration  | 13:57 | expected by 14:30 | running |  |
+| 18_dB-05 | 18_displacement | B | from the three measured declared->laid points compute the declaration  | 13:57 | expected by 14:30 | landed | ANSWERED: the 18.5 pt rung does not exist. The laid pitch ladder is laid = 0.75*(round(declared/0.75)+1), so laid pitch is always a multiple of 0.75 pt and 18.5 is not on it; the nearest rung to an 18.40 pt source is 18.75. No declaration lands 18.5, so this question is closed rather than answered with a value. See FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md. |
 | 00_pA-01 | 00_page_count | A | from the committed gverify JSONs and CENSUS.csv, how many documents do | 05:13 | 05:00 | landed | FINDINGS/18disp-prize-sizing-agentA.md |
 | 00_pB-01 | 00_page_count | B | re-measure every claim of the page-count finding from the exported PDF | 05:13 | 05:40 | landed | FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md |
+| 18_dresidual-census-01 | 18_d | residual-census | which current-engine documents fail 18_displacement, and what has FIND | 06:17 | a per-document table plus the check arithmetic, from committed files only | landed | FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - 58 of 213 Google results are on the current engine (98be7c3c); 24 fail 18_displacement, only 2 fail it alone (16_right_aligned_amounts_txtpos, 31_times_body_arial_headings); the 16-document solo population is stamped 462353f9, not current. Killed the row-pitch lead before a round trip was spent. |
+| 18_dblast-radius-01 | 18_d | blast-radius | the exact writer rule for w:trHeight/w:hRule, what the row-pitch patch | 06:17 | a blast-radius list and a verdict on whether the 18.5 pt rung is worth a Google round trip | landed | FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build. |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `13:29` attempt 15 on 18_displacement -> lead (0/1 moved)
-- `13:57` agent deployed: 18_displacement / A - static map of every writer that emits w:trHeight and cell w:spacing, and the exa
-- `13:57` agent deployed: 18_displacement / B - from the three measured declared->laid points compute the declaration that lands
-- `14:19` attempt 16 on 18_displacement -> lead (0/16 moved)
-- `14:45` attempt 17 on 18_displacement -> kept (1/16 moved)
 - `14:46` agent landed: 47_mA-02 /  -> FINDINGS/47_margins-CELLPATH-A-150000.md
 - `14:46` agent landed: 47_mB-02 /  -> FINDINGS/47_margins-DIAGNOSE40-B-150000.md
 - `15:28` attempt 18 on 18_displacement -> lead
@@ -137,6 +134,11 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `05:29` attempt 32 on 18_displacement -> lead
 - `06:11` attempt 33 on 18_displacement -> lead
 - `06:15` attempt 34 on 18_displacement -> lead
+- `06:17` agent deployed: 18_d / residual-census - which current-engine documents fail 18_displacement, and what has FINDINGS alrea
+- `06:17` agent deployed: 18_d / blast-radius - the exact writer rule for w:trHeight/w:hRule, what the row-pitch patch yields, a
+- `06:17` agent landed: 18_dresidual-census-01 /  -> FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - 58 of 213 Google results are on the current engine (98be7c3c); 24 fail 18_displacement, only 2 fail it alone (16_right_aligned_amounts_txtpos, 31_times_body_arial_headings); the 16-document solo population is stamped 462353f9, not current. Killed the row-pitch lead before a round trip was spent.
+- `06:17` agent landed: 18_dblast-radius-01 /  -> FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build.
+- `06:17` agent landed: 18_dB-05 /  -> ANSWERED: the 18.5 pt rung does not exist. The laid pitch ladder is laid = 0.75*(round(declared/0.75)+1), so laid pitch is always a multiple of 0.75 pt and 18.5 is not on it; the nearest rung to an 18.40 pt source is 18.75. No declaration lands 18.5, so this question is closed rather than answered with a value. See FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md.
 
 ## Where the rest of the state lives
 

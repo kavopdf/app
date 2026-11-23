@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 05:58 → running IST · 18 min**
+**23 Nov 2026 · slot 05:58 → running IST · 19 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -41,15 +41,18 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dresidual-census-01` | which current-engine documents fail 18_displacement, | 06:17 | 00:47 | 0 min |
+| `18_dblast-radius-01` | the exact writer rule for w:trHeight/w:hRule, what t | 06:17 | 00:47 | 0 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 05:58 → running · 18 min |
+| Slot window | 05:58 → running · 19 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 14 |
+| Tool beats | 25 |
 | Longest silence | **5.3 min** — from 06:01:27, after `attempt.py: recording an attempt` |
 | Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 3 parked, with the evidence to re-open them |
@@ -60,10 +63,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **10 min** | `#############` |
+| fix - diagnose and change the engine | **10 min** | `############` |
 | measure or build - a conversion, screen or compile writes no beacon | **5 min** | `#######` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |

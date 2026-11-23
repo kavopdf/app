@@ -7,7 +7,10 @@
  "attempts": 2,
  "kept": 0,
  "docs_improved": 0,
- "agents": [],
+ "agents": [
+  "18_dresidual-census-01",
+  "18_dblast-radius-01"
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0
 }

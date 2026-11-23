@@ -2098,3 +2098,21 @@
 {"t": 1795394813.5268734, "ist": "06:16:53", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795394813.7901933, "ist": "06:16:53", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795394814.286807, "ist": "06:16:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394842.0992403, "ist": "06:17:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795394842.219376, "ist": "06:17:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795394844.7948203, "ist": "06:17:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795394844.9092066, "ist": "06:17:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795394846.3947508, "ist": "06:17:26", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394851.4924562, "ist": "06:17:31", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795394851.606418, "ist": "06:17:31", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795394853.297094, "ist": "06:17:33", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394854.1161678, "ist": "06:17:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795394856.8742168, "ist": "06:17:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795394859.0861933, "ist": "06:17:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795394863.9177303, "ist": "06:17:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795394864.0709457, "ist": "06:17:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795394868.8037512, "ist": "06:17:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394869.5000317, "ist": "06:17:49", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394869.9924326, "ist": "06:17:49", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394870.2652729, "ist": "06:17:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394870.7788694, "ist": "06:17:50", "ev": "beat", "d": "report.py: building the report"}
