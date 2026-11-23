@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 13:20 → running IST · 2h 44m**
+**23 Nov 2026 · slot 13:20 → running IST · 2h 46m**
 
 > No change was kept this run. The carried lever was refuted in Google with three probe documents, and the
 > class it was aimed at turned out not to be one class.
@@ -8,44 +8,44 @@
 ## The class choice, and why
 
 `classpick.py` suggested `18_displacement` (34.5 CLEAN documents). I took `00_page_count` instead, and the
-reason is arithmetic: the 23 `page_count_refused` documents are **not in the 42-check denominator at all**.
-A document that draws the wrong number of pages is refused, so nobody has ever scored it — `60_page_border`
-is refused while LibreOffice scores it **41/42**. Twenty-three documents sit outside the measurement, and
-`00_page_count` is the only class whose fix turns an unscored document into a scored one. 18_displacement
-was worked at 13:20 and 14:58 and reverted twice; the question worth buying with this slot was why a third
-of the refusals exist.
+reason is arithmetic: the `page_count_refused` documents are **not in the 42-check denominator at all**. A
+document that draws the wrong number of pages is refused, so nobody has ever scored it — `60_page_border` is
+refused while LibreOffice scores it **41/42**. Those documents sit outside the measurement, and
+`00_page_count` is the only class whose fix turns an unscored document into a scored one. `18_displacement`
+was worked at 13:20 and 14:58 and reverted twice; the question worth buying with this slot was why the
+refusals exist.
 
 ## What the measurement found
 
 The 13:20 report's NEXT LEVER was: *Google keeps the empty paragraph that carries a page-positioned shape,
 it costs ~0.83 pt, merge them into one paragraph.* Measured on HEAD, in this order:
 
-1. **The carrier paragraphs are not there.** Converted all 23 with `ConvertOne`, one JVM each: **18 of 22
+1. **The carrier paragraphs are not there.** Converted the 23 with `ConvertOne`, one JVM each: **18 of 22
    have zero drawing-only paragraphs**. Only `041122` (2), `401_trifold_brochure` (21) and
    `361_product_catalogue_grid` (91) have any. The 2 464 the 0530 finding cites are not in this tree.
 2. **LibreOffice renders the right page count on 21 of the 22.** Only `041122` is wrong locally (9 → 10).
-   So the class is Google-only, and the "fixed-in-LO-only 23" column is the honest description of it.
-3. **Three Google probes, on HEAD, uploaded → converted → exported → deleted.** `60_page_border` renders
-   **2 pages with 0 characters on page 2**, and its 62 `wp:anchor` shapes arrive as **62 rasterised images
-   split 46 / 16 across the two pages**. `350_question_paper` also renders 2 pages, but page 2 carries 8
-   real characters — a genuine one-line overflow, a different fault wearing the same class name. Adding a
+   So the class is Google-only, and the "fixed-in-LO-only" column is the honest description of it.
+3. **Three Google probes on HEAD** — uploaded, converted on import, exported, deleted. `60_page_border`
+   renders **2 pages with 0 characters on page 2**, and its 62 `wp:anchor` shapes arrive as **62 rasterised
+   images split 46 / 16 across the two pages**. `350_question_paper` also renders 2 pages but page 2 carries
+   8 real characters — a genuine one-line overflow, a different fault wearing the same class name. Adding a
    trailing empty paragraph to `60_page_border` changed nothing: 2 pages before, 2 pages after.
 
 So the mechanism is **Google rasterising N independent page-positioned shapes and laying them out in flow**,
 not the paragraph that carries them. The falsifiable next test is one probe: replace `60_page_border`'s 62
-shapes with one shape, or with `w:pgBorders`, and Google should render 1 page. That is a `DocxWriter`
-change and it was not made in the remaining minutes — an unmeasured engine change is a guess, and rule 2
-says a guess goes in FINDINGS.
+shapes with one shape, or with `w:pgBorders`, and Google should render 1 page. That is a `DocxWriter` change
+and it was not made in the remaining minutes — an unmeasured engine change is a guess, and rule 2 says a
+guess goes in FINDINGS.
 
 ## Note on the run record — a pipeline bug with evidence
 
 `RUN.json` says this run started at **13:20** with **2 attempts**; the claim this run took was stamped at
 **15:16**. The 13:20 run was killed and never released its slot, and `round.py`'s takeover path refreshed the
 claim without calling `_run_record("start")` — the archive-and-restart block at `round.py:512-533` sits in
-the *no-existing-claim* branch, so a stale claim is taken over silently. The consequence is that this run's
-duration and attempt count are reported against the dead run's record: the 2h 44m below is 1h 48m of the
-13:20 run plus this one. `runclock.py` reads the claim, not `RUN.json`, and correctly said 33 min at 16:18.
-Not fixed — it is a change to the round machine, and it wants its own measurement.
+the *no-existing-claim* branch, so a stale claim is taken over silently. This run's duration and attempt
+count are therefore reported against the dead run's record. `runclock.py` reads the claim, not `RUN.json`,
+and correctly said 33 min at 16:18. Not fixed — it is a change to the round machine and wants its own
+measurement.
 
 ## Progress
 
@@ -56,8 +56,8 @@ Not fixed — it is a change to the round machine, and it wants its own measurem
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **1** — 416_many_tiny_pages |
-| **Fixed - Google, all 42 checks** | **0** of the **2** re-measured on this engine - **188** of the 190 scored are still on an older engine, and **30** were clean there |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 188 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **23** of the **61** re-measured on this engine - **129** of the 190 scored are still on an older engine, and **30** were clean there |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **3** run(s) for the 129 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
@@ -85,19 +85,20 @@ Not fixed — it is a change to the round machine, and it wants its own measurem
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `A-merge` | the column-page shape merge: does the handoff's `shape()` lever exist at HEAD, and where is the live gap? | 15:17 | 15:28 | 11 min |
-| `B-anchors` | `anchorShape()`'s one-paragraph-per-anchor carriers: how many, how safe to collapse, worth a slot? | 15:28 | 15:49 | 21 min |
+| `A-merge` | does the handoff's `shape()` lever exist at HEAD, and where is the live gap? | 15:17 | 15:28 | 11 min |
+| `B-anchors` | `anchorShape()`'s one-paragraph-per-anchor carriers: how many, safe to collapse, worth a slot? | 15:28 | 15:49 | 21 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:20 → running · 2h 45m |
+| Slot window | 13:20 → running · 2h 46m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 30 |
 | Longest silence | **52.3 min** — from 14:16:06, after `relay: fixer claimed the slot (the :50/:10 slot, found free)` |
 | Silences over 2 min | 10 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Obstacles | 2 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | `health.py --stalled` exits 0 and the fix row reads moving, 1 attempt(s) in the last 3 h, stage age 1.2 h. `st |
 
 
 ### Where the time went
@@ -105,10 +106,10 @@ Not fixed — it is a change to the round machine, and it wants its own measurem
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **23 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **1h 08m** | `#########` |
+| measure or build - a conversion, screen or compile writes no beacon | **1h 06m** | `#########` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
 | report - the report and the chain | **1h 01m** | `########` |
-| other - not attributed to a tool | **11 min** | `#` |
+| other - not attributed to a tool | **14 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -133,10 +134,10 @@ Not fixed — it is a change to the round machine, and it wants its own measurem
 `A-merge` — the handoff's proposed lever is **already in the tree**: `pageBody()` at 1318-1414 writes a
 page's shapes as bare runs joined to an existing paragraph, so re-implementing it in `shape()` (2893, not
 2726) is a no-op. The live gap is the **column page** path, `columnPage()` 1745 → `after.add(b)` 1985-1989 →
-`emitBlock()` 2271, and the repo already ships an unlanded, Google-measured patch for it. Agent re-verified
-it: applies clean on HEAD, compiles, `<w:p>` 40 → 29 on a synthetic two-column page with all 12 `wp:anchor`
-offsets identical and in order, LibreOffice 1 page both ways. **0 documents claimable CLEAN**: the four
-re-measured in Google after a merge came out 39/42, 37/42, 41/42 and one still refused.
+`emitBlock()` 2271, and the repo already ships an unlanded, Google-measured patch for it. Re-verified: applies
+clean on HEAD, compiles, `<w:p>` 40 → 29 on a synthetic two-column page with all 12 `wp:anchor` offsets
+identical and in order, LibreOffice 1 page both ways. **0 documents claimable CLEAN** — the four re-measured
+in Google after a merge came out 39/42, 37/42, 41/42, and one still refused.
 
 `B-anchors` — `anchorShape()` (5523, `<w:p>` written at 5583) writes **one complete `<w:p>` per anchored text
 box**; 1 037 of the corpus's 1 319 drawing-only paragraphs come from it, across 61 documents. A post-pass
