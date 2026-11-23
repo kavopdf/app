@@ -2234,3 +2234,6 @@
 {"t": 1795411649.2811532, "ist": "10:57:29", "ev": "beat", "d": "relay: patching t09 furniture key + owed-per-occurrence"}
 {"t": 1795411812.061269, "ist": "11:00:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795411817.16814, "ist": "11:00:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795411819.2759116, "ist": "11:00:19", "ev": "attempt", "d": "t09_page_furniture -> kept"}
+{"t": 1795411819.373691, "ist": "11:00:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795411819.489782, "ist": "11:00:19", "ev": "beat", "d": "classrow.py: refreshing the class file"}

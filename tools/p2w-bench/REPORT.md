@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-23 08:55
+# Fixer report - 2026-11-23 10:17
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 08:55 → 09:56 IST · 1h 01m**
+**23 Nov 2026 · slot 10:17 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,7 +21,6 @@
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
 | Working on | `-` |
-| Committed | **10** files in 3 commit(s) from `e87f223` — ...18_displacement-PAGE-SHIFT-CENSUS-1015-agent.md, ENGINE-STAMP.json, LAST-MESSAGE.md, RANKING.csv, REPORT.md, ROTATION.json, ROUND.json, TIMELINE.jsonl, TRACE.md, UNMEASURED.json |
 
 ## The txt
 
@@ -41,23 +40,12 @@
 
 | | |
 |:--|:--|
-| Slot window | 08:55 → 09:56 · 1h 01m |
+| Slot window | 10:17 → running · 0 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 18 |
-| Longest silence | **14.9 min** — from 08:55:53, after `claimed, reading findings` |
-| Silences over 2 min | 11 |
-| Obstacles | 0 cleared · 4 parked, with the evidence to re-open them |
-| Still a wall | **The fixer's claim is 55 min old against a 45-min stale window and no run has beaconed since it claimed at 08 |
+| Tool beats | 3 |
+| Silences over 2 min | 0 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| build - compiling the engine | **1 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **29 min** | `###########` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **29 min** | `###########` |
 ## Best results this round
 
 | Document | Before | After | Change |
