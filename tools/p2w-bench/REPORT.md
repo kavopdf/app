@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-23 17:58
+# Fixer report - 2026-11-23 18:58
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 17:58 → running IST · 35 min**
+**23 Nov 2026 · slot 18:58 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,8 +11,8 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
-| Documents improved, round total | **61** of the 212 compared (corpus 212) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
@@ -22,13 +22,7 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `44_header_footer` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 18:33 | **lead** | 0/None | running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1 |
+| Working on | `-` |
 
 ## The txt
 
@@ -48,20 +42,12 @@
 
 | | |
 |:--|:--|
-| Slot window | 17:58 → running · 35 min |
+| Slot window | 18:58 → running · 0 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 17 |
-| Longest silence | **20.3 min** — from 17:58:36, after `report.py: building the report` |
-| Silences over 2 min | 3 |
+| Tool beats | 2 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `###############` |
-| other - not attributed to a tool | **11 min** | `#######` |
 ## Best results this round
 
 | Document | Before | After | Change |

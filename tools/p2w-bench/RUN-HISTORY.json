@@ -1,22 +1,5 @@
 [
  {
-  "started_ts": 1795185064.7096055,
-  "started": "20:01",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "47_margins",
-  "attempts": 2,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   "47maanchor trace-01",
-   "47maclass census-01"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795188528.837544,
   "started": "20:58",
   "ended_ts": null,
@@ -1180,6 +1163,17 @@
  {
   "started": "12:28",
   "started_ts": 1795436889.3427005,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "13:28",
+  "started_ts": 1795440494.2673979,
   "ended": "(never)",
   "ended_ts": null,
   "attempts": 0,
