@@ -1198,14 +1198,29 @@ def compare(src_pdf, txt_path):
             if not (ln["y"] <= h * FURNITURE_BAND
                     or ln["y"] >= h * (1.0 - FURNITURE_BAND)):
                 continue
-            element_pages.setdefault(_furniture_key(ln["text"]), set()).add(pg["number"])
+            _k = _furniture_key(ln["text"])
+            element_pages.setdefault(_k, {})
+            element_pages[_k][pg["number"]] = element_pages[_k].get(pg["number"], 0) + 1
+    # A key with no letter in it is not furniture. _furniture_key folds every digit to
+    # "#", so a page of numeric table cells folds to a handful of keys that repeat on
+    # every page and pass FURNITURE_MIN_PAGES - on 324_loan_amortisation_schedule three
+    # such keys ('#', '#,#,#.#', '#,#.#') invented 18 owed and 1437 present out of table
+    # data. A running head or footer carries at least one letter; a column of amounts
+    # does not. Removing an element removes its owed and its present by the same amount,
+    # so this can never turn a pass into a fail.
     elements = {k: v for k, v in element_pages.items()
-                if len(v) >= FURNITURE_MIN_PAGES}
+                if len(v) >= FURNITURE_MIN_PAGES and any(ch.isalpha() for ch in k)}
     txt_furniture = Counter(_furniture_key(ln.strip()) for ln in lines)
     owed = 0
     present = 0
     for key, pgs in elements.items():
-        owed += len(pgs)
+        # owed is counted PER DRAWN OCCURRENCE, not per page. A document that prints
+        # "Page N of 4" twice on each page (top band and bottom band) owes 8 copies and
+        # the writer that emits all 8 is correct; counting one per page charged
+        # gst-invoice-multipage-item-table 39 owed against 43 present for a 4-copy surplus
+        # it had actually drawn. A writer that drops a second copy now shows as a deficit,
+        # which is the fault this check is for.
+        owed += sum(pgs.values())
         # NOT min(txt_furniture, len(pgs)). The cap made present <= owed always, so
         # present == owed held whenever there were AT LEAST enough copies and the check
         # could only ever see missing furniture, never duplicated furniture - while its
