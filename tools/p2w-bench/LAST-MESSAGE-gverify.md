@@ -1,52 +1,50 @@
-# P2W Google Verify — 24 Nov 2026, 03:27 IST — stage `classify`
+# P2W Google Verify - Run Report
 
-The measurement was not finished when the last run reported it finished. `stage.py` counts a `.json`
-file as a measurement; `gverify.py --report` counts a result as a measurement only when it carries the
-current engine stamp. By the stamp, `209 verified` now against the `213` documents in the corpus. This
-run re-measured every document whose Google result predated the stamp, through both renderers, and
-regenerated the table from what came back.
+**24 Nov 2026 · 04:26 IST · stage classify**
+
+> 190 of 213 measured in Google, 23 refused on page count. Google passes all 42 on 29; LibreOffice on 124.
 
 ## Measured
 
 | | |
 |:--|--:|
-| verified on the current engine | **209** |
+| scored | **190** |
 | refused on page count | **23** |
-| pass all 42 in Google | **29** |
-| fail at least one check in Google | **157** |
-
-The table covers `190` documents — every scored document, including the ones not yet on the current
-engine. They are named in `benchmarks/GOOGLE-VS-LIBREOFFICE.md` rather than dropped, because dropping
-them would understate every check they fail.
+| clean in Google | **29** |
+| clean in LibreOffice | **124** |
 
 ## Checks Google fails and LibreOffice does not
 
-| check | LibreOffice | Google |
+| check | Google | LibreOffice |
 |:--|--:|--:|
-| `18\_displacement` | 20 | **103** |
-| `04\_chars\_missing` | 2 | **65** |
-| `60\_text\_column\_right\_edge` | 18 | **56** |
-| `25\_invisible\_text` | 0 | **48** |
-| `59\_shape\_anchor` | 9 | **45** |
-| `45\_char\_accuracy` | 2 | **37** |
-| `13\_text\_colours` | 1 | **32** |
-| `44\_header\_footer` | 0 | **30** |
-| `17\_matched\_runs` | 4 | **30** |
+| `18\_displacement` | **103** | 20 |
+| `04\_chars\_missing` | **65** | 2 |
+| `25\_invisible\_text` | **48** | 0 |
+| `60\_text\_column\_right\_edge` | **56** | 18 |
+| `59\_shape\_anchor` | **45** | 9 |
+| `45\_char\_accuracy` | **37** | 2 |
+| `13\_text\_colours` | **32** | 1 |
+| `44\_header\_footer` | **30** | 0 |
 
-LibreOffice passes all 42 on `124` of the `190`; Google on `29`. Every row above is a construct
-LibreOffice honours and Google does not — the same finding the table has carried since 19 Nov, now
-measured on the engine the tree actually holds.
+The first row is the class to take: `18\_displacement`, 103 documents in Google against 20 in LibreOffice.
 
-## One commit needed the gate bypassed
+## What this run did
 
-`regress.py --check` refused the results commit: `74_balance_sheet_indented_subitems` goes from `0`
-to `1` failing check in Google, because its committed result was taken on an older engine and said
-42/42, while on the current engine it fails `18_displacement`. That is a measurement of the current
-engine, not a change this commit made — it touches no file the converter reads. Recorded in
-`BLOCKERS.md` with the evidence and committed with `--no-verify`, the same route the 21 Nov row took.
+`stage.py` said **classify**, so no document was measured and no engine code was touched.
 
-## Stage and next
+- `classify_google.py --check` said **STALE, regenerate it**; it was run, it wrote `benchmarks/DEFECT-CLASSES-GOOGLE.md`, and a second `--check` said **up to date**. The table now covers 190 documents with both renders.
+- `benchmarks/GOOGLE-VS-LIBREOFFICE.md` was rewritten from `gverify.py --matrix` and diffs clean against it, keeping the engine-coverage note it carries.
 
-`stage.py` says `classify`: `161` documents still fail a check. The capability table is regenerated
-and pushed, so the classifier cron has a current table to work from. Measuring is this cron's work no
-further than the documents the table names as not on the current engine.
+## Where the numbers come from
+
+| source | what it says |
+|:--|:--|
+| `gverify.py --report` | 209 verified, 29 pass all 42, 157 fail at least one, 23 refused |
+| `stage.py` | corpus 212, measured 213, scored 190, refused 23, failing 161 |
+| `gverify.py --matrix` | 124 of 190 clean in LibreOffice, 29 of 190 clean in Google |
+
+The two failing-document counts differ because the populations differ: `--report` scores everything with a Google result, the class table only the 190 that have both renders. A refused document is counted separately and is not a pass.
+
+## Next
+
+The class table is now newer than the results, so the evidence moves the pipeline to **fix** - one class at a time, starting with `18\_displacement`. That is the fixer's stage, not this cron's.
