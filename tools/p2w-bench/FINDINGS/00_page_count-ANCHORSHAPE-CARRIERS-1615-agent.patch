@@ -1,0 +1,133 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 72ade6d..ba5f033 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -1184,6 +1184,7 @@ public final class DocxWriter {
+             ctx.measuring = true;
+             pageBody(pg, page, ctx, pw, ph, secGap);
+             ctx.measuring = false;
++            collapseAnchorParas(pg);
+             int needTw = ctx.flowTw;
+             int writtenTw = spacingTw(pg);
+             // What the page carries that the flow is not charged for. Kept out of the budget the
+@@ -1237,6 +1238,7 @@ public final class DocxWriter {
+                     ctx.afterTablePt = -1f;
+                     ctx.budgetTw = Math.max(1, pageBudgetTw - overheadTw);
+                     pageBody(pg, page, ctx, pw, ph, secGap);
++                    collapseAnchorParas(pg);
+                     int w = spacingTw(pg);
+                     if (w < bestWritten) {
+                         bestWritten = w;
+@@ -2896,6 +2898,112 @@ public final class DocxWriter {
+         sb.append("</w:p>");
+     }
+ 
++    /**
++     * The opening of the paragraph {@link #anchorShape} writes for an anchored text box.
++     *
++     * <p>It is {@link #SHAPE_PARA_PPR} and nothing else, because the carrier paragraph of an
++     * anchored box must cost the reader the same line box as the carrier of a shape.
++     */
++    private static final String ANCHOR_PARA_OPEN =
++            "<w:p><w:pPr>" + SHAPE_PARA_PPR + "</w:pPr>";
++
++    /** The docPr name every box written by {@link #anchorShape} carries. */
++    private static final String ANCHOR_BOX_NAME = "KavoPDF text ";
++
++    /**
++     * One paragraph for a contiguous run of anchor-carrier paragraphs.
++     *
++     * <p>{@code anchorShape} writes one {@code <w:p>} per anchored text box: the pPr above, a
++     * body that is a single {@code <w:r><w:drawing>} holding one {@code wp:anchor}, and the
++     * paragraph break is the {@code </w:p>} it appends last. Every one of those anchors is
++     * {@code wp:positionH/V relativeFrom="page"} with {@code wp:wrapNone}, so it is placed
++     * against the paper and never consults the paragraph it sits in - the same argument
++     * {@link #pageBody} already relies on to write a {@code Shape} as a bare run.
++     *
++     * <p>Two or more of those paragraphs in a row therefore buy nothing the first one does not:
++     * the first pPr is kept, every run is kept in the order it was written, and the bytes of
++     * each {@code wp:anchor} are not touched. What is removed is only the close of one
++     * paragraph, the open and pPr of the next, and nothing else - the paragraph marks.
++     *
++     * <p>Deliberately conservative. A paragraph is merged only when its body is nothing but
++     * complete {@code <w:r><w:drawing>...</w:drawing></w:r>} runs and every one of them is a
++     * box this writer anchored for a line of text. A carrier that also holds a bookmark, a
++     * field, a {@code w:t}, or a nested paragraph is left exactly as it was, because none of
++     * those is a thing this method can move without changing what the file says.
++     */
++    private static void collapseAnchorParas(StringBuilder sb) {
++        String s = sb.toString();
++        if (s.indexOf(ANCHOR_PARA_OPEN) < 0) return;
++        StringBuilder out = new StringBuilder(s.length());
++        int i = 0, cut = 0, removed = 0;
++        while ((i = s.indexOf(ANCHOR_PARA_OPEN, i)) >= 0) {
++            int bodyStart = i + ANCHOR_PARA_OPEN.length();
++            int close = paraClose(s, i);
++            if (close < 0) break;
++            if (!anchorRunsOnly(s, bodyStart, close)) { i = close + 6; continue; }
++            int cursor = close + 6;
++            StringBuilder extra = new StringBuilder();
++            int n = 0;
++            while (s.startsWith(ANCHOR_PARA_OPEN, cursor)) {
++                int b2 = cursor + ANCHOR_PARA_OPEN.length();
++                int c2 = paraClose(s, cursor);
++                if (c2 < 0 || !anchorRunsOnly(s, b2, c2)) break;
++                extra.append(s, b2, c2);
++                cursor = c2 + 6;
++                n++;
++            }
++            if (n == 0) { i = close + 6; continue; }
++            out.append(s, cut, close).append(extra).append("</w:p>");
++            cut = cursor;
++            removed += n;
++            i = cursor;
++        }
++        if (removed == 0) return;
++        out.append(s, cut, s.length());
++        sb.setLength(0);
++        sb.append(out);
++        if (System.getProperty("p2w.debugAnchors") != null) {
++            System.err.println("ANCHOR merge: " + removed + " carrier paragraph(s) folded away");
++        }
++    }
++
++    /** The index of the {@code </w:p>} closing the paragraph that opens at {@code paraStart}. */
++    private static int paraClose(String s, int paraStart) {
++        int depth = 0, i = paraStart, n = s.length();
++        while (i < n) {
++            if (startsWith(s, "<w:p>", i) || startsWith(s, "<w:p ", i)) {
++                depth++;
++                i += 5;
++            } else if (startsWith(s, "</w:p>", i)) {
++                depth--;
++                if (depth == 0) return i;
++                i += 6;
++            } else {
++                i++;
++            }
++        }
++        return -1;
++    }
++
++    /**
++     * True when {@code s[from, to)} is one or more complete drawing runs, every one of them a
++     * box {@link #anchorShape} wrote, and nothing else at all.
++     */
++    private static boolean anchorRunsOnly(String s, int from, int to) {
++        int i = from;
++        if (i >= to) return false;
++        while (i < to) {
++            if (!startsWith(s, "<w:r><w:drawing>", i)) return false;
++            i += 16;
++            int end = s.indexOf("</w:drawing></w:r>", i);
++            if (end < 0 || end + 18 > to) return false;
++            if (s.indexOf("<w:drawing>", i) >= 0 && s.indexOf("<w:drawing>", i) < end) return false;
++            if (s.indexOf(ANCHOR_BOX_NAME, i) < 0 || s.indexOf(ANCHOR_BOX_NAME, i) > end) return false;
++            i = end + 18;
++        }
++        return i == to;
++    }
++
+     /**
+      * The shape as a bare run - no paragraph around it.
+      *
