@@ -261,3 +261,22 @@ for a scheduled run.
 What would re-open it: either a background-capable delegation in a scheduled run, or a brief that
 says what to do instead — e.g. one agent, scoped to under ten minutes, deployed only after the run's
 own first attempt is committed.
+
+## stage.py counts a file as a measurement, so the stage machine has advanced past a measurement that is 128 documents behind
+
+Measured 23 Nov by the gverify cron. `stage.py`'s `measured()` counts every `.json` in
+`benchmarks/gverify/` (213) and never asks which engine wrote it, while `gverify.py`'s `_done()` - the
+function that decides what still needs measuring - counts only results carrying the current engine
+stamp. On engine `5beb8b9d` the two disagreed by 128 documents: `stage.py` said "measured: 213 through
+Google (190 scored, 23 refused)" and `gverify.py --plan 60` said "85 of 213 documents have a Google
+result; 128 to go". The brief already names this exact failure - "a file on disk is not a measurement" -
+and fixed it in `--plan`; `measured()` was left with the old count.
+
+Consequence: the stage machine reports `fix`/`classify` while the Google measurement is incomplete, so
+a run that trusts `stage.py` alone does nothing and the fixer optimises against results from older
+engines. This run acted on `--plan`, re-measured 60 documents on `5beb8b9d` through both renderers, and
+left the stage alone.
+
+What would overturn it: `measured()` returning the same number as `len(_done())` on a corpus whose
+results are mixed-engine. Until it does, read `gverify.py --plan` for the measurement and `stage.py`
+for everything after it.
