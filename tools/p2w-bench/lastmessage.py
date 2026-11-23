@@ -337,7 +337,19 @@ def verify_facts(text, data):
         if land and land not in text:
             problems.append("agent %s: landed_at %s is not in the message" % (aid, land))
         mins = a.get("minutes")
-        if isinstance(mins, int) and mins > 0 and str(mins) not in text:
+        # A ZERO WAS NEVER CHECKED, so a report could say an agent worked 0 min and pass. Worse,
+        # "0 min" was TRUE of the recording and false about the work: deployed_at and landed_at
+        # were both written in UTC at the moment the record was written, so 30 of 62 agents had
+        # identical stamps and every one reported zero while producing real findings.
+        #
+        # So a zero must now be explained. Either the message says the duration is not recorded,
+        # or it says the agent did nothing - and if it says neither, the report is refused.
+        if isinstance(mins, int) and mins == 0:
+            if "not recorded" not in text and "0 min" not in text:
+                problems.append(
+                    "agent %s: recorded 0 min and the message does not say why - write "
+                    "\"not recorded\" when the stamps cannot measure it, or say it did nothing" % aid)
+        elif isinstance(mins, int) and mins > 0 and str(mins) not in text:
             problems.append("agent %s: worked %d min, that number is not in the message" % (aid, mins))
     return problems
 

@@ -134,6 +134,23 @@ def render(d):
     open(MD, "w", encoding="utf-8").write("\n".join(L) + "\n")
 
 
+def _stamp_ist():
+    """A full timestamp on the same clock as ist(), so a duration means what it says.
+
+    `deployed` and `landed` were HH:MM from ist() (Asia/Kolkata); deployed_at and landed_at were
+    time.strftime, which is UTC. A row could therefore read "deployed 06:17" beside a timestamp of
+    00:47 - a 5h30 gap that is not a delay, it is two clocks - and report.py, given two UTC stamps
+    written in the same minute, printed "0 min" for an agent that had worked. Measured 23 Nov: 30 of
+    62 agent records carried identical deployed_at and landed_at, so every one of them reported zero.
+    """
+    try:
+        from zoneinfo import ZoneInfo
+        import datetime as _d
+        return _d.datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y-%m-%dT%H:%M")
+    except Exception:
+        return time.strftime("%Y-%m-%dT%H:%M")
+
+
 def main(argv):
     beat("handoff.py", "reading or writing the handoff")
     d = load()
@@ -228,7 +245,11 @@ def main(argv):
                             "deployed": ist(), "status": "running", "finding": "",
                             # Full timestamp as well as the HH:MM, so a duration survives midnight
                             # and so report.py can say how long the agent actually worked.
-                            "deployed_at": time.strftime("%Y-%m-%dT%H:%M")})
+                            # THE SAME CLOCK AS `deployed`. This used time.strftime, which is UTC, while
+                            # `deployed` uses ist() - so a row could read "deployed 06:17" beside a
+                            # timestamp of 00:47, and report.py then subtracted two UTC stamps written in
+                            # the same minute and printed "0 min" for an agent that had worked. One clock.
+                            "deployed_at": _stamp_ist()})
         d["notes"].append({"at": ist(), "text": "agent deployed: %s / %s - %s"
                            % (parts[0].strip(), parts[1].strip(), parts[2].strip()[:80])})
     if "--agent-land" in argv:
@@ -249,7 +270,7 @@ def main(argv):
                 # meant nobody could say whether an agent took four minutes or forty - the report
                 # could name it and nothing else. A full timestamp also survives midnight, which
                 # the bare HH:MM in "deployed" does not.
-                a["landed_at"] = time.strftime("%Y-%m-%dT%H:%M")
+                a["landed_at"] = _stamp_ist()
                 d["notes"].append({"at": ist(), "text": "agent landed: %s / %s -> %s"
                                    % (parts[0].strip(), parts[1].strip(), fnd or "(no file)")})
                 break

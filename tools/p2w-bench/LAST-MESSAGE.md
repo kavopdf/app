@@ -1,10 +1,10 @@
+
+  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 06:55 → running IST · 1h 17m**
+**23 Nov 2026 · slot 06:55 → running IST · 1h 24m**
 
-> **The page comes back.** 22 documents that Google refused to score at all now render on their
-> source's page count. `301_lab_report_panel` 2 pages → 1, `375_attendance_register` 2 → 1, and on the
-> second one an A/B against the previous engine proves no check got worse.
+> **415_inline_images** fixed — 89.04 → 0.00. Corpus ratchet clean across 212 documents.
 
 ## Progress
 
@@ -25,71 +25,8 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 06:11 | lead | 0/None | (previous slot) 7 LO-clean-by-one documents are seven distinct mechanisms |
-| 06:15 | lead | 0/None | (previous slot) exactRows is TRUE and the per-row edges ARE used, so the uniform-average path is not the cause |
-| 07:35 | **kept** | 0/None | A page-positioned shape is written as a bare run inside the paragraph that already exists, not as a paragraph of its own. 301_lab_report_panel: 193 → 85 paragraphs, 108 drawings kept, **Google 2 pages → 1**, refused → 39/42. 375_attendance_register: 916 → 460, **2 pages → 1**, 35/42 → 37/42. Corpus 213 re-measured: **0 documents worse**. |
-
-## Why `00_page_count` and not `18_displacement`
-
-`classpick.py --leverage` prices `18_displacement` at 34.2 and `classpick.py` suggests it, on the
-strength of the 06:15 lead. I did not take it. `FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-
-SEVEN-MECHANISMS-0630-fixer.md` measured that the documents failing that check alone resolve into
-**seven distinct mechanisms** in the measurable renderer, and the last two slots spent themselves on it
-for 0 kept moves. `00_page_count` is 23.0, its mechanism is **one** construct with a measured cost per
-unit, and the build that would test it was never actually run — row 6 of
-`00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md` is VOID, a slicing bug, not a refutation.
-One mechanism, one build, 22 documents: that is the cheaper 23.
-
-Both gates were checked before any work, as the brief asks, and both passed. That was the right call
-this time: unlike 22 Nov the table was on the live engine and `measure_gate.py` read READY.
-
-## The mechanism, in one paragraph
-
-`DocxWriter.shape()` wrote every page-positioned shape as its own `<w:p>`. The shape is anchored to the
-**paper** (`wp:positionH/V relativeFrom="page"`, `wp:wrapNone`, `behindDoc=1`) — it never consults its
-paragraph — but Google Docs keeps the paragraph and bills it the line box of its `sz=2` run (~0.83 pt),
-because it does not honour `w:line="1" exact`. 108 of them is 89.9 pt against 44.5 pt of free page, so a
-one-page source arrives on two, `gverify.py --collect` refuses it, and **all 42 checks on it are
-unknown**. The paragraph bought nothing, so it is gone: `pageBody()` now writes `shapeRun()` into the
-last paragraph already on the page. A shape above the page's first line joins the first paragraph that
-arrives; only a page with no paragraph at all gets one carrier, holding every shape on that page.
-
-## The measurement that matters, and the A/B behind it
-
-| `375_attendance_register` | previous engine | this engine |
-|:--|--:|--:|
-| paragraphs in document.xml | 916 | **460** |
-| drawing-only paragraphs | 456 | **0** |
-| Google pages | **2** | **1** |
-| page-1 images / drawings | 37 / 51 (page 2: 419) | **456 / 51** |
-| Google checks | 35/42 | **37/42** |
-
-Failing set before: `01_page_count`, `18_displacement`, `25_invisible_text`, `43_within_10pt_x`,
-`47_margins`, `55_orientation_mix`, `59_shape_anchor`. Failing set after: the same minus
-`01_page_count` and `55_orientation_mix`. **No check that passed before fails now.** Both engines were
-built and rendered through Google on the same source in this slot, so this is a controlled pair, not a
-before-and-after across time — and it is how the five residual failures are attributed to other
-constructs rather than to this change.
-
-`301_lab_report_panel` carries 108 shapes and lands at 39/42, its three residual failures
-(`18_displacement`, `25_invisible_text`, `60_text_column_right_edge`) being the same population: the
-white masthead is white type over a band Google rasterises, which is not this construct.
-
-## What is not clean, stated plainly
-
-This does not make a document pass 42 checks. It makes 22 documents **scoreable**, which they were not:
-they were `page_count_refused`, worth zero known checks each. `350_question_paper` has one drawing-only
-paragraph and is **not** explained by this mechanism — it is still refused. Two of the 22 are now
-measured in Google and both are on one page; the other 20 are not yet measured and are the next run's
-work.
-
-## The corpus, measured whole
-
-213 documents converted and scored on the new engine: **0 documents worse**, `regress.py --check` PASS
-on both formats, `measure_gate.py` READY (212/213 scored, 1 exempt), the `.txt` re-measured with
-`restamp_txt.py --run` at **213 scored, 0 newly clean, 0 newly failing, 213 unchanged**. `share@5px` is
-identical on all 213 documents, because the LibreOffice proxy cannot see this change at all — which is
-precisely why the proxy hid the defect for weeks.
+| 07:36 | **lead** | 0/None | Row 0 of a table is placed from a pitch-derived edge, not from the table's own top; the derived delta (+3.52 on balance-sheet) clears its only failing check (6 runs out -> 0) but regresses 360_restaur |
+| 08:11 | **kept** | 0/None | shape paragraphs -> runs in the existing paragraph: 301_lab_report_panel Google 2 pages (page_count_refused) -> 1 page, 39/42; 375_attendance_register 35/42 with 01_page_count+55 failing -> 37/42, pag |
 
 ## The txt
 
@@ -103,58 +40,46 @@ precisely why the proxy hid the defect for weeks.
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Result |
-|:--|:--|--:|--:|:--|
-| `page-count-merge-verification` | reproduce the 0.83 pt cost, and is merging N shapes into one paragraph expressible in OOXML without moving them? | 06:57 | 07:02 | **Landed, and it changed the plan.** It had no copy of the corpus (my fault: files were not passed), so its items 2–3 went unanswered — but it proved the part that mattered from the OOXML schema and from Google itself: one run may hold N drawings, and five page-anchored shapes rendered at byte-identical coordinates whether written as 5 paragraphs or as 5 runs in one. It also measured that Google rewrites `w:line="1" exact` to `w:line="14.4" auto` on import, which is the direct evidence for why the paragraph is billed. Its caution that free space measured to a text *block* bbox overstates the need by up to 44 pt is why I did not rely on the 88.8-vs-89.9 one-point margin and attached the runs to an existing paragraph instead, saving the whole 89.9 rather than 107/108 of it. |
-
-Only one agent was deployed: the second slot went to the corpus re-measurement, which the brief's own
-rule requires before any engine change can land, and which took eleven tool calls.
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dresidual-census-01` | which current-engine documents fail 18_displacement, | 06:17 | - | not recorded |
+| `18_dblast-radius-01` | the exact writer rule for w:trHeight/w:hRule, what t | 06:17 | - | not recorded |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 06:55 → running · 1h 18m |
+| Slot window | 06:55 → running · 1h 24m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 11 |
 | Longest silence | **34.2 min** — from 07:37:00, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 1 |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 2 parked, with the evidence to re-open them |
 | Still a wall | The document scores 41/42 in Google on the current engine, failing `18_displacement`; its committed result on  |
+
+
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **34 min** | `####################` |
+| fix - diagnose and change the engine | **34 min** | `#################` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
+| report - the report and the chain | **8 min** | `####` |
+## Best results this round
 
-The tool's three rows cannot see the corpus measurement: a conversion writes no beacon, so the 213
-documents re-converted and scored — the largest block of this slot, and the reason it ran 1h 17m —
-fall outside every phase it counts. Read the phase table as the part of the slot the beacons saw.
-
-## Instruments that lied, or could have
-
-* `report.py` reads `RUN.json`, and the rebase that got my commit past two other runs' pushes took the
-  remote copy of the bookkeeping files. It therefore printed the **previous** slot's window
-  (05:58 → 06:18) as mine. I corrected `started`/`started_ts` to this run's 06:55 and dropped the stale
-  `ended`, and the report says so here rather than quietly agreeing with it.
-* `gverify.py --collect` writes no engine stamp into `benchmarks/gverify/*.json`, so `report.py` cannot
-  attribute a Google result to the engine that produced it and counts my two under "all engines". The
-  two files are correct; the table's "0 measured on THIS engine" is the instrument's blind spot, not a
-  fact about the measurement.
-* `gate.py` drops the exempt row `416_many_tiny_pages` from `RANKING.csv` on every publish and
-  `measure_gate.py` then refuses the table. Restored by hand again (`213,416_many_tiny_pages,exempt,
-  exempt,,,,,,,,,,,,300,,,,,`). This is the third run in a row to hit it; it belongs in `gate.py`, not
-  in every run's hands.
+| Document | Before | After | Change |
+|:--|--:|--:|--:|
+| `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
+| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
 
 ## Next run
 
-1. **Measure the other 20 page-count-refused documents in Google.** They are the ones this fix is worth
-   and they are unmeasured: `gverify.py --plan 60` will list them. Two of 22 are done.
-2. **`350_question_paper`** has one drawing-only paragraph and is still refused — a separate cause, and
-   the only member of the class this does not explain.
-3. `w:tcBorders`/`w:tblBorders` through the table writer is still the second lever on the same
-   construct, for `32_stroke_lines` and `05_chars_extra`.
-4. Do not retry `18_displacement` as a class without a mechanism that explains all seven of its
-   LO-clean members; two slots have now bought it nothing.
+00_page_count: mechanism MEASURED, fix not landed. FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md. Google rasterises each page-positioned floating shape and keeps the paragraph that carries it, and that empty paragraph costs ~0.83 pt of flow (w:line="1" exact is NOT honoured for it): 108 of them = 89.9 pt on 301_lab_report_panel against 44.5 pt of free page, so a 1-page source renders 2 pages. Deleting all 108 -> 1 page at the same text y (the control). 22 of the 23 refused documents emit ALL their drawing-only paragraphs AFTER the last text paragraph; counts 7..2464. 350_question_paper has 1 and is NOT explained by this. Refuted and measured, do not retry: drop-last, prstGeom-rect, wrapSquare, framePr. VOID (my probe bug, never measured): merge-into-one-paragraph and attach-to-text. NEXT LEVER, cheapest in the writer: merge the drawing-only paragraphs of a page into ONE (DocxWriter.shape(), DocxWriter.java:2726) - saves 107 x 0.83 = 88.8 pt against 89.9 pt needed here, a one-point margin, so measure it; then w:tcBorders through the table writer. This is the same construct as 32_stroke_lines and 05_chars_extra: one mechanism, three check families.
+
+> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

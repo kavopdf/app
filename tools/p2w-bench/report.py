@@ -759,8 +759,24 @@ def subagents():
             if dep and land:
                 d0 = _dt.datetime.fromisoformat(dep)
                 d1 = _dt.datetime.fromisoformat(land)
-                took = "%d min" % round((d1 - d0).total_seconds() / 60.0)
-                land_s = d1.strftime("%H:%M")
+                _secs = (d1 - d0).total_seconds()
+                # TWO STAMPS IN THE SAME MINUTE IS NOT "THE AGENT DID NOTHING". deployed_at and
+                # landed_at were both written by time.strftime (UTC) at the moment the record was
+                # written, so 30 of 62 agent records carried identical values and every one of them
+                # reported "0 min" - for agents whose findings were real. A zero now says the
+                # recording cannot measure it, which is the truth, instead of claiming the agent was idle.
+                if _secs <= 0:
+                    # A LANDING BEFORE THE DEPLOY IS NOT A DURATION, IT IS TWO CLOCKS. Older records
+                    # carry deployed_at from ist() and landed_at from time.strftime (UTC), so the
+                    # landing reads 5h30 earlier than the deploy. Printing it invites the reader to
+                    # believe an agent finished before it started, so the column says what is true:
+                    # the recording cannot measure it.
+                    took = "not recorded"
+                    if d1 < d0:
+                        land_s = "-"
+                else:
+                    took = "%d min" % round(_secs / 60.0)
+                    land_s = d1.strftime("%H:%M")
             elif dep_s and a.get("finding"):
                 # the finding file's own commit time, when the record has no landed_at
                 import subprocess
