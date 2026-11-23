@@ -1,17 +1,13 @@
 {
- "started_ts": 1795426367.386311,
- "started": "15:02",
- "ended_ts": 1795432139.0297785,
- "ended": "16:38",
- "class": "00_page_count",
- "attempts": 1,
+ "started_ts": 1795433413.3641412,
+ "started": "17:00",
+ "ended_ts": null,
+ "ended": null,
+ "class": "",
+ "attempts": 0,
  "kept": 0,
  "docs_improved": 0,
- "agents": [
-  "00_pA-02",
-  "gverB-01"
- ],
+ "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0,
- "partial": 1
+ "needs_human": 0
 }

@@ -2115,9 +2115,9 @@
   }
  ],
  "run": {
-  "started": "15:02",
-  "ended": "16:38",
-  "ended_how": "forced"
+  "started": "17:00",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
   {

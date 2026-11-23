@@ -2582,3 +2582,12 @@
 {"t": 1795432095.7399857, "ist": "16:38:15", "ev": "beat", "d": "relay: rowExcess 15->11 built; Google-measuring 72_bank (after)"}
 {"t": 1795432153.3119533, "ist": "16:39:13", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795432157.961496, "ist": "16:39:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795433413.2133791, "ist": "17:00:13", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795433413.3444836, "ist": "17:00:13", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795433430.3052027, "ist": "17:00:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795433452.265883, "ist": "17:00:52", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795433455.3768597, "ist": "17:00:55", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795433455.553445, "ist": "17:00:55", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795435434.3929896, "ist": "17:33:54", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795435868.6708975, "ist": "17:41:08", "ev": "beat", "d": "regress check before commit"}
+{"t": 1795435885.9736614, "ist": "17:41:25", "ev": "beat", "d": "attempt.py: recording an attempt"}
