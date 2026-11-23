@@ -2028,6 +2028,22 @@ report; the fixer has the same platform and no cap now either.
 is a reason for the next attempt. A gate that refuses is work - read it. Work until the platform takes the
 slot back or until the engine cannot emit anything more for the class you hold.
 
+**THE CHECKPOINT IS 60 MINUTES. IT IS NOT A STOPPING POINT - IT IS THE POINT BY WHICH NOTHING MAY BE UNSAVED.**
+
+The platform can end the run at any moment and there is no way to know when. So the report is not a thing you
+write at the end; it is a thing that is always already written.
+
+- **After every attempt:** write the findings to `FINDINGS/`, refresh the report, commit, push. A kill now
+  costs one attempt's news, not the run's.
+- **At 60 minutes (`runclock.py` says CHECKPOINT PASSED):** write the FULL report, commit it, push it - then
+  carry on with the next attempt. Past the checkpoint the run keeps working; the checkpoint only guarantees
+  that whatever it has done is on disk and pushed.
+
+60 and not another number: it is inside the measured longest real run (105 min, 70 beacons, 3 attempts), inside
+the platform's limits (300 s per command, 10 min idle, 30 min with no tool call, no run-length cap), and late
+enough that four to six attempts have happened. It is a checkpoint, and a checkpoint that arrives before the
+work does is a stopping point wearing a different name.
+
 **REFRESH AND COMMIT THE REPORT AFTER EVERY ATTEMPT.** That is what replaces the deadline: whichever moment
 the platform ends the run, the last committed report is current and the next run loses nothing. Writing it
 once, at the end, is what forced the end to be scheduled.

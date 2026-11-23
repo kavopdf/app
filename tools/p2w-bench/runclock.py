@@ -37,6 +37,16 @@ ROUND = os.path.join(HERE, "ROUND.json")
 BUDGET_MIN = None
 REPORT_AT_MIN = None
 
+# A CHECKPOINT IS NOT A STOPPING POINT. There is no time at which the run ends, but there IS a time by which
+# the report must already be complete and committed - because the platform can end the run at any moment and a
+# run that dies with nothing written teaches the next one nothing.
+#
+# 60 minutes: inside the measured longest real run (105 min, 70 beacons, 3 attempts), inside the platform's own
+# limits (no run-length cap; 300 s per command, 10 min idle, 30 min with no tool call), and late enough that
+# four to six attempts have happened. Past it the run keeps working - the checkpoint only guarantees that
+# whatever it has done so far is already on disk and pushed.
+CHECKPOINT_MIN = 60
+
 
 def _claimed_at():
     """When the current claim was made, as an epoch second. None if there is no claim.
@@ -76,9 +86,11 @@ def main(argv):
     elapsed = (time.time() - started) / 60.0
     left = None
     due = False
+    checkpoint = elapsed >= CHECKPOINT_MIN
 
     if "--json" in argv:
         print(json.dumps({"elapsed_min": round(elapsed, 1), "stopping_point": None,
+                          "checkpoint_min": CHECKPOINT_MIN, "checkpoint_passed": checkpoint,
                           "report_due": False}))
         return 0
 
@@ -87,8 +99,15 @@ def main(argv):
     print("  stopping point : none. The run ends when the platform ends it, or when the engine")
     print("                   genuinely blocks you - never because a clock said so.")
     print()
-    print("  KEEP WORKING.")
-    print("  After every attempt: refresh and commit the report, so a kill loses nothing.")
+    if checkpoint:
+        print("  CHECKPOINT PASSED. Not a reason to stop - a reason to make sure the report is")
+        print("  already complete and committed, because the platform can end this run at any moment.")
+        print("  Write the FULL report now, commit it, push it. Then carry on with the next attempt.")
+    else:
+        print("  CHECKPOINT IN %.0f MIN." % (CHECKPOINT_MIN - elapsed))
+        print("  Until then: refresh and commit the report after EVERY attempt, so a kill loses nothing.")
+    print()
+    print("  KEEP WORKING. There is no stopping point in this file.")
     print("  Next attempt: python3 tools/p2w-bench/classpick.py --leverage")
     print("                python3 tools/p2w-bench/allreports.py --unread")
     return 0
