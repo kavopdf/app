@@ -1,39 +1,32 @@
-Watchdog pass, 23 Nov. The pipeline is moving. Two stages are stopped and this run could not move either
-of them.
+# P2W Watchdog - Run Report
 
-health.py --stalled exits 1.
+**24 Nov 2026 · 03:07 IST**
 
-- measure-google: done, 213 of 212, age 4.2 h
-- matrix: done, 213 of 213, age 4.2 h
-- classify: stopped, age 7.5 h
-- fix: moving, 2 attempt(s) in 3 h, age 0.6 h
-- txt: stopped, 199 clean and 14 failing, age 12.7 h
+> **1 stage(s) stopped: txt**
 
-Trend, today's row against the last: docx open 59 -> 59, txt failing 16 -> 14, google 192 -> 190,
-google clean 23 -> 30. Today's row already existed, so nothing was appended and PROGRESS.md had nothing
-to commit.
+Nothing else in the pipeline was stopped, and nothing here could be moved from this pass. The fixer holds its slot and is working, the Google measurement and the class table are current, and today's trend row was already in place, so no past row was touched. The .txt row is the one thing standing still: the verifier was corrected after that table was written, so the score it prints was taken with an instrument that no longer exists, and the only cron that re-stamps it may not run while the phase is fix. This run has no cron tool, so the baseline cron could not be inspected or restarted; the exact calls that were not made are in BLOCKERS.md, together with the decision that the refresh route, not the class, is what is wrong.
 
-Round: phase fix, round 1 of 3. The phase is not done, so round.py --reopen does not apply; the class
-count round.py prints was not carried into this report because this checker will not verify it.
+## Stages
 
-Fixer slot: not dead. ROUND.json records the claim twelve minutes before this pass, so --release-fixer
---force was not run - releasing a slot a run took twelve minutes ago would put a second run into the
-engine. The fixer landed a commit while this pass was running.
+| stage | state | progress | age |
+|:--|:--|--:|--:|
+| measure-google | done | 213 of 212 | 1.3 h |
+| matrix | done | 213 of 213 | 7.1 h |
+| classify | moving |  | 2.6 h |
+| fix | moving |  | 0.5 h |
+| txt | **stopped** | 199 clean, 14 failing | 15.7 h |
 
-Both stopped stages belong to crons:
+## Trend
 
-- classify: the class table is older than the newest Google results it describes. Owner is the
-  classifier cron.
-- txt: the .txt table predates restamp_txt.py, one of the three inputs that can change a score; health
-  reports those inputs 6.8 h old. Owner is the baseline cron, which has made no recorded claim for over
-  a day.
+| | 2026-11-22 | 2026-11-23 | |
+|:--|--:|--:|:--|
+| .docx open | 59 | **59** | no change |
+| .txt failing | 16 | **14** | -2 |
+| Google measured | 192 | **190** | -2 |
+| Google clean | 23 | **30** | +7 |
 
-This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. I could not
-read next_fire_at, paused status or the run list for either cron. The exact calls I would have made are
-written into BLOCKERS.md: list, then pause and resume on the stalled id in the same run, then runs to
-look for a zombie.
+## What this pass did
 
-What would overturn this: a watchdog run whose tool list contains cron. Until then every pass reports
-the same blind spot, and a paused cron stays silent with nothing in the repository able to notice it.
+* Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
+* **A stage is stopped** - see BLOCKERS.md.
 
-BLOCKERS.md is updated and pushed.

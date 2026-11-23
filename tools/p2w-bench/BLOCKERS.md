@@ -382,3 +382,79 @@ it the spacer half has no room. There is no free parameter: for an unspendable s
 
 **needed:** a decision on whether a Google-measured win may move the LibreOffice proxy on a document
 where the proxy and Google disagree, which is every document in this class.
+
+## 2026-11-24 03:10 IST (2026-11-23 21:40 UTC) — watchdog: no `cron` tool this run; neither guard applied
+
+**What I was doing.** STEP 1, STEP 2, STEP 4 C and D of the watchdog pass.
+
+**This run has no `cron` tool.** The declared tool list carries no `cron` operation, and a
+`tool_search` for "cron list scheduled jobs pause resume" returned only Hugging Face and Drive
+operations. So a paused, zombie or stale-fire cron cannot be moved by automation from here. The exact
+calls that would have been made and were not:
+
+    cron(action="list")                                            # next_fire_at and status, all ids
+    cron(action="runs", cron_id="01M7N3RTAM7SATT9TXMQPP7QRM")      # baseline :00 - the txt row's owner
+    cron(action="runs", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")      # fixer :50 - zombie?
+    cron(action="pause",  cron_id=...); cron(action="resume", cron_id=...)   # same pass, never left paused
+
+**STEP 4 C did not apply.** `round.py --phase` prints `fix`, not `done`, so `round.py --reopen` has
+nothing to reopen; it refuses unless the phase is `done` and documents still fail.
+
+**STEP 4 D did not apply.** `status.py` reads the fixer claim 14 min old against `CLAIM_STALE_MIN
+["fixer"] = 45`, and `health.py` puts the fix stage at 0.5 h with 7 attempts in 3 h. A slot held by a
+run that claimed a quarter of an hour ago is a working run; `round.py --release-fixer --force` would
+have put a second run into the engine. Neither fixer cron was touched.
+
+**Can I fix it:** no. A missing tool is a missing tool. Until a watchdog run's tool list contains
+`cron`, a paused cron stays silent with nothing in the repository able to see it.
+
+---
+
+## 2026-11-24 03:12 IST — DECISION on the `txt` row (STEP 5): the approach is wrong, not the class, not the instrument
+
+The `txt` row has read stopped on two consecutive watchdog passes (12.7 h, then 15.6 h) and the
+baseline cron that owns it has not claimed since `ROUND.json`'s `baseline_started`, 22 Nov 15:34 UTC —
+over a day. That is past the 24-hour line, so this is a decision, not a coordination note.
+
+**The evidence, read from the repository.**
+
+* `tools/p2w-bench/txt/RANKING-TXT.csv` was last committed 23 Nov 05:57 UTC (42a9496a), reading 199
+  clean and 14 failing.
+* `tools/p2w-bench/verify_txt.py` was changed after it, at 23 Nov 20:12 UTC (50a999d9, "attempt:
+  t12_word_invention -> lead"). `glyph_truth()` now counts the text drawn by a printing annotation —
+  FreeText and Stamp — as page text, on the measured finding that a FreeText note and a Stamp on
+  `600_reviewed_invoice_with_annotations` print on the page, that `get_text()` cannot see them, and
+  that the `.txt` had transcribed them correctly. t12 was condemning the writer for being right.
+  Sticky notes and the markup types stay out, so the 7 words a sticky note contributes still count as
+  invented. This is an instrument correction of the kind this file already records; it also changes
+  **every** `.txt` score in the table, because the verifier that took them no longer exists.
+* `restamp_txt.py` — the tool that exists for exactly this — has not been run. It was last changed
+  23 Nov 11:48 UTC; the table is from 05:57.
+* The only cron that re-stamps the `.txt` half is the baseline at :00, and `BASELINE-BRIEF.md` tells it
+  to print `not my turn - phase is <PHASE>` and STOP whenever `round.py`'s phase is not `measure`. The
+  phase has been `fix` since 22 Nov 22:52. So the baseline is not idle by accident — by its own brief
+  it must not run, and the table therefore cannot clear itself while the pipeline is fixing.
+* This is **not** the false alarm `health.py`'s `superseded` state was written for. That state fires
+  when the table is newer than the engine, `verify_txt.py` and `restamp_txt.py`; here one of those
+  inputs is 1.4 h old and the table is 15.6 h old, so the row is reporting a real staleness.
+
+**Decision.** The approach is wrong: a table that is refreshed only in the `measure` phase cannot stay
+current through a long `fix` phase, even though the verifier or the engine can change underneath it in
+that phase. The `.txt` number the trend row prints is now taken with a retired instrument and is not
+reproducible.
+
+**What replaces it.** Either (a) let the baseline cron run `restamp_txt.py --run --apply` during `fix`
+as well — it writes no engine code and takes no engine claim, so it cannot collide with the fixer's
+slot — or (b) have `round.py` force a `.txt` restamp whenever `verify_txt.py` or the engine is
+committed, and gate the phase on the restamp having landed. (a) is the smaller change and the one I
+would take.
+
+**What would overturn this.** A `fix`-phase run that runs `restamp_txt.py --run --apply`, commits the
+new table, and leaves `health.py`'s `txt` row reading `superseded`. That would show the phase gate was
+never the blocker and the row was only late.
+
+**Not done here, deliberately:** the watchdog does not measure. Re-stamping the corpus is the baseline
+cron's work, not this pass's.
+
+**Trend:** `progress.py` appended nothing this pass — today's row already exists — and no past row was
+edited.
