@@ -2120,3 +2120,4 @@
 {"t": 1795394890.4857583, "ist": "06:18:10", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795394890.566942, "ist": "06:18:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795394890.5844, "ist": "06:18:10", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795399568.464485, "ist": "07:36:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
