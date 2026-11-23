@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 10:17 → running IST · 1h 10m**
+**23 Nov 2026 · slot 10:17 → 11:28 IST · 1h 11m**
 
 > **324_loan_amortisation_schedule** improved — 1.00 → 0.00. Corpus ratchet clean across 212 documents.
 
@@ -44,14 +44,16 @@
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
 | `18_dA-02` | what makes a single-page dense table drift in Google | 07:36 | - | not recorded |
+| `18_dA-02` | the .txt half of 18_displacement: same construct, a  | 10:20 | 10:32 | 12 min |
+| `t09_B-01` | independent blast-radius census for four proposed ve | 10:20 | 10:46 | 26 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 10:17 → running · 1h 10m |
+| Slot window | 10:17 → 11:28 · 1h 11m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 12 |
+| Tool beats | 17 |
 | Longest silence | **39.9 min** — from 10:17:36, after `report.py: building the report` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -63,7 +65,7 @@
 |:--|--:|:--|
 | fix - diagnose and change the engine | **2 min** | `#` |
 | measure or build - a conversion, screen or compile writes no beacon | **39 min** | `############` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
 | report - the report and the chain | **27 min** | `########` |
 ## Best results this round
 

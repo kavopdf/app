@@ -198,3 +198,4 @@
 | 23 Nov 08:11 | fixer | attempt 00_page_count -> kept (0/? moved) |
 | 23 Nov 10:17 | fixer | slot claimed - fixer running |
 | 23 Nov 11:00 | fixer | attempt t09_page_furniture -> kept (2/? moved) |
+| 23 Nov 11:28 | fixer | slot FORCED released - see INCIDENTS.md for why |

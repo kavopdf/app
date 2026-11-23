@@ -88,14 +88,16 @@ faults, not instrument faults, and are named as such in the finding.
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
 | `18_dA-02` | what makes a single-page dense table drift in Google | 07:36 | - | not recorded |
+| `18_dA-02` | the .txt half of 18_displacement: same construct, a  | 10:20 | 10:32 | 12 min |
+| `t09_B-01` | independent blast-radius census for four proposed ve | 10:20 | 10:46 | 26 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 10:17 → running · 1h 10m |
+| Slot window | 10:17 → 11:28 · 1h 11m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 12 |
+| Tool beats | 17 |
 | Longest silence | **39.9 min** — from 10:17:36, after `report.py: building the report` |
 | Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -107,7 +109,7 @@ faults, not instrument faults, and are named as such in the finding.
 |:--|--:|:--|
 | fix - diagnose and change the engine | **2 min** | `#` |
 | measure or build - a conversion, screen or compile writes no beacon | **39 min** | `############` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
 | report - the report and the chain | **27 min** | `########` |
 ## Best results this round
 
@@ -125,7 +127,7 @@ faults, not instrument faults, and are named as such in the finding.
 reordered, not lost) but `t01` compares unstripped punctuation, so the digit/letter split alone
 measured **0 flips**. Applying the punctuation strip to both sides is the whole of that
 document and is **unmeasured** — the corpus and engine are now on the pod, so it is one
-`restamp_txt.py --run` away. The remaining 12 `.txt` failures are: 2 real engine text faults
+`restamp_txt.py --run` away. The remaining 14 `.txt` failures are: 2 real engine text faults
 (`311`, `600`), 2 ZapfDingbats documents that need **opposite** treatments and are parked with
 the evidence, and the date-box `t09` keys on `041122` and the filled form (owed 12 against
 present 125). `18_displacement` still holds the 34.5-document lead, but its `.txt` half is
