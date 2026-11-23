@@ -718,7 +718,7 @@
   "status": "OPEN"
  },
  "60_text_column_right_edge": {
-  "attempts": 1,
+  "attempts": 2,
   "first_seen": null,
   "history": [
    {
@@ -727,16 +727,25 @@
     "outcome": "lead",
     "reason": "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text",
     "total": 0
+   },
+   {
+    "at": "2026-11-23 19:36",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median l",
+    "total": 0
    }
   ],
   "last": null,
   "last_engine": "b7699196",
   "outcomes": [
+   "lead",
    "lead"
   ],
-  "reason": "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one.",
+  "reason": "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect.",
   "reasons": [
-   "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one."
+   "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one.",
+   "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect."
   ],
   "requeues": 0,
   "status": "OPEN"
