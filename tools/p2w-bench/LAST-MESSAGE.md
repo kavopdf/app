@@ -19,14 +19,16 @@ band, y=811.4 bottom band) and its `.txt` carries all 8 copies; the check owed 4
 a 4-copy surplus for a duplication the page makes. Owed/present 39/43 → **43/43**. A writer
 that drops a second copy now shows as a deficit, which is the fault the check is for.
 
-Measured on all 213, re-scored with the real `verify_txt.compare()` on a fresh conversion of
-the whole corpus: head **197** clean, each fault alone **198**, and **zero** `ok -> fail`
-flips on any check of any document. `test_txt_checks.py` 8/8, `regress.py --check` PASS,
-`measure_gate.py` READY. The two fixes were landed together; the combination was bounded for
-the four documents they touch and cannot regress against baseline, but it was **not re-scored
-as a combination** — the conversion is 20+ minutes and the slot had 20. `RANKING-TXT.csv` is
-now stale against the verifier and needs `restamp_txt.py --run --apply`; until then the table
-still says 197, so this report does not claim the 198 in its own table.
+Measured on all 213. Each fault alone re-scored at **198** clean with **zero** `ok -> fail`
+flips on any check of any document; the two were then landed together and the combination was
+scored on the whole corpus — corpus fetched, engine built from this tree, all 213 converted:
+
+    213 scored | 2 documents newly clean, 0 newly failing, 211 unchanged
+      NEWLY CLEAN: 324_loan_amortisation_schedule, gst-invoice-multipage-item-table
+
+`restamp_txt.py --apply` wrote the table at **199 clean (93.4%)**, up from 197, with 0 newly
+failing. `test_txt_checks.py` 8/8, `regress.py --check` PASS for both formats,
+`measure_gate.py` READY.
 
 Two sub-agent diagnoses ran inside this turn, not in the background (a scheduled run has no
 one to answer a later result), so the tooling records none. Both came back with measurements
@@ -76,24 +78,26 @@ faults, not instrument faults, and are named as such in the finding.
 | | |
 |:--|:--|
 | Scored | **213** of 213 |
-| Clean - every applicable check passes | **197** (92.5%) |
-| Failing at least one check | **16** |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 8 documents |
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-02` | what makes a single-page dense table drift in Google | 07:36 | - | not recorded |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 10:17 → running · 44 min |
+| Slot window | 10:17 → running · 1h 10m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 9 |
+| Tool beats | 12 |
 | Longest silence | **39.9 min** — from 10:17:36, after `report.py: building the report` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -102,9 +106,9 @@ faults, not instrument faults, and are named as such in the finding.
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **2 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **39 min** | `####################` |
+| measure or build - a conversion, screen or compile writes no beacon | **39 min** | `############` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **27 min** | `########` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -117,8 +121,12 @@ faults, not instrument faults, and are named as such in the finding.
 
 ## Next run
 
-Re-stamp `RANKING-TXT.csv` (`restamp_txt.py --run --apply`) so the table stops lying about
-the verifier that produced it, and score the two landed faults **as a combination** to settle
-whether `324_loan_amortisation_schedule` holds — that is the difference between 198 and 199.
-Then `t01`'s punctuation strip, which is the whole of `77`, and is unmeasured. `18_displacement`
-still holds the 34.5-document lead, but its `.txt` half is closed: work it in the `.docx`.
+`t01`'s punctuation strip: `77_arabic_rtl_document` loses no character (its date is bidi
+reordered, not lost) but `t01` compares unstripped punctuation, so the digit/letter split alone
+measured **0 flips**. Applying the punctuation strip to both sides is the whole of that
+document and is **unmeasured** — the corpus and engine are now on the pod, so it is one
+`restamp_txt.py --run` away. The remaining 12 `.txt` failures are: 2 real engine text faults
+(`311`, `600`), 2 ZapfDingbats documents that need **opposite** treatments and are parked with
+the evidence, and the date-box `t09` keys on `041122` and the filled form (owed 12 against
+present 125). `18_displacement` still holds the 34.5-document lead, but its `.txt` half is
+closed: work it in the `.docx`.
