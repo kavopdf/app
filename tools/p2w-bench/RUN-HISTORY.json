@@ -1,29 +1,5 @@
 [
  {
-  "started_ts": 1795177765.2093527,
-  "started": "17:59",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "t08_line_order",
-  "attempts": 6,
-  "kept": 1,
-  "docs_improved": 1,
-  "agents": [
-   "t13column census-01",
-   "t13itr weld fix-01"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ratchets": 1,
-  "counted": [
-   [
-    "t13_amount_columns",
-    1
-   ]
-  ],
-  "ended_how": "killed - never released the slot"
- },
- {
   "started_ts": 1795185064.7096055,
   "started": "20:01",
   "ended_ts": null,
@@ -1193,6 +1169,17 @@
  {
   "started": "11:30",
   "started_ts": 1795433410.7031503,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "12:28",
+  "started_ts": 1795436889.3427005,
   "ended": "(never)",
   "ended_ts": null,
   "attempts": 0,

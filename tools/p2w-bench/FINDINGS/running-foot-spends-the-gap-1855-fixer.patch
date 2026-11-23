@@ -1,0 +1,31 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index f0439044..0b01075e 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -3590,7 +3590,25 @@ public final class DocxWriter {
+                 // gap was written as 120 pt - 152 pt short of the gap the page drew, and the
+                 // footer landed 130.6 pt above its own baseline. flowFromBox anchors the same
+                 // gap rather than truncating it.
+-                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)) {
++                // A RUNNING FOOT IS DOCUMENT TEXT. THE GAP MUST BE SPENT, NOT ANCHORED.
++                //
++                // This row is the page's last line, drawn in the bottom tenth of the sheet.
++                // Anchoring it here writes it as a DrawingML text box, and Google Docs - the
++                // renderer these documents are opened in - drops that text from the page
++                // entirely. Measured 23 Nov on 27_two_column_left_short_txtpos, in Google, at
++                // HEAD: the source's last two lines are the ONLY two lines missing from
++                // Google's export, and they are that document's only two text boxes
++                // (04_chars_missing 0 -> 43 characters, 44_header_footer 4 -> 2 honoured).
++                //
++                // The gap cap is right for a gap in the body of the page: a gap wider than the
++                // flow may spend means the flow has drifted, and spending it would push the
++                // rest of the document down. It is wrong for a line in the bottom band, where
++                // the page has already decided where the line goes and there is nothing left
++                // below it to push. Spending the measured gap puts the line on its own baseline
++                // in the flow, where the reader can select it, and charges the page exactly the
++                // height the page already used.
++                boolean footBand = first.y > 0.90f * ctx.pageHeightPt;
++                if (!ctx.inColumn && !footBand && extra * TWIPS_PER_PT > gapCapTw(ctx)) {
+                     ctx.positioned = true;
+                     for (PdfToWord.Box ab : cols) anchorBox(sb, p, ab, ctx);
+                     return;

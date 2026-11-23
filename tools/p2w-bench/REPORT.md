@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-23 17:00
+# Fixer report - 2026-11-23 17:58
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 17:00 → running IST · 42 min**
+**23 Nov 2026 · slot 17:58 → running IST · 35 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -22,13 +22,13 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
+| Working on | `44_header_footer` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 17:41 | **lead** | 0/190 | Google render is runnable in a fixer slot: JDK from GitHub releases + verify-engine compile + Drive round trip. Re-measured two rows on HEAD b7699196 in Google: bank-statement-5-pages 40/47 -> 42/47 ( |
+| 18:33 | **lead** | 0/None | running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1 |
 
 ## The txt
 
@@ -48,11 +48,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 17:00 → running · 42 min |
+| Slot window | 17:58 → running · 35 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 11 |
-| Longest silence | **33.0 min** — from 17:00:55, after `gaps.py: reading the timeline` |
-| Silences over 2 min | 2 |
+| Tool beats | 17 |
+| Longest silence | **20.3 min** — from 17:58:36, after `report.py: building the report` |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -60,9 +60,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **33 min** | `##################` |
-| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `####` |
-| report - the report and the chain | **1 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `###############` |
+| other - not attributed to a tool | **11 min** | `#######` |
 ## Best results this round
 
 | Document | Before | After | Change |
