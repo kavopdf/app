@@ -3250,3 +3250,19 @@
 {"t": 1795469910.9663951, "ist": "03:08:30", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795469911.1301508, "ist": "03:08:31", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795469943.320812, "ist": "03:09:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795468894.4636345, "ist": "02:51:34", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795468894.578994, "ist": "02:51:34", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795468906.8239884, "ist": "02:51:46", "ev": "beat", "d": "claimed, reading state"}
+{"t": 1795468906.9551713, "ist": "02:51:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795469420.3756933, "ist": "03:00:20", "ev": "beat", "d": "agent 1 returned: spacer half confirmed, row half refuted, proposed first move is a no-op. reading spacer code"}
+{"t": 1795469447.5515554, "ist": "03:00:47", "ev": "beat", "d": "fetching corpus (6 min)"}
+{"t": 1795469461.4996245, "ist": "03:01:01", "ev": "beat", "d": "corpus 213 ok, building engine"}
+{"t": 1795469516.3344774, "ist": "03:01:56", "ev": "beat", "d": "engine built, checking gates"}
+{"t": 1795469525.2686813, "ist": "03:02:05", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795469526.9766455, "ist": "03:02:06", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795469568.725105, "ist": "03:02:48", "ev": "beat", "d": "decided: txt t12_word_invention (8 docs), reading finding"}
+{"t": 1795469601.7723393, "ist": "03:03:21", "ev": "beat", "d": "attempt 1: guard charges row excess on unruled tables. baseline docx for candidates"}
+{"t": 1795469673.3649952, "ist": "03:04:33", "ev": "beat", "d": "patched guard, rebuilding"}
+{"t": 1795470905.7311382, "ist": "03:25:05", "ev": "beat", "d": "corpus pass to commit guard fix (213 docx+render)"}
+{"t": 1795471212.153509, "ist": "03:30:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795471230.0982869, "ist": "03:30:30", "ev": "beat", "d": "attempt.py: recording an attempt"}
