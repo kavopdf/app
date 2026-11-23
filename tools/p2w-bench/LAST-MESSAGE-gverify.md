@@ -1,32 +1,28 @@
 # P2W Google Verify - Run Report
 
-**23 Nov 2026 · 18:23 IST · stage classify**
+**23 Nov 2026 · stage classify (from stage.py)**
 
-> 190 of 213 measured in Google, 23 refused on page count. Google passes all 42 on 30; LibreOffice on 122.
+> 86 of 213 documents have a Google result on the current engine, and the rest still carry results from older engines. Of those 86, 13 pass all 42 and 50 fail at least one; 23 are refused on page count.
 
-This run did the classify step and nothing else: the capability table was regenerated from the committed results, given a computed engine-coverage section at the top, committed and pushed. The coverage section says plainly that none of the pairs it summarises was measured on the engine now on HEAD, so the rows are a record of the engines their results carry, not a statement about HEAD. No document was measured this run.
+This run re-measured a fresh batch through Google and re-rendered the LibreOffice half of the same documents, so the pair for each one now comes from the current engine rather than from an older build. Both result sets are committed. The stage label above is what stage.py prints; its measured count reads every result file without asking which engine wrote it, so the measurement itself is tracked by the plan line, which still lists documents to go.
 
-## Measured
+## Checks the current-engine set fails in Google
 
-| | |
+| check | documents |
 |:--|--:|
-| scored | **190** |
-| refused on page count | **23** |
-| clean in Google | **30** |
-| clean in LibreOffice | **122** |
+| `18\_displacement` | 28 |
+| `04\_chars\_missing` | 24 |
+| `60\_text\_column\_right\_edge` | 21 |
+| `25\_invisible\_text` | 19 |
+| `59\_shape\_anchor` | 19 |
+| `13\_text\_colours` | 18 |
+| `45\_char\_accuracy` | 14 |
+| `35\_rotation` | 10 |
 
-## Checks Google fails and LibreOffice does not
+## Both renderers, all committed results
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `18\_displacement` | **100** | 20 |
-| `04\_chars\_missing` | **65** | 2 |
-| `25\_invisible\_text` | **48** | 0 |
-| `32\_stroke\_lines` | **47** | 1 |
-| `05\_chars\_extra` | **43** | 3 |
-| `60\_text\_column\_right\_edge` | **56** | 18 |
-| `59\_shape\_anchor` | **45** | 9 |
-| `45\_char\_accuracy` | **37** | 2 |
+Across every committed result, mixed engines included: LibreOffice passes all 42 on 122 of 190, Google on 30 of 190. The disagreement is unchanged in shape - `18\_displacement` 20 against 101, `04\_chars\_missing` 2 against 65, `25\_invisible\_text` 0 against 48, `32\_stroke\_lines` 1 against 47.
 
-The first row is the class to take: `18\_displacement`, 100 documents in Google against 20 in LibreOffice.
+## Next
 
+Continue the Google measurement: most of the corpus still carries no result from the current engine. One document scored worse than its committed result (`08\_two\_overlapping\_stamps`, recorded in BLOCKERS.md with the gate refusal), and nothing else in the re-measured set moved.
