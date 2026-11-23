@@ -198,3 +198,4 @@
 | 23 Nov 19:34 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
 | 23 Nov 19:36 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
 | 23 Nov 19:39 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
+| 23 Nov 19:57 | fixer | slot claimed - fixer running |

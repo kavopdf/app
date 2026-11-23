@@ -1,33 +1,5 @@
 [
  {
-  "started_ts": 1795188528.837544,
-  "started": "20:58",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "t01_word_accuracy",
-  "attempts": 4,
-  "kept": 2,
-  "docs_improved": 3,
-  "agents": [
-   "t01_verifier-tokenisation-01",
-   "t01_writer-word-drop-01"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "counted": [
-   [
-    "t01_word_accuracy",
-    3
-   ],
-   [
-    "t01_word_accuracy",
-    0
-   ]
-  ],
-  "ratchets": 1,
-  "ended_how": "killed - never released the slot"
- },
- {
   "started_ts": 1795192024.3831508,
   "started": "21:57",
   "ended_ts": null,
@@ -1174,6 +1146,17 @@
  {
   "started": "13:28",
   "started_ts": 1795440494.2673979,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "14:27",
+  "started_ts": 1795444038.4937537,
   "ended": "(never)",
   "ended_ts": null,
   "attempts": 0,

@@ -2708,19 +2708,11 @@
 {"t": 1795442956.662907, "ist": "19:39:16", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795442993.3549452, "ist": "19:39:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795442998.2714849, "ist": "19:39:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795445642.7523727, "ist": "20:24:02", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445646.31027, "ist": "20:24:06", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445647.2503808, "ist": "20:24:07", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445647.959546, "ist": "20:24:07", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445648.9309394, "ist": "20:24:08", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445650.9334815, "ist": "20:24:10", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445651.6499157, "ist": "20:24:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445652.4100947, "ist": "20:24:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445660.1821218, "ist": "20:24:20", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445662.236575, "ist": "20:24:22", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445662.8612196, "ist": "20:24:22", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445663.56268, "ist": "20:24:23", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445664.2854216, "ist": "20:24:24", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445665.7437015, "ist": "20:24:25", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445666.338305, "ist": "20:24:26", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795445667.4185479, "ist": "20:24:27", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795444041.393229, "ist": "19:57:21", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795444041.5931294, "ist": "19:57:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795444043.4950576, "ist": "19:57:23", "ev": "beat", "d": "cloned, claimed, reading charter"}
+{"t": 1795444057.9764037, "ist": "19:57:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795444069.6650255, "ist": "19:57:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795444072.2878218, "ist": "19:57:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795445119.600614, "ist": "20:15:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795445119.8402927, "ist": "20:15:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}

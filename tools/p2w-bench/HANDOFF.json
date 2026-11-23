@@ -1236,6 +1236,10 @@
   {
    "at": "19:39",
    "text": "attempt 3 on 60_text_column_right_edge -> lead"
+  },
+  {
+   "at": "20:15",
+   "text": "agent deployed: 18A-01 / 18_displacement - A"
   }
  ],
  "next": "00_page_count: measure 041122-Account_Opening_Form in Google (2464 drawing-only paragraphs, nine pages, worst score in the corpus at 98.65) - the scale test for the carrier paragraph. Then 350_question_paper: FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md charges picture() lines 2542-2564 (an unplaced picture emitted <wp:inline> in a paragraph with no w:pPr, inheriting sz=22 and w:after=120 from docDefaults, which spacingTw cannot see); the patch beside it is UNCOMPILED. Then w:tcBorders for 32_stroke_lines/05_chars_extra.",
@@ -2136,10 +2140,21 @@
    "finding": "tools/p2w-bench/FINDINGS/gverify-COLLECT-DOWNLOAD-SHAPE-1120-agent.md",
    "deployed_at": "2026-11-23T16:37",
    "landed_at": "2026-11-23T16:37"
+  },
+  {
+   "id": "18A-18_displacement-01",
+   "class": "18A-01",
+   "angle": "18_displacement",
+   "question": "A",
+   "expected": "is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact",
+   "deployed": "20:15",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-23T20:15"
   }
  ],
  "run": {
-  "started": "18:58",
+  "started": "19:57",
   "ended": null,
   "ended_how": null
  },

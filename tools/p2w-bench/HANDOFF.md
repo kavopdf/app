@@ -19,7 +19,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 18:58 |
+| started | 19:57 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
@@ -112,13 +112,13 @@ unfinished work, not as a result.
 | B160_text_column_right_edge-01 | B1 | 60_text_column_right_edge | right-edge+shape_anchor | 13:21 | Is 60_text_column_right_edge the same construct as 59_shape_anchor (they travel together) and what minimal writer change clears both | running |  |
 | 00_pA-02 | 00_page_count | A | which construct costs 350_question_paper its second page in Google - i | 16:37 | a charged line in DocxWriter and one general rule | landed | tools/p2w-bench/FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md |
 | gverB-01 | gverify | B | why gverify --collect cannot read the download result the Drive tool r | 16:37 | a fix with a test | landed | tools/p2w-bench/FINDINGS/gverify-COLLECT-DOWNLOAD-SHAPE-1120-agent.md |
+| 18A-18_displacement-01 | 18A-01 | 18_displacement | A | 20:15 | is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `06:11` attempt 33 on 18_displacement -> lead
 - `06:15` attempt 34 on 18_displacement -> lead
 - `06:17` agent deployed: 18_d / residual-census - which current-engine documents fail 18_displacement, and what has FINDINGS alrea
 - `06:17` agent deployed: 18_d / blast-radius - the exact writer rule for w:trHeight/w:hRule, what the row-pitch patch yields, a
@@ -143,6 +143,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `19:34` attempt 1 on 60_text_column_right_edge -> lead
 - `19:36` attempt 2 on 60_text_column_right_edge -> lead
 - `19:39` attempt 3 on 60_text_column_right_edge -> lead
+- `20:15` agent deployed: 18A-01 / 18_displacement - A
 
 ## Where the rest of the state lives
 

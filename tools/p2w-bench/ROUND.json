@@ -1,8 +1,10 @@
 {
   "baseline_started": 1795361683.041859,
   "classifier_started": 0,
+  "fixer_doing": "cloned, claimed, reading charter",
+  "fixer_doing_since": 1795444043.4957824,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795442239.970571,
+  "fixer_last_beat": 1795444043.495783,
   "fixer_started": 1795444038.492151,
   "history": [
     {
