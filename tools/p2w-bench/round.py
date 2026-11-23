@@ -201,7 +201,16 @@ def _handoff(*args):
 # 45 is what baseline uses, and it is the window the fixer had before the heartbeat existed. The risk it
 # reintroduces - a dead run holding the slot - is what the :10 relay cron exists to cover, and the relay
 # only has to find the slot free once an hour.
-CLAIM_STALE_MIN = {"fixer": 45, "baseline": 45, "classifier": 20}
+# THE FIXER'S WINDOW MUST COVER THE BUDGET ITS OWN PROMPT GIVES IT. It was 45, and the prompt's
+# timeline is 0-10 read / 10-75 attempt after attempt / 75-90 report and release. So a run working
+# exactly as told was reaped at 45 minutes, before its second attempt could exist. The ledger agrees:
+# of 60 runs, zero ended on their own terms. The 17:58 run is the shape of it - one attempt at 18:33,
+# an improvement measured (40/42 -> 42/42), and no time left to keep it or try again.
+#
+# 150 is not a guess: it is the longest a fixer run has actually worked on this pipeline (2.5 h), so it
+# is a duration this machine has demonstrated it can sustain. A run that genuinely dies still frees the
+# slot through the :10 relay, which is what the relay exists for.
+CLAIM_STALE_MIN = {"fixer": 150, "baseline": 45, "classifier": 20}
 
 
 def load():
