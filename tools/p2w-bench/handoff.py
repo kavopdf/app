@@ -148,7 +148,13 @@ def _stamp_ist():
         import datetime as _d
         return _d.datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y-%m-%dT%H:%M")
     except Exception:
-        return time.strftime("%Y-%m-%dT%H:%M")
+            # NOT time.strftime - that is UTC, and falling back to it is how this bug would come
+            # back: a sandbox without tzdata would silently stamp UTC into a field report.py
+            # subtracts from an IST one, and every duration would be off by 5h30 again with nothing
+            # to show for it. IST is UTC+05:30 with no daylight saving, so no tzdata is needed.
+            import datetime as _d
+            return (_d.datetime.utcnow()
+                    + _d.timedelta(hours=5, minutes=30)).strftime("%Y-%m-%dT%H:%M")
 
 
 def main(argv):
