@@ -2,15 +2,14 @@
  "name": "54_two_column_body_full_width_header_footer",
  "status": "ok",
  "rc": 1,
- "passed": 36,
+ "passed": 37,
  "total": 42,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
   "25_invisible_text",
-  "32_stroke_lines",
   "44_header_footer",
   "45_char_accuracy"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

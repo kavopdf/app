@@ -2,15 +2,13 @@
  "name": "381_incident_report_timeline",
  "status": "ok",
  "rc": 1,
- "passed": 41,
+ "passed": 43,
  "total": 47,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "18_displacement",
   "25_invisible_text",
-  "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

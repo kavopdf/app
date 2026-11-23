@@ -2,14 +2,12 @@
  "name": "55_sidebar_box_beside_body",
  "status": "ok",
  "rc": 1,
- "passed": 37,
+ "passed": 39,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
-  "32_stroke_lines",
   "44_header_footer",
   "45_char_accuracy"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

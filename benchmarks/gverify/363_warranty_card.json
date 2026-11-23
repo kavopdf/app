@@ -2,12 +2,11 @@
  "name": "363_warranty_card",
  "status": "ok",
  "rc": 1,
- "passed": 39,
+ "passed": 40,
  "total": 42,
  "failed": [
   "18_displacement",
-  "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

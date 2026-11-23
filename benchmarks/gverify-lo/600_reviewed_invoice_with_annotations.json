@@ -1,272 +1,272 @@
 {
- "source": "/scratch/work/p2w/corpus/600_reviewed_invoice_with_annotations.pdf",
- "render": "/tmp/lo-batch/600_reviewed_invoice_with_annotations.pdf",
- "passed": 37,
- "total": 44,
- "failed": [
-  "05_chars_extra",
-  "18_displacement",
-  "28_clipped_at_edge",
-  "45_char_accuracy",
-  "47_margins",
-  "59_shape_anchor",
-  "62_table_columns"
- ],
- "engine": "462353f",
- "ok": false,
- "checks": {
-  "01_page_count": {
-   "source": 1,
-   "render": 1,
-   "ok": true
-  },
-  "04_chars_missing": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "05_chars_extra": {
-   "source": 0,
-   "render": 91,
-   "ok": false
-  },
-  "08_image_count": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "10_font_sizes": {
-   "source": 5,
-   "render": 5,
-   "ok": true
-  },
-  "13_text_colours": {
-   "source": 2,
-   "render": 2,
-   "ok": true
-  },
-  "14_filled_shapes": {
-   "source": 2613,
-   "render": 2951,
-   "ok": true
-  },
-  "17_matched_runs": {
-   "source": 56,
-   "render": 56,
-   "ok": true
-  },
-  "18_displacement": {
-   "source": 0,
-   "render": 1,
-   "ok": false
-  },
-  "23_line_pitch": {
-   "source": 16.0,
-   "render": 16.0,
-   "ok": true
-  },
-  "25_invisible_text": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "26_text_overlap": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "27_text_off_page": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "28_clipped_at_edge": {
-   "source": 0,
-   "render": 3,
-   "ok": false
-  },
-  "31_pages_lost_their_text": {
-   "source": 1,
-   "render": 0,
-   "ok": true
-  },
-  "32_stroke_lines": {
-   "source": 3,
-   "render": 0,
-   "ok": true
-  },
-  "34a_span_size_match": {
-   "source": 100,
-   "render": 100,
-   "ok": true
-  },
-  "34b_span_colour_match": {
-   "source": 100,
-   "render": 100,
-   "ok": true
-  },
-  "34c_span_weight_match": {
-   "source": 100,
-   "render": 100,
-   "ok": true
-  },
-  "35_rotation": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "36_underline_rules": {
-   "source": 1,
-   "render": 30,
-   "ok": true
-  },
-  "37_super_subscript": {
-   "source": [
-    0,
-    0
-   ],
-   "render": 0,
-   "ok": true
-  },
-  "38_list_markers": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "39_image_position": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "40_link_targets": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "42_justification_edges": {
-   "source": 0,
-   "render": 3,
-   "ok": true
-  },
-  "43_within_10pt_x": {
-   "source": 100,
-   "render": 100,
-   "ok": true
-  },
-  "44_header_footer": {
-   "source": 6,
-   "render": 6,
-   "ok": true
-  },
-  "45_char_accuracy": {
-   "source": 100,
-   "render": 88,
-   "ok": false
-  },
-  "46_text_crossing_rule": {
-   "source": 24,
-   "render": 0,
-   "ok": true
-  },
-  "47_margins": {
-   "source": 0.8,
-   "render": 0,
-   "ok": false
-  },
-  "48_image_area": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "49_page_size": {
-   "source": 1,
-   "render": 1,
-   "ok": true
-  },
-  "50_annotation_text": {
-   "source": 3,
-   "render": 3,
-   "ok": true
-  },
-  "51_field_values": {
-   "source": 0,
-   "render": 0,
-   "ok": true,
-   "detail": {
-    "state": "none",
-    "widgets": 0,
-    "empty": 0,
-    "unreadable": 0
-   }
-  },
-  "52_outline": {
-   "source": 0,
-   "render": 6,
-   "ok": true,
-   "detail": "source has no outline; render adds 6 entries (not scored)"
-  },
-  "53_embedded_faces": {
-   "source": 2,
-   "render": 2,
-   "ok": true
-  },
-  "54_image_dpi": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "55_orientation_mix": {
-   "source": [
-    0,
-    1
-   ],
-   "render": [
-    0,
-    1
-   ],
-   "ok": true
-  },
-  "59_shape_anchor": {
-   "source": 37,
-   "render": 9,
-   "ok": false
-  },
-  "60_text_column_right_edge": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "61_blank_not_filled": {
-   "source": 0,
-   "render": 0,
-   "ok": true
-  },
-  "62_table_columns": {
-   "source": 1,
-   "render": 1,
-   "ok": false
-  },
-  "63_table_rows": {
-   "source": 1,
-   "render": 0,
-   "ok": true
-  }
- },
- "detail": {
-  "47_margins": {
-   "worst_median_pt": 0.8,
-   "worst_unregistered": 0,
-   "margin_bad": [
-    {
-     "page": 1,
-     "source": 48,
-     "render": 0
+  "source": "/scratch/work/p2w/corpus/600_reviewed_invoice_with_annotations.pdf",
+  "render": "/tmp/lo-one/600_reviewed_invoice_with_annotations.pdf",
+  "passed": 37,
+  "total": 44,
+  "failed": [
+    "05_chars_extra",
+    "18_displacement",
+    "28_clipped_at_edge",
+    "45_char_accuracy",
+    "47_margins",
+    "59_shape_anchor",
+    "62_table_columns"
+  ],
+  "engine": "98be7c3c",
+  "ok": false,
+  "checks": {
+    "01_page_count": {
+      "source": 1,
+      "render": 1,
+      "ok": true
+    },
+    "04_chars_missing": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "05_chars_extra": {
+      "source": 0,
+      "render": 91,
+      "ok": false
+    },
+    "08_image_count": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "10_font_sizes": {
+      "source": 5,
+      "render": 5,
+      "ok": true
+    },
+    "13_text_colours": {
+      "source": 2,
+      "render": 2,
+      "ok": true
+    },
+    "14_filled_shapes": {
+      "source": 2613,
+      "render": 2951,
+      "ok": true
+    },
+    "17_matched_runs": {
+      "source": 56,
+      "render": 56,
+      "ok": true
+    },
+    "18_displacement": {
+      "source": 0,
+      "render": 1,
+      "ok": false
+    },
+    "23_line_pitch": {
+      "source": 16.0,
+      "render": 16.0,
+      "ok": true
+    },
+    "25_invisible_text": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "26_text_overlap": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "27_text_off_page": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "28_clipped_at_edge": {
+      "source": 0,
+      "render": 3,
+      "ok": false
+    },
+    "31_pages_lost_their_text": {
+      "source": 1,
+      "render": 0,
+      "ok": true
+    },
+    "32_stroke_lines": {
+      "source": 3,
+      "render": 0,
+      "ok": true
+    },
+    "34a_span_size_match": {
+      "source": 100,
+      "render": 100,
+      "ok": true
+    },
+    "34b_span_colour_match": {
+      "source": 100,
+      "render": 100,
+      "ok": true
+    },
+    "34c_span_weight_match": {
+      "source": 100,
+      "render": 100,
+      "ok": true
+    },
+    "35_rotation": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "36_underline_rules": {
+      "source": 1,
+      "render": 30,
+      "ok": true
+    },
+    "37_super_subscript": {
+      "source": [
+        0,
+        0
+      ],
+      "render": 0,
+      "ok": true
+    },
+    "38_list_markers": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "39_image_position": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "40_link_targets": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "42_justification_edges": {
+      "source": 0,
+      "render": 3,
+      "ok": true
+    },
+    "43_within_10pt_x": {
+      "source": 100,
+      "render": 100,
+      "ok": true
+    },
+    "44_header_footer": {
+      "source": 6,
+      "render": 6,
+      "ok": true
+    },
+    "45_char_accuracy": {
+      "source": 100,
+      "render": 88,
+      "ok": false
+    },
+    "46_text_crossing_rule": {
+      "source": 24,
+      "render": 0,
+      "ok": true
+    },
+    "47_margins": {
+      "source": 0.8,
+      "render": 0,
+      "ok": false
+    },
+    "48_image_area": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "49_page_size": {
+      "source": 1,
+      "render": 1,
+      "ok": true
+    },
+    "50_annotation_text": {
+      "source": 3,
+      "render": 3,
+      "ok": true
+    },
+    "51_field_values": {
+      "source": 0,
+      "render": 0,
+      "ok": true,
+      "detail": {
+        "state": "none",
+        "widgets": 0,
+        "empty": 0,
+        "unreadable": 0
+      }
+    },
+    "52_outline": {
+      "source": 0,
+      "render": 6,
+      "ok": true,
+      "detail": "source has no outline; render adds 6 entries (not scored)"
+    },
+    "53_embedded_faces": {
+      "source": 2,
+      "render": 2,
+      "ok": true
+    },
+    "54_image_dpi": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "55_orientation_mix": {
+      "source": [
+        0,
+        1
+      ],
+      "render": [
+        0,
+        1
+      ],
+      "ok": true
+    },
+    "59_shape_anchor": {
+      "source": 37,
+      "render": 9,
+      "ok": false
+    },
+    "60_text_column_right_edge": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "61_blank_not_filled": {
+      "source": 0,
+      "render": 0,
+      "ok": true
+    },
+    "62_table_columns": {
+      "source": 1,
+      "render": 1,
+      "ok": false
+    },
+    "63_table_rows": {
+      "source": 1,
+      "render": 0,
+      "ok": true
     }
-   ],
-   "indent_bad": []
-  }
- },
- "document": "600_reviewed_invoice_with_annotations",
- "source_file": "/scratch/work/p2w/corpus/600_reviewed_invoice_with_annotations.pdf",
- "render_file": "/tmp/lo-batch/600_reviewed_invoice_with_annotations.pdf"
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.8,
+      "worst_unregistered": 0,
+      "margin_bad": [
+        {
+          "page": 1,
+          "source": 48,
+          "render": 0
+        }
+      ],
+      "indent_bad": []
+    }
+  },
+  "document": "600_reviewed_invoice_with_annotations",
+  "source_file": "/scratch/work/p2w/corpus/600_reviewed_invoice_with_annotations.pdf",
+  "render_file": "/tmp/lo-one/600_reviewed_invoice_with_annotations.pdf"
 }

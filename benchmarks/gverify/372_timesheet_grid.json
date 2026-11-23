@@ -2,13 +2,12 @@
  "name": "372_timesheet_grid",
  "status": "ok",
  "rc": 1,
- "passed": 43,
+ "passed": 44,
  "total": 47,
  "failed": [
   "18_displacement",
   "25_invisible_text",
-  "59_shape_anchor",
-  "60_text_column_right_edge"
+  "59_shape_anchor"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

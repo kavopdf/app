@@ -2,15 +2,13 @@
  "name": "40_devanagari_shaping_font",
  "status": "ok",
  "rc": 1,
- "passed": 41,
+ "passed": 43,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
-  "32_stroke_lines",
   "34a_span_size_match",
   "38_list_markers",
   "47_margins"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

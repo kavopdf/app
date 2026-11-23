@@ -2,13 +2,10 @@
  "name": "52_one_cm_margin_wide_body",
  "status": "ok",
  "rc": 1,
- "passed": 38,
+ "passed": 41,
  "total": 42,
  "failed": [
-  "05_chars_extra",
-  "18_displacement",
-  "32_stroke_lines",
   "59_shape_anchor"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

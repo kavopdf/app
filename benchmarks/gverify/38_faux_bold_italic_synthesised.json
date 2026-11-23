@@ -2,15 +2,11 @@
  "name": "38_faux_bold_italic_synthesised",
  "status": "ok",
  "rc": 1,
- "passed": 36,
+ "passed": 40,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
-  "18_displacement",
-  "32_stroke_lines",
-  "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

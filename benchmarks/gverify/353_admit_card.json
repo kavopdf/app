@@ -1,18 +1,7 @@
 {
  "name": "353_admit_card",
- "status": "ok",
- "rc": 1,
- "passed": 39,
- "total": 47,
- "failed": [
-  "04_chars_missing",
-  "05_chars_extra",
-  "18_displacement",
-  "25_invisible_text",
-  "26_text_overlap",
-  "32_stroke_lines",
-  "44_header_footer",
-  "59_shape_anchor"
- ],
- "engine": "462353f"
+ "status": "page_count_refused",
+ "pages": 2,
+ "want": 1,
+ "engine": "98be7c3c"
 }

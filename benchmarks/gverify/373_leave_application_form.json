@@ -5,10 +5,10 @@
  "passed": 43,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
   "23_line_pitch",
+  "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }

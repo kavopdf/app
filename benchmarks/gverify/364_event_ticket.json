@@ -2,15 +2,13 @@
  "name": "364_event_ticket",
  "status": "ok",
  "rc": 1,
- "passed": 36,
+ "passed": 38,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "18_displacement",
   "25_invisible_text",
-  "32_stroke_lines",
   "45_char_accuracy",
   "59_shape_anchor"
  ],
- "engine": "462353f"
+ "engine": "98be7c3c"
 }
