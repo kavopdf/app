@@ -3016,3 +3016,20 @@
 {"t": 1795460536.0821922, "ist": "00:32:16", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795460536.1842544, "ist": "00:32:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795460536.199254, "ist": "00:32:16", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795461988.13792, "ist": "00:56:28", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795461988.430542, "ist": "00:56:28", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795461991.6339715, "ist": "00:56:31", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795461994.1273954, "ist": "00:56:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795461995.6265936, "ist": "00:56:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795461997.6177878, "ist": "00:56:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795463461.3357153, "ist": "01:21:01", "ev": "beat", "d": "fetching corpus to test 00_page_count (23 unscored docs)"}
+{"t": 1795463745.548672, "ist": "01:25:45", "ev": "beat", "d": "downloading corpus zips"}
+{"t": 1795463768.1812136, "ist": "01:26:08", "ev": "beat", "d": "building engine"}
+{"t": 1795463828.346018, "ist": "01:27:08", "ev": "beat", "d": "converting 4 overflow docs"}
+{"t": 1795463918.7639275, "ist": "01:28:38", "ev": "beat", "d": "converting all 23 refused docs"}
+{"t": 1795464041.518971, "ist": "01:30:41", "ev": "beat", "d": "LO page count for all 23"}
+{"t": 1795464255.447988, "ist": "01:34:15", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795464321.2648876, "ist": "01:35:21", "ev": "beat", "d": "measuring 64 txt-failing docs on HEAD engine"}
+{"t": 1795464533.314709, "ist": "01:38:53", "ev": "beat", "d": "verifying 64 txt docs"}
+{"t": 1795464625.816909, "ist": "01:40:25", "ev": "beat", "d": "patching verify_txt source reader for printed annotations"}
+{"t": 1795464730.5039299, "ist": "01:42:10", "ev": "beat", "d": "attempt.py: recording an attempt"}

@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 23:58 |
-| ended | 00:32 |
-| how it ended | forced |
+| started | 00:56 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it

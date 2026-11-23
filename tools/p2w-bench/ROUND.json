@@ -1,8 +1,10 @@
 {
   "baseline_started": 1795361683.041859,
   "classifier_started": 0,
+  "fixer_doing": "patching verify_txt source reader for printed annotations",
+  "fixer_doing_since": 1795464625.817675,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795460286.0868971,
+  "fixer_last_beat": 1795464625.8176758,
   "fixer_started": 1795461975.1095068,
   "history": [
     {

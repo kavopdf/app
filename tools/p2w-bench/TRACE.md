@@ -6,9 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 21 Nov 14:35 | fixer | build-engine | engine built in 46s |
-| 21 Nov 14:38 | fixer | build-engine | started |
-| 21 Nov 14:39 | fixer | build-engine | engine built in 77s |
 | 21 Nov 14:42 | fixer | attempt | t01_word_accuracy -> kept (1/5 moved) |
 | 21 Nov 14:42 | fixer | attempt | t01_word_accuracy -> kept (1/5 moved) |
 | 21 Nov 14:49 | fixer | attempt | t01_word_accuracy -> reverted (0/3 moved) |
@@ -406,3 +403,6 @@
 | 24 Nov 00:28 | fixer | build-engine | started |
 | 24 Nov 00:29 | fixer | build-engine | engine built in 64s |
 | 24 Nov 00:30 | fixer | attempt | content-present-partly-displaced -> lead (0/13 moved) |
+| 24 Nov 00:56 | fixer | claim | fixer claimed the slot |
+| 24 Nov 01:26 | fixer | build-engine | started |
+| 24 Nov 01:27 | fixer | build-engine | engine built in 40s |

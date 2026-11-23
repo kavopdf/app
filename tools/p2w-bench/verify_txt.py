@@ -527,7 +527,8 @@ def glyph_truth(path):
     """
     import fitz
     stats = {"glyphs": 0, "declared": 0, "from_glyphs": 0, "widget_glyphs": 0,
-             "undeclared_face": [], "structure_fallback": 0, "unnameable": 0}
+             "undeclared_face": [], "structure_fallback": 0, "unnameable": 0,
+             "annotation_glyphs": 0}
     d = fitz.open(path)
     pages = []
     try:
@@ -716,6 +717,41 @@ def glyph_truth(path):
                 if t.strip() and t.strip() not in walked:
                     stats["widget_glyphs"] += len(t)
                     walked += "\n" + t
+            # AN ANNOTATION THAT PRINTS IS PART OF THE PAGE, AND get_text() CANNOT SEE IT.
+            #
+            # Measured 24 Nov on 600_reviewed_invoice_with_annotations: t12 reported 21
+            # invented words and every one was drawn on the page by an annotation whose
+            # appearance is not in the content stream. A FreeText note ("Checked against
+            # PO 4471. Quantity on line 3 raised from 20 to 25") and a Stamp ("Approved")
+            # both print - a reader holding the page sees them - and the .txt transcribed
+            # them correctly. They were missing from the SOURCE, so the writer was
+            # condemned for being right.
+            #
+            # ONLY THE PRINTING TYPES ARE ADDED. /Text (a sticky note) and the markup
+            # types (Highlight, Underline, StrikeOut) draw no text: their /Contents is a
+            # comment, and a .txt carrying it describes something the document does not
+            # show. Those stay out, so the 7 words a sticky note contributes on 600 stay
+            # invented - the true answer for that document until TxtWriter stops emitting
+            # comment bodies.
+            #
+            # The same guard as the widget block above, and for the same reason: a page
+            # that already drew the text must not have it counted twice. A page with no
+            # printing annotation is byte-identical, so no document without one moves.
+            try:
+                _ann = []
+                for _a in (pg.annots() or []):
+                    _ty = _a.type[0] if isinstance(_a.type, tuple) else _a.type
+                    if _ty not in (2, 13):        # 2 = FreeText, 13 = Stamp
+                        continue
+                    _t = (_a.info or {}).get("content") or ""
+                    _t = _t.strip()
+                    if _t and _t not in walked and _t not in _ann:
+                        _ann.append(_t)
+                for _t in _ann:
+                    stats["annotation_glyphs"] = stats.get("annotation_glyphs", 0) + len(_t)
+                    walked += "\n" + _t
+            except Exception:
+                pass
             pages.append(walked)
     finally:
         d.close()
@@ -840,6 +876,43 @@ def _src_pages(path):
                               # different place on the page. The order checks skip it
                               # rather than assert an order the page never had.
                               "upright": tuple(ln.get("dir", (1, 0))) == (1, 0)})
+        # ---- AN ANNOTATION THAT PRINTS IS PART OF THE PAGE ------------------
+        # Measured 24 Nov on 600_reviewed_invoice_with_annotations: t12 reported 21
+        # invented words, and every one of them was drawn on the page by an annotation
+        # that this reader could not see. get_text("dict") returns the page's content
+        # stream and NOTHING from an annotation's appearance, so a FreeText note
+        # ("Checked against PO 4471. Quantity on line 3 raised from 20 to 25") and a
+        # Stamp ("Approved") were both invisible here and present in the .txt - which
+        # transcribed them correctly, because a reader holding the printed page sees
+        # them.
+        #
+        # ONLY THE TYPES THAT PRINT ARE ADDED. /Text (a sticky note) and the markup
+        # types (Highlight, Underline, StrikeOut) draw no text on the page: their
+        # /Contents is a comment, and a .txt that carries it describes something the
+        # document does not show. Adding those here would bless the writer's mistake
+        # instead of finding it, so they stay out and the 7 words they contribute on
+        # 600 stay invented - which is the true answer for that document until
+        # TxtWriter stops emitting comment bodies.
+        #
+        # A page with no printing annotation is left byte-identical, so no document
+        # without one can move.
+        try:
+            _extra = []
+            for _an in (pg.annots() or []):
+                _ty = _an.type[0] if isinstance(_an.type, tuple) else _an.type
+                if _ty not in (2, 13):          # 2 = FreeText, 13 = Stamp
+                    continue
+                _txt = (_an.info or {}).get("content") or ""
+                if not _txt.strip():
+                    continue
+                _r = _an.rect
+                _extra.append({"text": _txt.strip(), "x": _r.x0, "y": _r.y0,
+                               "right": _r.x1, "size": 10.0, "upright": True})
+            if _extra:
+                lines.extend(_extra)
+                lines.sort(key=lambda _l: _l["y"])
+        except Exception:
+            pass
         pages.append({"number": pg.number, "height": pg.rect.height,
                       "width": pg.rect.width, "lines": lines})
     d.close()

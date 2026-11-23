@@ -1,5 +1,3 @@
-| 20 Nov 19:33 | fixer | attempt t08_line_order -> reverted (0/10 moved) |
-| 20 Nov 20:01 | fixer | slot claimed - fixer running |
 | 20 Nov 20:28 | fixer | attempt 47_margins -> reverted (0/14 moved) |
 | 20 Nov 20:44 | fixer | attempt 47_margins -> reverted (0/14 moved) |
 | 20 Nov 20:46 | fixer | slot FORCED released - see INCIDENTS.md for why |
@@ -199,3 +197,4 @@
 | 24 Nov 00:25 | fixer | attempt content-present-partly-displaced -> lead (0/13 moved) |
 | 24 Nov 00:30 | fixer | attempt content-present-partly-displaced -> lead (0/13 moved) |
 | 24 Nov 00:32 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 24 Nov 00:56 | fixer | slot claimed - fixer running |
