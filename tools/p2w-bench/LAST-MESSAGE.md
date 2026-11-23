@@ -1,6 +1,6 @@
-# P2W Watchdog - Run Report
+# P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 04:56 → 05:30 IST · 34 min**
+**23 Nov 2026 · slot 05:58 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -8,7 +8,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -17,14 +17,7 @@
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 05:09 | **lead** | 0/23 | corrected: see FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md - the cost is the empty paragraph (~0.83 pt), not an inline image |
-| 05:29 | **lead** | 0/None | the construct was already on main (ef99cb2c) from a concurrent run; this slot's independently built version measured 213 documents, found 4 proxy costs, and removed them with two guard clauses (measur |
+| Working on | `-` |
 
 ## The txt
 
@@ -38,31 +31,18 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `00_pA-01` | from the committed gverify JSONs and CENSUS.csv, how | 05:13 | 23:43 | 0 min |
-| `00_pB-01` | re-measure every claim of the page-count finding fro | 05:13 | 23:43 | 0 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 04:56 → 05:30 · 34 min |
+| Slot window | 05:58 → running · 0 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 37 |
-| Longest silence | **16.3 min** — from 05:13:25, after `dead claim cleared by force release` |
-| Silences over 2 min | 4 |
+| Tool beats | 2 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| fix - diagnose and change the engine | **25 min** | `################` |
-| record - attempt, handoff, class rows | **5 min** | `####` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 04:56 |
-| ended | 05:30 |
-| how it ended | forced |
+| started | 05:58 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -112,7 +112,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `12:06` attempt 15 on content-present-partly-displaced -> lead (1/16 moved)
 - `13:12` attempt 14 on 18_displacement -> lead (0/1 moved)
 - `13:29` attempt 15 on 18_displacement -> lead (0/1 moved)
 - `13:57` agent deployed: 18_displacement / A - static map of every writer that emits w:trHeight and cell w:spacing, and the exa
@@ -137,6 +136,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `05:13` agent landed: 00_page_count / A -> FINDINGS/18disp-prize-sizing-agentA.md
 - `05:13` agent landed: 00_page_count / B -> FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md
 - `05:29` attempt 32 on 18_displacement -> lead
+- `06:11` attempt 33 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 
