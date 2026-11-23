@@ -2163,3 +2163,22 @@
 {"t": 1795401807.4554186, "ist": "08:13:27", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795401807.7665322, "ist": "08:13:27", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795401808.3054488, "ist": "08:13:28", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795404306.8656085, "ist": "08:55:06", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795404353.4546225, "ist": "08:55:53", "ev": "beat", "d": "claimed, reading findings"}
+{"t": 1795405245.29935, "ist": "09:10:45", "ev": "beat", "d": "testing corpus download and engine build for the gate"}
+{"t": 1795405259.8217912, "ist": "09:10:59", "ev": "beat", "d": "building the engine (JDK from Adoptium)"}
+{"t": 1795405319.7575452, "ist": "09:11:59", "ev": "beat", "d": "downloading the corpus"}
+{"t": 1795405326.430458, "ist": "09:12:06", "ev": "beat", "d": "corpus: fetching the remaining batches"}
+{"t": 1795405334.40489, "ist": "09:12:14", "ev": "beat", "d": "corpus: v3 batch"}
+{"t": 1795405353.5160744, "ist": "09:12:33", "ev": "beat", "d": "corpus pass on the current engine (1/6)"}
+{"t": 1795405714.551115, "ist": "09:18:34", "ev": "beat", "d": "corpus pass on the current engine (1/6)"}
+{"t": 1795405963.6830685, "ist": "09:22:43", "ev": "beat", "d": "corpus pass (2/6) - converting"}
+{"t": 1795406214.184026, "ist": "09:26:54", "ev": "beat", "d": "corpus pass (3/6) - converting"}
+{"t": 1795406463.2196443, "ist": "09:31:03", "ev": "beat", "d": "corpus pass (4/6) - finishing conversion"}
+{"t": 1795406715.6779516, "ist": "09:35:15", "ev": "beat", "d": "corpus pass (5/8) - measuring"}
+{"t": 1795406970.3626275, "ist": "09:39:30", "ev": "beat", "d": "corpus pass (6/8) - measuring"}
+{"t": 1795407225.8550735, "ist": "09:43:45", "ev": "beat", "d": "corpus pass (7/8) - measuring"}
+{"t": 1795407480.565975, "ist": "09:48:00", "ev": "beat", "d": "corpus pass (8/8) - finalising"}
+{"t": 1795407737.2081132, "ist": "09:52:17", "ev": "beat", "d": "corpus pass - the last 7 slow documents"}
+{"t": 1795407857.3932524, "ist": "09:54:17", "ev": "beat", "d": "table published - checking regressions before stamping"}
+{"t": 1795407887.8284185, "ist": "09:54:47", "ev": "beat", "d": "stamped - committing findings and clearing the claim"}
