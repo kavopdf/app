@@ -2064,4 +2064,9 @@
 {"t": 1795393887.0623667, "ist": "06:01:27", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795394202.7639554, "ist": "06:06:42", "ev": "beat", "d": "corpus fetch (6 min), then measure 31_times_body page-top offset"}
 {"t": 1795394233.1638372, "ist": "06:07:13", "ev": "beat", "d": "building engine (45s compile)"}
+{"t": 1795394353.9126532, "ist": "06:09:13", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795394481.5223396, "ist": "06:11:21", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795394481.7669466, "ist": "06:11:21", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795394481.9813292, "ist": "06:11:21", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394482.2428026, "ist": "06:11:22", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394482.6815004, "ist": "06:11:22", "ev": "beat", "d": "report.py: building the report"}

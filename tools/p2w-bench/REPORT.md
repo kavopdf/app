@@ -1,9 +1,9 @@
 # Fixer report - 2026-11-23 04:56
 
 ```
-# P2W Fixer - Run Report
+# P2W Watchdog - Run Report
 
-**23 Nov 2026 · slot 04:56 → 05:13 IST · 16 min**
+**23 Nov 2026 · slot 04:56 → 05:30 IST · 34 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -27,6 +27,7 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 05:09 | **lead** | 0/23 | corrected: see FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md - the cost is the empty paragraph (~0.83 pt), not an inline image |
+| 05:29 | **lead** | 0/None | the construct was already on main (ef99cb2c) from a concurrent run; this slot's independently built version measured 213 documents, found 4 proxy costs, and removed them with two guard clauses (measur |
 
 ## The txt
 
@@ -49,11 +50,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 04:56 → 05:13 · 16 min |
+| Slot window | 04:56 → 05:30 · 34 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 27 |
-| Longest silence | **9.1 min** — from 05:00:24, after `agent B landed: 12 docs fail 18_displacement alone; fetching corpus` |
-| Silences over 2 min | 3 |
+| Tool beats | 37 |
+| Longest silence | **16.3 min** — from 05:13:25, after `dead claim cleared by force release` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -61,10 +62,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **9 min** | `############` |
-| record - attempt, handoff, class rows | **5 min** | `#######` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **1 min** | `##` |
+| fix - diagnose and change the engine | **25 min** | `################` |
+| record - attempt, handoff, class rows | **5 min** | `####` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

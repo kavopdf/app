@@ -1,63 +1,8 @@
-# Fixer report - 2026-11-23 04:56
+# P2W Watchdog - Run Report
 
-```
-# P2W Fixer - Run Report
-
-**23 Nov 2026 · slot 04:56 → 05:13 IST · 16 min**
+**23 Nov 2026 · slot 04:56 → 05:30 IST · 34 min**
 
 > No change was kept this run. The numbers below say what was tried.
-
-
-> **A second fixer slot ran concurrently and overwrote this run's record.** The table below is
-> report.py's, generated from ROUND.json/RUN.json as they now stand (the 04:56 slot). This relay's
-> own slot ran 02:13 → 00:40 UTC; what it did is in **This relay's slot** below. It changed no
-> document, so every number in the table is the same for both.
-
-## This relay's slot (02:13 → 00:40 UTC)
-
-**The construct I built was already on main.** A concurrent run landed the same spacer split at
-04:56 with a better guard — "the page has room" — and the rebase said so. I dropped my engine patch
-and kept the measurement and the instrument fix.
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 22:33 | **reverted** | 0 | spacer split, guard = nil-border carrier and gap<=20pt, measured across all 213: 65 documents better, 3 worse (363_warranty_card 10.58->11.13, price-list-right-aligned-amounts 1.79->1.90, 03_stamp_vertical_90deg 16.98->17.50). regress.py refused. |
-| 23:54 | **lead** | 0 | the same split narrowed by two clauses - spend the gap only where it was MEASURED from the page's flow position, and only on a page with no floating shape at all - passes regress.py with nothing worse in either format and keeps all six documents the split fixes. Dropped at the rebase: main already carries this construct. |
-
-### What landed (`d5b6edc7`)
-
-`_soffice_warm()` ran `soffice.bin --version`, which short-circuits **before** LibreOffice's profile
-is initialised. On a fresh pod the first document launch then exits 81 with no PDF and no message:
-`measured 0 of 212`, four runs in a row, `pre/` empty while 213 .docx existed. Three clean-HOME
-experiments through the real `soffice_pdf()` path: `--version` leaves the profile absent and the first
-convert fails; `mkdir` of the profile directory alone changes nothing (rc=81 either way);
-`--headless --norestore --terminate_after_init` populates it in 0.6 s and the first convert converts.
-**This was the gate, not a construct** - runs that stood aside reading "measured 0" were blocked by a
-missing directory, not by policy.
-
-### The census, which is the lead
-
-Instrumented at the exact statement the gate reads, all 213 documents:
-
-| | |
-|:--|:--|
-| Reachable (nil-border table, gap ≤ 20 pt) | **50** |
-| Of those, failing Google | **46** |
-| Of those, exactly one check short, and it is `18_displacement` | **9** |
-| Of those, already 42/42 (must not break) | **1** — 74_balance_sheet_indented_subitems |
-
-Six of the nine are already at 42/42 in Google under the split the 01:14 slot measured. Three were
-never measured in Google: `362_price_list_dense`, `balance-sheet-two-columns-of-figures`,
-`bus-timetable-station-left-right`. Three round trips close the class.
-
-### Parked, with the evidence to re-open
-
-`_engine_stamp()` hashes `ENGINE_SRC`, but the invalidation runs where `ENGINE_SRC` resolved to
-`/scratch/work/p2w/repo` while the measurement was of `P2W_ENGINE_SRC`. The stamp written therefore
-describes another tree, the next call computes the real one, and `rm -rf`s `DOCX`/`DIST`/`PRE` — it
-cost this slot two full 213-document reconversions. Not fixed: what the stamp should describe (the
-tree measured, or the commit measured) is a decision. Evidence:
-`FINDINGS/18_displacement-CENSUS-AND-TWO-INSTRUMENT-FAULTS-0015-relay.md`.
 
 ## Progress
 
@@ -79,6 +24,7 @@ tree measured, or the commit measured) is a decision. Evidence:
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 05:09 | **lead** | 0/23 | corrected: see FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md - the cost is the empty paragraph (~0.83 pt), not an inline image |
+| 05:29 | **lead** | 0/None | the construct was already on main (ef99cb2c) from a concurrent run; this slot's independently built version measured 213 documents, found 4 proxy costs, and removed them with two guard clauses (measur |
 
 ## The txt
 
@@ -101,11 +47,11 @@ tree measured, or the commit measured) is a decision. Evidence:
 
 | | |
 |:--|:--|
-| Slot window | 04:56 → 05:13 · 16 min |
+| Slot window | 04:56 → 05:30 · 34 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 27 |
-| Longest silence | **9.1 min** — from 05:00:24, after `agent B landed: 12 docs fail 18_displacement alone; fetching corpus` |
-| Silences over 2 min | 3 |
+| Tool beats | 37 |
+| Longest silence | **16.3 min** — from 05:13:25, after `dead claim cleared by force release` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -113,10 +59,10 @@ tree measured, or the commit measured) is a decision. Evidence:
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **9 min** | `############` |
-| record - attempt, handoff, class rows | **5 min** | `#######` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **1 min** | `##` |
+| fix - diagnose and change the engine | **25 min** | `################` |
+| record - attempt, handoff, class rows | **5 min** | `####` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -129,14 +75,9 @@ tree measured, or the commit measured) is a decision. Evidence:
 
 ## Next run
 
-Three Google round trips close `18_displacement`: `362_price_list_dense`,
-`balance-sheet-two-columns-of-figures`, `bus-timetable-station-left-right`, on the engine as it
-stands, against their committed Google scores. If all three reach 42/42 the class is solved; if one
-does not, its failing check names the next construct. Do not rebuild the corpus to ask it - the
-construct is committed and the proxy cannot see it.
+00_page_count: mechanism MEASURED, fix not landed. FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md. Google rasterises each page-positioned floating shape and keeps the paragraph that carries it, and that empty paragraph costs ~0.83 pt of flow (w:line="1" exact is NOT honoured for it): 108 of them = 89.9 pt on 301_lab_report_panel against 44.5 pt of free page, so a 1-page source renders 2 pages. Deleting all 108 -> 1 page at the same text y (the control). 22 of the 23 refused documents emit ALL their drawing-only paragraphs AFTER the last text paragraph; counts 7..2464. 350_question_paper has 1 and is NOT explained by this. Refuted and measured, do not retry: drop-last, prstGeom-rect, wrapSquare, framePr. VOID (my probe bug, never measured): merge-into-one-paragraph and attach-to-text. NEXT LEVER, cheapest in the writer: merge the drawing-only paragraphs of a page into ONE (DocxWriter.shape(), DocxWriter.java:2726) - saves 107 x 0.83 = 88.8 pt against 89.9 pt needed here, a one-point margin, so measure it; then w:tcBorders through the table writer. This is the same construct as 32_stroke_lines and 05_chars_extra: one mechanism, three check families.
 
-Before any long measurement, check `pre/` is filling. `measured 0 of 212` is a missing LibreOffice
-profile, not a policy block, and the fix is in `benchmarks/p2w.py` as of `d5b6edc7`.
+> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
-> **1 item parked** — the engine stamp names the wrong tree; it wipes a local tree's own corpus. See
-> the top of `HANDOFF.md` and the FINDINGS file above for what would re-open it.
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
