@@ -29,6 +29,7 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 16:34 | **partial** | 2/23 | LANDED the column-page shape merge (21 documents change in document.xml, 361 124->40 paragraphs, 401 52->27, 301 untouched at 85). Corpus on this tree: 212/212 scored, 0 documents worse, regress PASS, |
+| 16:39 | **lead** | 0/None | rowExcessTw 15->11 opens the spacer guard on 72_bank (w:line=366 -> w:before=365+w:line=1) and removes the -15pt table lift, but the page lands 4.85pt low and 7/80 runs exceed tolerance against a budg |
 
 ## The txt
 
@@ -53,9 +54,9 @@
 |:--|:--|
 | Slot window | 15:02 → 16:38 · 1h 36m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 55 |
-| Longest silence | **6.1 min** — from 15:28:54, after `attempt 1: forced rebuild of 213 on the patched tree, call 1` |
-| Silences over 2 min | 18 |
+| Tool beats | 20 |
+| Longest silence | **30.6 min** — from 15:18:23, after `lastmessage.py: running a tool for its numbers` |
+| Silences over 2 min | 6 |
 | Obstacles | 2 cleared · 1 parked, with the evidence to re-open them |
 | Still a wall | `health.py --stalled` exits 0 and the fix row reads moving, 1 attempt(s) in the last 3 h, stage age 1.2 h. `st |
 
@@ -64,11 +65,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| build - compiling the engine | **3 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **16 min** | `####` |
-| record - attempt, handoff, class rows | **3 min** | `#` |
-| report - the report and the chain | **13 min** | `###` |
-| other - not attributed to a tool | **58 min** | `#############` |
+| fix - diagnose and change the engine | **15 min** | `####` |
+| measure or build - a conversion, screen or compile writes no beacon | **54 min** | `#############` |
+| record - attempt, handoff, class rows | **2 min** | `#` |
+| report - the report and the chain | **8 min** | `##` |
+| other - not attributed to a tool | **8 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
