@@ -465,6 +465,27 @@ def claim(name):
     s[key] = time.time()
     save(s)
 
+    # A NEW RUN MUST NOT INHERIT THE LAST ONE'S LEDGER, OR THE GUARDS THAT READ IT ARE BLIND.
+    #
+    # RUN.json holds what THIS run has done - started, attempts, agents, kept. Nothing reset it on a
+    # claim, so a fresh run opened the previous run's numbers. Measured 23 Nov, 10 minutes after a new
+    # claim: RUN.json still said started 13:20, attempts 1, agents 2 - all from the run before it. The
+    # release guard reads exactly those fields, so it would have passed a run that deployed no agent and
+    # made no attempt, on the strength of the previous run's work.
+    #
+    # That is the failure the guard was written to catch, wearing the guard's own evidence. A ledger that
+    # is not reset per run is not a ledger; it is a running total that flatters whoever reads it.
+    if name == "fixer":
+        try:
+            import json as _j
+            _rp = os.path.join(HERE, "RUN.json")
+            with open(_rp, "w", encoding="utf-8") as _f:
+                _j.dump({"started": time.strftime("%H:%M"), "started_ts": time.time(),
+                         "ended": None, "ended_ts": None, "attempts": 0, "kept": 0,
+                         "agents": [], "docs_improved": 0}, _f, indent=1)
+        except Exception:
+            pass
+
     # THE CLAIM IS ONLY REAL ONCE IT IS PUSHED. THIS IS THE LOCK.
     #
     # save() writes ROUND.json into THIS sandbox's clone. Every cron runs in its own sandbox, so a
