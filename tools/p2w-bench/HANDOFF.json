@@ -1228,6 +1228,10 @@
   {
    "at": "19:34",
    "text": "attempt 1 on 60_text_column_right_edge -> lead"
+  },
+  {
+   "at": "19:36",
+   "text": "attempt 2 on 60_text_column_right_edge -> lead"
   }
  ],
  "next": "00_page_count: measure 041122-Account_Opening_Form in Google (2464 drawing-only paragraphs, nine pages, worst score in the corpus at 98.65) - the scale test for the carrier paragraph. Then 350_question_paper: FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md charges picture() lines 2542-2564 (an unplaced picture emitted <wp:inline> in a paragraph with no w:pPr, inheriting sz=22 and w:after=120 from docDefaults, which spacingTw cannot see); the patch beside it is UNCOMPILED. Then w:tcBorders for 32_stroke_lines/05_chars_extra.",

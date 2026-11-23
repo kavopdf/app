@@ -1,4 +1,3 @@
-| 20 Nov 15:08 | fixer | attempt 47_margins -> partial (2/26 moved) |
 | 20 Nov 15:55 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 20 Nov 15:55 | fixer | slot claimed - fixer running |
 | 20 Nov 16:14 | fixer | attempt t13_amount_columns -> reverted (0/26 moved) |
@@ -198,3 +197,4 @@
 | 23 Nov 18:58 | fixer | slot claimed - fixer running |
 | 23 Nov 19:31 | fixer | attempt 18_displacement -> reverted (0/? moved) |
 | 23 Nov 19:34 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
+| 23 Nov 19:36 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |

@@ -118,7 +118,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `05:13` agent landed: 00_page_count / B -> FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md
 - `05:29` attempt 32 on 18_displacement -> lead
 - `06:11` attempt 33 on 18_displacement -> lead
 - `06:15` attempt 34 on 18_displacement -> lead
@@ -143,6 +142,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `18:34` attempt 2 on 44_header_footer -> lead
 - `19:31` attempt 39 on 18_displacement -> reverted
 - `19:34` attempt 1 on 60_text_column_right_edge -> lead
+- `19:36` attempt 2 on 60_text_column_right_edge -> lead
 
 ## Where the rest of the state lives
 
