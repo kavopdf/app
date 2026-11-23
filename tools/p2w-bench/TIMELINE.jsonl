@@ -2069,3 +2069,14 @@
 {"t": 1795394484.581859, "ist": "06:11:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795394484.680401, "ist": "06:11:24", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795394487.363406, "ist": "06:11:27", "ev": "beat", "d": "recording lead, committing finding"}
+{"t": 1795394514.1189015, "ist": "06:11:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394530.2025218, "ist": "06:12:10", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394530.7138324, "ist": "06:12:10", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394530.960366, "ist": "06:12:10", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394531.4179544, "ist": "06:12:11", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394534.060637, "ist": "06:12:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394541.610674, "ist": "06:12:21", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394542.2605464, "ist": "06:12:22", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394542.7111804, "ist": "06:12:22", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394542.9992325, "ist": "06:12:22", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795394543.4786527, "ist": "06:12:23", "ev": "beat", "d": "report.py: building the report"}

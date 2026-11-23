@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 05:58 → running IST · 0 min**
+**23 Nov 2026 · slot 05:58 → running IST · 13 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -20,7 +20,13 @@
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `18_displacement` |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 06:11 | **lead** | 0/None | LO census: 7 docs are one check from clean in the measurable renderer and they are 7 distinct mechanisms. Controlled 3-variant experiment on balance-sheet-two-columns-of-figures: w:trHeight is inert o |
 
 ## The txt
 
@@ -40,12 +46,22 @@
 
 | | |
 |:--|:--|
-| Slot window | 05:58 → running · 0 min |
+| Slot window | 05:58 → running · 13 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 2 |
-| Silences over 2 min | 0 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 10 |
+| Longest silence | **5.3 min** — from 06:01:27, after `attempt.py: recording an attempt` |
+| Silences over 2 min | 3 |
+| Obstacles | 0 cleared · 3 parked, with the evidence to re-open them |
+| Still a wall | **The `.txt` half is now a stall past a day and nothing moved it: 197 clean, 16 failing, unchanged since 21 No |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| fix - diagnose and change the engine | **6 min** | `###########` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `##########` |
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
