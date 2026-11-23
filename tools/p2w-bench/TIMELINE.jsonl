@@ -2613,6 +2613,7 @@
 {"t": 1795435943.8967276, "ist": "17:42:23", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795435944.3314037, "ist": "17:42:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795435944.4591901, "ist": "17:42:24", "ev": "beat", "d": "report.py: building the report"}
+<<<<<<< HEAD
 {"t": 1795437690.2378035, "ist": "18:11:30", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795437749.6330936, "ist": "18:12:29", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795437750.285047, "ist": "18:12:30", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
@@ -2625,3 +2626,21 @@
 {"t": 1795438133.6784732, "ist": "18:18:53", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795438134.0714664, "ist": "18:18:54", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795438182.5881214, "ist": "18:19:42", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+=======
+{"t": 1795436907.5907025, "ist": "17:58:27", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795436907.7847097, "ist": "17:58:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795436916.7576966, "ist": "17:58:36", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795438132.2479444, "ist": "18:18:52", "ev": "beat", "d": "two agents read; auditing 25_invisible_text instrument"}
+{"t": 1795438146.8059042, "ist": "18:19:06", "ev": "beat", "d": "fetching corpus"}
+{"t": 1795438181.593135, "ist": "18:19:41", "ev": "beat", "d": "building engine"}
+{"t": 1795438246.7492163, "ist": "18:20:46", "ev": "beat", "d": "converting 6 docs"}
+{"t": 1795438441.032537, "ist": "18:24:01", "ev": "beat", "d": "measuring 27 in Google"}
+{"t": 1795438472.389819, "ist": "18:24:32", "ev": "beat", "d": "rebuilding with bandLine change"}
+{"t": 1795438573.690506, "ist": "18:26:13", "ev": "beat", "d": "rebuilding footBand"}
+{"t": 1795438656.4332619, "ist": "18:27:36", "ev": "beat", "d": "checking gate"}
+{"t": 1795438691.5455706, "ist": "18:28:11", "ev": "beat", "d": "corpus pass for regress"}
+{"t": 1795438983.6406596, "ist": "18:33:03", "ev": "beat", "d": "recording attempt"}
+{"t": 1795438992.992968, "ist": "18:33:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795438996.2738519, "ist": "18:33:16", "ev": "beat", "d": "attempt.py: recording an attempt"}
+>>>>>>> 4ab717d0 (attempt: 44_header_footer -> lead (0 of None))
+{"t": 1795439089.2639165, "ist": "18:34:49", "ev": "beat", "d": "attempt.py: recording an attempt"}

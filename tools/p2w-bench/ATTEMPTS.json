@@ -516,6 +516,39 @@
   "requeues": 0,
   "status": "PARKED"
  },
+ "44_header_footer": {
+  "attempts": 2,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-23 18:33",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1",
+    "total": null
+   },
+   {
+    "at": "2026-11-23 18:34",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1",
+    "total": null
+   }
+  ],
+  "last": null,
+  "last_engine": "b7699196",
+  "outcomes": [
+   "lead",
+   "lead"
+  ],
+  "reason": "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1. Not committed: full-corpus restamp does not fit a slot. Patch in FINDINGS/running-foot-spends-the-gap-1855-fixer.patch. Second site unaddressed: flowFromBox anchors the same oversized gap (55_ and 61_ still carry 4 boxes).",
+  "reasons": [
+   "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1. Not committed: full-corpus restamp does not fit a slot. Patch in FINDINGS/running-foot-spends-the-gap-1855-fixer.patch. Second site unaddressed: flowFromBox anchors the same oversized gap (55_ and 61_ still carry 4 boxes).",
+   "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1. Not committed: full-corpus restamp does not fit a slot. Patch in FINDINGS/running-foot-spends-the-gap-1855-fixer.patch. Second site unaddressed: flowFromBox anchors the same oversized gap (55_ and 61_ still carry 4 boxes)."
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "47_margins": {
   "attempts": 18,
   "first_seen": 1794518680.890611,
