@@ -1,32 +1,34 @@
-# P2W Google Verify - Run Report
+gverify run — 23 Nov 2026
 
-**23 Nov 2026 · 21:29 IST · stage classify**
+Stage: classify. 213 measured through Google, 190 scored, 23 refused on page count. 160 documents still fail at least one check. The capability table is regenerated and committed; measuring is finished for this cron.
 
-> 190 of 213 measured in Google, 23 refused on page count. Google passes all 42 on 30; LibreOffice on 122.
+The 86 results that carry the current engine stamp read: 13 pass all 42, 50 fail at least one, 23 refused. The 190 scored figures below include results from earlier engine commits, which is what the table reads.
 
-This run did the classify stage's own step and nothing else. I regenerated the capability table from the two committed result directories and committed it, with the engine-coverage block recomputed against the engine on HEAD; no row in the comparison moved, so the table is the same measurement it was, now with its coverage stated honestly. I measured no documents, changed no engine code, and did not classify - that is the next cron's slot.
+| renderer | passes all 42 |
+|---|---:|
+| LibreOffice | 122 of 190 |
+| Google Docs | 30 of 190 |
 
-## Measured
+## Where the renderers disagree
 
-| | |
-|:--|--:|
-| scored | **190** |
-| refused on page count | **23** |
-| clean in Google | **30** |
-| clean in LibreOffice | **122** |
+| check | LibreOffice fails | Google fails |
+|---|---:|---:|
+| 18\_displacement | 20 | 101 |
+| 04\_chars\_missing | 2 | 65 |
+| 60\_text\_column\_right\_edge | 18 | 56 |
+| 25\_invisible\_text | 0 | 48 |
+| 32\_stroke\_lines | 1 | 47 |
+| 59\_shape\_anchor | 9 | 45 |
+| 05\_chars\_extra | 3 | 43 |
+| 45\_char\_accuracy | 2 | 37 |
+| 13\_text\_colours | 1 | 32 |
+| 44\_header\_footer | 0 | 31 |
+| 17\_matched\_runs | 4 | 30 |
 
-## Checks Google fails and LibreOffice does not
+Constructs LibreOffice honours and Google does not: 25\_invisible\_text on 48 documents, 44\_header\_footer on 31, 10\_font\_sizes on 6, 23\_line\_pitch on 3, 31\_pages\_lost\_their\_text on 1, 46\_text\_crossing\_rule on 1. Google honours 14\_filled\_shapes where LibreOffice does not, on 2 documents.
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `18\_displacement` | **101** | 20 |
-| `04\_chars\_missing` | **65** | 2 |
-| `25\_invisible\_text` | **48** | 0 |
-| `32\_stroke\_lines` | **47** | 1 |
-| `05\_chars\_extra` | **43** | 3 |
-| `60\_text\_column\_right\_edge` | **56** | 18 |
-| `59\_shape\_anchor` | **45** | 9 |
-| `45\_char\_accuracy` | **37** | 2 |
+## Current-engine failures, by check
 
-The first row is the class to take: `18\_displacement`, 101 documents in Google against 20 in LibreOffice.
+18\_displacement 28, 04\_chars\_missing 24, 60\_text\_column\_right\_edge 21, 25\_invisible\_text 19, 59\_shape\_anchor 19, 13\_text\_colours 18, 45\_char\_accuracy 14, 35\_rotation 10, 17\_matched\_runs 10, 47\_margins 8, 43\_within\_10pt\_x 5, 44\_header\_footer 5.
 
+Next: the classifier cron groups the 160 failing documents into classes. No engine code touched.
