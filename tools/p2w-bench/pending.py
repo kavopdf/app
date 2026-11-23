@@ -195,6 +195,29 @@ def main(argv):
         print(json.dumps({"pending": items, "count": len(items)}, indent=1))
         return 0 if not items else 1
 
+    if "--decisions" in argv:
+        # THE ITEMS A FIXER CANNOT CLOSE ARE NOT THE FIXER'S WORK, AND THEY MUST NOT BE LOST EITHER.
+        # 59 of the 81 items on 23 Nov are blockers whose own "can I fix it" column begins with "no" -
+        # they need a decision from a person. classpick.py does not let them block a run (a gate that
+        # waited for them would never open), so without this view they would sit in BLOCKERS.md and be
+        # read by nobody. This prints only those, so the decisions that are owed stay visible.
+        dec = [i for i in items
+               if i.get("kind") == "blocker"
+               and (i.get("why") or "").lower().startswith("can i fix it: no")]
+        if not dec:
+            print("NO DECISIONS OWED - every open item is one a fixer can close.")
+            return 0
+        print("NEEDS A DECISION (%d) - these are not a fixer's to close, and they do not block it." % len(dec))
+        print("")
+        for n, it in enumerate(dec, 1):
+            print("%d. %s" % (n, it["who"]))
+            print("   %s" % it["what"])
+            print("   %s" % it["why"])
+            print("")
+        print("A fixer keeps working while these are open. They are reported so a person can decide,")
+        print("not so a slot can wait.")
+        return 1
+
     if not items:
         print("NOTHING PENDING - a new class may be taken.")
         print("Every carried-over item is closed, no agent is outstanding, no kept fix is")
