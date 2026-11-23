@@ -2716,3 +2716,10 @@
 {"t": 1795444072.2878218, "ist": "19:57:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795445119.600614, "ist": "20:15:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795445119.8402927, "ist": "20:15:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795446545.6395059, "ist": "20:39:05", "ev": "beat", "d": "applying trHeight-absorb patch, building for a Google round trip"}
+{"t": 1795446624.6540546, "ist": "20:40:24", "ev": "beat", "d": "fetching corpus, converting two documents"}
+{"t": 1795446677.9677463, "ist": "20:41:17", "ev": "beat", "d": "two docx staged, uploading to Google"}
+{"t": 1795446726.6089008, "ist": "20:42:06", "ev": "beat", "d": "scoring Google export, table-with-no-header-row"}
+{"t": 1795446787.1624982, "ist": "20:43:07", "ev": "beat", "d": "building HEAD for the before-render of table-with-no-header-row"}
+{"t": 1795446857.7432168, "ist": "20:44:17", "ev": "beat", "d": "measuring baseline Google render of tnhr"}
+{"t": 1795446881.8334832, "ist": "20:44:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
