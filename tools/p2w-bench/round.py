@@ -560,6 +560,15 @@ def claim(name):
     return 0
 
 
+def _json_run():
+    """RUN.json as a dict, or {} - the record of what this run has done so far."""
+    try:
+        import json as _j
+        return _j.load(open(os.path.join(HERE, "RUN.json"), encoding="utf-8"))
+    except Exception:
+        return {}
+
+
 def _attempts_this_run():
     """How many attempt lines the trace holds since the last claim."""
     path = os.path.join(HERE, "TRACE.md")
@@ -687,6 +696,33 @@ def release(name, force=False):
         # did nothing could never release it - it had to wait out the stale window, and the
         # next run lost its first ten minutes to a slot nobody was using. Found by the final
         # audit, which ran the command the error message recommends and watched it fail.
+        # ZERO AGENTS IS THE SAME REFUSAL AS ZERO ATTEMPTS, AND IT HAD NO TEETH AT ALL.
+        #
+        # The brief says deploy two every run, and nothing checked it. Measured 23 Nov across three
+        # consecutive runs: 08:55 deployed none and its prose said "one agent, not two"; 12:14 deployed
+        # none and its report said "None deployed this run" in as many words; only 10:17 deployed two.
+        # Two of three runs ignored the rule and both reports passed, because lastmessage.py only refuses
+        # a message that claims MORE agents than the ledger holds - a report that admits deploying none
+        # is honest and still a wasted slot.
+        #
+        # An agent is not a luxury: the runs that moved nothing are the ones that deployed none, and the
+        # brief's own record says so. So this refuses like the attempt floor, with the same escape.
+        try:
+            _agents = (_json_run() or {}).get("agents") or []
+        except Exception:
+            _agents = []
+        if not _agents and not force:
+            print("refused: this run deployed no agent.")
+            print("The brief asks for two every run, in the first ten minutes, before your own attempt.")
+            print("A run that deployed none is the shape of the runs that moved nothing - and two of the")
+            print("last three runs did exactly that and reported it as if it were fine.")
+            print()
+            print("    python3 tools/p2w-bench/handoff.py --agent-add \"<id>|<class>|<angle>|<question>\"")
+            print()
+            print("Record them before you release. If the platform genuinely would not run one - and")
+            print("that is a thing to state with evidence, not to assume - release with --force.")
+            return 1
+
         if done < 1 and not force:
             print("refused: this run has recorded no attempt at all.")
             print("An attempt is a patch, a measurement and a line in ATTEMPTS.json - or an honest")
