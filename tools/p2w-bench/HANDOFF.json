@@ -1176,6 +1176,14 @@
   {
    "at": "11:28",
    "text": "attempt 4 on 00_page_count -> lead"
+  },
+  {
+   "at": "13:21",
+   "text": "agent deployed: A1 / 18_displacement - writer-construct"
+  },
+  {
+   "at": "13:21",
+   "text": "agent deployed: B1 / 60_text_column_right_edge - right-edge+shape_anchor"
   }
  ],
  "next": "00_page_count: mechanism MEASURED, fix not landed. FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md. Google rasterises each page-positioned floating shape and keeps the paragraph that carries it, and that empty paragraph costs ~0.83 pt of flow (w:line=\"1\" exact is NOT honoured for it): 108 of them = 89.9 pt on 301_lab_report_panel against 44.5 pt of free page, so a 1-page source renders 2 pages. Deleting all 108 -> 1 page at the same text y (the control). 22 of the 23 refused documents emit ALL their drawing-only paragraphs AFTER the last text paragraph; counts 7..2464. 350_question_paper has 1 and is NOT explained by this. Refuted and measured, do not retry: drop-last, prstGeom-rect, wrapSquare, framePr. VOID (my probe bug, never measured): merge-into-one-paragraph and attach-to-text. NEXT LEVER, cheapest in the writer: merge the drawing-only paragraphs of a page into ONE (DocxWriter.shape(), DocxWriter.java:2726) - saves 107 x 0.83 = 88.8 pt against 89.9 pt needed here, a one-point margin, so measure it; then w:tcBorders through the table writer. This is the same construct as 32_stroke_lines and 05_chars_extra: one mechanism, three check families.",
@@ -2029,10 +2037,32 @@
    "finding": "FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build.",
    "deployed_at": "2026-11-23T00:47",
    "landed_at": "2026-11-23T00:47"
+  },
+  {
+   "id": "A118_displacement-01",
+   "class": "A1",
+   "angle": "18_displacement",
+   "question": "writer-construct",
+   "expected": "Which single .docx writer construct causes the 18_displacement failures that 13+ documents fail alone, and which documents go CLEAN if fixed",
+   "deployed": "13:21",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-23T13:21"
+  },
+  {
+   "id": "B160_text_column_right_edge-01",
+   "class": "B1",
+   "angle": "60_text_column_right_edge",
+   "question": "right-edge+shape_anchor",
+   "expected": "Is 60_text_column_right_edge the same construct as 59_shape_anchor (they travel together) and what minimal writer change clears both",
+   "deployed": "13:21",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-23T13:21"
   }
  ],
  "run": {
-  "started": "06:55",
+  "started": "13:20",
   "ended": null,
   "ended_how": null
  },

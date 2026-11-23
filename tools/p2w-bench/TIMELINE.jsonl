@@ -2396,3 +2396,21 @@
 {"t": 1795419227.5624948, "ist": "13:03:47", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795419228.555201, "ist": "13:03:48", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795419228.7781446, "ist": "13:03:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795420254.1896782, "ist": "13:20:54", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795420254.3241243, "ist": "13:20:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795420256.6066778, "ist": "13:20:56", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795420259.5260086, "ist": "13:20:59", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795420270.5100398, "ist": "13:21:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795420277.308066, "ist": "13:21:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795420277.4855921, "ist": "13:21:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795421144.3952918, "ist": "13:35:44", "ev": "beat", "d": "relay: building engine (JDK fetch + javac)"}
+{"t": 1795421229.9279623, "ist": "13:37:09", "ev": "beat", "d": "relay: fetching corpus (213 PDFs)"}
+{"t": 1795421246.691699, "ist": "13:37:26", "ev": "beat", "d": "relay: ConvertAll 213 PDFs -> /tmp/vc-before"}
+{"t": 1795421359.104715, "ist": "13:39:19", "ev": "beat", "d": "relay: rebuild + ConvertAll after patch"}
+{"t": 1795421474.0234218, "ist": "13:41:14", "ev": "beat", "d": "relay: verify-change on 51 moved docs"}
+{"t": 1795421760.3358815, "ist": "13:46:00", "ev": "beat", "d": "relay: verify-change pass 2"}
+{"t": 1795422037.762426, "ist": "13:50:37", "ev": "beat", "d": "relay: verify-change pass 3 (cache warm)"}
+{"t": 1795422343.9815319, "ist": "13:55:43", "ev": "beat", "d": "relay: incremental measure of 51"}
+{"t": 1795422772.4819598, "ist": "14:02:52", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795422775.908494, "ist": "14:02:55", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795422778.50268, "ist": "14:02:58", "ev": "beat", "d": "attempt.py: recording an attempt"}
