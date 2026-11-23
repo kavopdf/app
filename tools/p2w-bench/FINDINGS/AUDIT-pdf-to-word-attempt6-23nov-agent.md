@@ -70,6 +70,26 @@ boundary is guarded, but the guard explains nothing.
 `report.notes` (or a new counter), and let the note say "OCR failed on page N: OutOfMemoryError" instead of "has
 no text layer".
 
+### F2b — and it is not one swallow, it is sixteen
+
+`catch (Throwable ignored)` appears **16 times** in `PdfToWord.java`. Counted, not estimated. Two of them are on
+the text-extraction path, and those two matter most:
+
+    995   ocrText = hook.text(index);                                  <- the OCR hook
+    2627  walker.walk(readAll(in), page.getResources(), new float[]{1,0,...})   <- the glyph walker
+    2938  walk(readAll(stream.createInputStream()), inner, mul(m, ctm), ...)    <- a form XObject
+
+The other thirteen are in shape, image and stream handling, where a comment at 6485 states the intent plainly:
+*"One unreadable image must not cost the page its text."* That is the right instinct.
+
+**Applied to the glyph walker it is the wrong one.** If `walker.walk` throws — a malformed content stream, an
+unsupported operator, a font it cannot decode — the page keeps whatever glyphs were collected before the throw
+and loses the rest, **silently**. No note, no counter, no skipped page. The document then scores low on text
+recall, and nothing in the verdict says the text was never extracted.
+
+This is the mechanism behind a class of low scores that no attempt has been able to explain: the checks are
+measuring a document the reader only partly read, and both the reader and the checks are silent about it.
+
 ---
 
 ## F3 — what is still unmeasured after six attempts
