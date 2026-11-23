@@ -1,14 +1,41 @@
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 06:55 → running IST · 2h 00m**
+**23 Nov 2026 · slot 08:55 → 09:56 IST · 1h 01m**
 
-> **415_inline_images** fixed — 89.04 → 0.00. Corpus ratchet clean across 212 documents.
+The pipeline was not slow this run, it was dead: every commit, including the fixer's own claim, was
+refused by the gate because `benchmarks/RANKING.csv` still described the engine from before `5beb8b9d`,
+and the docx stamp had been correctly deleted when it was found to be a lie. Two fixer slots died on it -
+the 08:11 run claimed, could not push the claim, and vanished.
+
+So this slot went to the gate. I built the engine (no `java` on the image; `build-engine.sh` fetches a
+JDK from Adoptium in 38 s), fetched the corpus from the public `corpus-v1` release, and ran
+`benchmarks/p2w.py` to completion in nine calls: 213 `.docx` converted and every measurable document
+scored on engine `4a607e4b793fb348`. I published the table, restored the exempt row `rank()` still drops,
+committed the measurement, and stamped docx only after that commit - in that order, because the stamp's
+own precondition is that the table was committed after the engine. `regress.py --check` now prints PASS
+for both formats and `measure_gate.py` prints READY.
+
+No document moved: with the commit gate shut, a measured fix could not have been recorded, and
+`attempt.py` refuses a moved count against an uncommitted tree. The next run can claim, measure and
+commit, which no run since `5beb8b9d` could do.
+
+The one subagent came back with a measured mechanism worth the next slot: Google honours `w:before` at
+the top of the body but **drops it at the top of a page opened by a page break** - a probe page carrying
+`w:before="1097"` after a break reads 54.85 pt high plus its own 1.35 pt residual, agreeing to 0.01 pt.
+It also refuted the obvious guess: the 13 documents that fail `18_displacement` and nothing else are all
+single-page with no page breaks, so the margin is not their mechanism. The writer value it names is
+`w:pgMar w:top`, the literal `"0"` at `DocxWriter.java:2391`.
+
+I deployed one agent, not two. The second would have run inline for another 13 minutes against a slot
+with a corpus pass still to pay for. Recorded, not hidden.
+
+---
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 4 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 212) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -17,14 +44,8 @@
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `00_page_count` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 07:36 | **lead** | 0/None | Row 0 of a table is placed from a pitch-derived edge, not from the table's own top; the derived delta (+3.52 on balance-sheet) clears its only failing check (6 runs out -> 0) but regresses 360_restaur |
-| 08:11 | **kept** | 0/None | shape paragraphs -> runs in the existing paragraph: 301_lab_report_panel Google 2 pages (page_count_refused) -> 1 page, 39/42; 375_attendance_register 35/42 with 01_page_count+55 failing -> 37/42, pag |
+| Working on | `-` |
+| Committed | **10** files in 3 commit(s) from `e87f223` — ...18_displacement-PAGE-SHIFT-CENSUS-1015-agent.md, ENGINE-STAMP.json, LAST-MESSAGE.md, RANKING.csv, REPORT.md, ROTATION.json, ROUND.json, TIMELINE.jsonl, TRACE.md, UNMEASURED.json |
 
 ## The txt
 
@@ -38,31 +59,29 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dresidual-census-01` | which current-engine documents fail 18_displacement, | 06:17 | - | not recorded |
-| `18_dblast-radius-01` | the exact writer rule for w:trHeight/w:hRule, what t | 06:17 | - | not recorded |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 06:55 → running · 2h 00m |
+| Slot window | 08:55 → 09:56 · 1h 01m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 11 |
-| Longest silence | **41.6 min** — from 08:13:28, after `report.py: building the report` |
-| Silences over 2 min | 2 |
-| Obstacles | 0 cleared · 3 parked, with the evidence to re-open them |
-| Still a wall | **The engine on HEAD moved twice after the table was last generated, and no pair in the table is measured on i |
+| Tool beats | 18 |
+| Longest silence | **14.9 min** — from 08:55:53, after `claimed, reading findings` |
+| Silences over 2 min | 11 |
+| Obstacles | 0 cleared · 4 parked, with the evidence to re-open them |
+| Still a wall | **The fixer's claim is 55 min old against a 45-min stale window and no run has beaconed since it claimed at 08 |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **34 min** | `##########` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **44 min** | `############` |
+| build - compiling the engine | **1 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **29 min** | `###########` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **29 min** | `###########` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -81,3 +100,9 @@
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+```
+
+Written by report.py from committed files only. Every number above is read from
+ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
+and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.

@@ -1,20 +1,13 @@
 {
- "started_ts": 1795397100.0,
- "started": "06:55",
- "class": "00_page_count",
- "attempts": 4,
- "kept": 1,
+ "started_ts": 1795404320.0,
+ "started": "08:55",
+ "ended_ts": 1795407984.2531803,
+ "ended": "09:56",
+ "class": "",
+ "attempts": 0,
+ "kept": 0,
  "docs_improved": 0,
- "agents": [
-  "18_dresidual-census-01",
-  "18_dblast-radius-01"
- ],
+ "agents": [],
  "obstacles_cleared": 0,
- "needs_human": 0,
- "counted": [
-  [
-   "00_page_count",
-   0
-  ]
- ]
+ "needs_human": 0
 }
