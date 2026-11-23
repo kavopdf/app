@@ -25,7 +25,7 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 | document | share@5 | dx | dy | explains | still >20pt |
 |---|---|---|---|---|---|
 | 041122-Account_Opening_Form | 98.65 | 38.6 | -39.5 | 1.0 | 70.0% |
-| Account_Opening_Form_Fillable_fill | 97.62 | 3.4 | -17.4 | 2.0 | 66.0% |
+| Account_Opening_Form_Fillable_fill | 97.62 | 3.4 | -17.5 | 2.0 | 66.0% |
 | one-page-rotated-180-degrees | 81.64 | 0.0 | 0.0 | 0.0 | 23.0% |
 | 600_reviewed_invoice_with_annotati | 62.46 | 0.0 | 102.7 | 28.0 | 1.0% |
 | 601_fillable_admission_form | 52.39 | 0.0 | 26.9 | 15.0 | 8.0% |

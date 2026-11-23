@@ -2575,3 +2575,36 @@
 {"t": 1795430410.1355054, "ist": "16:10:10", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795430410.2740488, "ist": "16:10:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795430410.3027341, "ist": "16:10:10", "ev": "killed", "d": "dead claim cleared by force release"}
+<<<<<<< HEAD
+=======
+{"t": 1795425981.425424, "ist": "14:56:21", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795425987.7967272, "ist": "14:56:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795425987.929025, "ist": "14:56:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795426013.709943, "ist": "14:56:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795426017.9813101, "ist": "14:56:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795426367.2197216, "ist": "15:02:47", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795426367.365008, "ist": "15:02:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795426371.9048338, "ist": "15:02:51", "ev": "beat", "d": "attempt 1: apply the page_count merge patch and build"}
+{"t": 1795426459.6893573, "ist": "15:04:19", "ev": "beat", "d": "attempt 1: corpus fetch + convert from an empty pod (gate.py, call 1 of N)"}
+{"t": 1795426753.9995718, "ist": "15:09:13", "ev": "beat", "d": "attempt 1: corpus conversion (gate.py call 2)"}
+{"t": 1795427049.5593903, "ist": "15:14:09", "ev": "beat", "d": "attempt 1: corpus conversion (gate.py call 3)"}
+{"t": 1795427341.6705272, "ist": "15:19:01", "ev": "beat", "d": "attempt 1: corpus conversion (gate.py call 4)"}
+{"t": 1795427651.9206536, "ist": "15:24:11", "ev": "beat", "d": "attempt 1: reconvert 213 on the PATCHED tree (P2W_ENGINE_SRC=/scratch/work/CS)"}
+{"t": 1795427934.0749562, "ist": "15:28:54", "ev": "beat", "d": "attempt 1: forced rebuild of 213 on the patched tree, call 1"}
+{"t": 1795428302.8980634, "ist": "15:35:02", "ev": "beat", "d": "attempt 1: forced patched-tree corpus pass, call 2"}
+{"t": 1795428581.2624116, "ist": "15:39:41", "ev": "beat", "d": "attempt 1: p2w --force rebuild of 213 docx on the patched tree, call 1"}
+{"t": 1795428846.6960053, "ist": "15:44:06", "ev": "beat", "d": "attempt 1: p2w --force rebuild call 2"}
+{"t": 1795429110.573858, "ist": "15:48:30", "ev": "beat", "d": "attempt 1: p2w --force rebuild call 3"}
+{"t": 1795429375.4607255, "ist": "15:52:55", "ev": "beat", "d": "attempt 1: p2w --force rebuild call 4"}
+{"t": 1795429542.5993319, "ist": "15:55:42", "ev": "beat", "d": "attempt 1: p2w --force rebuild call 4"}
+{"t": 1795429693.4374359, "ist": "15:58:13", "ev": "beat", "d": "attempt 1: p2w --force rebuild call 4"}
+{"t": 1795429973.9116187, "ist": "16:02:53", "ev": "beat", "d": "attempt 1: measuring the patched corpus, call 1"}
+{"t": 1795430401.6558042, "ist": "16:10:01", "ev": "beat", "d": "attempt 1: measuring the patched corpus, call 2"}
+{"t": 1795430657.9742758, "ist": "16:14:17", "ev": "beat", "d": "attempt 1: measuring the patched corpus, call 3 (final)"}
+{"t": 1795430916.483676, "ist": "16:18:36", "ev": "beat", "d": "attempt 1: the last 7 documents (nine-page forms)"}
+{"t": 1795431177.5684023, "ist": "16:22:57", "ev": "beat", "d": "attempt 1: last 5 documents"}
+{"t": 1795431436.8185995, "ist": "16:27:16", "ev": "beat", "d": "attempt 1: collect 212/212 into RANKING.csv and STATE.json"}
+{"t": 1795431682.5243804, "ist": "16:31:22", "ev": "beat", "d": "attempt 1: restamp txt, then the regression stamp"}
+{"t": 1795431801.318725, "ist": "16:33:21", "ev": "beat", "d": "attempt 1: committing engine + table together"}
+{"t": 1795431843.682417, "ist": "16:34:03", "ev": "beat", "d": "attempt.py: recording an attempt"}
+>>>>>>> 0be925ff (00_page_count: land the column-page shape merge - 21 documents, 0 regressions)

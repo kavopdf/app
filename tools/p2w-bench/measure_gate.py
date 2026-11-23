@@ -68,12 +68,23 @@ def exempt():
 
 
 def expected_docs():
-    """How many documents the corpus should hold: 211 synthetic + the real ones."""
+    """How many documents the corpus should hold: 211 synthetic + the real ones, MINUS the exempt.
+
+    AN EXEMPT DOCUMENT IS NOT IN THE TABLE, SO IT IS NOT MISSING FROM IT.
+    This returned SYNTHETIC + real and nothing else, so it demanded 213 rows from a table that
+    gate.py deliberately publishes with 212: gate.py re-applies EXEMPT.json after the copy and
+    DROPS 416_many_tiny_pages rather than writing a share5 of 0.0 that means "unknown". The same
+    file already reads EXEMPT.json twice - exempt() feeds `blocked`, which correctly skips the
+    exempt document - so the gate held two answers to one question and refused the honest table
+    with "the corpus should hold 213". Measured 23 Nov: 212 scored, 1 exempt, 0 blocking, and
+    still NOT READY. A gate that cannot accept its own publisher's table blocks every engine
+    change, which is the shape of the two runs that measured a fix and could not land it.
+    """
     real = os.path.join(ROOT, "benchmarks", "realworld")
     n = 0
     if os.path.isdir(real):
         n = len([f for f in os.listdir(real) if f.lower().endswith(".pdf")])
-    return SYNTHETIC + n
+    return SYNTHETIC + n - len(exempt()["docx"])
 
 
 def read_ranking():

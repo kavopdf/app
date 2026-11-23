@@ -1,6 +1,6 @@
 document,problem,share5,max_pt,worst_page,pages,src_chars,docx_chars,src_images,docx_images,src_drawings,docx_tables,docx_cells,src_annots,src_images_any,signal,dx_pt,dy_pt,explains,moved_gt20
 041122-Account_Opening_Form,content-missing-partly-replaced,98.65,937.92,9,9,48837,48623,1,1,2534,26,659,0,1,none-identified,38.6,-39.5,1.0,70.0
-Account_Opening_Form_Fillable_filled,content-missing-partly-replaced,97.62,358.08,7,9,48936,48702,1,1,2534,26,659,0,1,none-identified,3.4,-17.4,2.0,66.0
+Account_Opening_Form_Fillable_filled,content-missing-partly-replaced,97.62,358.08,7,9,48936,48702,1,1,2534,26,659,0,1,none-identified,3.4,-17.5,2.0,66.0
 one-page-rotated-180-degrees,content-missing-partly-replaced,81.64,177.6,2,2,1951,1884,0,0,42,2,59,0,0,none-identified,0.0,0.0,0.0,23.0
 600_reviewed_invoice_with_annotations,content-missing-partly-replaced,62.46,62.88,1,1,776,831,0,0,23,2,50,6,0,annotations-present,0.0,102.7,28.0,1.0
 601_fillable_admission_form,content-missing-partly-replaced,52.39,27.84,1,1,562,539,0,0,13,0,0,0,0,none-identified,0.0,26.9,15.0,8.0

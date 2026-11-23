@@ -7,6 +7,9 @@ run rebuilt the loop by hand. This is that driver.
     python3 gverify.py --plan 20                 # the next 20 documents that have no Google result
     python3 gverify.py --stage <name>            # copy out/<name>.docx somewhere stable, print it
     python3 gverify.py --collect <name> <url>    # fetch the export, check it, run the 42 checks
+                                                 # <url> is whatever GOOGLEDRIVE_DOWNLOAD_FILE
+                                                 # handed back: an s3url, a local workspace_path,
+                                                 # or the tool result itself as JSON
     python3 gverify.py --report                  # what the corpus looks like so far
 
 WHY IT IS SPLIT THIS WAY. Three of the four steps are Drive API calls and a plain script cannot make
@@ -16,7 +19,14 @@ them - VERIFY-GOOGLE.md says so - so the caller does them:
     b. GOOGLEDRIVE_CREATE_FILE(name=..., mimeType="application/vnd.google-apps.document",
                                parents=[<folder>], file_to_upload={name,mimetype,s3key})
     c. GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE(fileId=<id>, mimeType="application/pdf")
-    d. gverify.py --collect <name> <s3url>
+    d. gverify.py --collect <name> <what GOOGLEDRIVE_DOWNLOAD_FILE returned>
+
+    WHAT STEP d ACCEPTS, AND WHY IT CHANGED. It used to be the s3url out of
+    `downloaded_file_content.s3url`, and on 23 Nov 2026 the tool stopped returning one:
+    it now hands back `artifacts[0].workspace_path`, a local path. `--collect` takes either -
+    an s3url, a local path, or the whole tool result as a JSON string - because a cron that
+    cannot be called with what the tool actually returns does not collect anything. See
+    download_source() for the accepted shapes and the error it raises when neither is present.
 
 `--collect` verifies the bytes before it scores them: a page-count mismatch or a copy identical to
 the source is refused, because a score computed against the wrong file looks exactly like a layout
@@ -146,6 +156,90 @@ def _pages(p):
         return -1
 
 
+_URL_SCHEMES = ("http://", "https://", "s3://", "gs://", "file://")
+
+
+def _is_url(s):
+    return s.startswith(_URL_SCHEMES)
+
+
+def download_source(result):
+    """The one thing `--collect` needs out of a GOOGLEDRIVE_DOWNLOAD_FILE result: where the bytes are.
+
+    TWO SHAPES, BOTH ACCEPTED. The tool used to return
+
+        {"downloaded_file_content": {"s3url": "https://..."}}
+
+    and `--collect` read `downloaded_file_content.s3url`. On 23 Nov 2026 the 04:47 fixer run
+    recorded that it no longer does: it returns
+
+        {"artifacts": [{"workspace_path": "/tmp/....pdf"}]}
+
+    a local path, and a cron that passes that to a function expecting an s3url collects nothing.
+
+    THE NEW SHAPE WINS WHEN BOTH ARE PRESENT - a local path is already fetched, an s3url is a
+    second download that can fail on its own. The old branch is kept because other callers still
+    pass an s3url and nothing about them has changed.
+
+    `artifacts` IS A LIST. More than one file can come back from an export, so the entry whose
+    workspace_path ends in .pdf is chosen; if none is named .pdf the first one that has a
+    workspace_path is used, because a single artifact is by definition the one that was asked for.
+
+    A PLAIN STRING IS ALSO ACCEPTED - an s3url or a local path, which is what the shell hands in.
+    A string that parses as a JSON object is treated as the tool result it is, so the caller can
+    paste the whole response. Raises ValueError naming the keys actually returned when the shape
+    is neither: the next run should not have to guess what the tool said.
+    """
+    if isinstance(result, str):
+        s = result.strip()
+        if s.startswith("{"):
+            try:
+                return download_source(json.loads(s))
+            except ValueError:
+                raise
+            except Exception:
+                pass            # not JSON after all - fall through and treat it as a path/url
+        if s:
+            return s
+        raise ValueError("GOOGLEDRIVE_DOWNLOAD_FILE returned an empty string")
+
+    if not isinstance(result, dict) or not result:
+        raise ValueError("GOOGLEDRIVE_DOWNLOAD_FILE returned no usable result: %r" % (result,))
+
+    # NEW SHAPE FIRST.
+    arts = result.get("artifacts")
+    if isinstance(arts, list):
+        cands = [a for a in arts if isinstance(a, dict) and a.get("workspace_path")]
+        for a in cands:
+            if str(a["workspace_path"]).lower().endswith(".pdf"):
+                return a["workspace_path"]
+        if cands:
+            return cands[0]["workspace_path"]
+
+    # OLD SHAPE, unchanged.
+    dfc = result.get("downloaded_file_content")
+    if isinstance(dfc, dict) and dfc.get("s3url"):
+        return dfc["s3url"]
+    if result.get("s3url"):
+        return result["s3url"]
+
+    # NEITHER. Say exactly what came back, so nobody has to run it again to find out.
+    keys = sorted(result)
+    detail = "top-level keys: %s" % (keys or "none")
+    if isinstance(arts, list):
+        detail += "; artifacts has %d entr%s" % (len(arts), "y" if len(arts) == 1 else "ies")
+        if arts and isinstance(arts[0], dict):
+            detail += "; artifacts[0] keys: %s" % sorted(arts[0])
+        elif arts:
+            detail += "; artifacts[0] is %s" % type(arts[0]).__name__
+    elif arts is not None:
+        detail += "; artifacts is %s, not a list" % type(arts).__name__
+    if "downloaded_file_content" in result:
+        detail += "; downloaded_file_content is %s" % type(dfc).__name__
+    raise ValueError("GOOGLEDRIVE_DOWNLOAD_FILE result has neither artifacts[].workspace_path "
+                     "nor downloaded_file_content.s3url (%s)" % detail)
+
+
 def collect(name, url):
     src = os.path.join(CORPUS, name + ".pdf")
     docx = os.path.join(OUT, name + ".docx")
@@ -156,11 +250,25 @@ def collect(name, url):
     os.makedirs(RES, exist_ok=True)
     pdf = os.path.join(GD, name + ".pdf")
     tmp = pdf + ".part"
-    r = subprocess.run(["curl", "-sL", "--max-time", "120", url, "-o", tmp],
-                       capture_output=True, text=True)
-    if r.returncode != 0 or not os.path.exists(tmp):
-        print("download failed: %s" % (r.stderr or r.stdout)[:160])
+    try:
+        target = download_source(url)
+    except ValueError as e:
+        print("cannot collect %s: %s" % (name, e))
         return 2
+    if _is_url(target):
+        r = subprocess.run(["curl", "-sL", "--max-time", "120", target, "-o", tmp],
+                           capture_output=True, text=True)
+        if r.returncode != 0 or not os.path.exists(tmp):
+            print("download failed: %s" % (r.stderr or r.stdout)[:160])
+            return 2
+    else:
+        # THE NEW SHAPE IS ALREADY A LOCAL FILE. No second download to fail.
+        import shutil
+        try:
+            shutil.copyfile(target, tmp)
+        except OSError as e:
+            print("cannot read the local artifact %s: %s" % (target, e))
+            return 2
     with open(tmp, "rb") as f:
         if f.read(5) != b"%PDF-":
             os.remove(tmp)

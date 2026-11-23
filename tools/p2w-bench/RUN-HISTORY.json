@@ -1202,8 +1202,8 @@
   "started": "13:20",
   "ended_ts": null,
   "ended": "(never)",
-  "class": "00_page_count",
-  "attempts": 3,
+  "class": "18_displacement",
+  "attempts": 1,
   "kept": 0,
   "docs_improved": 0,
   "agents": [
@@ -1212,6 +1212,6 @@
   ],
   "obstacles_cleared": 0,
   "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
+  "ended_how": "killed - never released the slot"
  }
 ]

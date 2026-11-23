@@ -199,3 +199,11 @@
 | 23 Nov 16:05 | fixer | attempt 00_page_count -> lead (0/? moved) |
 | 23 Nov 16:09 | fixer | attempt 00_page_count -> lead (0/? moved) |
 | 23 Nov 16:10 | fixer | slot FORCED released - see INCIDENTS.md for why |
+<<<<<<< HEAD
+=======
+| 20 Nov 08:52 | fixer | slot claimed - fixer running |
+>>>>>>> 0be925ff (00_page_count: land the column-page shape merge - 21 documents, 0 regressions)
+<<<<<<< HEAD
+=======
+| 23 Nov 15:02 | fixer | slot claimed - fixer running |
+>>>>>>> 0be925ff (00_page_count: land the column-page shape merge - 21 documents, 0 regressions)

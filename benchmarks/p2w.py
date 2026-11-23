@@ -1015,7 +1015,13 @@ def docx(end):
     # ones this build has already rewritten and the loop advances. `_eng_mtime` is the build, not
     # the clock: a document converted before the engine changed is still rebuilt, which is what
     # --force is for.
-    _eng = REPO + "/tools/engine-verify/out/com/kavopdf/app/engine/PdfToWord.class"
+    # THE BUILD THAT MUST WRITE THE DOCUMENT IS ENGINE_SRC'S, NOT REPO'S.
+    # This read REPO unconditionally, so with P2W_ENGINE_SRC set to the working tree the staleness
+    # clock was another clone's binary: measured 23 Nov, a patched tree's --force run compared every
+    # document against repo@FETCH_HEAD's PdfToWord.class and skipped all 213 as "newer than the
+    # engine", which is a full corpus scored on an engine the run had not built. Same shape as the
+    # render-cache-by-name bug below: a cache outliving the thing it caches.
+    _eng = ENGINE_SRC + "/tools/engine-verify/out/com/kavopdf/app/engine/PdfToWord.class"
     _eng_mtime = os.path.getmtime(_eng) if os.path.exists(_eng) else 0.0
     def _need(p):
         b = os.path.basename(p)[:-4]

@@ -1,0 +1,67 @@
+--- a/DocxWriter.java
++++ b/DocxWriter.java
+@@ -2546,21 +2546,40 @@
+             anchoredPicture(sb, p, id, ctx);
+             return;
+         }
+-        sb.append("<w:p><w:r><w:drawing><wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">")
+-                .append("<wp:extent cx=\"").append(p.widthEmu).append("\" cy=\"")
+-                .append(p.heightEmu).append("\"/>")
+-                .append("<wp:docPr id=\"").append(id).append("\" name=\"Picture ").append(id)
+-                .append("\" descr=\"").append(esc(p.text == null ? "" : p.text)).append("\"/>")
+-                .append("<a:graphic><a:graphicData uri=\"")
+-                .append("http://schemas.openxmlformats.org/drawingml/2006/picture\">")
+-                .append("<pic:pic><pic:nvPicPr><pic:cNvPr id=\"").append(id)
+-                .append("\" name=\"image").append(id).append(".png\"/><pic:cNvPicPr/></pic:nvPicPr>")
+-                .append("<pic:blipFill><a:blip r:embed=\"rIdImg").append(id)
+-                .append("\"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>")
+-                .append("<pic:spPr><a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"")
+-                .append(p.widthEmu).append("\" cy=\"").append(p.heightEmu).append("\"/></a:xfrm>")
+-                .append("<a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom></pic:spPr>")
+-                .append("</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>");
++        // NO DRAWING IS EVER IN THE FLOW.
++        //
++        // This branch used to write the picture as <wp:inline>, i.e. as a box in the page's
++        // text flow, in a paragraph that carried no w:pPr at all. That paragraph is the only
++        // one this writer emits with no vertical metrics of its own, so it inherits
++        // styles.xml's docDefaults - w:sz 22 and w:after 120 (6 pt) - and neither number is a
++        // w:before/w:line token, so spacingTw() cannot see it and the budget guard above it
++        // never learns the page is full. A page whose only content is a scan is then charged
++        // the image's height PLUS the paragraph mark's 11 pt line PLUS 6 pt of after-spacing
++        // by a reader that keeps the mark's line (Google Docs does; LibreOffice lays the
++        // image's line at the image's own height and drops the mark's), and an image that
++        // reaches within ~18 pt of the paper's edge renders a second, empty sheet.
++        //
++        // A picture the PDF drew is pinned to the paper exactly as a Shape is (see Picture.placed
++        // and anchoredPicture): wp:wrapNone means it takes no room in the flow, so the page pays
++        // one zero-height carrier for it instead of its own height. Nothing here is specific to
++        // one document - the rule is that the flow carries text and the paper carries drawings.
++        anchoredPicture(sb, pinned(p, ctx), id, ctx);
++    }
++
++    /**
++     * The same picture, pinned to the place the flow has reached on this page.
++     *
++     * <p>Only a picture whose PDF position is unknown needs this; every other picture is already
++     * {@code placed}. It is anchored where the flow stands - the last baseline the page drew, or
++     * the paper's top edge on a page whose flow has not started - rather than dropped into the
++     * flow, because a flow box is the one thing a reader may re-lay out and a page-positioned
++     * drawing is the one thing it may not.
++     */
++    private static Picture pinned(Picture p, Ctx ctx) {
++        float wPt = (float) (p.widthEmu / EMU_PER_PT);
++        float hPt = (float) (p.heightEmu / EMU_PER_PT);
++        float topPt = ctx.flowY >= 0f ? ctx.flowY : 0f;
++        return new Picture(p.png, 0f, topPt, wPt, hPt);
+     }
+ 
+     /**
+@@ -2593,7 +2612,7 @@
+                 .append("<wp:effectExtent l=\"0\" t=\"0\" r=\"0\" b=\"0\"/>")
+                 .append("<wp:wrapNone/>")
+                 .append("<wp:docPr id=\"").append(id).append("\" name=\"Picture ").append(id)
+-                .append("\"/>")
++                .append("\" descr=\"").append(esc(p.text == null ? "" : p.text)).append("\"/>")
+                 .append("<a:graphic><a:graphicData uri=\"")
+                 .append("http://schemas.openxmlformats.org/drawingml/2006/picture\">")
+                 .append("<pic:pic><pic:nvPicPr><pic:cNvPr id=\"").append(id)
