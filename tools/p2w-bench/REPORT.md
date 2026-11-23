@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-23 15:02
+# Fixer report - 2026-11-23 17:00
 
 ```
 # P2W Fixer - Run Report
 
-**23 Nov 2026 · slot 15:02 → 16:38 IST · 1h 36m**
+**23 Nov 2026 · slot 17:00 → running IST · 42 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -16,20 +16,19 @@
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **0** of the **0** re-measured on this engine - **190** of the 190 scored are still on an older engine, and **30** were clean there |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 190 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **0** of the **2** re-measured on this engine - **188** of the 190 scored are still on an older engine, and **30** were clean there |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 188 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `00_page_count` |
+| Working on | `18_displacement` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 16:34 | **partial** | 2/23 | LANDED the column-page shape merge (21 documents change in document.xml, 361 124->40 paragraphs, 401 52->27, 301 untouched at 85). Corpus on this tree: 212/212 scored, 0 documents worse, regress PASS, |
-| 16:39 | **lead** | 0/None | rowExcessTw 15->11 opens the spacer guard on 72_bank (w:line=366 -> w:before=365+w:line=1) and removes the -15pt table lift, but the page lands 4.85pt low and 7/80 runs exceed tolerance against a budg |
+| 17:41 | **lead** | 0/190 | Google render is runnable in a fixer slot: JDK from GitHub releases + verify-engine compile + Drive round trip. Re-measured two rows on HEAD b7699196 in Google: bank-statement-5-pages 40/47 -> 42/47 ( |
 
 ## The txt
 
@@ -43,33 +42,27 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `00_pA-02` | which construct costs 350_question_paper its second  | 16:37 | - | not recorded |
-| `gverB-01` | why gverify --collect cannot read the download resul | 16:37 | - | not recorded |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 15:02 → 16:38 · 1h 36m |
+| Slot window | 17:00 → running · 42 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 20 |
-| Longest silence | **30.6 min** — from 15:18:23, after `lastmessage.py: running a tool for its numbers` |
-| Silences over 2 min | 6 |
-| Obstacles | 2 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | `health.py --stalled` exits 0 and the fix row reads moving, 1 attempt(s) in the last 3 h, stage age 1.2 h. `st |
+| Tool beats | 11 |
+| Longest silence | **33.0 min** — from 17:00:55, after `gaps.py: reading the timeline` |
+| Silences over 2 min | 2 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **15 min** | `####` |
-| measure or build - a conversion, screen or compile writes no beacon | **54 min** | `#############` |
-| record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **8 min** | `##` |
-| other - not attributed to a tool | **8 min** | `##` |
+| fix - diagnose and change the engine | **33 min** | `##################` |
+| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `####` |
+| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

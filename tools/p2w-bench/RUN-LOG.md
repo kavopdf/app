@@ -1,19 +1,3 @@
-| 20 Nov 09:22 | fixer | attempt content-present-partly-displaced -> reverted (0/23 moved) |
-| 20 Nov 09:24 | fixer | slot FORCED released - see INCIDENTS.md for why |
-| 20 Nov 09:25 | fixer | slot re-claimed by a status check, then released again - the claim was accidental, no work was done under it |
-| 20 Nov 09:58 | fixer | slot claimed - fixer running |
-| 20 Nov 10:36 | fixer | attempt 18_displacement -> reverted (0/107 moved) |
-| 20 Nov 10:38 | fixer | attempt 18_displacement -> reverted (0/107 moved) |
-| 20 Nov 10:41 | fixer | attempt 18_displacement -> reverted (0/107 moved) |
-| 20 Nov 10:43 | fixer | slot FORCED released - see INCIDENTS.md for why |
-| 20 Nov 10:51 | fixer | slot claimed - fixer running |
-| 20 Nov 10:52 | fixer | attempt t13_amount_columns -> error |
-| 20 Nov 11:51 | fixer | attempt t13_amount_columns -> kept (10/18 moved) |
-| 20 Nov 11:59 | fixer | attempt t13_amount_columns -> kept (2/18 moved) |
-| 20 Nov 12:03 | fixer | slot FORCED released - see INCIDENTS.md for why |
-| 20 Nov 12:52 | fixer | slot claimed - fixer running |
-| 20 Nov 13:34 | fixer | attempt 47_margins -> partial (3/13 moved) |
-| 20 Nov 13:34 | fixer | attempt 47_margins -> reverted (0/13 moved) |
 | 20 Nov 13:37 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 20 Nov 13:54 | fixer | slot claimed - fixer running |
 | 20 Nov 14:35 | fixer | attempt 47_margins -> reverted (0/26 moved) |
@@ -212,3 +196,5 @@
 | 23 Nov 16:35 | fixer | attempt 00_page_count -> partial (2/23 moved) |
 >>>>>>> f3b47658 (run report 23 Nov 15:02: the column-page shape merge landed (partial, 2/23 - the proxy is blind to it))
 | 23 Nov 16:38 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 23 Nov 17:00 | fixer | slot claimed - fixer running |
+| 23 Nov 17:41 | fixer | attempt 18_displacement -> lead (0/190 moved) |

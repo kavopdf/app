@@ -2,16 +2,18 @@
  "name": "bank-statement-5-pages",
  "status": "ok",
  "rc": 1,
- "passed": 40,
+ "passed": 42,
  "total": 47,
  "failed": [
-  "05_chars_extra",
   "18_displacement",
   "25_invisible_text",
   "27_text_off_page",
-  "32_stroke_lines",
   "44_header_footer",
   "59_shape_anchor"
  ],
- "engine": "462353f"
+ "engine": "b7699196",
+ "engine_fingerprint": "b7699196",
+ "export_sha256": "efba8b1cf0fb2666eef5d6e78e17f561b8d74858f7f68861a059923605304a5c",
+ "measured": "2026-11-23T17:15+05:30 fixer slot 17:00, Google Docs round trip, probe deleted",
+ "method": "ConvertOne at HEAD -> GOOGLEDRIVE_CREATE_FILE (application/vnd.google-apps.document, parent KavoPDF-Verify) -> GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE application/pdf -> gverify.py --collect"
 }

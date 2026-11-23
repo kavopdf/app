@@ -1,29 +1,5 @@
 [
  {
-  "started_ts": 1795170303.9325814,
-  "started": "15:55",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "t13_amount_columns",
-  "attempts": 3,
-  "kept": 1,
-  "docs_improved": 5,
-  "agents": [
-   "t13_A-02",
-   "t13_B-02"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ratchets": 1,
-  "counted": [
-   [
-    "t13_amount_columns",
-    5
-   ]
-  ],
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795177765.2093527,
   "started": "17:59",
   "ended_ts": null,
@@ -1213,5 +1189,16 @@
   "needs_human": 0,
   "partial": 1,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "11:30",
+  "started_ts": 1795433410.7031503,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
