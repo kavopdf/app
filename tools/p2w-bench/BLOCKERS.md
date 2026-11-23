@@ -314,3 +314,50 @@ What would overturn it: `regress.py` comparing a working-tree result against a b
 same engine stamp, or the gate exempting a commit whose only staged paths are `benchmarks/gverify*/`.
 Until one of those lands, this cron commits results with `--no-verify` and writes the regression here,
 and no engine commit may use the same bypass.
+
+## Two stages stopped, and this watchdog has no `cron` tool to move either of them
+
+Checked by the watchdog on 23 Nov 18:40 UTC. `health.py --stalled` exits 1 and names two stages.
+Neither is a 24-hour stall that nothing moved - `progress.py` shows txt failing 16 -> 14 and google
+clean 23 -> 30 between 22 and 23 Nov - so nothing here was parked or re-opened. What follows is
+coordination that this run could see and could not act on.
+
+**classify - stopped, 7.5 h.** The class table `benchmarks/DEFECT-CLASSES-GOOGLE.md` was last committed
+23 Nov 03:04 UTC; the newest Google result under `benchmarks/gverify/` was committed 23 Nov 14:29 UTC.
+The table is older than the results it describes, which is exactly the condition the row measures. Owner:
+the classifier cron, hourly :40, id `01M733RFR3D71C2E0T2TQ9PW0R`.
+
+**txt - stopped, 12.7 h.** `tools/p2w-bench/txt/RANKING-TXT.csv` was last committed 23 Nov 05:57 UTC, and
+`restamp_txt.py` - one of the three things that can change a .txt score - was changed after it, at 23 Nov
+11:48 UTC. `health.py --json` reports `inputs_age_h` 6.8 and does not mark the table current. Owner: the
+baseline cron, hourly :00, id `01M7N3RTAM7SATT9TXMQPP7QRM`, whose last recorded claim in `ROUND.json`
+(`baseline_started`) is 22 Nov 15:34 UTC - over a day with no claim.
+
+**this watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation.** The tool
+list for this run contains no `cron` operation, and `tool_search` for "cron list scheduled jobs runs
+pause resume" returns only Hugging Face and Drive operations - there is no such tool to call, which is
+not the same thing as a decision someone has to make. The exact calls that would have been made, and
+were not:
+
+    cron(action="list")                                  # next_fire_at and status for both ids above:
+                                                         # paused, or enabled with next_fire_at in the past?
+    cron(action="pause",  cron_id="01M733RFR3D71C2E0T2TQ9PW0R")
+    cron(action="resume", cron_id="01M733RFR3D71C2E0T2TQ9PW0R")   # same run, never left paused
+    cron(action="runs",   cron_id="01M733RFR3D71C2E0T2TQ9PW0R")   # a run `running` with ended_at null
+    cron(action="runs",   cron_id="01M7N3RTAM7SATT9TXMQPP7QRM")
+
+The same gap covers the two fixer crons: whether the :50 run is a zombie cannot be seen from here. The
+`:10` relay is the designed answer to that and was not touched.
+
+**What would overturn this:** a watchdog run whose tool list contains `cron`. Until then every watchdog
+pass reports the same blind spot, and a paused cron stays silent with nothing in the repository able to
+notice it.
+
+## The fixer slot is held by a live run, and the phase is not `done` - neither guard applied
+
+`ROUND.json` records `fixer_started` at 23 Nov 18:28 UTC, twelve minutes before this pass, and
+`health.py` puts the fix stage at 0.6 h with 2 attempts in 3 h. A slot held by a run that started twelve
+minutes ago is a working run, so `round.py --release-fixer --force` was not run: releasing it would have
+put a second run into the engine. `round.py --phase` prints `fix`, so `round.py --reopen` does not apply
+either - it refuses when nothing is failing and is only for a phase of `done` with documents still
+failing.
