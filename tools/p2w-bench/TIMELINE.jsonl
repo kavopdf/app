@@ -2928,3 +2928,21 @@
 {"t": 1795460101.9632852, "ist": "00:25:01", "ev": "attempt", "d": "content-present-partly-displaced -> lead"}
 {"t": 1795460102.6652455, "ist": "00:25:02", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795460103.4822433, "ist": "00:25:03", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795460190.62932, "ist": "00:26:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795460221.2978601, "ist": "00:27:01", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795460221.504695, "ist": "00:27:01", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795460222.787008, "ist": "00:27:02", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795460223.088339, "ist": "00:27:03", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795460223.6889017, "ist": "00:27:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795460223.9706988, "ist": "00:27:03", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795460225.2643392, "ist": "00:27:05", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795460225.5930305, "ist": "00:27:05", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795460230.5718071, "ist": "00:27:10", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795460235.4786868, "ist": "00:27:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795460235.764278, "ist": "00:27:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795460236.9920764, "ist": "00:27:16", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795460237.3565893, "ist": "00:27:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795460237.9691374, "ist": "00:27:17", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795460238.396444, "ist": "00:27:18", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795460239.9017472, "ist": "00:27:19", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795460240.1480055, "ist": "00:27:20", "ev": "beat", "d": "report.py: building the report"}
