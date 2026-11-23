@@ -718,7 +718,7 @@ def release(name, force=False):
         # next run lost its first ten minutes to a slot nobody was using. Found by the final
         # audit, which ran the command the error message recommends and watched it fail.
 
-        if done < 1 and not force:
+        if done < 3 and not force:
             print("refused: this run has recorded no attempt at all.")
             print("An attempt is a patch, a measurement and a line in ATTEMPTS.json - or an honest")
             print("'error' because the root cause was not found. Any of those counts.")
