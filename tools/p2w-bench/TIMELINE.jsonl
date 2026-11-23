@@ -3040,3 +3040,20 @@
 {"t": 1795464789.6136866, "ist": "01:43:09", "ev": "attempt", "d": "00_page_count -> lead"}
 {"t": 1795464789.7059467, "ist": "01:43:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795464789.808342, "ist": "01:43:09", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795464806.2151356, "ist": "01:43:26", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795464818.7641978, "ist": "01:43:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795464818.868629, "ist": "01:43:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795464819.2561543, "ist": "01:43:39", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795464819.3622465, "ist": "01:43:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795464819.5435755, "ist": "01:43:39", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795464819.665285, "ist": "01:43:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795464820.0665925, "ist": "01:43:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795464820.186459, "ist": "01:43:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795464831.0332904, "ist": "01:43:51", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795464831.1492467, "ist": "01:43:51", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795464831.5568445, "ist": "01:43:51", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795464831.6741917, "ist": "01:43:51", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795464831.86517, "ist": "01:43:51", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795464832.0069737, "ist": "01:43:52", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795464832.4311702, "ist": "01:43:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795464832.5380526, "ist": "01:43:52", "ev": "beat", "d": "report.py: building the report"}

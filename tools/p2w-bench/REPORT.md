@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 00:56 → running IST · 0 min**
+**24 Nov 2026 · slot 00:56 → running IST · 47 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -22,7 +22,14 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `00_page_count` |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 01:42 | **lead** | 0/213 | t12's 21 invented words on 600 split into 3 faults; source reader now sees printing annotations (21->20, blast radius 1 doc, no verdict moved); remaining 20 are the converter duplicating FreeText text |
+| 01:43 | **lead** | 0/213 | 23 page_count_refused docs: 21 render the RIGHT page count in LibreOffice and one too many in Google (proxy is blind); the 350 inline-picture construct is REFUTED - 0 wp:inline across all 23, the engi |
 
 ## The txt
 
@@ -42,12 +49,22 @@
 
 | | |
 |:--|:--|
-| Slot window | 00:56 → running · 0 min |
+| Slot window | 00:56 → running · 47 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 2 |
-| Silences over 2 min | 0 |
+| Tool beats | 23 |
+| Longest silence | **24.4 min** — from 00:56:37, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| fix - diagnose and change the engine | **3 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **27 min** | `#############` |
+| record - attempt, handoff, class rows | **2 min** | `#` |
+| other - not attributed to a tool | **12 min** | `######` |
 ## Best results this round
 
 | Document | Before | After | Change |
