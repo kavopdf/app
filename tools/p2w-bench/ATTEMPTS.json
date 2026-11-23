@@ -1,6 +1,6 @@
 {
  "00_page_count": {
-  "attempts": 5,
+  "attempts": 6,
   "first_seen": null,
   "history": [
    {
@@ -30,6 +30,13 @@
     "outcome": "lead",
     "reason": "Measured the 23 page_count_refused documents on HEAD: 18 of 22 have zero drawing-only paragraphs, so the carried 'carrier paragraph costs 0.83pt' lever is dead. 21 of 22 render the correct page count ",
     "total": null
+   },
+   {
+    "at": "2026-11-23 16:09",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Prediction confirmed in Google: 60_page_border's 62 wrapNone/behindDoc anchors render as 62 rasterised images split 46/16 across TWO pages (page 2: 0 chars); the same document with all 62 runs removed",
+    "total": null
    }
   ],
   "last": null,
@@ -41,15 +48,17 @@
    "lead",
    "kept",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "Measured the 23 page_count_refused documents on HEAD: 18 of 22 have zero drawing-only paragraphs, so the carried 'carrier paragraph costs 0.83pt' lever is dead. 21 of 22 render the correct page count in LibreOffice, so the refusal is Google-only. Three Google probes: 60_page_border 2 pages with 0 chars and 16 of its 62 rasterised shapes on page 2; 350_question_paper 2 pages with 8 real chars (one-line overflow, different family); adding a trailing paragraph changes nothing. Next lever: emit page furniture as one shape or w:pgBorders.",
+  "reason": "Prediction confirmed in Google: 60_page_border's 62 wrapNone/behindDoc anchors render as 62 rasterised images split 46/16 across TWO pages (page 2: 0 chars); the same document with all 62 runs removed and a real w:pgBorders added renders ONE page with the identical 689 characters and zero images. The page count follows the number of page-positioned floating shapes. Open: the probe does not show Google draws the pgBorders frame (the only drawing in either export is the full-page rect), so the next test must check ink at the four page edges, else fall back to one composite shape per edge.",
   "reasons": [
    "namespace test",
    "Mechanism measured, fix not landed: Google converts each page-positioned floating shape into an inline image in the flow, ~0.79 pt each; 22 of 23 refused documents emit their shapes AFTER the last text paragraph, so a full page overflows. Six docx-level variants measured through Google (drop last, merge into one paragraph, attach to text paragraphs, prstGeom, wrapSquare, framePr) - all still 2 pages; deleting all shapes is 1 page, which proves the cause. Fix needs the table writer (w:tcBorders). FINDINGS/00_page_count-GOOGLE-INLINES-EVERY-SHAPE-0530-fixer.md",
    "shape paragraphs -> runs in the existing paragraph: 301_lab_report_panel Google 2 pages (page_count_refused) -> 1 page, 39/42; 375_attendance_register 35/42 with 01_page_count+55 failing -> 37/42, page count 1, no check newly failing (A/B measured with the previous engine built and rendered). Corpus 213 re-measured: 0 worse in LO, share5 identical on all 213 because the proxy cannot see it. Landing it moves 22 page-count-refused documents from 'all 42 unknown' to measurable.",
    "Merged the shape-only paragraphs that columnPage() still emitted one-per-shape. Google A/B (not LibreOffice): 361_product_catalogue_grid 2 pages at HEAD -> 1 page with the patch, 41/42 checks, scorable for the first time; 401_trifold_brochure 2->2. Patch committed as FINDINGS/00_page_count-MERGE-SHAPE-PARAGRAPHS.patch. Not landed because the docx table re-measure (benchmarks/gate.py --budget 250) does not finish inside one 290s call; txt half re-measured (213 scored, 0 moved).",
-   "Measured the 23 page_count_refused documents on HEAD: 18 of 22 have zero drawing-only paragraphs, so the carried 'carrier paragraph costs 0.83pt' lever is dead. 21 of 22 render the correct page count in LibreOffice, so the refusal is Google-only. Three Google probes: 60_page_border 2 pages with 0 chars and 16 of its 62 rasterised shapes on page 2; 350_question_paper 2 pages with 8 real chars (one-line overflow, different family); adding a trailing paragraph changes nothing. Next lever: emit page furniture as one shape or w:pgBorders."
+   "Measured the 23 page_count_refused documents on HEAD: 18 of 22 have zero drawing-only paragraphs, so the carried 'carrier paragraph costs 0.83pt' lever is dead. 21 of 22 render the correct page count in LibreOffice, so the refusal is Google-only. Three Google probes: 60_page_border 2 pages with 0 chars and 16 of its 62 rasterised shapes on page 2; 350_question_paper 2 pages with 8 real chars (one-line overflow, different family); adding a trailing paragraph changes nothing. Next lever: emit page furniture as one shape or w:pgBorders.",
+   "Prediction confirmed in Google: 60_page_border's 62 wrapNone/behindDoc anchors render as 62 rasterised images split 46/16 across TWO pages (page 2: 0 chars); the same document with all 62 runs removed and a real w:pgBorders added renders ONE page with the identical 689 characters and zero images. The page count follows the number of page-positioned floating shapes. Open: the probe does not show Google draws the pgBorders frame (the only drawing in either export is the full-page rect), so the next test must check ink at the four page edges, else fall back to one composite shape per edge."
   ],
   "requeues": 0,
   "status": "OPEN"
