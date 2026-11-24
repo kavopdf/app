@@ -37,7 +37,7 @@ starts. If that file is different when the gate finishes, a docx number moved du
 the gate says so, loudly, instead of letting the change through. The docx ratchet is still the only
 thing that can authorise a docx change; this gate's job is to prove the txt work did not make one.
 
-    python3 tools/p2w-bench/txt_gate.py --score 40     # score the next 40, then gate
+    python3 tools/p2w-bench/txt_gate.py --score 60     # score the next 40, then gate
     python3 tools/p2w-bench/txt_gate.py --gate         # gate only, no scoring
 """
 import hashlib, json, os, subprocess, sys, time

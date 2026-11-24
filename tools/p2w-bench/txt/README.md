@@ -140,7 +140,7 @@ check that did not run is not a check that passed.
 ## Commands
 
     python3 tools/p2w-bench/txt_rank.py --limit 40     # score the next 40 unscored documents
-    python3 tools/p2w-bench/txt_gate.py --score 40     # score, then gate and write STATE-TXT.json
+    python3 tools/p2w-bench/txt_gate.py --score 60     # score, then gate and write STATE-TXT.json
     python3 tools/p2w-bench/txt_gate.py --gate         # gate only
 
 ## What was here before

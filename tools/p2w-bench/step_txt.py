@@ -52,7 +52,7 @@ def main(argv):
     rs = load()
     if rs is None:
         print("no %s - score the .txt first:" % os.path.basename(RANK))
-        print("    python3 tools/p2w-bench/txt_gate.py --score 40")
+        print("    python3 tools/p2w-bench/txt_gate.py --score 60")
         return 1
 
     failing = [r for r in rs if r["failed"] > 0]
@@ -114,7 +114,7 @@ def main(argv):
 
     print("  then:")
     print("      python3 tools/p2w-bench/txt_gate.py --snapshot      # before the change")
-    print("      python3 tools/p2w-bench/txt_gate.py --score 40      # rescore, then ratchet")
+    print("      python3 tools/p2w-bench/txt_gate.py --score 60      # rescore, then ratchet")
     print("      python3 tools/p2w-bench/txt_gate.py --verify        # after: did the docx move?")
     print("      python3 tools/p2w-bench/classify_txt.py             # refresh the four records")
     return 0

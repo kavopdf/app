@@ -3800,3 +3800,4 @@
 {"t": 1795488694.4969153, "ist": "08:21:34", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795488694.5882494, "ist": "08:21:34", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795488694.6056526, "ist": "08:21:34", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795488861.5850332, "ist": "08:24:21", "ev": "beat", "d": "pending.py: reading the pending gate"}

@@ -1073,7 +1073,7 @@ def main(argv):
             L.append("| Measured | **%s ago**%s |" % (
                 ("%.1f h" % _a) if _a >= 1 else ("%d min" % int(_a * 60)),
                 "" if _a < 6 else " - nothing re-measures this on a schedule; run "
-                "`txt_gate.py --score 40`" if _a >= 6 else ""))
+                "`txt_gate.py --score 60`" if _a >= 6 else ""))
         L.append("| Scored | **%d** of 213 |" % tx["scored"])
         L.append("| Clean - every applicable check passes | **%d** (%.1f%%) |" % (tx["clean"], tx["pct"]))
         L.append("| Failing at least one check | **%d** |" % tx["failing"])
