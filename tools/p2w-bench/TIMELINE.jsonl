@@ -5237,3 +5237,13 @@
 {"t": 1795540554.448172, "ist": "22:45:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795540555.9515939, "ist": "22:45:55", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795540562.1711304, "ist": "22:46:02", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795541147.1264076, "ist": "22:55:47", "ev": "beat", "d": "fetching corpus (6 min)"}
+{"t": 1795541182.5954983, "ist": "22:56:22", "ev": "beat", "d": "corpus fetched, fetching jdk"}
+{"t": 1795541203.4310396, "ist": "22:56:43", "ev": "beat", "d": "jdk ok, running regress check"}
+{"t": 1795541234.8520224, "ist": "22:57:14", "ev": "beat", "d": "building engine"}
+{"t": 1795543061.5638728, "ist": "23:27:41", "ev": "beat", "d": "converting corpus slice 1"}
+{"t": 1795543307.72878, "ist": "23:31:47", "ev": "beat", "d": "corpus slice 2 (161 to go, slice deadlock fixed)"}
+{"t": 1795543552.2223754, "ist": "23:35:52", "ev": "beat", "d": "corpus slice 3 (109 to go)"}
+{"t": 1795543742.7737272, "ist": "23:39:02", "ev": "beat", "d": "corpus slice 4 (57 to go)"}
+{"t": 1795544022.8561888, "ist": "23:43:42", "ev": "beat", "d": "corpus slice 5 (5 to go)"}
+{"t": 1795544051.3520327, "ist": "23:44:11", "ev": "beat", "d": "corpus stamped 213/213, running gate"}
