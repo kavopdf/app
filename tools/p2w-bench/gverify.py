@@ -205,6 +205,39 @@ def _pages(p):
         return -1
 
 
+def _page_census(p, first_extra):
+    """What is ON the pages the source did not have - the evidence a refusal used to destroy.
+
+    A page-count mismatch is the largest single reason a document is not scored (23 of 213 on 24 Nov),
+    and the question every reader asks about it is the same one: did the engine break the page, or did
+    the instrument count a sheet the reader never sees? That question is answered by the extra page's
+    own content and by nothing else - a page holding the page's borders and rules is a real second
+    sheet, a page holding nothing is a counter artefact.
+
+    `--collect` used to `os.remove` the export in exactly this branch, so the export was gone before
+    anyone could look at it, and 21 of the 23 were recorded as "one page too many" with no evidence of
+    what the extra page held. A recorder that deletes the thing it is recording is not a recorder.
+
+    The census is written INTO the record rather than left in a file, because the record is committed
+    and /scratch/work is not.
+    """
+    out = []
+    try:
+        import fitz
+        with fitz.open(p) as d:
+            for i in range(max(0, first_extra), len(d)):
+                pg = d[i]
+                txt = pg.get_text() or ""
+                out.append({"page": i + 1,
+                            "words": len(txt.split()),
+                            "chars": len("".join(txt.split())),
+                            "drawings": len(pg.get_drawings()),
+                            "images": len(pg.get_images(full=True))})
+    except Exception as e:
+        return [{"error": str(e)[:160]}]
+    return out
+
+
 _URL_SCHEMES = ("http://", "https://", "s3://", "gs://", "file://")
 
 
@@ -325,13 +358,38 @@ def collect(name, url):
             return 3
     want, got = _pages(src), _pages(tmp)
     if want > 0 and got > 0 and got != want:
-        os.remove(tmp)
         # A REFUSAL, NOT A RESULT. Google reflowed the document onto a different number of pages, or
         # the export returned something else. Recording that as "42 checks failed" would hide a real
         # finding under a false one.
+        #
+        # THE EXPORT IS KEPT, AND THE REFUSAL NOW CARRIES THE ENGINE AND THE EXTRA PAGE'S CONTENT.
+        # This branch wrote its own record instead of going through _write, so 23 refusals in the store
+        # carry no `engine` and no `checks` stamp - which is why "23 refused" was a claim about 23 Nov
+        # and not about the tree in front of the next run, and why none of them could ever be counted as
+        # current. Going through _write stamps both. The census is the other half: it says whether the
+        # extra sheet holds anything, which is the difference between an engine defect and a counter.
+        refused = os.path.join(GD, name + ".refused.pdf")
+        try:
+            os.replace(tmp, refused)
+        except OSError:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+            refused = None
+        census = _page_census(refused, want) if refused else [{"error": "export not kept"}]
         print("REFUSED: %s rendered to %d page(s), the source has %d" % (name, got, want))
+        if census and "error" not in census[0]:
+            for c in census:
+                print("  page %d: %d word(s), %d drawing(s), %d image(s)%s"
+                      % (c["page"], c["words"], c["drawings"], c["images"],
+                         "  <- EMPTY: a counter, not a sheet" if not (c["words"] or c["drawings"] or c["images"]) else ""))
+        if refused:
+            print("  export kept: %s" % refused)
         _write(name, {"name": name, "status": "page_count_refused", "pages": got, "want": want,
-                        "at": time.strftime("%Y-%m-%dT%H:%M:%S")})
+                      "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                      "extra_pages": census,
+                      "export": os.path.basename(refused) if refused else None})
         return 4
     os.replace(tmp, pdf)
     out_json = os.path.join(RES, name + ".json")

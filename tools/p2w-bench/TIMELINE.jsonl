@@ -4762,6 +4762,16 @@
 {"t": 1795519559.4363399, "ist": "16:55:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795519566.0922115, "ist": "16:56:06", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795519567.3922288, "ist": "16:56:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795523039.5300882, "ist": "17:53:59", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795523039.817974, "ist": "17:53:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795523039.9592974, "ist": "17:53:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795523045.0309725, "ist": "17:54:05", "ev": "beat", "d": "claimed, reading the brief"}
+{"t": 1795523057.0111275, "ist": "17:54:17", "ev": "beat", "d": "reading state: report, gates, pending"}
+{"t": 1795523057.3914413, "ist": "17:54:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795523058.493694, "ist": "17:54:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795523063.366545, "ist": "17:54:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795523893.9240477, "ist": "18:08:13", "ev": "beat", "d": "agent A landed: 60_right_edge is Google-cannot; reading leverage"}
+{"t": 1795523894.182859, "ist": "18:08:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795523948.098978, "ist": "18:09:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795523955.4592457, "ist": "18:09:15", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795524002.3613174, "ist": "18:10:02", "ev": "beat", "d": "pending.py: reading the pending gate"}
@@ -4769,6 +4779,7 @@
 {"t": 1795524219.8358836, "ist": "18:13:39", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795524220.03347, "ist": "18:13:40", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795524252.7514045, "ist": "18:14:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795524275.0959911, "ist": "18:14:35", "ev": "beat", "d": "two agents landed; reading the spacer construct"}
 {"t": 1795524275.1707144, "ist": "18:14:35", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795524309.0065408, "ist": "18:15:09", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795524309.1648915, "ist": "18:15:09", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
@@ -4776,4 +4787,14 @@
 {"t": 1795524346.2560425, "ist": "18:15:46", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795524378.7233098, "ist": "18:16:18", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795524378.9065986, "ist": "18:16:18", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795524390.3821683, "ist": "18:16:30", "ev": "beat", "d": "instrument: the refusal record loses the engine and the page-2 evidence"}
 {"t": 1795524411.0460358, "ist": "18:16:51", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795524460.6324725, "ist": "18:17:40", "ev": "beat", "d": "instrument fix measured; running the gates"}
+{"t": 1795525065.051155, "ist": "18:27:45", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795525065.1781392, "ist": "18:27:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795525065.6289747, "ist": "18:27:45", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795525065.7611833, "ist": "18:27:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795525071.3150318, "ist": "18:27:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795525071.3996537, "ist": "18:27:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795525071.851046, "ist": "18:27:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795525071.9352312, "ist": "18:27:51", "ev": "beat", "d": "pending.py: reading the pending gate"}

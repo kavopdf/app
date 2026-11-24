@@ -19,25 +19,23 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 16:00 |
+| started | 17:53 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> 18_displacement: the residual on the 13 sole-failure documents is TWO constructs whose errors cancel, and that is why 20 attempts moved 4. Four live Google round trips this slot: med_dy -2.8 (362_price_list_dense), -3.0 (bus-timetable), -6.7 (mobile-bill), -13.0 (72_bank_statement); worst_dy 5.4/4.9/10.0/28.2; med_dx -0.2..+0.2 on all four; bad_pages [0] on all four. Run-by-run profiles: at every table's block top the gap is lost (-8.76, -4.19, -4.08 pt on mobile-bill) and inside every table each row is laid 0.75 pt too tall, so dy climbs back to 0 at the footer. 24 rows x 0.75 = 18 pt of ramp against 17.0 pt of step. Each half refuted alone because spending the spacer overflows (the DocxWriter guard at :6074 names mobile-bill and insurance-policy-schedule) and the row declaration change alone leaves the step uncompensated. The untried pair: deliver the gap through the first-row cell w:before (measured 1:1 by Google, 66 probes, error 0.000000) AND reduce w:trHeight by the same per-row amount, so the table total is unchanged. 362_price_list_dense has no step, only a monotone ramp, so it is the document that proves or refutes the pair. All 13 are converted in /scratch/work/p2w/out.
+> 24 Nov 17:54 slot. Two subagents landed real measurements and both say the leverage table is optimistic: 60_text_column_right_edge is k x (line width) on a substituted face - 4 documents are Google-cannot (they declare DejaVu, which Google lacks) and 1 is the instrument reading the widest extractor line, so 0 of 5 are reachable by an engine change. 00_page_count's 23 refused documents are all engine (the page's own furniture emitted as many page-positioned shapes, Google charges 0.10-0.96 pt per shape, LibreOffice nothing) but ZERO of them would go clean: not one carries a single Google check because a refusal skips all 47, and 21 of the 23 refusals carry no engine stamp at all. This run fixed the recorder: gverify --collect no longer deletes the refused export and now stamps engine/checks/at plus a per-page census (words/drawings/images) into the record, so the next pass can decide engine-vs-instrument for those 23 from the record instead of a Drive round trip.
 
 ## What the next run should do first
 
-> 1. CORPUS FIRST, AND IT COSTS 16 s: `bash tools/p2w-bench/corpus-fetch.sh` puts all 213 PDFs on a fresh pod (212 scored in RANKING.csv, 0 missing). Measured 24 Nov 16:05 IST. Without it every gate reports 'corpus : could not be built (3) - no corpus PDFs found' and still prints PASS, so a run can believe it cleared a gate that read nothing. Run this before anything else. 2. DO NOT SPEND A CORPUS PASS ON THE UNIFORM-PITCH SNAP. Measured in Google on 24 Nov: the patch rewrites the w:trHeight values on 11 of the 13 sole-failure documents and both probes stayed 41/42 failing 18_displacement (72_bank_statement_no_rules_right_amounts, 17 of 18 rows rewritten; bus-timetable-station-left-times-right, 33 of 33). 0 of 13 moved. See FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-INERT-ON-THE-13-1120-fixer.md. The 42/42 on 362_price_list_dense stands and is a different table. 3. screen.py CANNOT SCREEN ON A FRESH POD. It converts, then hangs in 'prerender ... soffice batches of 12' past 280 s on two consecutive calls, because soffice is broken on a fresh pod. Fix the prerender or make it optional; until then the only number that comes back is Google's, at about 4 minutes per document (upload -> CREATE_FILE as a Google Doc in KavoPDF-Verify (id 1WpTvoWqJ9VymwDSzaMAVa0enZSwcUesB) -> EXPORT pdf -> gverify.py --collect). 4. A full --force pass is ~38 min conversion + ~15-20 min measurement on this 1.05-core pod, and parallelism is worth 1.0x. The remaining lever for landing anything is a cache that outlives the pod. 5. Next class: 60_text_column_right_edge is worth 19.8 clean documents and 5 documents fail only it - the second-largest single-check leverage, and nothing has been measured against it.
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-convert.py --ensure) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 28 item(s) you can close - run pending.py and take them in its order before the class below. Re-measure the 23 page-count refusals in Google with the new recorder - the census now says whether the extra page holds anything, which is the difference between an engine defect and a counter. Then the 18_displacement pair: the spacer split is already in HEAD behind the room guard; the blocker is measured at +0.70 pt/row on w:trHeight hRule=atLeast (factor 0.9634), and it must land in the same attempt or mobile-bill and insurance-policy-schedule lose content.
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 18A-01 | 18_displacement | A | is the LO regression on the spacer+trHeight patch a real layout change | 20:15 | is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact | landed | FINDINGS/18_displacement-LO-PROXY-VERDICT-2013-agentA.md |
-| 18B-01 | 18_displacement | B | is there a construct that gives Google the row pitch without changing  | 20:44 | is there a construct that gives Google the row pitch without changing what LibreOffice draws | landed | FINDINGS/18_displacement-TRHEIGHT-CROSS-RENDERER-1506-agentB.md |
 | 04_c-01 | 04_chars_missing construct: Google drops wps:txbx text; missing multiset fully explained by anchored boxes on 9 docs |  |  | 23:32 |  | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
 | 44_h-01 | 44_header_footer: .txt half clean (0 lost/duplicated across 31); 20 of 28 feet are floating anchors, 8 flow and still fail |  |  | 23:32 |  | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
 | 18_dA-01 | 18_displacement | A | which single failing Google check, if fixed, makes the most documents  | 02:00 | landed | landed | DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those. |
@@ -60,14 +58,14 @@ unfinished work, not as a result.
 | txt -01 | txt discrepancy |  |  | 14:00 |  | running |  |
 | 18_dA-06 | 18_displacement | A | where does the 11 s/doc conversion go, and the smallest change that ma | 14:00 | 13:16 | running |  |
 | 18_dB-03 | 18_displacement | B | why do RANKING-TXT.csv and the report disagree by 50 documents | 14:00 | 13:18 | running |  |
+| 60ed60_text_column_right_edge-01 | 60edge | 60_text_column_right_edge | A - is the right edge the engine's or the face's | 18:27 | LANDED: FINDINGS/60_text_column_right_edge-EDGE-IS-THE-FACE-4GOOGLE-1INSTRUMENT-24NOV-agentA.md - k x (line width), 4 Google-cannot + 1 instrument, 0 engine | running |  |
+| pc2300_page_count-01 | pc23 | 00_page_count | B - what is on the extra page of the 23 refusals | 18:27 | LANDED: FINDINGS/00_page_count-23-REFUSED-ALL-ENGINE-0-CLEAN-24NOV-agentB.md - 23 engine, 0 instrument, 0 clean, and 21 carry no engine stamp | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `06:35` agent landed: 18_drowpitch-census-01 /  -> no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B.
-- `06:38` attempt 47 on 18_displacement -> lead
 - `06:40` attempt 48 on 18_displacement -> lead
 - `07:11` attempt 1 on 25_invisible_text -> kept (2/5 moved)
 - `07:12` attempt 2 on 25_invisible_text -> kept (5/5 moved)
@@ -91,6 +89,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:00` agent deployed: 18_displacement / B - why do RANKING-TXT.csv and the report disagree by 50 documents
 - `15:36` attempt 56 on 18_displacement -> lead
 - `16:46` attempt 57 on 18_displacement -> lead
+- `18:27` agent deployed: 60edge / 60_text_column_right_edge - A - is the right edge the engine's or the face's
+- `18:27` agent deployed: pc23 / 00_page_count - B - what is on the extra page of the 23 refusals
 
 ## Where the rest of the state lives
 
