@@ -1,131 +1,131 @@
 {
- "baseline_started": 0,
- "classifier_started": 0,
- "fixer": {
-  "agents": [
-   {
-    "id": "A1",
-    "name": "25_invisible_text mechanism"
-   },
-   {
-    "id": "A2",
-    "name": "row-height law"
-   }
-  ]
- },
- "fixer_doing": "writing the report",
- "fixer_doing_since": 1795519205.1330016,
- "fixer_engine_at_claim": "b7699196",
- "fixer_last_beat": 1795519205.1330023,
- "fixer_started": 1795516227.0,
- "history": [
-  {
-   "at": "2026-11-12 09:46",
-   "phase": "measure",
-   "round": 1
+  "baseline_started": 0,
+  "classifier_started": 0,
+  "fixer": {
+    "agents": [
+      {
+        "id": "A1",
+        "name": "25_invisible_text mechanism"
+      },
+      {
+        "id": "A2",
+        "name": "row-height law"
+      }
+    ]
   },
-  {
-   "at": "2026-11-12 09:56",
-   "phase": "classify",
-   "round": 1
-  },
-  {
-   "at": "13 Nov 10:26",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "2026-11-13 10:27",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "13 Nov 10:28",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "2026-11-13 11:11",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "2026-11-13 11:24",
-   "phase": "classify",
-   "round": 1
-  },
-  {
-   "at": "15 Nov 18:43",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "15 Nov 18:43",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "2026-11-16 06:42",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "2026-11-16 07:47",
-   "phase": "classify",
-   "round": 1
-  },
-  {
-   "at": "17 Nov 21:30",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "2026-11-17 23:41",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "2026-11-17 23:44",
-   "phase": "classify",
-   "round": 1
-  },
-  {
-   "at": "22 Nov 18:11",
-   "phase": "measure",
-   "round": 1,
-   "why": "docx table stamped 6c6cf642e13b7ed2, live engine 226f7f2df3013ad7 - re-measure before fixing (watchdog 18:11)"
-  },
-  {
-   "at": "2026-11-22 20:03",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "22 Nov 20:11",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "2026-11-22 21:52",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "2026-11-22 22:52",
-   "phase": "classify",
-   "round": 1
-  }
- ],
- "phase": "fix",
- "round": 1,
- "rounds_total": 3,
- "session_start": "18:00",
- "session_start_ts": 1795005004.0,
- "started": 1794327166
+  "fixer_doing": "writing the report",
+  "fixer_doing_since": 1795519205.1330016,
+  "fixer_engine_at_claim": "b7699196",
+  "fixer_last_beat": 1795519205.1330023,
+  "fixer_started": 1795523031.2858806,
+  "history": [
+    {
+      "at": "2026-11-12 09:46",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "2026-11-12 09:56",
+      "phase": "classify",
+      "round": 1
+    },
+    {
+      "at": "13 Nov 10:26",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-13 10:27",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "13 Nov 10:28",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-13 11:11",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "2026-11-13 11:24",
+      "phase": "classify",
+      "round": 1
+    },
+    {
+      "at": "15 Nov 18:43",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "15 Nov 18:43",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-16 06:42",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "2026-11-16 07:47",
+      "phase": "classify",
+      "round": 1
+    },
+    {
+      "at": "17 Nov 21:30",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-17 23:41",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "2026-11-17 23:44",
+      "phase": "classify",
+      "round": 1
+    },
+    {
+      "at": "22 Nov 18:11",
+      "phase": "measure",
+      "round": 1,
+      "why": "docx table stamped 6c6cf642e13b7ed2, live engine 226f7f2df3013ad7 - re-measure before fixing (watchdog 18:11)"
+    },
+    {
+      "at": "2026-11-22 20:03",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "22 Nov 20:11",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-22 21:52",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "2026-11-22 22:52",
+      "phase": "classify",
+      "round": 1
+    }
+  ],
+  "phase": "fix",
+  "round": 1,
+  "rounds_total": 3,
+  "session_start": "18:00",
+  "session_start_ts": 1795005004.0,
+  "started": 1794327166
 }
