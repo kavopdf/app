@@ -652,3 +652,56 @@ The other two sandboxes hit a wall: every Drive write path needs an `s3key` the 
 stage. This one did not need to write - **the Google Docs already existed**, because the gverify cron has
 been uploading them for weeks. That is worth remembering: the measurement was available all along, in the
 place the pipeline had already put it.
+
+## 45_char_accuracy — the same text-box rasterisation as 04, and the two classes are one fault
+
+**`45_char_accuracy` compares the source PDF's text layer against the text layer of the PDF export of the
+Google Doc - not against the .docx.** And Google rasterises every anchored DrawingML text box on import:
+text inside `<wps:txbx><w:txbxContent>` is drawn as one small image per line and never enters the exported
+PDF's text layer.
+
+**The .docx is not at fault.** On all 34 documents that could be re-converted, the .docx carries **every**
+source character with none substituted: source-minus-docx is **0 characters**, and `S~D = 100` on 33 of 34.
+The committed `RANKING.csv` independently gives `chars_missing = 0 / text_recall 100.0` for all 37. And
+**LibreOffice's render of the same .docx passes this same check on 36 of the 37.**
+
+**Two exact equalities make it proof rather than correlation:**
+
+1. The render's glyph multiset equals the .docx's **non-text-box** text, with only Google's own U+200B added.
+2. The set of characters missing from the render is **character-for-character the set inside text boxes** -
+   exact on 30 documents, 2,505 of 2,506 on a 31st, and a correlation of **0.996** between box share and
+   deficit across 33.
+
+**Character classes, 9,787 characters missing from the render across 33 documents:**
+
+| class | characters | documents |
+|---|---:|---:|
+| text inside an anchored text box - rasterised, visible as images, absent from the text layer | 9,702 | 31 |
+| underscore runs inside a 2-cell table - dropped from the render entirely | 84 | 1 |
+| residual: one hyphen | 1 | 1 |
+| extra direction: annotation text the .docx adds, plus U+200B | 225 | 23 |
+
+**Ligature, soft hyphen, combining mark, bullet or symbol-font code, small-caps synthesis, U+FFFD,
+hyphenation difference, genuinely wrong character: zero of each, measured.** Source-minus-docx is 0 across
+all 34, so nothing was normalised or substituted before Google ever saw the file.
+
+**Coverage: 34 of 37 by the text-box mechanism, 35 of 37 outright.**
+
+**And the class is not what its name says.** `45_char_accuracy` is a whitespace-stripped NFKC **multiset**
+ratio with a 3 % tolerance, order-blind - so it fires on MISSING characters too, which is why it co-fails
+with `04_chars_missing` on **36 of these 37**. It is not a "wrong characters" check at all.
+
+### The consolidation this forces
+
+**`04_chars_missing` (54 of 65) and `45_char_accuracy` (34 of 37) are the same fault.** Both compare against
+Google's exported text layer; both are defeated by the engine routing body text into an anchored text box;
+both pass in LibreOffice on the identical file.
+
+So the **120 pt gap cap** at `DocxWriter` - which flips a page into `ctx.positioned` and anchors everything
+after it - is not a `04` finding. **It is the single largest engine defect found today: 88 document-failures
+across two classes, from one threshold in one place.**
+
+### A separate engine defect found in passing
+
+**`table-with-rotated-header` has no HEAD .docx because `PdfToWord` throws on that source.** That is a crash
+on a corpus document, not a check fault, and it needs its own investigation.
