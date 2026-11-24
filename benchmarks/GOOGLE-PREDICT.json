@@ -3,1043 +3,1061 @@
 "01_stamp_rotated_15deg_upright": {
 "w:drawing": 18,
 "wp:anchor": 18,
-"w:before-page-top": 70
+"w:before-any": 70
 },
 "02_stamp_rotated_15deg_upleft": {
 "w:drawing": 22,
 "wp:anchor": 22,
-"w:before-page-top": 83
+"w:before-any": 83
 },
 "03_stamp_vertical_90deg": {
 "w:drawing": 22,
 "wp:anchor": 22,
-"w:before-page-top": 121
+"w:before-any": 121
 },
 "041122-Account_Opening_Form": {
 "w:drawing": 2653,
 "wp:anchor": 2653,
 "w:spacing-letter": 2,
-"w:before-page-top": 1451
+"w:before-any": 1451,
+"w:before-after-pagebreak": 7
 },
 "04_stamp_180deg_upside_down": {
 "w:drawing": 16,
 "wp:anchor": 16,
-"w:before-page-top": 47
+"w:before-any": 47
 },
 "05_round_company_seal_curved_text": {
 "w:drawing": 70,
 "wp:anchor": 70,
-"w:before-page-top": 143
+"w:before-any": 143
 },
 "06_rect_paid_stamp_red_transparent": {
 "w:drawing": 19,
 "wp:anchor": 19,
-"w:before-page-top": 103
+"w:before-any": 103
 },
 "07_stamp_over_table": {
 "w:drawing": 18,
 "wp:anchor": 18,
-"w:before-page-top": 81
+"w:before-any": 81
 },
 "08_two_overlapping_stamps": {
 "w:drawing": 15,
 "wp:anchor": 15,
-"w:before-page-top": 30
+"w:before-any": 30
 },
 "09_stamp_font_not_embedded": {
 "w:drawing": 4,
 "wp:anchor": 4,
-"w:before-page-top": 21
+"w:before-any": 21
 },
 "10_stamp_as_image": {
 "w:drawing": 15,
 "wp:anchor": 15,
-"w:before-page-top": 51
+"w:before-any": 51
 },
 "11_stamp_with_signature_image": {
 "w:drawing": 4,
 "wp:anchor": 4,
-"w:before-page-top": 24
+"w:before-any": 24
 },
 "12_stamp_across_page_break": {
 "w:drawing": 10,
 "wp:anchor": 10,
-"w:before-page-top": 43
+"w:before-any": 43,
+"w:before-after-pagebreak": 1
 },
 "13_stamp_non_english": {
 "w:drawing": 12,
 "wp:anchor": 12,
-"w:before-page-top": 27
+"w:before-any": 27
 },
 "14_stamp_chars_positioned_td": {
 "w:drawing": 16,
 "wp:anchor": 16,
-"w:before-page-top": 52
+"w:before-any": 52
 },
 "15_stamp_on_scanned_page": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 4
+"w:before-any": 4
 },
 "16_right_aligned_amounts_txtpos": {
 "w:drawing": 17,
 "wp:anchor": 17,
-"w:before-page-top": 74
+"w:before-any": 74
 },
 "17_three_column_widths_txtpos": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 19
+"w:before-any": 19
 },
 "18_centred_heading_left_body_txtpos": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 22
+"w:before-any": 22
 },
 "19_hanging_indent_txtpos": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 23
+"w:before-any": 23
 },
 "20_numbered_list_separate_column_txtpos": {
 "w:drawing": 9,
 "wp:anchor": 9,
-"w:before-page-top": 39
+"w:before-any": 39
 },
 "21_form_labels_x60_values_x300_txtpos": {
 "w:drawing": 21,
 "wp:anchor": 21,
-"w:before-page-top": 29
+"w:before-any": 29
 },
 "22_invoice_four_columns_txtpos": {
 "w:drawing": 4,
 "wp:anchor": 4,
-"w:before-page-top": 70
+"w:before-any": 70
 },
 "23_timetable_grid_txtpos": {
 "w:drawing": 11,
 "wp:anchor": 11,
-"w:before-page-top": 65
+"w:before-any": 65
 },
 "24_address_block_indents_txtpos": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 27
+"w:before-any": 27
 },
 "25_signature_block_underscores_txtpos": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 39
+"w:before-any": 39
 },
 "26_footnote_marker_bottom_note_txtpos": {
 "w:drawing": 3,
 "wp:anchor": 3,
-"w:before-page-top": 22
+"w:before-any": 22
 },
 "27_two_column_left_short_txtpos": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 39
+"w:before-any": 39
 },
 "28_value_overflows_cell_txtpos": {
 "w:drawing": 13,
 "wp:anchor": 13,
-"w:before-page-top": 26
+"w:before-any": 26
 },
 "29_dot_leaders_txtpos": {
 "w:drawing": 3,
 "wp:anchor": 3,
-"w:before-page-top": 30
+"w:before-any": 30
 },
 "300_prescription_rx": {
 "w:drawing": 43,
 "wp:anchor": 43,
-"w:before-page-top": 56
+"w:before-any": 56
 },
 "301_lab_report_panel": {
 "w:drawing": 108,
 "wp:anchor": 108,
-"w:before-page-top": 85
+"w:before-any": 85
 },
 "302_radiology_report": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 38
+"w:before-any": 38
 },
 "303_discharge_summary": {
 "w:drawing": 23,
 "wp:anchor": 23,
-"w:before-page-top": 43
+"w:before-any": 43
 },
 "304_package_insert_small_print": {
 "w:spacing-letter": 9,
-"w:before-page-top": 34
+"w:before-any": 34
 },
 "305_vaccination_certificate": {
 "w:drawing": 276,
 "wp:anchor": 276,
-"w:before-page-top": 130
+"w:before-any": 130
 },
 "306_clinical_protocol_synopsis": {
 "w:drawing": 95,
 "wp:anchor": 95,
-"w:before-page-top": 101
+"w:before-any": 101
 },
 "30_mixed_font_sizes_one_baseline_txtpos": {
 "w:drawing": 12,
 "wp:anchor": 12,
-"w:before-page-top": 30
+"w:before-any": 30
 },
 "310_court_judgment": {
 "w:spacing-letter": 3,
-"w:before-page-top": 28
+"w:before-any": 28
 },
 "311_fir_police_form": {
 "w:drawing": 65,
 "wp:anchor": 65,
-"w:before-page-top": 78
+"w:before-any": 78
 },
 "312_affidavit_stamp_paper": {
 "w:drawing": 32,
 "wp:anchor": 32,
-"w:before-page-top": 80
+"w:before-any": 80
 },
 "313_power_of_attorney": {
 "w:spacing-letter": 7,
-"w:before-page-top": 30
+"w:before-any": 30
 },
 "314_tender_rfp_boq": {
 "w:drawing": 79,
 "wp:anchor": 79,
-"w:before-page-top": 82
+"w:before-any": 82
 },
 "315_gazette_notification": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 34
+"w:before-any": 34
 },
 "316_contract_with_schedules": {
 "w:drawing": 1,
 "wp:anchor": 1,
 "w:spacing-letter": 4,
-"w:before-page-top": 43
+"w:before-any": 43
 },
 "317_rti_response": {
 "w:spacing-letter": 3,
-"w:before-page-top": 26
+"w:before-any": 26
 },
 "318_court_summons_form": {
 "w:drawing": 51,
 "wp:anchor": 51,
-"w:before-page-top": 89
+"w:before-any": 89
 },
 "31_times_body_arial_headings": {
 "w:drawing": 2,
 "wp:anchor": 2,
 "w:spacing-letter": 2,
-"w:before-page-top": 24
+"w:before-any": 24
 },
 "320_balance_sheet_statutory": {
 "w:drawing": 80,
 "wp:anchor": 80,
-"w:before-page-top": 88
+"w:before-any": 88
 },
 "321_auditors_report": {
 "w:spacing-letter": 10,
-"w:before-page-top": 34
+"w:before-any": 34
 },
 "323_credit_card_statement": {
 "w:drawing": 111,
 "wp:anchor": 111,
-"w:before-page-top": 93
+"w:before-any": 93
 },
 "324_loan_amortisation_schedule": {
 "w:drawing": 1483,
 "wp:anchor": 1483,
-"w:before-page-top": 1508
+"w:before-any": 1508,
+"w:before-after-pagebreak": 6
 },
 "325_demat_holdings_statement": {
 "w:drawing": 74,
 "wp:anchor": 74,
-"w:before-page-top": 81
+"w:before-any": 81
 },
 "326_itr_computation": {
 "w:drawing": 88,
 "wp:anchor": 88,
-"w:before-page-top": 70
+"w:before-any": 70
 },
 "32_serif_nondefault_body": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 19
+"w:before-any": 19
 },
 "330_cad_drawing_sheet": {
 "w:drawing": 115,
 "wp:anchor": 115,
-"w:before-page-top": 51
+"w:before-any": 51
 },
 "331_pid_diagram": {
 "w:drawing": 59,
 "wp:anchor": 59,
-"w:before-page-top": 51
+"w:before-any": 51
 },
 "332_bom_on_drawing": {
 "w:drawing": 58,
 "wp:anchor": 58,
-"w:before-page-top": 53
+"w:before-any": 53
 },
 "333_datasheet_spec_tables": {
 "w:drawing": 132,
 "wp:anchor": 132,
-"w:before-page-top": 140
+"w:before-any": 140
 },
 "334_patent_document": {
 "w:drawing": 10,
 "wp:anchor": 10,
-"w:before-page-top": 28
+"w:before-any": 28
 },
 "335_msds_safety_data_sheet": {
 "w:drawing": 21,
 "wp:anchor": 21,
-"w:before-page-top": 45
+"w:before-any": 45
 },
 "33_sans_nondefault_body": {
 "w:drawing": 11,
 "wp:anchor": 11,
-"w:before-page-top": 34
+"w:before-any": 34
 },
 "340_bill_of_lading": {
 "w:drawing": 56,
 "wp:anchor": 56,
-"w:before-page-top": 36
+"w:before-any": 36
 },
 "341_shipping_manifest": {
 "w:drawing": 301,
 "wp:anchor": 301,
-"w:before-page-top": 305
+"w:before-any": 305
 },
 "342_packing_list": {
 "w:drawing": 37,
 "wp:anchor": 37,
-"w:before-page-top": 52
+"w:before-any": 52
 },
 "343_air_waybill": {
 "w:drawing": 46,
 "wp:anchor": 46,
-"w:before-page-top": 27
+"w:before-any": 27
 },
 "344_customs_declaration": {
 "w:drawing": 58,
 "wp:anchor": 58,
-"w:before-page-top": 67
+"w:before-any": 67
 },
 "34_monospace_document": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 41
+"w:before-any": 41
 },
 "350_question_paper": {
 "w:drawing": 1,
 "wp:anchor": 1,
-"w:before-page-top": 70
+"w:before-any": 70
 },
 "351_omr_answer_sheet": {
 "w:drawing": 381,
 "wp:anchor": 381,
-"w:before-page-top": 65
+"w:before-any": 65
 },
 "352_certificate_ornate_border": {
 "w:drawing": 46,
 "wp:anchor": 46,
-"w:before-page-top": 69
+"w:before-any": 69
 },
 "353_admit_card": {
 "w:drawing": 70,
 "wp:anchor": 70,
-"w:before-page-top": 39
+"w:before-any": 39
 },
 "35_four_typefaces_one_page": {
 "w:drawing": 12,
 "wp:anchor": 12,
-"w:before-page-top": 51
+"w:before-any": 51
 },
 "360_restaurant_menu": {
 "w:drawing": 45,
 "wp:anchor": 45,
-"w:before-page-top": 78
+"w:before-any": 78
 },
 "361_product_catalogue_grid": {
 "w:drawing": 91,
 "wp:anchor": 91,
-"w:before-page-top": 40
+"w:before-any": 40
 },
 "362_price_list_dense": {
-"w:before-page-top": 264
+"w:before-any": 264
 },
 "363_warranty_card": {
 "w:drawing": 15,
 "wp:anchor": 15,
-"w:before-page-top": 34
+"w:before-any": 34
 },
 "364_event_ticket": {
 "w:drawing": 44,
 "wp:anchor": 44,
-"w:before-page-top": 23
+"w:before-any": 23
 },
 "365_recipe_card": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 43
+"w:before-any": 43
 },
 "36_embedded_subset_font": {
 "w:drawing": 11,
 "wp:anchor": 11,
-"w:before-page-top": 28
+"w:before-any": 28
 },
 "370_offer_letter": {
 "w:drawing": 1,
 "wp:anchor": 1,
 "w:spacing-letter": 1,
-"w:before-page-top": 38
+"w:before-any": 38
 },
 "371_experience_certificate": {
 "w:drawing": 32,
 "wp:anchor": 32,
-"w:before-page-top": 73
+"w:before-any": 73
 },
 "372_timesheet_grid": {
 "w:drawing": 64,
 "wp:anchor": 64,
-"w:before-page-top": 69
+"w:before-any": 69
 },
 "373_leave_application_form": {
 "w:drawing": 20,
 "wp:anchor": 20,
-"w:before-page-top": 36
+"w:before-any": 36
 },
 "374_org_chart": {
 "w:drawing": 24,
 "wp:anchor": 24,
-"w:before-page-top": 20
+"w:before-any": 20
 },
 "375_attendance_register": {
 "w:drawing": 456,
 "wp:anchor": 456,
-"w:before-page-top": 460
+"w:before-any": 460
 },
 "37_font_not_embedded_substitution": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 18
+"w:before-any": 18
 },
 "380_runbook_terminal_output": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 20
+"w:before-any": 20
 },
 "381_incident_report_timeline": {
 "w:drawing": 49,
 "wp:anchor": 49,
-"w:before-page-top": 63
+"w:before-any": 63
 },
 "382_architecture_diagram": {
 "w:drawing": 34,
 "wp:anchor": 34,
-"w:before-page-top": 23
+"w:before-any": 23
 },
 "383_api_docs_page": {
 "w:drawing": 42,
 "wp:anchor": 42,
-"w:before-page-top": 63
+"w:before-any": 63
 },
 "38_faux_bold_italic_synthesised": {
 "w:drawing": 10,
 "wp:anchor": 10,
-"w:before-page-top": 43
+"w:before-any": 43
 },
 "390_wide_data_appendix": {
 "w:drawing": 400,
 "wp:anchor": 400,
-"w:before-page-top": 404
+"w:before-any": 404
 },
 "391_survey_questionnaire_grid": {
 "w:drawing": 81,
 "wp:anchor": 81,
-"w:before-page-top": 13
+"w:before-any": 13
 },
 "392_statistical_console_output": {
-"w:before-page-top": 21
+"w:before-any": 21
 },
 "393_spectrum_peak_table": {
 "w:drawing": 21,
 "wp:anchor": 21,
-"w:before-page-top": 26
+"w:before-any": 26
 },
 "394_map_with_legend": {
 "w:drawing": 25,
 "wp:anchor": 25,
-"w:before-page-top": 15
+"w:before-any": 15
 },
 "39_small_caps_letter_spacing": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 24
+"w:before-any": 24
 },
 "400_comic_page_speech_bubbles": {
 "w:drawing": 77,
 "wp:anchor": 77,
-"w:before-page-top": 51
+"w:before-any": 51
 },
 "401_trifold_brochure": {
 "w:drawing": 26,
 "wp:anchor": 26,
-"w:before-page-top": 32
+"w:before-any": 32
 },
 "402_calendar_month_grid": {
 "w:drawing": 48,
 "wp:anchor": 48,
-"w:before-page-top": 52
+"w:before-any": 52
 },
 "403_crossword_puzzle": {
 "w:drawing": 169,
 "wp:anchor": 169,
-"w:before-page-top": 28
+"w:before-any": 28
 },
 "404_sudoku_grid": {
 "w:drawing": 81,
 "wp:anchor": 81,
-"w:before-page-top": 85
+"w:before-any": 85
 },
 "405_sheet_music_lyrics": {
 "w:drawing": 144,
 "wp:anchor": 144,
-"w:before-page-top": 13
+"w:before-any": 13
 },
 "406_passport_mrz_page": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 32
+"w:before-any": 32
 },
 "407_id_card_front_back": {
 "w:drawing": 41,
 "wp:anchor": 41,
-"w:before-page-top": 16
+"w:before-any": 16
 },
 "410_form_xobject_reused": {
-"w:before-page-top": 7
+"w:before-any": 7
 },
 "411_nested_xobject_transforms": {
 "w:drawing": 1,
 "wp:anchor": 1,
-"w:before-page-top": 4
+"w:before-any": 4
 },
 "412_page_labels_roman": {
-"w:before-page-top": 19
+"w:before-any": 19,
+"w:before-after-pagebreak": 4
 },
 "413_tagged_pdf_actualtext": {
-"w:before-page-top": 2
+"w:before-any": 2
 },
 "414_transparency_softmask": {
-"w:before-page-top": 2
+"w:before-any": 2
 },
 "415_inline_images": {
 "w:drawing": 1,
 "wp:anchor": 1,
-"w:before-page-top": 3
+"w:before-any": 3
 },
 "416_many_tiny_pages": {
-"w:before-page-top": 1199
+"w:before-any": 1199,
+"w:before-after-pagebreak": 299
 },
 "417_rotate180_and_mirrored": {
-"w:before-page-top": 9
+"w:before-any": 9,
+"w:before-after-pagebreak": 1
 },
 "41_coloured_headings_white_bg": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 38
+"w:before-any": 38
 },
 "42_table_coloured_header_alternating_rows": {
 "w:drawing": 16,
 "wp:anchor": 16,
-"w:before-page-top": 60
+"w:before-any": 60
 },
 "43_red_stamp_over_black_text": {
 "w:drawing": 3,
 "wp:anchor": 3,
-"w:before-page-top": 24
+"w:before-any": 24
 },
 "44_coloured_underlined_hyperlinks": {
 "w:drawing": 7,
 "wp:anchor": 7,
-"w:before-page-top": 19
+"w:before-any": 19
 },
 "45_coloured_callout_box": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 18
+"w:before-any": 18
 },
 "46_chart_coloured_labels_body_text": {
 "w:drawing": 26,
 "wp:anchor": 26,
-"w:before-page-top": 32
+"w:before-any": 32
 },
 "47_grey_body_black_headings": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 21
+"w:before-any": 21
 },
 "48_form_coloured_border_coloured_values": {
 "w:drawing": 14,
 "wp:anchor": 14,
-"w:before-page-top": 19
+"w:before-any": 19
 },
 "49_coloured_background_block_paragraph": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 19
+"w:before-any": 19
 },
 "50_invoice_coloured_total_row": {
 "w:drawing": 13,
 "wp:anchor": 13,
-"w:before-page-top": 53
+"w:before-any": 53
 },
 "51_two_cm_margins": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 19
+"w:before-any": 19
 },
 "52_one_cm_margin_wide_body": {
 "w:drawing": 10,
 "wp:anchor": 10,
-"w:before-page-top": 37
+"w:before-any": 37
 },
 "53_single_space_body_15_headings": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 22
+"w:before-any": 22
 },
 "54_two_column_body_full_width_header_footer": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 32
+"w:before-any": 32
 },
 "55_sidebar_box_beside_body": {
 "w:drawing": 6,
 "wp:anchor": 6,
-"w:before-page-top": 44
+"w:before-any": 44
 },
 "56_table_indented_from_margin": {
 "w:drawing": 14,
 "wp:anchor": 14,
-"w:before-page-top": 49
+"w:before-any": 49
 },
 "57_centred_title_page_left_body_pages": {
 "w:drawing": 3,
 "wp:anchor": 3,
-"w:before-page-top": 29
+"w:before-any": 29,
+"w:before-after-pagebreak": 1
 },
 "58_header_rule_footer_rule": {
 "w:drawing": 6,
 "wp:anchor": 6,
-"w:before-page-top": 18
+"w:before-any": 18,
+"w:before-after-pagebreak": 1
 },
 "59_landscape_mixed_portrait": {
 "w:drawing": 13,
 "wp:anchor": 13,
-"w:before-page-top": 54
+"w:before-any": 54
 },
 "600_reviewed_invoice_with_annotations": {
 "w:drawing": 13,
 "wp:anchor": 13,
-"w:before-page-top": 64
+"w:before-any": 64
 },
 "601_fillable_admission_form": {
 "w:drawing": 13,
 "wp:anchor": 13,
-"w:before-page-top": 19
+"w:before-any": 19
 },
 "602_bookmarked_annual_report": {
-"w:before-page-top": 27
+"w:before-any": 27,
+"w:before-after-pagebreak": 2
 },
 "60_page_border": {
 "w:drawing": 62,
 "wp:anchor": 62,
-"w:before-page-top": 109
+"w:before-any": 109
 },
 "61_two_col_abstract_spanning": {
 "w:drawing": 6,
 "wp:anchor": 6,
-"w:before-page-top": 42
+"w:before-any": 42
 },
 "62_two_col_newsletter_pull_quote": {
 "w:drawing": 8,
 "wp:anchor": 8,
-"w:before-page-top": 37
+"w:before-any": 37
 },
 "63_three_column_brochure": {
 "w:drawing": 7,
 "wp:anchor": 7,
-"w:before-page-top": 43
+"w:before-any": 43
 },
 "64_newspaper_uneven_columns_ad_boxes": {
 "w:drawing": 3,
 "wp:anchor": 3,
-"w:before-page-top": 77
+"w:before-any": 77
 },
 "65_two_col_full_width_figure_caption": {
 "w:drawing": 74,
 "wp:anchor": 74,
-"w:before-page-top": 71
+"w:before-any": 71
 },
 "66_two_col_footnotes_bottom": {
 "w:drawing": 12,
 "wp:anchor": 12,
-"w:before-page-top": 38
+"w:before-any": 38
 },
 "67_two_col_with_sidebar": {
 "w:drawing": 6,
 "wp:anchor": 6,
-"w:before-page-top": 51
+"w:before-any": 51
 },
 "68_journal_wide_table_spanning": {
 "w:drawing": 14,
 "wp:anchor": 14,
-"w:before-page-top": 66
+"w:before-any": 66
 },
 "69_two_col_legal_numbered_clauses": {
 "w:drawing": 39,
 "wp:anchor": 39,
-"w:before-page-top": 84
+"w:before-any": 84
 },
 "70_magazine_drop_cap_photo_caption": {
 "w:drawing": 6,
 "wp:anchor": 6,
-"w:before-page-top": 27
+"w:before-any": 27
 },
 "71_invoice_space_aligned_no_rules": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 68
+"w:before-any": 68
 },
 "72_bank_statement_no_rules_right_amounts": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 99
+"w:before-any": 99
 },
 "73_marksheet_subject_marks_grade": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 63
+"w:before-any": 63
 },
 "74_balance_sheet_indented_subitems": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 48
+"w:before-any": 48
 },
 "75_merged_header_cell_three_columns": {
 "w:drawing": 10,
 "wp:anchor": 10,
-"w:before-page-top": 52
+"w:before-any": 52
 },
 "76_devanagari_table": {
-"w:before-page-top": 46
+"w:before-any": 46
 },
 "77_arabic_rtl_document": {
 "w:drawing": 4,
 "wp:anchor": 4,
-"w:before-page-top": 43
+"w:before-any": 43
 },
 "78_mixed_english_devanagari_line": {
-"w:before-page-top": 31
+"w:before-any": 31
 },
 "79_inr_indian_digit_grouping_table": {
 "w:drawing": 10,
 "wp:anchor": 10,
-"w:before-page-top": 51
+"w:before-any": 51
 },
 "80_gstin_pan_cin_ifsc_table": {
 "w:drawing": 10,
 "wp:anchor": 10,
-"w:before-page-top": 96
+"w:before-any": 96
 },
 "Account_Opening_Form_Fillable_filled": {
 "w:drawing": 2653,
 "wp:anchor": 2653,
 "w:spacing-letter": 2,
-"w:before-page-top": 1451
+"w:before-any": 1451,
+"w:before-after-pagebreak": 7
 },
 "academic-paper-ieee-2col-abstract": {
 "w:drawing": 52,
 "wp:anchor": 52,
 "w:spacing-letter": 50,
-"w:before-page-top": 189
+"w:before-any": 189,
+"w:before-after-pagebreak": 1
 },
 "admission-form-labels-left-boxes-right": {
 "w:drawing": 26,
 "wp:anchor": 26,
-"w:before-page-top": 31
+"w:before-any": 31
 },
 "admit-card": {
 "w:drawing": 14,
 "wp:anchor": 14,
-"w:before-page-top": 85
+"w:before-any": 85
 },
 "annual-review-2col-uneven-columns": {
 "w:drawing": 3,
 "wp:anchor": 3,
 "w:spacing-letter": 20,
-"w:before-page-top": 46
+"w:before-any": 46
 },
 "balance-sheet-and-profit-loss": {
 "w:drawing": 4,
 "wp:anchor": 4,
-"w:before-page-top": 208
+"w:before-any": 208,
+"w:before-after-pagebreak": 1
 },
 "balance-sheet-two-columns-of-figures": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 107
+"w:before-any": 107
 },
 "bank-statement-horizontal-rules-only": {
 "w:drawing": 39,
 "wp:anchor": 39,
-"w:before-page-top": 57
+"w:before-any": 57
 },
 "boq-horizontal-rules-only": {
 "w:drawing": 33,
 "wp:anchor": 33,
-"w:before-page-top": 34
+"w:before-any": 34
 },
 "boq-tender-bill-of-quantities": {
 "w:drawing": 3,
 "wp:anchor": 3,
-"w:before-page-top": 167
+"w:before-any": 167
 },
 "brochure-3col-with-sidebar-box": {
 "w:drawing": 16,
 "wp:anchor": 16,
 "w:spacing-letter": 29,
-"w:before-page-top": 84
+"w:before-any": 84
 },
 "bus-timetable-station-left-times-right": {
 "w:drawing": 36,
 "wp:anchor": 36,
-"w:before-page-top": 173
+"w:before-any": 173
 },
 "delivery-challan": {
 "w:drawing": 11,
 "wp:anchor": 11,
-"w:before-page-top": 82
+"w:before-any": 82
 },
 "electricity-bill": {
 "w:drawing": 15,
 "wp:anchor": 15,
-"w:before-page-top": 131
+"w:before-any": 131
 },
 "eway-bill": {
 "w:drawing": 19,
 "wp:anchor": 19,
-"w:before-page-top": 129
+"w:before-any": 129
 },
 "form16-part-b": {
 "w:drawing": 6,
 "wp:anchor": 6,
-"w:before-page-top": 153
+"w:before-any": 153,
+"w:before-after-pagebreak": 1
 },
 "gst-invoice-3line-items": {
 "w:drawing": 9,
 "wp:anchor": 9,
-"w:before-page-top": 107
+"w:before-any": 107
 },
 "gst-invoice-horizontal-rules-only": {
 "w:drawing": 21,
 "wp:anchor": 21,
-"w:before-page-top": 38
+"w:before-any": 38
 },
 "gst-invoice-multipage-item-table": {
 "w:drawing": 18,
 "wp:anchor": 18,
-"w:before-page-top": 384
+"w:before-any": 384,
+"w:before-after-pagebreak": 3
 },
 "gst-invoice-with-qr-code": {
 "w:drawing": 20,
 "wp:anchor": 20,
-"w:before-page-top": 93
+"w:before-any": 93
 },
 "insurance-policy-schedule": {
 "w:drawing": 16,
 "wp:anchor": 16,
-"w:before-page-top": 110
+"w:before-any": 110
 },
 "invoice-line-items-qty-rate-amount": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 88
+"w:before-any": 88
 },
 "itr-computation-with-slab-table": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 143
+"w:before-any": 143
 },
 "journal-2col-with-footnotes": {
 "w:drawing": 2,
 "wp:anchor": 2,
 "w:spacing-letter": 12,
-"w:before-page-top": 60
+"w:before-any": 60
 },
 "landscape-page-inside-portrait-document": {
 "w:drawing": 6,
 "wp:anchor": 6,
 "w:spacing-letter": 1,
-"w:before-page-top": 122
+"w:before-any": 122
 },
 "magazine-2col-pullquote-spanning": {
 "w:drawing": 42,
 "wp:anchor": 42,
 "w:spacing-letter": 6,
-"w:before-page-top": 81
+"w:before-any": 81
 },
 "marksheet-subject-left-marks-right": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 95
+"w:before-any": 95
 },
 "marksheet-university-consolidated": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 166
+"w:before-any": 166
 },
 "mobile-bill": {
 "w:drawing": 15,
 "wp:anchor": 15,
-"w:before-page-top": 112
+"w:before-any": 112
 },
 "mutual-fund-statement": {
 "w:drawing": 19,
 "wp:anchor": 19,
-"w:before-page-top": 244
+"w:before-any": 244,
+"w:before-after-pagebreak": 1
 },
 "newsletter-3col-header-footer": {
 "w:drawing": 10,
 "wp:anchor": 10,
 "w:spacing-letter": 70,
-"w:before-page-top": 124
+"w:before-any": 124
 },
 "newspaper-2col-fullwidth-headline": {
 "w:drawing": 6,
 "wp:anchor": 6,
 "w:spacing-letter": 20,
-"w:before-page-top": 63
+"w:before-any": 63
 },
 "one-page-rotated-180-degrees": {
 "w:drawing": 25,
 "wp:anchor": 25,
-"w:before-page-top": 92
+"w:before-any": 92,
+"w:before-after-pagebreak": 1
 },
 "payslip-label-left-amount-right": {
 "w:drawing": 9,
 "wp:anchor": 9,
-"w:before-page-top": 95
+"w:before-any": 95
 },
 "policy-2col-spanning-section-heading": {
 "w:drawing": 65,
 "wp:anchor": 65,
 "w:spacing-letter": 22,
-"w:before-page-top": 130
+"w:before-any": 130
 },
 "price-list-2col-dense-right-aligned": {
 "w:drawing": 85,
 "wp:anchor": 85,
-"w:before-page-top": 250
+"w:before-any": 250
 },
 "price-list-right-aligned-amounts": {
 "w:drawing": 42,
 "wp:anchor": 42,
-"w:before-page-top": 159
+"w:before-any": 159
 },
 "product-catalogue-code-left-price-right": {
 "w:drawing": 21,
 "wp:anchor": 21,
-"w:before-page-top": 106
+"w:before-any": 106
 },
 "property-tax-receipt": {
 "w:drawing": 10,
 "wp:anchor": 10,
-"w:before-page-top": 117
+"w:before-any": 117
 },
 "purchase-order": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 126
+"w:before-any": 126
 },
 "question-paper-marks-right-margin": {
 "w:drawing": 4,
 "wp:anchor": 4,
-"w:before-page-top": 41
+"w:before-any": 41
 },
 "report-2col-table-spanning-both-columns": {
 "w:drawing": 4,
 "wp:anchor": 4,
 "w:spacing-letter": 12,
-"w:before-page-top": 91
+"w:before-any": 91
 },
 "salary-slip-corporate": {
 "w:drawing": 13,
 "wp:anchor": 13,
-"w:before-page-top": 136
+"w:before-any": 136
 },
 "salary-slip-factory-wages": {
 "w:drawing": 5,
 "wp:anchor": 5,
-"w:before-page-top": 106
+"w:before-any": 106
 },
 "table-across-page-break-repeated-header": {
 "w:drawing": 6,
 "wp:anchor": 6,
-"w:before-page-top": 467
+"w:before-any": 467,
+"w:before-after-pagebreak": 2
 },
 "table-inside-two-column-page": {
 "w:drawing": 4,
 "wp:anchor": 4,
 "w:spacing-letter": 13,
-"w:before-page-top": 67
+"w:before-any": 67
 },
 "table-of-contents-dot-leaders": {
 "w:drawing": 4,
 "wp:anchor": 4,
-"w:before-page-top": 58
+"w:before-any": 58
 },
 "table-with-merged-cells": {
 "w:drawing": 3,
 "wp:anchor": 3,
-"w:before-page-top": 100
+"w:before-any": 100
 },
 "table-with-no-header-row": {
 "w:drawing": 2,
 "wp:anchor": 2,
-"w:before-page-top": 214
+"w:before-any": 214
 },
 "table-with-rotated-header": {
 "w:drawing": 14,
 "wp:anchor": 14,
-"w:before-page-top": 170
+"w:before-any": 170
 },
 "text-held-twice-shadow-text": {
 "w:drawing": 2,
 "wp:anchor": 2,
 "w:spacing-letter": 2,
-"w:before-page-top": 46
+"w:before-any": 46
 },
 "two-tables-stacked-with-no-gap": {
 "w:drawing": 8,
 "wp:anchor": 8,
-"w:before-page-top": 71
+"w:before-any": 71
 },
 "very-long-single-column-table": {
 "w:drawing": 6,
 "wp:anchor": 6,
-"w:before-page-top": 512
+"w:before-any": 512,
+"w:before-after-pagebreak": 2
 }
 },
-"at": "2026-11-24T17:02:50"
+"at": "2026-11-24T18:00:35"
 }

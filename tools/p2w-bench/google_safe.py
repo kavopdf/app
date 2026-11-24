@@ -54,10 +54,16 @@ IGNORED = [
     ("w:position", "vertical-raise",
      re.compile(r"<w:position\b"),
      "Google ignores w:position; a raised or lowered run renders on the baseline."),
-    ("w:before-page-top", "page-top-gap",
-     re.compile(r"<w:spacing\b[^>]*w:before=\""),
-     "FINDINGS/18_displacement-page-top-before-DROPPED: Google drops w:before at the top of a page - "
-     "55.15 pt asked, 0.33 pt rendered."),
+    # RENAMED 24 Nov: this pattern matches ANY w:before, not a page top. Measured by an agent on a
+    # 6-paragraph document: 214 matches, table cells included, while the defect is only a w:before
+    # AT a page top. The count was quoted as '210 documents, 20786 instances' as if it were page-top
+    # gaps. It is not. The label now says what it measures, and the real page-top construct follows.
+    ("w:before-any", "before-gap",
+     re.compile(r'<w:spacing\b[^>]*w:before="'),
+     "ANY paragraph or cell before-gap - not a defect on its own (Google honours it 1:1 except at a page top)."),
+    ("w:before-after-pagebreak", "page-top-gap",
+     re.compile(r'<w:br\s+w:type="page"\s*/>(?:(?!<w:p[ >]).)*?<w:p\b(?:(?!<w:p[ >]).)*?w:before="([1-9]\d*)"', re.S),
+     "Google drops w:before at a page top after a hard break: 55.15 pt asked, 0.33 rendered. This is the real construct."),
 ]
 
 EMBEDDED_FONT = ("embedded-font", "FINDINGS/GOOGLE-IGNORES-CHARACTER-WIDTH-2424.md: an embedded face is "

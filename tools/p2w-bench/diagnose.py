@@ -41,7 +41,7 @@ CAUSE = {
                   "44_header_footer", "17_matched_runs"],
     "w:drawing": ["04_chars_missing", "45_char_accuracy", "13_text_colours",
                   "44_header_footer", "17_matched_runs"],
-    "w:before-page-top": ["18_displacement"],
+    "w:before-after-pagebreak": ["18_displacement"],
     "w:spacing-letter": ["17_matched_runs"],
     "embedded-font": ["45_char_accuracy", "13_text_colours"],
 }
