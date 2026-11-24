@@ -3909,3 +3909,24 @@
 {"t": 1795499852.5916958, "ist": "11:27:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795499852.755092, "ist": "11:27:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795499853.2508245, "ist": "11:27:33", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795501468.4658353, "ist": "11:54:28", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795501468.943369, "ist": "11:54:28", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795501469.232592, "ist": "11:54:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795501475.8787134, "ist": "11:54:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795501482.696912, "ist": "11:54:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795501745.480949, "ist": "11:59:05", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795501935.3842373, "ist": "12:02:15", "ev": "beat", "d": "applying uniform-pitch patch then building engine"}
+{"t": 1795502053.505878, "ist": "12:04:13", "ev": "beat", "d": "engine built, bootstrapping corpus + first pass"}
+{"t": 1795502377.7685914, "ist": "12:09:37", "ev": "beat", "d": "corpus 213 ready, converting+measuring pass 1"}
+{"t": 1795502783.9719994, "ist": "12:16:23", "ev": "beat", "d": "soffice wrapper fix, pass 2"}
+{"t": 1795503074.8779724, "ist": "12:21:14", "ev": "beat", "d": "pass 3"}
+{"t": 1795503374.832598, "ist": "12:26:14", "ev": "beat", "d": "parallel convert of remaining docx"}
+{"t": 1795503673.97333, "ist": "12:31:13", "ev": "beat", "d": "parallel convert batch 2"}
+{"t": 1795503936.7384129, "ist": "12:35:36", "ev": "beat", "d": "parallel convert batch 2"}
+{"t": 1795504117.8217895, "ist": "12:38:37", "ev": "beat", "d": "all 213 converted, measuring"}
+{"t": 1795504401.9187694, "ist": "12:43:21", "ev": "beat", "d": "measure pass 2"}
+{"t": 1795504685.0847898, "ist": "12:48:05", "ev": "beat", "d": "measure pass 3"}
+{"t": 1795505277.4705045, "ist": "12:57:57", "ev": "beat", "d": "measure pass 4"}
+{"t": 1795505681.15135, "ist": "13:04:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795505685.4657223, "ist": "13:04:45", "ev": "beat", "d": "recording lead"}
+{"t": 1795505686.0518281, "ist": "13:04:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
