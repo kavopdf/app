@@ -743,3 +743,73 @@ across 33 documents and called 34 of 37 explained; the second counted 11,811 acr
 explained. The mechanisms and the verdict are identical; the difference is the set of Google Docs each
 could locate (the second found all 37 among the 460 pre-existing Docs in Drive, the first found 33). The
 larger sample is the better number.
+
+## 59_shape_anchor CLOSED: 45 of 45 measured, and not one is a shape-anchor defect
+
+The first investigation stopped at 11 documents and said 34 could not be rendered through Google. **That
+blocker was not real** - the corpus's Google Docs were already in Drive (1,292 listed, 1,194 live, 432
+distinct names, all 45 present), and every one was exported. Provenance: page count equals the source on
+45 of 45, and all 45 reproduce the recorded `59_shape_anchor` failure.
+
+**The class produces 1,003 convictions, and not one is a shape anchored somewhere else while its text
+stayed:**
+
+| conviction path | runs | whose question it is |
+|---|---:|---|
+| `same_box` - the render's box matches the source's on all four corners (<= 2 pt), text moved inside it | **878** | `18_displacement`'s |
+| `lost` - text absent from the render | **104** | `04_chars_missing`'s |
+| `no_render_box` + `_box_moved` | **14** | the check's own claim - **false in 14 of 14** |
+| `box_differs` + `_box_moved` | 7 | genuine, Google's row-height quantisation |
+
+**The proven split, one number per category:**
+
+| category | documents |
+|---|---:|
+| **Engine** - a real shape-anchoring defect only this check can see | **0** |
+| **Check** - proven false positive: `_box_moved` convicted on the same rectangle in the same place | **2** |
+| **Duplicate charge of `18_displacement`** - the box did not move, the text did | **32** |
+| **Duplicate charge of `04_chars_missing`** - no shape conviction at all, only lost runs | **11** |
+| total | **45** |
+
+**The two false positives, in full.** `_box_moved` found "a shape of the source box's width and height
+elsewhere on the render" - and the shape it found is the source box, in the source box's own place:
+`324_loan_amortisation_schedule`'s box `[0, 0, 595.28, 30.00]` matched `[-0.37, -0.38, 595.88, 30.37]`,
+offset 0.37-0.60 pt, `_same_box` True. In both documents the **text** is what moved: the header line is
+drawn at y = -12.29 pt, above the top of the page, while the band stayed.
+
+**26 of the 32 also fail `18_displacement` outright.** The other 6 pass it, because 59 applies a flat 3.0 pt
+tolerance where the house standard is `clamp(0.35·size, 1.5, 4.5)` pt - so it charges runs that 18's own
+budget forgives. A second, narrower fault layered on the duplication.
+
+### The fix, and why `_same_object` alone is not it
+
+Each step was simulated on all 45 real renders:
+
+1. **Call `_same_object` AND add the position term it still lacks.** `_box_moved` must be satisfied only by a
+   box that is the same object *and* is **not** at the source box's own position. Without the position term,
+   `_same_object` alone still fires on a coincident box. **Measured: clears 2 of 45.**
+2. **Stop counting `lost` as an out.** A run whose text is absent is `04`'s conviction; today it increments
+   `n_out` and can fail a page alone. **With (1): clears the 11 lost-only documents.**
+3. **Stop convicting on the `same_box` path.** When the render's box agrees on all four corners, the check
+   has already declared the shape unmoved - and then convicts on the text's offset inside it. Either drop
+   the clause or adopt 18's tolerance. **With (1)+(2)+(3): 44 of 45 clear.** The last,
+   `373_leave_application_form`, fails on 7 runs where the row band really did move 2.5 pt (row pitch 26 to
+   27 pt), already reported by `18_displacement` and `23_line_pitch`.
+
+**So `_same_object` is necessary and not sufficient.** It fixes the 2 documents where the check convicts on a
+comparison between rectangles it should never have compared. The other 43 are not shape-anchor defects at
+all.
+
+### What this overturns
+
+- "34 of 45 could not be rendered through Google" - **0 could not.**
+- "27 structurally exposed" - all 27 are convicted or cleared with evidence.
+- "`_box_moved` returns True whenever a box of the source's width and height exists anywhere" - **confirmed**,
+  14 of 14 firings matched the source box itself.
+
+### The number that matters for the whole exercise
+
+**Nine classes have now been root-caused, and six of them are the same three faults wearing different
+names:** the anchored text box (04, 45, 13, 44, 17), the page-top `w:before` drop (18), and a check reading
+the renderer's paper or text layer instead of the document (25, 47, 59, 17). **The engine has exactly one
+defect of its own that nobody else's class already covers: the 120 pt gap cap.**
