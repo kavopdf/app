@@ -379,7 +379,7 @@ def status():
     print("  stamp       : %s" % (json.dumps(st) if st else "none"))
     warm = st.get("engine") == engine_now() and st.get("documents") == want and have == want
     print("  state       : %s" % ("WARM - a run can gate immediately" if warm
-                                  else "COLD - the next --ensure rebuilds"))
+                                  else "COLD - the next --ensure continues from what is on disk, it does not start over"))
     return 0
 
 
