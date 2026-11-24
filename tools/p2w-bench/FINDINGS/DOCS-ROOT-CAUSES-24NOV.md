@@ -462,3 +462,126 @@ adds the measured replacement (1x1 exact table, 55.83 of 55.15 pt) and the sizin
 write path needs an `s3key` the platform `upload` tool would stage, and that tool is not bound here. The
 Google-side numbers come from the stored per-document records and the repo's committed census, not from a
 fresh round trip.
+
+## 59_shape_anchor — three charges wearing one name, and a test that was written and never called
+
+**`59_shape_anchor` is not one defect class.** Its conviction logic has three exits and two of them belong
+to other checks: text moved inside the same box (that is `18_displacement`'s question), text absent from
+the render (that is `04_chars_missing`'s question), and "the outline moved and the text stayed"
+(`_box_moved`).
+
+**`_box_moved` has no position term.** It returns True whenever a box of the source box's width and height
+exists anywhere on the render - which is exactly the case when the box is still where the page put it.
+Demonstrated on a document's only box: `_box_moved(B, source_shapes, source_shapes)` returns **True**, i.e.
+"the outline moved" is reported with the outline unmoved. And `_same_box(B, B shifted 2.1 pt)` returns
+**False**, so identity is lost at 2.1 pt.
+
+**The test written to stop two unrelated rectangles being compared is dead code.** `_same_object`
+(`verify_google.py:2308`) - filled-versus-outline primitive **and** the set of texts the box holds - is
+**defined and never called**. `_face` and `_held` likewise. The executed identity gate is `_same_box`
+(`:2271`), four corners within 2 pt, with no notion of what the rectangle *is*. And `_box_moved` is a hard
+tripwire: one run fails the page, with no 5 % budget.
+
+**Shape populations do not correspond at all:**
+
+| document | source shapes | .docx shapes | reproduced within 2 pt |
+|---|---:|---:|---:|
+| 48_form_coloured_border_coloured_values | 1 | 14 | 1 |
+| 324_loan_amortisation_schedule | 42 | **1483** | 2 |
+| 375_attendance_register | 14 | 456 | 2 |
+| 77_arabic_rtl_document | 9 | 4 | **0** |
+| mutual-fund-statement | 23 | 19 | **0** |
+
+**45 of 45 have a different shape population; 38 have more; 27 do not reproduce at least one source box at
+its own geometry.**
+
+**Measured against real Google renders of 11 documents:** the engine is wrong on **7** (proven - six stamp
+documents with `MOVED(samebox)` and dy of -7.5 to -41.9 pt verified on the baseline, and `35_rotation`
+fires on all six because the writer drops preset shapes under a rotated CTM at `PdfToWord.java:4231`);
+the check is wrong on **2** (sole explanation, with all 44 other checks passing); 2 are a duplicate charge
+of `04`'s question; and **32 of the 45 also fail `18_displacement`, so 59 is re-asking 18's question in
+another frame.**
+
+**Also:** `344_customs_declaration` **passes** 59 against a fresh Google render although the committed
+record says it fails - a stale verdict. And the "PDF box drawn as four lines versus a .docx table border"
+theory is **falsified as the dominant cause**: the 45 anchor 18 % of 4,327 runs to rule-assembled faces
+against 39 % of 9,210 in the passing population.
+
+**Honest limit:** the check-side hole did not fire on any of the 11 real Google renders, so it cannot be
+claimed as the majority cause. 27 documents are structurally exposed to it and unrendered.
+
+## 04_chars_missing — one document is unsatisfiable by construction
+
+A third investigation confirms the 54 and adds the decisive facts:
+
+- **62 of 65 have "characters absent from the flow text" that are exactly, multiset-equal to the characters
+  inside `wps:txbx`** - 12,289 of 88,786 source characters (13.8 %), on 54 documents.
+- **Running the check's own `compare()` against a LibreOffice render of the same .docx returns `04 = 0` on
+  63 of 65.** Same code, same file, different renderer, verdict flips.
+- **The tuple's "source" field is a hard-coded `0`** (`verify_google.py:4697`) - the check has never
+  displayed a source-side number at all.
+- **The separation is total in both directions: 0 of the 125 passing documents carry any textbox text,
+  54 of 54 failing ones do.**
+
+**`38_faux_bold_italic_synthesised` is unsatisfiable by construction.** Its bold is synthesised by drawing
+the same line more than once: at y = 99.5 the headline `PROJECT REPORT - CIVIL` is drawn three times at
+identical coordinates (fill navy, fill black, stroke navy), and `runs()` returns it **twice**. The .docx
+correctly holds that line once. So 19 characters are reported missing forever, and the missing multiset is
+character-for-character one copy of `projectreport-civil`. **No .docx and no renderer draws one visible line
+twice - the fault is the source side counting draw operations instead of characters.**
+
+**The white / invisible / off-page hypothesis is refuted:** 0 characters in text-render mode 3, 0 off the
+page, 0 clipped-out spans. 16 documents do carry near-white text (647 characters) but none of it is among
+the missing, because the .docx holds all of it.
+
+**`601`'s two characters are a fiction of the extraction:** ZapfDingbats code 0x33 is a tick, PyMuPDF
+reports the raw code, and the check hunts for the ASCII digit `3`. The engine did drop the two ticks (real),
+but the characters the check names cannot be supplied by any renderer.
+
+## 60_right_edge — the fix that works is face identity, and the obvious fix does not work
+
+A third investigation measured the substitution from the font files and then tried three rules.
+
+**The substitution is 4 % to 21 % narrower (median 14 %, k = 0.787 to 0.958), which is 1.5x to 4.8x the
+check's entire tolerance (8 pt plus one word).** Because the face is narrower every line is shorter by the
+same ratio, the page needs fewer lines, and **the column's widest line becomes a different line of text** -
+so the edge lands 40-230 pt inside the source's. The correlation between line width and displacement is
+**-0.94 to -0.99**, which is the signature of a substituted face: proportional, not a constant offset and
+not last-line-only.
+
+**Controlled experiment:** changing **only the font name** in the .docx and rendering it makes **26 of 28
+flip to FAIL**, and the two that survive are exactly the two whose predicted deficit is under tolerance.
+
+### The obvious fix does not work, and that is the useful part
+
+**R1 - scale the expected edge by the document's own k - still fires on 24 of 28 and newly fires on 6 clean
+documents.** The fault is a **re-break**, not a scale: a narrower face needs fewer lines, line membership
+changes, and the residual `rg - k·rs` reaches +-90 pt even with perfect geometry. A ratio-threshold rule
+fixes the substituted set but silently loses 4 real defects. "Scaled and more lines" fails for the same
+reason - narrowing *reduces* the line count.
+
+### The rule that holds
+
+**Key on face identity, not a measured ratio.** If every face the .docx declares is one the renderer ships,
+run the extent check unchanged; if any is not, the extent check **abstains in that renderer** and the
+document is attributed to the substitution, with the real-defect question answered where the face exists.
+
+**Validated: 0 real defects lost** (the 3 DejaVu real defects are all caught by the LibreOffice verdict),
+the 12 non-DejaVu real defects still fire, and all 41 clean renders still pass. Cost: it would not catch a
+real column bug inside a DejaVu document in Google's verdict - 3 documents of 28.
+
+**The 16 non-DejaVu Google-only failures are untouched by this rule and remain open.** Their slack collapses
+to about 4 pt on a table-cell label column holding a single digit.
+
+### Two prior findings contradict each other on the direction
+
+`...GOOGLE-HAS-NO-DEJAVU-0830` measured `302` going **+4.8 % wider** (Verdana, 33 to 35 lines);
+`...IT-FIRES-UNDER-2323` measured **10-15 % narrower** (Arial). This investigation's controlled experiment
+supports the narrowing arm for Arial. **Both can be true if Google substitutes per run**, which would make
+any "scale by k" rule even less viable - and it is another reason face identity is the right key.
+
+### Renderer split, reproduced twice
+
+**41 fail only in Google, 15 fail in both.** The committed `gverify-lo` files and an independent
+re-implementation of the check's own `columns()`/`edge()` agree on the same 15. The repo's
+`GOOGLE-VS-LIBREOFFICE.md` figure of 18 is an older snapshot.
