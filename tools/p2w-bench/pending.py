@@ -246,12 +246,12 @@ def collect():
     if _ta is None:
         items.append({"kind": "measure", "who": "the .txt table",
                       "what": "RANKING-TXT.csv is missing - the .txt half has no score at all",
-                      "why": "actionable - run `python3 tools/p2w-bench/txt_gate.py --score 40`"})
+                      "why": "actionable - run `python3 tools/p2w-bench/txt_gate.py --score 60`"})
     elif _ta >= 6.0:
         items.append({"kind": "measure", "who": "the .txt table",
                       "what": "RANKING-TXT.csv is %.1f h old - the .txt numbers are not today's" % _ta,
-                      "why": "actionable - run `python3 tools/p2w-bench/txt_gate.py --score 40`. It is "
-                             "incremental: 40 documents a pass at ~10 s each, so ~7 passes cover 213 and a "
+                      "why": "actionable - run `python3 tools/p2w-bench/txt_gate.py --score 60`. It is "
+                             "incremental: 60 documents a pass at ~10 s each, so ~4 passes cover 213 and a "
                              "full `--all` would take 35 min of a 90-min slot. Nothing else regenerates it"})
 
     # The docx table: fresh if the newest verdict is recent AND every scored document is on the current

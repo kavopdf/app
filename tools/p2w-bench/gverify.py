@@ -496,15 +496,15 @@ def main(argv):
         # that measures docx measures txt too, here, rather than in a brief nobody reads.
         #
         # Nothing regenerates RANKING-TXT.csv except txt_rank.py, and no cron calls it - the table was 16.8 h
-        # old this morning while the report printed its numbers as current. 40 documents a pass at the ~10 s
-        # each measured on 24 Nov is about seven minutes, and it is incremental, so a pass always makes
+        # old this morning while the report printed its numbers as current. 60 documents a pass at the ~10 s
+        # each measured on 24 Nov is about ten minutes, and it is incremental, so a pass always makes
         # progress and never spends 35 minutes on a full rescore.
         rc = plan(a.plan)
         try:
             import subprocess as _sp
             print("")
-            print("  .txt half - scoring the next 40 so that table is never older than this pass")
-            _sp.run([sys.executable, os.path.join(HERE, "txt_gate.py"), "--score", "40"],
+            print("  .txt half - scoring the next 60 so that table is never older than this pass")
+            _sp.run([sys.executable, os.path.join(HERE, "txt_gate.py"), "--score", "60"],
                     timeout=900)
         except Exception as _e:
             print("  .txt scoring did not run: %s" % _e)
