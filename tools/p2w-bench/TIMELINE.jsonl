@@ -3839,3 +3839,26 @@
 {"t": 1795492190.766087, "ist": "09:19:50", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795492192.3414636, "ist": "09:19:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795492192.5002441, "ist": "09:19:52", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795494657.3232772, "ist": "10:00:57", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795494657.4866965, "ist": "10:00:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795494660.1528976, "ist": "10:01:00", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795494676.0324502, "ist": "10:01:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795494689.5888715, "ist": "10:01:29", "ev": "beat", "d": "deploying two agents: guard blast-radius, txt word_invention"}
+{"t": 1795495942.1273541, "ist": "10:22:22", "ev": "beat", "d": "agent A landed: 85 docs touched, 0 page-count changes; now apply+build"}
+{"t": 1795495950.8407953, "ist": "10:22:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795495959.6996312, "ist": "10:22:39", "ev": "beat", "d": "patch applied, building"}
+{"t": 1795496076.558858, "ist": "10:24:36", "ev": "beat", "d": "corpus pass 1/8: fetching corpus, measuring with patched engine"}
+{"t": 1795496389.2070332, "ist": "10:29:49", "ev": "beat", "d": "corpus pass: zips in place, unzip+engine+measure"}
+{"t": 1795496674.959901, "ist": "10:34:34", "ev": "beat", "d": "corpus pass: docx 45/213, continuing"}
+{"t": 1795496970.3434868, "ist": "10:39:30", "ev": "beat", "d": "corpus pass: docx 74/213"}
+{"t": 1795497263.0978858, "ist": "10:44:23", "ev": "beat", "d": "corpus pass: docx 119/213"}
+{"t": 1795497560.6521614, "ist": "10:49:20", "ev": "beat", "d": "corpus pass: docx 166/213"}
+{"t": 1795497853.7176633, "ist": "10:54:13", "ev": "beat", "d": "corpus measure: 2/212"}
+{"t": 1795498148.7672913, "ist": "10:59:08", "ev": "beat", "d": "corpus measure: 54/212"}
+{"t": 1795498443.5875661, "ist": "11:04:03", "ev": "beat", "d": "corpus measure: 99/212"}
+{"t": 1795498741.617328, "ist": "11:09:01", "ev": "beat", "d": "corpus measure: ~125/212"}
+{"t": 1795499036.311607, "ist": "11:13:56", "ev": "beat", "d": "corpus measure: 162/212, final 50"}
+{"t": 1795499320.2531445, "ist": "11:18:40", "ev": "beat", "d": "corpus measure: ~190/212"}
+{"t": 1795499565.3075109, "ist": "11:22:45", "ev": "beat", "d": "200/212 measured; running regress --check"}
+{"t": 1795499616.7150095, "ist": "11:23:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795499621.125955, "ist": "11:23:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
