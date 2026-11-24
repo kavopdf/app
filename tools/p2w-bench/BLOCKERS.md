@@ -654,3 +654,41 @@ would have been made and were not:
     cron(action="pause", cron_id=...); cron(action="resume", cron_id=...)   # same pass, never left paused
 
 STEP 3 and STEP 4 A and B did not run, and nothing in this entry claims they did.
+
+---
+
+## 2026-11-24 12:20 IST — gverify: four scored results predate the current engine, and no corpus exists to re-measure them
+
+**What I was doing.** The run opened at `stage.py` = `classify`, and before writing the capability
+table it checked the results for the engine stamp that `--plan` uses.
+
+**The obstacle.** `stage.py` counts a document as measured whenever a `.json` exists, so it prints
+`measured 213`. `gverify.py`'s own `_done()` is stricter: a scored result counts only when its
+`engine` matches `_engine_now()` (`b7699196`). Measured this run, from the committed results:
+
+    186 scored results carry b7699196   (current)
+     21 page_count_refused carry none   (counted as done by _done(), by design)
+      4 scored results carry an older stamp and are NOT done
+
+The four: `15_stamp_on_scanned_page` (5beb8b9d), `magazine-2col-pullquote-spanning`,
+`newspaper-2col-fullwidth-headline`, `very-long-single-column-table` (all 462353f). So the honest
+count is 209 of 213 measured against the current engine, not 213 — and the capability table's
+`190 scored` includes those four.
+
+**What I tried.** `gverify.py --plan` cannot even be run in this slot: it lists documents from
+`/scratch/work/p2w/out`, which no call in this cron populates, and it dies with
+`FileNotFoundError: '/scratch/work/p2w/out'`. Building that corpus needs `p2w.py` and a built engine
+(`java -cp <classpath> ConvertOne <pdf> /scratch/work/p2w/out` per FIXER-BRIEF.md), which is a
+corpus pass, not a measurement step, and cannot be done from a `git clone` inside this slot.
+
+**Decision.** The measurement work this run could do is done and the table is written from it. The
+four stale documents are left in the table and named here, not silently counted as current. The
+matrix does not change materially: all four already fail, and re-measuring them can move their
+per-check rows, not the shape of the table.
+
+**Can I fix it.** No — it needs a corpus pass.
+
+**What is needed.** One run that builds `/scratch/work/p2w/out` with the current engine, then
+`gverify.py --plan` to confirm it prints `0 to go`, then `gverify.py --collect` on the four names
+above. Until then, `stage.py`'s `measured` line overstates by exactly the number of stale scored
+results, and any report that quotes it as "213 measured against this engine" is wrong.
