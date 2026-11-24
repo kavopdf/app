@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 18:28
+# Fixer report - 2026-11-24 18:59
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 18:28 → 18:34 IST · 6 min**
+**24 Nov 2026 · slot 18:59 → running IST · 2 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -12,7 +12,7 @@
 | | |
 |:--|:--|
 | Self-check | **every field agrees with its second source** |
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -23,21 +23,13 @@
 | Not scored - page count did not match | **22** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `60_text_column_right_edge` - taken from the pending list (26 still open), not a new class |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 18:28 | **lead** | 0/23 | Recorded as a lead, not a fix: the class's 23 refusals are all engine (the page's furniture as N page-positioned shapes, Google charges 0.10-0.96 pt per shape) but zero of them can go clean - a refusa |
-| 18:30 | **lead** | 0/23 | Second measurement this slot, live in Google through the fixed recorder: 60_page_border still 2 vs 1 on b7699196 with page 2 holding 0 words / 1 drawing / 16 images (the page's own border, rasterised |
-| 18:34 | **lead** | 0/5 | Measured, not guessed, and it is not an engine class: the column's right edge is left + k x (line width) where k is the ratio of the substituted face's advance widths - measured k 1.0019 (DejaVu, r 0. |
+| Working on | `-` - taken from the pending list (27 still open), not a new class |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **44 min ago** |
+| Measured | **2 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -46,29 +38,18 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `60ed60_text_column_right_edge-01` | is the right edge the engine's or the face's | 18:27 | 18:40 | 13 min |
-| `pc2300_page_count-01` | what is on the extra page of the 23 refusals | 18:27 | 18:40 | 13 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 18:28 → 18:34 · 6 min |
+| Slot window | 18:59 → running · 2 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 70 |
+| Tool beats | 4 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| record - attempt, handoff, class rows | **4 min** | `###############` |
-| report - the report and the chain | **1 min** | `###` |
-| other - not attributed to a tool | **1 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |
