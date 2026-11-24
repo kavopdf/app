@@ -129,7 +129,7 @@ RATCHET = os.path.join(HERE, "RATCHET.json")
 
 # The .txt marks live apart from the .docx marks for the same reason the results do: a
 # regression in one must never be able to hide behind a good score in the other.
-RATCHET_TXT = os.path.join(HERE, "RATCHET-TXT.json")
+RATCHET_TXT = os.path.join(HERE, "txt", "RATCHET-TXT.json")   # txt_rank.py writes it here, not beside this file
 RESULTS_TXT = os.path.join(HERE, "RESULTS-TXT.jsonl")
 RESULTS = os.path.join(HERE, "RESULTS.jsonl")
 
