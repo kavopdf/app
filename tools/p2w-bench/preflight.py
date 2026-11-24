@@ -97,7 +97,8 @@ def tools():
     """Which of the fast-path tools exist, so a run knows what it has before it reads anything."""
     have, miss = [], []
     for n in ('corpus-slice.py', 'corpus-changed.py', 'preflight.py',
-              'google_safe.py', 'classpick.py', 'pending.py'):
+              'google_safe.py', 'classpick.py', 'pending.py',
+              'diagnose.py', 'predict-outcome.py', 'google-needed.py'):
         (have if os.path.exists(os.path.join(HERE, n)) else miss).append(n)
     return (not miss), "%d present%s" % (len(have), (" - missing " + ", ".join(miss)) if miss else "")
 
@@ -193,6 +194,8 @@ def main(argv):
         print("  cheap signal: python3 tools/p2w-bench/google_safe.py --predict   (1 s, all documents)")
         print("  scoped meas : P2W_CHANGED_ONLY=1 p2w.py --budget N               (only what moved)")
         print("  coupled fix : P2W_ACCEPT_WORSE=doc1,doc2 regress.py --check      (named, net-positive)")
+        print('  per document: python3 tools/p2w-bench/diagnose.py <name>        (why THIS document fails)')
+        print('  before patch: python3 tools/p2w-bench/predict-outcome.py        (which construct buys clean docs)')
         print("")
         print("  READY in %.1f s" % (time.time() - t0))
     return 0
