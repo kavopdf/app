@@ -1000,9 +1000,9 @@ def main(argv):
         _gs = co.get("google_scored", 0)
         _to_go = max(0, _gs - _gsc)
         L.append("| **Fixed - Google, every applicable check** | **%d** of the **%d** re-measured on this "
-                 "engine - **%d** of the %d scored are still on an older engine, and **%d** were "
-                 "clean there |"
-                 % (_gfc, _gsc, _to_go, _gs, co.get("google_fixed", 0)))
+                 "engine - **%d** of the %d scored are still on an older engine, and **%d** of those "
+                 "were clean on the engine they were measured with |"
+                 % (_gfc, _gsc, _to_go, _gs, max(0, co.get("google_fixed", 0) - _gfc)))
         if _to_go:
             L.append("| Who re-measures them | the **:20 gverify** cron, up to %d documents a run "
                      "- about **%d** run(s) for the %d outstanding. Until then \"fixed\" means "

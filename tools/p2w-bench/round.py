@@ -479,8 +479,11 @@ def claim(name):
         try:
             import json as _j
             _rp = os.path.join(HERE, "RUN.json")
+                # IST, like every other row in this file. A bare time.strftime("%H:%M") writes the
+                # sandbox clock, which is UTC - and then `started` and `started_ts` disagree, which is
+                # how the 05:59 run printed "05:59 -> 06:40 . 2 min" when the span was 41.
             with open(_rp, "w", encoding="utf-8") as _f:
-                _j.dump({"started": time.strftime("%H:%M"), "started_ts": time.time(),
+                _j.dump({"started": ist("%H:%M"), "started_ts": time.time(),
                          "ended": None, "ended_ts": None, "attempts": 0, "kept": 0,
                          "agents": [], "docs_improved": 0}, _f, indent=1)
         except Exception:

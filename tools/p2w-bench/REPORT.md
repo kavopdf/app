@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 07:12 → running IST · 9 min**
+**24 Nov 2026 · slot 07:12 → 07:23 IST · 10 min**
 
 > **5 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
 
@@ -16,7 +16,7 @@
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **34** of the **186** re-measured on this engine - **4** of the 190 scored are still on an older engine, and **34** were clean there |
+| **Fixed - Google, every applicable check** | **34** of the **186** re-measured on this engine - **4** of the 190 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
 | Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **1** run(s) for the 4 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
@@ -50,9 +50,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 07:12 → running · 9 min |
+| Slot window | 07:12 → 07:23 · 10 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 11 |
+| Tool beats | 16 |
 | Longest silence | **4.1 min** — from 07:13:44, after `report.py: building the report` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -62,9 +62,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **2 min** | `######` |
-| record - attempt, handoff, class rows | **1 min** | `###` |
-| report - the report and the chain | **5 min** | `#############` |
+| fix - diagnose and change the engine | **2 min** | `#####` |
+| record - attempt, handoff, class rows | **2 min** | `####` |
+| report - the report and the chain | **5 min** | `############` |
 ## Best results this round
 
 | Document | Before | After | Change |
