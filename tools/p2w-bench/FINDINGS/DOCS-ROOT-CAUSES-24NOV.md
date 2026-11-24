@@ -300,3 +300,68 @@ Two independent investigations, different methods, same split: **~25 of the 56 a
 rest are either the half-point size floor or a different defect. One measured the substitution by changing
 the declared face (21 of 24 flip), the other by changing `w:rFonts` in the emitted file (29 of 40 flip).
 Both agree the engine cannot express the edge.
+
+## 04_chars_missing, engine side: the trigger is a 120 pt gap cap, and both investigations agree
+
+A second investigation, working from the writer, reached the same 54 and named the mechanism to the line.
+
+**The engine does not lose these characters - it writes them into a DrawingML anchored text box instead
+of a paragraph.** `DocxWriter.para()` (`:3101`) routes every line into `anchorBox()` once that page's flow
+has entered `ctx.positioned` mode, and `anchorShape()` (`:5580`) emits the text as
+`<wps:wsp><wps:cNvSpPr txBox="1"/>...<wps:txbx><w:txbxContent>` at **`DocxWriter.java:5664`**.
+
+**And the trigger is a vertical gap wider than 120 pt.** `ctx.positioned` is set by the gap guards in
+`flowFromBox()` (`:4381`, and lines 4453, 4487, 4587) and `flowRow()` (`:3571`, 3594, 3663) when a gap
+exceeds `gapCapTw()` - **2400 twips (120 pt)** unless `ctx.spendGaps` is true (`:400`). On a two-column
+page, a band boundary or a running footer is wider than that cap, so it becomes "a position, not a gap"
+and **every line after it is anchored**.
+
+**Those boxes are body text, not stamps.** 286 of the 341 anchored boxes in the 65 documents are
+`anchorPos` (84 %), against 13 stamp boxes, with zero `rot=` on the big carriers. Whole policy clauses,
+article paragraphs and column labels are inside them.
+
+**The separation is perfect and has no exception:** `w:txbxContent` present means 54 fail
+`04_chars_missing` and **0 pass**; absent means 11 fail and 125 pass.
+
+**And the arithmetic is exact.** Emptying `<w:txbxContent>` and nothing else, then rendering and running
+the real check, reproduces the box character count to the character: 2586/2586, 2505/2505, 1811/1811,
+1155/1155, 535/535, 246/246, 106/106, 90/90, 59/59, **43/43**. That last is
+`27_two_column_left_short_txtpos`, the one document with a committed Google measurement: 43 missing,
+40/42 FAIL to **42/42 PASS** once its boxes were driven to zero.
+
+**The engine drops only 19 characters across all 65 documents, all on `38_faux_bold`.** On the other 64 it
+drops zero - measured by converting all 213 at HEAD and diffing the check's own source extraction against
+`word/document.xml`.
+
+**The U+FFFD hypothesis explains 0 of the 65.** It is a real latent check-side defect - on
+`041122-Account_Opening_Form` PyMuPDF reads 127 characters as CIDs where the engine writes U+FFFD, so the
+check would report 127 missing characters no reader can see - but that document and its twin are
+`page_count_refused` and never reach the 47 checks. Measured over all 65 with the check's own
+`runs()`/`norm_text()`, the U+FFFD count is **zero on every one**.
+
+### Who owns the fault, stated precisely
+
+For the 54, the **renderer** drops the text: the .docx is valid and complete, LibreOffice reads every
+character, and the diff finds no deficit. **But the engine's writer owns the exposure** - it chooses, for
+ordinary body text, a construct its own source already records Google mishandling (the `w:framePr` note at
+`DocxWriter.java:5174-5200`, and the off-page-box note at `5590-5600` measuring 123 characters recovered by
+moving the anchor back onto the sheet).
+
+**So the actionable finding is not "stop using text boxes" - it is the 120 pt cap.** A gap wider than 120 pt
+flips a page into positioned mode and anchors everything after it. That is one threshold, in one place, and
+it decides whether 54 documents carry their body text as text or as a picture.
+
+### Not established
+
+- The sub-mechanism of the 19-character loss on `38_faux_bold`: the letters are scattered singles, none off
+  the page box, and they do not line up with the document's duplicate-position glyphs.
+- Whether `ctx.spendGaps = pageFits(page, ph)` is false on exactly the pages that flip into positioned mode
+  was not traced per page. Disabling the `PAGE_POSITION_ON_ANCHOR` cascade (`-Dp2w.pagepos=0`) moved the
+  box count only 495 to 483, so that flag is not the driver; the trigger sits in the `gapCapTw` branches.
+- The 9 undetermined documents need a Google export text layer, which no sandbox could obtain.
+
+### Two independent investigations, same answer
+
+One worked from the documents and found the missing character multiset identical to the text boxes'
+contents; the other worked from the writer and found the routing path and the 120 pt cap. Both say **54 of
+65**, and both say the boxes are body text. That is the strongest agreement of any class so far.
