@@ -3,30 +3,6 @@
   {
    "angle": "A",
    "class": "18_displacement",
-   "deployed": "02:00",
-   "deployed_at": "2026-11-24T02:00",
-   "expected": "landed",
-   "finding": "DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.",
-   "id": "18_dA-01",
-   "landed_at": "2026-11-24T02:07",
-   "question": "which single failing Google check, if fixed, makes the most documents CLEAN",
-   "status": "landed"
-  },
-  {
-   "angle": "B",
-   "class": "04_chars_missing",
-   "deployed": "02:00",
-   "deployed_at": "2026-11-24T02:00",
-   "expected": "landed",
-   "finding": "DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.",
-   "id": "04_cB-01",
-   "landed_at": "2026-11-24T02:07",
-   "question": "is the missing-char multiset fully explained by anchored text boxes on 9 docs",
-   "status": "landed"
-  },
-  {
-   "angle": "A",
-   "class": "18_displacement",
    "deployed": "02:07",
    "deployed_at": "2026-11-24T02:07",
    "expected": "landed",
@@ -282,6 +258,28 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-24T22:34"
+  },
+  {
+   "id": "gap--01",
+   "class": "gap-cap patch: traced DocxWriter, produced spendWideGap() foot-band patch, applied and reverted as a no-op on 69/323/311; census: cap = 1469 chars over 23 of 35 positioned pages",
+   "angle": "",
+   "question": "",
+   "expected": "",
+   "deployed": "02:59",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-25T02:59"
+  },
+  {
+   "id": "zero-01",
+   "class": "zero-gap census: the latch is 655 lines/24920 chars vs the rule's 12 lines/358; pagepos=0 + anchorkeep=0 changes no page count across 213",
+   "angle": "",
+   "question": "",
+   "expected": "",
+   "deployed": "02:59",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-25T02:59"
   }
  ],
  "context": "04_chars_missing: the 120pt gap cap is NOT the main cause of anchored text boxes. The page-local latch ctx.positioned (DocxWriter 3126-3144) multiplies one anchored line into every later line on the page: 655 lines / 24,920 chars vs the cap's 1,469. Measured: -Dp2w.pagepos=0 -Dp2w.anchorkeep=0 cuts 69_two_col_legal 36 boxes/1358c -> 9/367, academic-paper 51/2942 -> 3/181, 323_credit_card 13/222 -> 6/35, 311_fir 3/206 -> 1/30, and changes NOTHING on 47 other 04-failing docs. Adding -Dp2w.zganchor=false: 69 -> 7/242, 323 -> 4/26. No combination reaches 0 boxes, so 04 does not flip. Separately: 47 of the 64 04-failing documents carry FEWER THAN 200 boxed characters - their box is a stamp, not body text, so emptying boxes cannot clean them. A spendWideGap foot-band patch was applied, rebuilt and is a no-op on 69/323/311; reverted.",
@@ -395,21 +393,9 @@
    "what": "the widget-AP walk is refused by one document, and the decision is not a fixer's"
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. Land the latch change (anchorkeep=0 semantics: flow resumes at the anchored baseline instead of latching the page), then run the corpus pass and a Google read on 69_two_col_legal_numbered_clauses and 323_credit_card_statement. Do not spend the slot on gapCapTw - it is the smaller half. Expect 04 to stay OPEN on the 47 stamp documents: that needs a rule about what kind of text a box may carry.",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 17 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. Land the latch change (anchorkeep=0 semantics: flow resumes at the anchored baseline instead of latching the page), then run the corpus pass and a Google read on 69_two_col_legal_numbered_clauses and 323_credit_card_statement. Do not spend the slot on gapCapTw - it is the smaller half. Expect 04 to stay OPEN on the 47 stamp documents: that needs a rule about what kind of text a box may carry.",
  "next_class": "",
  "notes": [
-  {
-   "at": "02:07",
-   "text": "agent landed: 04_c-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed."
-  },
-  {
-   "at": "02:07",
-   "text": "agent landed: 44_h-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed."
-  },
-  {
-   "at": "02:07",
-   "text": "agent landed: 18_dA-01 /  -> DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those."
-  },
   {
    "at": "02:07",
    "text": "agent landed: 04_cB-01 /  -> DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those."
@@ -637,6 +623,18 @@
   {
    "at": "02:00",
    "text": "attempt 61 on 18_displacement -> lead"
+  },
+  {
+   "at": "02:59",
+   "text": "attempt 5 on 04_chars_missing -> lead (0/64 moved)"
+  },
+  {
+   "at": "02:59",
+   "text": "agent deployed: gap-cap patch: traced DocxWriter, produced spendWideGap() foot-band patch, applied and reverted as a no-op on 69/323/311; census: cap = 1469 chars over 23 of 35 positioned pages /  - "
+  },
+  {
+   "at": "02:59",
+   "text": "agent deployed: zero-gap census: the latch is 655 lines/24920 chars vs the rule's 12 lines/358; pagepos=0 + anchorkeep=0 changes no page count across 213 /  - "
   }
  ],
  "plan": "",

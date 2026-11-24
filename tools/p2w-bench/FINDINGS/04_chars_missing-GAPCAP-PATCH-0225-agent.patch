@@ -1,0 +1,134 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index f043904..1767542 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -395,11 +395,100 @@ public final class DocxWriter {
+      */
+     private static final int EMPTY_CELL_LINE_TW = 20;
+ 
++    /**
++     * Whether a gap wider than {@link #GAP_CAP_TW} may be spent on a line in the foot of the
++     * sheet instead of anchoring that line - see {@link #spendWideGap}.
++     *
++     * <p>A kill switch in the style of the other guards in this file, so the change can be
++     * measured against itself: {@code -Dp2w.spendfoot=0} restores the anchoring rule exactly.
++     */
++    static final boolean SPEND_FOOT_GAP = !"0".equals(System.getProperty("p2w.spendfoot"));
++
++    /**
++     * Where the foot of the sheet begins, as a fraction of the page's height.
++     *
++     * <p>A line drawn below this is the page's last business: a running foot, a folio, a
++     * signature line. Nothing the flow writes comes under it, so spending the gap above it
++     * displaces nothing - which is the property {@link #spendWideGap} needs and the body of the
++     * page does not have. 0.90 is the band the measured case sits in
++     * ({@code 27_two_column_left_short_txtpos}'s footer baseline is at 805.89 of 842, 0.957)
++     * and it is a band, not a threshold tuned to one document: on an 842 pt sheet it is the
++     * last 84 pt, which is the height of a foot at any body size this corpus is set in.
++     */
++    private static final float FOOT_BAND = 0.90f;
++
+     /** The ceiling this page's gaps get - see {@link #GAP_CAP_SPEND_TW}. */
+     private static int gapCapTw(Ctx ctx) {
+         return ctx.spendGaps ? GAP_CAP_SPEND_TW : GAP_CAP_TW;
+     }
+ 
++    /**
++     * Whether a gap wider than {@link #GAP_CAP_TW} may be SPENT as {@code w:before} instead of
++     * anchoring the line that follows it.
++     *
++     * <p>THE GAP IS STILL A POSITION, AND {@code w:before} IS A CONSTRUCT THAT SAYS SO. The cap
++     * exists because a gap wider than the page can afford pushes everything under it down the
++     * sheet (see {@link #GAP_CAP_TW}); an anchored text box was how the writer held the line at
++     * its own y without paying that. The box is not free either: Google Docs - the renderer
++     * these documents are opened in - rasterises an anchored DrawingML text box on import, so
++     * its characters leave the page's text layer and the line fails {@code 04_chars_missing}
++     * even though it renders in the right place.
++     *
++     * <p>So the box is kept only where the price it avoids is real. Three questions decide that,
++     * in the order that rejects the most:
++     *
++     * <ol>
++     *   <li>IS THERE ANYTHING BELOW IT TO PUSH? Only a line in the foot of the sheet
++     *       ({@link #FOOT_BAND}) is safe, because the page has already decided where that line
++     *       goes and no flow runs under it. A gap in the body of a page is white space the
++     *       page's own content has to fit around, and spending one there is measured wrong: with
++     *       every gap spent, {@code 330_cad_drawing_sheet}'s median displacement went 3.14 to
++     *       16.77 pt, {@code table-inside-two-column-page}'s worst 9.17 to 92.01, and
++     *       {@code newsletter-3col-header-footer}'s 6.26 to 28.36 (the 24 Nov census in
++     *       tools/p2w-bench/FINDINGS).</li>
++     *   <li>DOES THE LINE LAND ON THE PAPER? A gap that puts the line past the sheet's own
++     *       height is a position the paper cannot hold; it stays a box, which is the construct
++     *       that does not advance the flow past the paper.</li>
++     *   <li>CAN THIS PAGE'S BUDGET CARRY THE GAP? This is the arithmetic {@link #fitPage} does
++     *       when it gives a gap up to make a page fit (its step 1). Where the budget cannot carry
++     *       it, the gap would be clamped out of {@code w:before} anyway and the line would land
++     *       above its own baseline - the 130.6 pt footer miss on
++     *       {@code 27_two_column_left_short_txtpos} that the cap's own clamp was rejected for.
++     *       So the box is kept there too.</li>
++     * </ol>
++     *
++     * <p>Where all three hold, the gap is written as spacing-before: the line stays a flowed
++     * paragraph, Google honours {@code w:before} 1:1, the text stays in the text layer and the
++     * page is charged exactly the height the page already used. Measured in Google Docs through
++     * the real path (Drive upload -> convert -> export) on
++     * {@code 27_two_column_left_short_txtpos}: 40/42 -> 42/42 checks, {@code w:txbxContent} 4 ->
++     * 0, one page either way.
++     *
++     * <p>Not asked here: whether the gap is a table's own white space. The caller applies this
++     * only to a gap measured from the line above it ({@code pitch}), never to one measured from
++     * a table's edge - a table's rendered height is the renderer's, not the model's, so spending
++     * that gap would put the model's table error into the line's position. See the two call
++     * sites.
++     *
++     * @param gapPt     the gap the page drew, in points
++     * @param lineTopPt the top of this line's own box, in points from the top of the sheet
++     * @param linePt    the height of this line's own box, in points
++     */
++    private static boolean spendWideGap(Ctx ctx, float gapPt, float lineTopPt, float linePt) {
++        if (!SPEND_FOOT_GAP) return false;
++        // A line inside a column cell is not on the page's own flow at all.
++        if (ctx.inColumn) return false;
++        // 1. nothing the flow writes runs under this line.
++        if (lineTopPt < FOOT_BAND * ctx.pageHeightPt) return false;
++        int gapTw = (int) Math.max(0L, Math.round(gapPt * TWIPS_PER_PT));
++        int lineTw = (int) Math.max(1L, Math.round(linePt * TWIPS_PER_PT));
++        // 2. the line lands on the paper.
++        if (lineTopPt + lineTw / (float) TWIPS_PER_PT > ctx.pageHeightPt) return false;
++        // 3. the page's budget carries it, so fitPage will not take the gap away again.
++        if (ctx.budgetTw <= 0) return false;
++        return ctx.flowTw + gapTw + lineTw <= ctx.budgetTw;
++    }
++
+     /**
+      * Charges one paragraph against the page's budget, and says how much of it may be used.
+      *
+@@ -3590,7 +3679,12 @@ public final class DocxWriter {
+                 // gap was written as 120 pt - 152 pt short of the gap the page drew, and the
+                 // footer landed 130.6 pt above its own baseline. flowFromBox anchors the same
+                 // gap rather than truncating it.
+-                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)) {
++                // A RUNNING FOOT IS DOCUMENT TEXT, NOT A POSITION. Where the gap can be spent -
++                // a row in the foot of the sheet whose page budget carries it - it is written as
++                // w:before and the row stays a flowed paragraph; only where it cannot is the row
++                // anchored. See spendWideGap for what each of those three asks.
++                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)
++                        && !spendWideGap(ctx, extra, first.y - LINE_BASE * linePt, linePt)) {
+                     ctx.positioned = true;
+                     for (PdfToWord.Box ab : cols) anchorBox(sb, p, ab, ctx);
+                     return;
+@@ -4483,7 +4577,13 @@ public final class DocxWriter {
+                 // what the page did, and from here on the page is placed rather than flowed.
+                 // Same rule inside a cell: a gap between two bands of the same column is space
+                 // the cell can hold, not a reason to float the line out of the text.
+-                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)) {
++                // A RUNNING FOOT IS DOCUMENT TEXT, NOT A POSITION. Same rule as flowRow's pitch
++                // branch, and the same reason: a single line under a wide gap - the page's foot,
++                // which is where this branch fires on a document whose footer is not a row -
++                // stays a flowed paragraph where the page can afford to spend the gap, and is
++                // anchored only where it cannot. See spendWideGap.
++                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)
++                        && !spendWideGap(ctx, extra, b.y - LINE_BASE * linePt, linePt)) {
+                     ctx.positioned = true;
+                     anchorBox(sb, p, b, ctx);
+                     return;

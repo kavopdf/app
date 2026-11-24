@@ -1,7 +1,10 @@
 {
- "agents": [],
- "attempts": 3,
- "class": "18_displacement",
+ "agents": [
+  "gap--01",
+  "zero-01"
+ ],
+ "attempts": 4,
+ "class": "04_chars_missing",
  "docs_improved": 0,
  "ended": "02:01",
  "ended_ts": 1795552309.3346412,
