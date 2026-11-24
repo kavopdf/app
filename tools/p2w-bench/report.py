@@ -315,14 +315,19 @@ def self_check():
             _have = set(os.listdir(_fd)) if os.path.isdir(_fd) else set()
             _missing = []
             for _a in _claimed:
-                _id = str((_a or {}).get("id") or (a or {}).get("class") or "")
+                _id = str((_a or {}).get("id") or (_a or {}).get("class") or "")
                 if _id and not any(_id[:12] in _n for _n in _have):
                     _missing.append(_id[:16])
             if _missing:
                 out.append(("subagents", "%d deployed" % len(_claimed),
                             "no FINDINGS file for %s" % ", ".join(_missing[:2])))
-    except Exception:
-        pass
+    except Exception as _e:
+        # A CHECK THAT CANNOT RUN IS NOT A CHECK THAT PASSED. Every block above swallowed its own
+        # exception, and that is exactly how five of these checks were dead code while looking live:
+        # google_fixed() returns a tuple, g.get() raised, `except: pass` hid it. A self-check that
+        # hides its own failures is worse than none, because it reports "every field agrees".
+        out.append(("self-check", "the subagent check raised %s" % type(_e).__name__,
+                    "it did not run, so it cannot vouch for anything"))
     return out
 
 
