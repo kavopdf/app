@@ -3666,3 +3666,6 @@
 {"t": 1795484918.8712547, "ist": "07:18:38", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795484942.9198172, "ist": "07:19:02", "ev": "beat", "d": "attempt 3: row declared one rule short"}
 {"t": 1795485094.1548622, "ist": "07:21:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795485097.2579274, "ist": "07:21:37", "ev": "attempt", "d": "18_displacement -> reverted"}
+{"t": 1795485097.3442752, "ist": "07:21:37", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795485097.4453373, "ist": "07:21:37", "ev": "beat", "d": "classrow.py: refreshing the class file"}

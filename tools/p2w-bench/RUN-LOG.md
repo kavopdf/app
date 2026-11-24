@@ -1,4 +1,3 @@
-| 21 Nov 04:34 | fixer | attempt t01_word_accuracy -> partial (1/? moved) |
 | 21 Nov 04:34 | fixer | attempt t01_word_accuracy -> partial (1/5 moved) |
 | 21 Nov 04:36 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 07:14 | fixer | slot claimed - fixer running |
@@ -198,3 +197,4 @@
 | 24 Nov 07:00 | fixer | slot claimed - fixer running |
 | 24 Nov 07:11 | fixer | attempt 25_invisible_text -> kept (2/5 moved) |
 | 24 Nov 07:12 | fixer | attempt 25_invisible_text -> kept (5/5 moved) |
+| 24 Nov 07:21 | fixer | attempt 18_displacement -> reverted (0/2 moved) |

@@ -166,3 +166,4 @@
 {"at": "2026-11-24 06:40", "attempt": 48, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-24 07:11", "attempt": 1, "class": "25_invisible_text", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-24 07:12", "attempt": 2, "class": "25_invisible_text", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-24 07:21", "attempt": 49, "class": "18_displacement", "outcome": "reverted", "requeues": 0, "round": 1, "status": "PARKED"}

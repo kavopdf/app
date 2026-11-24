@@ -36,8 +36,6 @@ unfinished work, not as a result.
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 18_dA-06 | 18_displacement | A | static map of every writer that emits w:trHeight and cell w:spacing, a | 13:57 | expected by 14:30 | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
-| 18_dB-05 | 18_displacement | B | from the three measured declared->laid points compute the declaration  | 13:57 | expected by 14:30 | landed | ANSWERED: the 18.5 pt rung does not exist. The laid pitch ladder is laid = 0.75*(round(declared/0.75)+1), so laid pitch is always a multiple of 0.75 pt and 18.5 is not on it; the nearest rung to an 18.40 pt source is 18.75. No declaration lands 18.5, so this question is closed rather than answered with a value. See FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md. |
 | 00_pA-01 | 00_page_count | A | from the committed gverify JSONs and CENSUS.csv, how many documents do | 05:13 | 05:00 | landed | FINDINGS/18disp-prize-sizing-agentA.md |
 | 00_pB-01 | 00_page_count | B | re-measure every claim of the page-count finding from the exported PDF | 05:13 | 05:40 | landed | FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md |
 | 18_dresidual-census-01 | 18_d | residual-census | which current-engine documents fail 18_displacement, and what has FIND | 06:17 | a per-document table plus the check arithmetic, from committed files only | landed | FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - 58 of 213 Google results are on the current engine (98be7c3c); 24 fail 18_displacement, only 2 fail it alone (16_right_aligned_amounts_txtpos, 31_times_body_arial_headings); the 16-document solo population is stamped 462353f9, not current. Killed the row-pitch lead before a round trip was spent. |
@@ -60,13 +58,14 @@ unfinished work, not as a result.
 | 18_dB-02 | 18_displacement | B | if the table-top step were removed, which documents become CLEAN | 04:38 | 10 min | landed | step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40 |
 | 18_drowheight-prepass-01 | 18_displacement | rowheight-prepass | produce a minimal compilable two-pass emit for the atLeast trHeight th | 06:34 | a unified diff that applies and compiles, plus the catch that an all-equal test skips the target document | landed | FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch |
 | 18_drowpitch-census-01 | 18_displacement | rowpitch-census | census the table row pitch of every corpus PDF and classify uniform-fr | 06:34 | a CSV and a count per class, so the guard's population is measured rather than assumed | landed | no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B. |
+| A1 | 25_invisible_text | check-definition | what does 25_invisible_text compare, and which construct makes 48 docu | 07:03 | the check's operands and a named Java site, so a fix could be attempted | landed | the check stopped at the FIRST fill under a run's corner. A Google export opens with a page-sized white rect and rasterises our bands into images, so white type on an orange band matched the sheet. This run's fix; 5 documents went 42/42. |
+| A2 | 18_displacement | row-height-law | what law does Google use to lay a table row's height, and what LO-inva | 07:22 | a law fitted to the committed Google numbers, and one falsifiable change | landed | row = 0.75*round((max(trHeight,content)+rule)/0.75): trHeight is a quantised floor, not a length. 362 is unruled, so it does not ramp +0.75/row - the carry-over's 21.75 pt is ruled-table arithmetic. The LO-invariant change is DocxWriter:6468 declaring the row one rule short; it must be tested on a ruled document, not 362. |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `02:07` agent landed: 04_cB-01 /  -> DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.
 - `02:07` agent landed: 18_dA-02 /  -> FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md
 - `02:07` agent landed: 04_cB-02 /  -> FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md
 - `02:08` attempt 42 on 18_displacement -> lead (0/13 moved)
@@ -91,6 +90,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `06:40` attempt 48 on 18_displacement -> lead
 - `07:11` attempt 1 on 25_invisible_text -> kept (2/5 moved)
 - `07:12` attempt 2 on 25_invisible_text -> kept (5/5 moved)
+- `07:21` attempt 49 on 18_displacement -> reverted (0/2 moved)
 
 ## Where the rest of the state lives
 

@@ -406,7 +406,7 @@
   "status": "OPEN"
  },
  "25_invisible_text": {
-  "attempts": 1,
+  "attempts": 2,
   "first_seen": null,
   "history": [
    {
@@ -415,18 +415,27 @@
     "outcome": "kept",
     "reason": "check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42",
     "total": 5
+   },
+   {
+    "at": "2026-11-24 07:12",
+    "moved": 5,
+    "outcome": "kept",
+    "reason": "all five single-check documents re-measured 42/42 in Google on this engine after the check fix",
+    "total": 5
    }
   ],
   "last": null,
   "last_engine": "b7699196",
-  "last_moved": 2,
+  "last_moved": 5,
   "last_total": 5,
   "outcomes": [
+   "kept",
    "kept"
   ],
-  "reason": "check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42",
+  "reason": "all five single-check documents re-measured 42/42 in Google on this engine after the check fix",
   "reasons": [
-   "check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42"
+   "check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42",
+   "all five single-check documents re-measured 42/42 in Google on this engine after the check fix"
   ],
   "requeues": 0,
   "status": "OPEN"
