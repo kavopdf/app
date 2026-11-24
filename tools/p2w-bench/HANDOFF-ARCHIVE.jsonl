@@ -372,3 +372,4 @@
 {"_list": "notes", "_entry": {"at": "16:37", "text": "agent landed: gverB-01 /  -> tools/p2w-bench/FINDINGS/gverify-COLLECT-DOWNLOAD-SHAPE-1120-agent.md"}}
 {"_list": "agents", "_entry": {"id": "00_pB-01", "class": "00_page_count", "angle": "B", "question": "re-measure every claim of the page-count finding from the exported PDFs and docx alone - pages, image counts, paragraph counts", "expected": "05:40", "deployed": "05:13", "status": "landed", "finding": "FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md", "deployed_at": "2026-11-22T23:43", "landed_at": "2026-11-22T23:43"}}
 {"_list": "notes", "_entry": {"at": "17:41", "text": "attempt 38 on 18_displacement -> lead (0/190 moved)"}}
+{"_list": "notes", "_entry": {"at": "18:34", "text": "attempt 2 on 44_header_footer -> lead"}}

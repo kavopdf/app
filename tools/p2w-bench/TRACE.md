@@ -6,32 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 22 Nov 01:53 | fixer | stale-claim | fixer slot was stale (10 min) - the previous run ended without releasing it |
-| 22 Nov 02:02 | fixer | build-engine | started |
-| 22 Nov 02:02 | fixer | build-engine | engine built in 34s |
-| 22 Nov 02:07 | fixer | build-engine | started |
-| 22 Nov 02:07 | fixer | build-engine | engine built in 33s |
-| 22 Nov 02:09 | fixer | attempt | 32_stroke_lines -> lead (13/213 moved) |
-| 22 Nov 03:17 | fixer | build-engine | started |
-| 22 Nov 03:18 | fixer | build-engine | engine built in 38s |
-| 22 Nov 03:33 | fixer | build-engine | started |
-| 22 Nov 03:34 | fixer | build-engine | engine built in 36s |
-| 22 Nov 03:35 | fixer | attempt | 32_stroke_lines -> lead (0/213 moved) |
-| 22 Nov 04:01 | fixer | attempt | 32_stroke_lines -> reverted (0/16 moved) |
-| 22 Nov 04:08 | fixer | attempt | 32_stroke_lines -> lead (1/? moved) |
-| 22 Nov 04:18 | fixer | claim | fixer claimed the slot |
-| 22 Nov 04:18 | fixer | stale-claim | fixer slot was stale (10 min) - the previous run ended without releasing it |
-| 22 Nov 04:49 | fixer | attempt | 32_stroke_lines -> lead (0/? moved) |
-| 22 Nov 05:14 | fixer | claim | fixer claimed the slot |
-| 22 Nov 05:15 | fixer | build-engine | started |
-| 22 Nov 05:15 | fixer | build-engine | engine built in 33s |
-| 22 Nov 05:18 | fixer | attempt | 32_stroke_lines -> lead (0/? moved) |
-| 22 Nov 05:56 | fixer | claim | fixer claimed the slot |
-| 22 Nov 05:56 | fixer | stale-claim | fixer slot was stale (38 min) - the previous run ended without releasing it |
-| 22 Nov 06:05 | fixer | build-engine | started |
-| 22 Nov 06:06 | fixer | build-engine | engine built in 34s |
-| 22 Nov 06:10 | fixer | attempt | 32_stroke_lines -> kept (3/213 moved) |
-| 22 Nov 06:13 | fixer | attempt | 32_stroke_lines -> kept (16/213 moved) |
 | 22 Nov 06:17 | fixer | attempt | 18_displacement -> lead |
 | 22 Nov 07:14 | fixer | claim | fixer claimed the slot |
 | 22 Nov 07:14 | fixer | stale-claim | fixer slot was stale (19 min) - the previous run ended without releasing it |
@@ -406,3 +380,29 @@
 | 24 Nov 09:01 | fixer | build-engine | started |
 | 24 Nov 09:02 | fixer | build-engine | engine built in 37s |
 | 24 Nov 09:17 | fixer | attempt | 18_displacement -> lead (1/10 moved) |
+| 24 Nov 10:00 | fixer | claim | fixer claimed the slot |
+| 24 Nov 10:22 | fixer | build-engine | started |
+| 24 Nov 10:24 | fixer | build-engine | engine built in 62s |
+| 24 Nov 10:30 | fixer | build-engine | started |
+| 24 Nov 10:30 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 10:34 | fixer | build-engine | started |
+| 24 Nov 10:34 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 10:39 | fixer | build-engine | started |
+| 24 Nov 10:39 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 10:44 | fixer | build-engine | started |
+| 24 Nov 10:44 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 10:49 | fixer | build-engine | started |
+| 24 Nov 10:49 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 10:54 | fixer | build-engine | started |
+| 24 Nov 10:54 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 10:59 | fixer | build-engine | started |
+| 24 Nov 10:59 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 11:04 | fixer | build-engine | started |
+| 24 Nov 11:04 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 11:09 | fixer | build-engine | started |
+| 24 Nov 11:09 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 11:14 | fixer | build-engine | started |
+| 24 Nov 11:14 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 11:19 | fixer | build-engine | started |
+| 24 Nov 11:19 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 11:23 | fixer | attempt | 18_displacement -> lead (0/200 moved) |

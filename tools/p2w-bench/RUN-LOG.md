@@ -1,6 +1,3 @@
-| 21 Nov 11:18 | fixer | slot claimed - fixer running |
-| 21 Nov 11:35 | fixer | attempt t02_position -> error |
-| 21 Nov 11:36 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 12:12 | fixer | slot claimed - fixer running |
 | 21 Nov 12:46 | fixer | attempt 32_stroke_lines -> error (0/37 moved) |
 | 21 Nov 12:49 | fixer | slot FORCED released - see INCIDENTS.md for why |
@@ -199,3 +196,5 @@
 | 24 Nov 08:57 | fixer | slot claimed - fixer running |
 | 24 Nov 09:17 | fixer | attempt 18_displacement -> lead (1/10 moved) |
 | 24 Nov 09:19 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 24 Nov 10:00 | fixer | slot claimed - fixer running |
+| 24 Nov 11:23 | fixer | attempt 18_displacement -> lead (0/200 moved) |
