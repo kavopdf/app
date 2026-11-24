@@ -1,0 +1,136 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index f0439044..12409bd9 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6364,6 +6364,35 @@ public final class DocxWriter {
+         // are stacked from the table's own top, so row 2 starts one WRITTEN row below row 1.
+         float recutTopPt = Float.NaN;
+         float rowTopPagePtHere = Float.NaN;
++        // THE UNIFORM-PITCH CUMULATIVE PIXEL SNAP - prepared here, applied after the loop.
++        //
++        // Google Docs lays a table row out on WHOLE CSS PIXELS and truncates the fraction:
++        // 1 px = 15 twips = 0.75 pt, so a row declared 168 twips (11.2 px) renders at 11 px
++        // and loses 0.15 pt on EVERY row. Snapping the CUMULATIVE height to whole pixels and
++        // writing each row as the difference of two snapped cumulatives CARRIES the fraction
++        // instead of dropping it, so the cumulative error stays inside half a pixel however
++        // many rows the table has (362_price_list_dense: 168 x 28 -> 165/165/180 repeating,
++        // 41/42 -> 42/42 in Google).
++        //
++        // It is applied ONLY to a table whose row heights are a UNIFORM PITCH - one repeating
++        // fractional row height, plus rows that are already whole pixels (see the test at the
++        // end of the loop). A repeating grid pitch is a line grid whose total must be
++        // preserved, and preserving the total is exactly what this does; a table of
++        // individually measured boxes has no pitch to preserve - it is already placed where
++        // the page drew it - and redistributing its rows is pure loss. That is why the guard is
++        // not `ruleTwHere == 0` and not `!exactRows`: both were measured and both cost documents.
++        //
++        // The heights cannot be known before the first row is written. rowHeightTw is built
++        // per row from that row's own edge, its cells' wrap, the type-size floor and - on a
++        // re-cut table - from recutTopPt, which is a running sum of the rows ABOVE it, so a
++        // true pre-pass would have to duplicate this whole body and re-derive recutTopPt from
++        // heights it has not written yet. So the rows are written first and the value inside
++        // each w:trHeight is rewritten here once every height is known. Nothing but that one
++        // attribute value changes: rowHeightTw itself - and therefore writtenRowsTw, the flow
++        // charge, lastRowHeightTw and the anchor after the table - is left exactly as it was.
++        int[] rowHeightInTw = new int[keepRows];
++        int[] trHeightAt = new int[keepRows];
++        int[] trHeightLen = new int[keepRows];
+         for (int r = 0; r < keepRows; r++) {
+             List<String> row = t.rows.get(r);
+             // This row's own pitch. A ruled table's rule lies inside the row's box, so it comes
+@@ -6555,7 +6584,14 @@ public final class DocxWriter {
+             }
+             inner.append("<w:tr>");
+             if (rowTwHere > 0) {
+-                inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
++                // The value is recorded, not decided: the snap is applied after the loop, when
++                // every row of this table has a height to compare against (see above).
++                rowHeightInTw[r] = rowHeightTw;
++                String hTw = Integer.toString(rowHeightTw);
++                inner.append("<w:trPr><w:trHeight w:val=\"");
++                trHeightAt[r] = inner.length();
++                trHeightLen[r] = hTw.length();
++                inner.append(hTw)
+                      .append("\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
+             }
+             int c = 0;
+@@ -6992,6 +7028,79 @@ public final class DocxWriter {
+             }
+             inner.append("</w:tr>");
+         }
++        // THE SNAP, now that every row's height is known.
++        //
++        // IS THIS TABLE A UNIFORM PITCH? A grid whose pitch repeats is a line grid whose total
++        // must be preserved, and preserving the total is exactly what the snap does; a table of
++        // individually measured boxes has no pitch to preserve - it is already placed where the
++        // page drew it - and redistributing its rows is pure loss. So the table is a pitch when
++        // it has ONE row height that is not already a whole number of pixels, and that height
++        // repeats at least three times.
++        //
++        // A row that is ALREADY a whole number of pixels does not disqualify the table and is
++        // not redistributed: the snap leaves such a row exactly where it is, because a whole
++        // pixel height reached from a whole pixel cumulative snaps to itself. That is what lets
++        // 362_price_list_dense through - its table is a 240 twip (16 px) header over 28 rows of
++        // 168 twips (11.2 px), and the header comes out at 240 unchanged while the body becomes
++        // 165/165/180 repeating, which is the distribution measured at 42/42 in Google.
++        // Requiring every row to be equal would skip exactly the table the fix exists for.
++        //
++        // A table with TWO different fractional heights (electricity-bill's 360/375/390
++        // alternation) is not a pitch and is skipped, and so is one whose rows are all whole
++        // pixels already: the snap is the identity there and its .docx stays byte-identical.
++        if (keepRows >= 3) {
++            int pitchInTw = 0;
++            int pitchRows = 0;
++            boolean uniform = true;
++            for (int r = 0; r < keepRows; r++) {
++                int h = rowHeightInTw[r];
++                // A row written with no w:trHeight has no height to snap and no place in a pitch.
++                if (h <= 0) { uniform = false; break; }
++                if (h % 15 == 0) continue;
++                if (pitchInTw == 0) { pitchInTw = h; pitchRows = 1; }
++                else if (h == pitchInTw) pitchRows++;
++                else { uniform = false; break; }
++            }
++            if (uniform && pitchRows >= 3) {
++                // cumTw  = the height the page asked for, summed down the table.
++                // doneTw = the height already written, summed down the table.
++                // 15 * round(cumTw / 15) is the cumulative snapped to a whole CSS pixel, and
++                // the row is the difference between two snapped cumulatives - so the fraction
++                // is carried from row to row instead of being dropped on every row.
++                //
++                // sum(out) == sum(in), EXACTLY, and that is what makes this safe: the table's
++                // total height is never changed, only its distribution. The LAST row is
++                // written as totalInTw - doneTw rather than as a snapped difference, because
++                // the last cumulative IS the total: snapping it would change the table's own
++                // height by up to 7 twips whenever the total is not a whole pixel count. The
++                // last row therefore absorbs that remainder - under one pixel, 0.75 pt at
++                // most, on the one edge no row below it depends on.
++                int totalInTw = 0;
++                for (int r = 0; r < keepRows; r++) totalInTw += rowHeightInTw[r];
++                int[] rowHeightOutTw = new int[keepRows];
++                int cumTw = 0, doneTw = 0;
++                boolean sane = true;
++                for (int r = 0; r < keepRows; r++) {
++                    cumTw += rowHeightInTw[r];
++                    int outTw = r == keepRows - 1
++                            ? totalInTw - doneTw
++                            : 15 * Math.round(cumTw / 15.0f) - doneTw;
++                    // A row shorter than a pixel cannot be snapped to one; leave the table
++                    // exactly as written rather than write a row of no height.
++                    if (outTw <= 0) { sane = false; break; }
++                    rowHeightOutTw[r] = outTw;
++                    doneTw += outTw;
++                }
++                // Rewritten back to front, so the offsets recorded for the rows not yet
++                // rewritten are untouched: every replacement lies to the RIGHT of them.
++                if (sane) {
++                    for (int r = keepRows - 1; r >= 0; r--) {
++                        inner.replace(trHeightAt[r], trHeightAt[r] + trHeightLen[r],
++                                Integer.toString(rowHeightOutTw[r]));
++                    }
++                }
++            }
++        }
+         inner.append("</w:tbl>");
+         sb.append(inner);
+         // A table must be followed by a paragraph of its own: Word inserts one if it is not

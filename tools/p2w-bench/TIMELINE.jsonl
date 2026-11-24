@@ -3481,3 +3481,7 @@
 {"t": 1795482151.2844114, "ist": "06:32:31", "ev": "beat", "d": "patch saved, engine reverted; checking the gates"}
 {"t": 1795482161.5897639, "ist": "06:32:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795482164.061121, "ist": "06:32:44", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795482166.0627904, "ist": "06:32:46", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795482166.1542149, "ist": "06:32:46", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795482166.260827, "ist": "06:32:46", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795482168.3584902, "ist": "06:32:48", "ev": "beat", "d": "committing the finding and the attempt record"}
