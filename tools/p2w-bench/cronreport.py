@@ -108,6 +108,43 @@ def google_state():
     return scored, refused, clean, failed_by
 
 
+def _gv_results():
+    """Every Google verdict on disk, as {name: dict}."""
+    out = {}
+    for f in sorted(glob.glob(GV + "/*.json")):
+        try:
+            out[os.path.basename(f)[:-5]] = json.load(open(f, encoding="utf-8"))
+        except Exception:
+            continue
+    return out
+
+
+def _checks_applied():
+    """How many checks the documents were actually measured against, as a readable string.
+
+    DERIVED, NEVER ASSUMED. This said "42" for as long as the check set was 42; when it reached 47 the
+    report kept saying "passes all 42" over documents that had never been asked the other five questions.
+    A mixed set is stated as mixed, because one number cannot describe two standards.
+    """
+    totals = sorted({v.get("total") for v in _gv_results().values() if v.get("total")})
+    if not totals:
+        return "unknown"
+    if len(totals) == 1:
+        return "%d" % totals[0]
+    return ", ".join(str(x) for x in totals) + " (mixed - a document is clean only against its own set)"
+
+
+def _on_current():
+    """How many scored documents carry the current (largest) check count."""
+    res = _gv_results()
+    totals = [v.get("total") for v in res.values() if v.get("total")]
+    if not totals:
+        return 0
+    cur = max(totals)
+    return sum(1 for v in res.values()
+               if v.get("status") != "page_count_refused" and v.get("total") == cur)
+
+
 def scored_names():
     """The documents the Google count is over: a result that is not a page-count refusal.
 
@@ -329,8 +366,16 @@ def gverify():
         pass
     L = ["# P2W Google Verify - Run Report", "",
          "**%s · %s IST%s**" % (d, t, (" · stage " + stage) if stage else ""), "",
-         "> %d of %d measured in Google, %d refused on page count. Google passes all 42 on %d;"
+         "> %d of %d measured in Google, %d refused on page count. Google passes every check on %d;"
          " LibreOffice on %d of the same %d." % (scored, scored + refused, refused, gclean, lclean, scored), "",
+         # THE CHECK SET HAS GROWN AND NOT EVERY DOCUMENT HAS CAUGHT UP. "passes all 42" was a
+         # hard-coded 42 that stopped being the standard when the set reached 47. Measured 24 Nov:
+         # all 35 clean documents were scored against 42 checks, and all 62 documents scored against
+         # the current 47 fail. So "35 pass" is the best case of an older standard, and a reader who
+         # takes it as today's number is being told something better than the truth. The count is now
+         # derived from the results, and a mixed set is stated rather than resolved silently.
+         "| checks applied | **%s** |" % _checks_applied(),
+         "| measured against the current set | **%d of %d** |" % (_on_current(), scored),
          "## Measured", "",
          "| | |", "|:--|--:|",
          "| scored | **%d** |" % scored,
