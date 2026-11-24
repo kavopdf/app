@@ -491,23 +491,21 @@ def main(argv):
     ap.add_argument("--report", action="store_true")
     a = ap.parse_args(argv)
     if a.plan:
-        # THE DOCX PASS ALSO MEASURES THE .TXT HALF. The user asked for one cron to keep both tables fresh,
-        # and there is no cron that measures the whole corpus: :20 runs 60 documents a pass. So the pass
-        # that measures docx measures txt too, here, rather than in a brief nobody reads.
-        #
-        # Nothing regenerates RANKING-TXT.csv except txt_rank.py, and no cron calls it - the table was 16.8 h
-        # old this morning while the report printed its numbers as current. 60 documents a pass at the ~10 s
-        # each measured on 24 Nov is about ten minutes, and it is incremental, so a pass always makes
-        # progress and never spends 35 minutes on a full rescore.
-        rc = plan(a.plan)
+        # THE .TXT HALF RUNS FIRST, AND THE ORDER IS NOT ARBITRARY.
+        # docx commits per document - --collect writes each verdict as it lands - so a pass cut off at
+        # 35 of 60 loses nothing; the cron's own prompt says so. txt_rank.py does not: it writes
+        # RANKING-TXT.csv once, at the end, so a pass killed part-way keeps none of what it scored.
+        # Running the half that must finish FIRST puts the slot's edge on the half that can afford it.
+        # 60 documents at the ~10 s each measured on 24 Nov is about ten minutes, inside the 900 s cap.
         try:
             import subprocess as _sp
-            print("")
-            print("  .txt half - scoring the next 60 so that table is never older than this pass")
+            print("  .txt half - scoring the next 60 first, because this half cannot be cut off safely")
             _sp.run([sys.executable, os.path.join(HERE, "txt_gate.py"), "--score", "60"],
                     timeout=900)
+            print("")
         except Exception as _e:
             print("  .txt scoring did not run: %s" % _e)
+        rc = plan(a.plan)
         return rc
     if a.stage:   return stage(a.stage)
     if a.collect: return collect(*a.collect)

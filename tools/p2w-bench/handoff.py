@@ -24,7 +24,7 @@ The next run reads it before it reads anything else and before it picks a class.
     python3 tools/p2w-bench/handoff.py --agent-land "class|A" --finding "FINDINGS/x.md"
     python3 tools/p2w-bench/handoff.py --run-end released
 """
-import json, os, sys, time
+import json, os, subprocess, sys, time
 
 try:
     from beacon import beat
@@ -81,7 +81,43 @@ def _trim(d):
     return d
 
 
+def _pending_count():
+    """How many items pending.py lists that a run can close, or 0. Subprocess, like round.py does.
+
+    A subprocess and not an import: pending.py is the single authority on what is outstanding, and a
+    second copy of its rules here is how two answers to one question start.
+    """
+    try:
+        r = subprocess.run([sys.executable, os.path.join(HERE, "pending.py"), "--json"],
+                           capture_output=True, text=True, timeout=90)
+        items = (json.loads(r.stdout) or {}).get("pending") or []
+        return len([i for i in items
+                    if not (i.get("kind") == "blocker"
+                            and (i.get("why") or "").lower().startswith("can i fix it: no"))])
+    except Exception:
+        return 0
+
+
 def save(d):
+    # THE HANDOFF IS THE FIRST THING A RUN READS, SO THE GATE MUST BE IN IT.
+    #
+    # classpick.decide() refuses a class while pending work is open, and that refusal was being
+    # bypassed every time without anyone ignoring it: the handoff is written by the previous run and
+    # says "18_displacement: apply the patch, build, start the slot". A run follows the handoff and
+    # never asks classpick. Measured 24 Nov: the 08:57 run took 18_displacement with 23 items open,
+    # because that is what the handoff told it to do.
+    #
+    # So the gate is prepended here. A run that reads only one file reads the right instruction first.
+    try:
+        _n = _pending_count()
+        if _n > 0:
+            _lead = ("PENDING FIRST: %d item(s) you can close - run pending.py and take them in its "
+                     "order before the class below. " % _n)
+            _cur = str(d.get("next") or "")
+            if not _cur.startswith("PENDING FIRST"):
+                d["next"] = _lead + _cur
+    except Exception:
+        pass
     json.dump(_trim(d), open(JS, "w", encoding="utf-8"), indent=1)
     render(d)
 

@@ -330,7 +330,7 @@ def gverify():
     L = ["# P2W Google Verify - Run Report", "",
          "**%s · %s IST%s**" % (d, t, (" · stage " + stage) if stage else ""), "",
          "> %d of %d measured in Google, %d refused on page count. Google passes all 42 on %d;"
-         " LibreOffice on %d." % (scored, scored + refused, refused, gclean, lclean), "",
+         " LibreOffice on %d of the same %d." % (scored, scored + refused, refused, gclean, lclean, scored), "",
          "## Measured", "",
          "| | |", "|:--|--:|",
          "| scored | **%d** |" % scored,

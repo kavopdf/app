@@ -196,8 +196,21 @@ def self_check():
         _gf = _gs = _gfc = _gsc = _grf = 0
     g = {"google_fixed": _gf, "google_scored": _gs, "google_fixed_current": _gfc,
          "google_scored_current": _gsc, "google_refused": _grf}
-    t = txt() or {}
-    c = corpus() or {}
+    # A DEPENDENCY THAT RAISES MUST NOT TAKE THE SELF-CHECK WITH IT. These two calls sat outside every
+    # try, so a broken corpus() crashed self_check() and the report was never written at all - worse
+    # than a check that stays silent, because the whole row disappears and nothing says why.
+    try:
+        t = txt() or {}
+    except Exception as _e:
+        t = {}
+        out.append(("self-check", "txt() raised " + _e.__class__.__name__ + ": " + str(_e)[:60],
+                    "the .txt checks did not run"))
+    try:
+        c = corpus() or {}
+    except Exception as _e:
+        c = {}
+        out.append(("self-check", "corpus() raised " + _e.__class__.__name__ + ": " + str(_e)[:60],
+                    "the corpus checks did not run"))
 
     # 1. corpus size: the gverify files against the ranking's own row count.
     try:
@@ -207,8 +220,8 @@ def self_check():
         _nr = c.get("docs")
         if _nr and _nv and int(_nr) != int(_nv):
             out.append(("corpus size", "ranking says %s" % _nr, "gverify has %s files" % _nv))
-    except Exception:
-        pass
+    except Exception as _e:
+        out.append(("self-check", "the corpus size check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
 
     # 2. attempts: RUN.json's counter against the history inside this run's window.
     try:
@@ -218,8 +231,8 @@ def self_check():
         if int(_counter) != int(_hist):
             out.append(("attempts", "RUN.json counter %s" % _counter,
                         "ATTEMPTS.json history %s" % _hist))
-    except Exception:
-        pass
+    except Exception as _e:
+        out.append(("self-check", "the attempts check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
 
     # 3. the .txt table's own size against the corpus it claims to cover.
     try:
@@ -227,16 +240,16 @@ def self_check():
         _cr = c.get("docs")
         if _tr and _cr and int(_tr) != int(_cr):
             out.append((".txt scored", "RANKING-TXT says %s" % _tr, "corpus says %s" % _cr))
-    except Exception:
-        pass
+    except Exception as _e:
+        out.append(("self-check", "the txt scored check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
 
     # 4. the .txt table's age. Not a disagreement, but a number that reads as current and is not.
     try:
         _a = t.get("age_h")
         if _a is not None and _a >= 6.0:
             out.append((".txt age", "measured %.1f h ago" % _a, "nothing re-measures it on a schedule"))
-    except Exception:
-        pass
+    except Exception as _e:
+        out.append(("self-check", "the txt age check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
 
     # 5. clean counts: gverify's own count against the number the ranking table carries.
     try:
@@ -244,8 +257,8 @@ def self_check():
         _tc = c.get("clean")
         if _gc is not None and _tc is not None and int(_gc) != int(_tc):
             out.append(("clean count", "gverify says %s" % _gc, "ranking says %s" % _tc))
-    except Exception:
-        pass
+    except Exception as _e:
+        out.append(("self-check", "the clean count check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
     # 6. THE ARITHMETIC IDENTITIES. A report can lie without any second file disagreeing, by printing
     # three numbers that cannot all be true at once. Each of these is a sum that must close.
     try:
@@ -266,8 +279,8 @@ def self_check():
         if int(_gfc) > int(_gsc):
             out.append(("clean vs scored", "clean %s exceeds scored %s" % (_gfc, _gsc),
                         "more documents cannot be clean than were scored"))
-    except Exception:
-        pass
+    except Exception as _e:
+        out.append(("self-check", "the clean split check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
 
     # 7. scored + refused must equal the corpus. 190 + 23 = 213 is the identity the report relies on.
     try:
@@ -278,8 +291,8 @@ def self_check():
             if int(_scored) + int(_refused) != int(_docs):
                 out.append(("corpus identity", "scored %s + refused %s" % (_scored, _refused),
                             "does not equal the corpus %s" % _docs))
-    except Exception:
-        pass
+    except Exception as _e:
+        out.append(("self-check", "the scored total check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
 
     # 8. the .txt table's own arithmetic: clean + failing must equal scored.
     try:
@@ -288,8 +301,8 @@ def self_check():
             if int(_tc) + int(_tf) != int(_ts):
                 out.append((".txt identity", "clean %s + failing %s" % (_tc, _tf),
                             "does not equal scored %s" % _ts))
-    except Exception:
-        pass
+    except Exception as _e:
+        out.append(("self-check", "the clean vs scored check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
 
     # 9. classes solved cannot exceed the class count, and the count must match the file the classes
     # come from. "0 of 34 clear" is a claim about 34 rows somewhere.
@@ -302,8 +315,8 @@ def self_check():
             if _open > _total:
                 out.append(("classes", "%s open of %s" % (_open, _total),
                             "more open classes than classes"))
-    except Exception:
-        pass
+    except Exception as _e:
+        out.append(("self-check", "the corpus identity check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
 
     # 10. a subagent the run says it deployed should have left a FINDINGS file. An agent claimed and not
     # found is the same false-zero shape as attempts.
@@ -315,14 +328,19 @@ def self_check():
             _have = set(os.listdir(_fd)) if os.path.isdir(_fd) else set()
             _missing = []
             for _a in _claimed:
-                _id = str((_a or {}).get("id") or (a or {}).get("class") or "")
+                _id = str((_a or {}).get("id") or (_a or {}).get("class") or "")
                 if _id and not any(_id[:12] in _n for _n in _have):
                     _missing.append(_id[:16])
             if _missing:
                 out.append(("subagents", "%d deployed" % len(_claimed),
                             "no FINDINGS file for %s" % ", ".join(_missing[:2])))
-    except Exception:
-        pass
+    except Exception as _e:
+        # A CHECK THAT CANNOT RUN IS NOT A CHECK THAT PASSED. Every block above swallowed its own
+        # exception, and that is exactly how five of these checks were dead code while looking live:
+        # google_fixed() returns a tuple, g.get() raised, `except: pass` hid it. A self-check that
+        # hides its own failures is worse than none, because it reports "every field agrees".
+        out.append(("self-check", "the subagent check raised %s" % type(_e).__name__,
+                    "it did not run, so it cannot vouch for anything"))
     return out
 
 
