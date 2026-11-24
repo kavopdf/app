@@ -1271,6 +1271,38 @@ def run(end):
           if not os.path.exists(DIST+"/"+os.path.basename(p)[:-4]+".json")
           and os.path.basename(p)[:-4] not in _exempt_docx]
     todo.sort(key=_pages)
+    # MEASURE ONLY WHAT THE ENGINE ACTUALLY CHANGED. A restamp of all 213 is 54 minutes, which is
+    # why a slot affords one attempt and 218 attempts produced nothing. corpus-changed.py hashes every
+    # .docx against the previous build; a document whose bytes did not move cannot produce a different
+    # verdict, because the source PDF, the .docx and the instrument are all the same.
+    #
+    # ABSENT OR UNREADABLE IS A REFUSAL, NOT AN EMPTY LIST. Filtering to nothing would report a
+    # complete measurement having measured none, which is the fault this whole pipeline was built to
+    # stop. Without the flag the behaviour is unchanged.
+    if os.environ.get('P2W_CHANGED_ONLY'):
+        _ch = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                           'benchmarks', 'DOCX-CHANGED.json')
+        # A STALE LIST IS WORSE THAN NO LIST. If the corpus was rebuilt after the last --record, the
+        # list describes bytes that no longer exist and the filter would skip documents that did move.
+        # The manifest's own timestamp is the test: it must be newer than the corpus stamp.
+        _stamp = os.path.join(os.path.dirname(os.environ.get('P2W_OUT')
+                                   or '/scratch/work/p2w/out'), '.stamp')
+        try:
+            if os.path.exists(_stamp) and os.path.getmtime(_stamp) > os.path.getmtime(_ch):
+                log('changed-only: the corpus is newer than the changed list - refusing; '
+                    'run corpus-changed.py --record after the build')
+                return
+        except OSError:
+            pass
+        try:
+            _want = set(json.load(open(_ch, encoding='utf-8')).get('todo') or [])
+        except Exception as _e:
+            log('changed-only: cannot read %s (%s) - refusing rather than measuring nothing'
+                % (_ch, type(_e).__name__))
+            return
+        _before = len(todo)
+        todo = [d for d in todo if d in _want]
+        log('changed-only: %d of %d documents moved since the last record' % (len(todo), _before))
     if not todo:
         return
     for i in range(0,len(todo),CHUNK):
