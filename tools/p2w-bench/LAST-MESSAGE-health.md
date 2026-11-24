@@ -25,7 +25,7 @@
 
 ## What this pass did
 
-**Released a fixer slot held by a dead run.** The claim was taken at 14:17 IST and its own last beacon read 13:51 - a claim newer than its last beat only happens when a run takes the slot and does nothing. round.py --release-fixer --force cleared it, the engine tree was clean so the release reverted nothing, and status.py now reads IDLE with the slot free. The last fixer event before this pass was at 14:07.
+**Released a fixer slot held by a dead run.** The claim was taken at 14:17 IST and its own last beacon read 13:51 - a claim newer than its last beat only happens when a run takes the slot and does nothing. round.py --release-fixer --force cleared it, the engine tree was clean so the release reverted nothing, and status.py read IDLE with the slot free. The last fixer event before this pass was at 14:07, and the next fixer run took the slot back within the same minute - the pair working as designed.
 
 **Amended today's PROGRESS row.** The committed row carried an older Google-clean count than the live tables. progress.py --amend rewrote today's row from the live tables and named what it used to say; it now reads 35 clean against 30 on 23 Nov. No past row was touched.
 
