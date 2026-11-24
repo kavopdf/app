@@ -5288,3 +5288,7 @@
 {"t": 1795546729.6559563, "ist": "00:28:49", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795546729.8893347, "ist": "00:28:49", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795546783.4716377, "ist": "00:29:43", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795549111.4654837, "ist": "01:08:31", "ev": "beat", "d": "relay: picking the next attempt from one-check-away docs"}
+{"t": 1795549126.1578894, "ist": "01:08:46", "ev": "beat", "d": "relay: applying the table-spacer patch"}
+{"t": 1795549153.0896306, "ist": "01:09:13", "ev": "beat", "d": "relay: writing the 18_displacement finding"}
+{"t": 1795549171.9154096, "ist": "01:09:31", "ev": "beat", "d": "attempt.py: recording an attempt"}

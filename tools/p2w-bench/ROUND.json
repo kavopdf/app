@@ -13,10 +13,10 @@
       }
     ]
   },
-  "fixer_doing": "relay: cloned, claiming slot",
-  "fixer_doing_since": 1795545023.1739159,
+  "fixer_doing": "relay: writing the 18_displacement finding",
+  "fixer_doing_since": 1795549153.0899854,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795545023.1739166,
+  "fixer_last_beat": 1795549153.0899858,
   "fixer_started": 1795548572.6050725,
   "history": [
     {
