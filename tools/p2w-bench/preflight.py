@@ -123,6 +123,21 @@ def next_action():
         return "none", "the ranking is empty"
     top = str((rk[0][0] if isinstance(rk[0], (list, tuple)) else rk[0]) or '')
     docs = rk[0][1] if isinstance(rk[0], (list, tuple)) and len(rk[0]) > 1 else '?'
+    # AN EXHAUSTED CLASS IS NOT A NEXT ACTION. classpick drops these from its ranking, but this read
+    # ranking()[0] and said 18_displacement while the rotation's own top was 25_invisible_text.
+    # The skip runs BEFORE att/moved are read, so the action and its evidence come from the same
+    # class - building `why` first left the row naming one class and counting another, which is the
+    # fault this whole week has been about.
+    try:
+        _ex = set(cp.exhausted())
+        for _r in rk:
+            _n = str((_r[0] if isinstance(_r, (list, tuple)) else _r) or '')
+            if _n and _n not in _ex:
+                top = _n
+                docs = _r[1] if isinstance(_r, (list, tuple)) and len(_r) > 1 else docs
+                break
+    except Exception:
+        pass
     att, moved = 0, 0
     try:
         at = json.load(open(os.path.join(HERE, 'ATTEMPTS.json'), encoding='utf-8'))
