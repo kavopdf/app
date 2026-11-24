@@ -95,3 +95,123 @@ resolve.
   ladder are the repo's live measurements, not that investigation's.
 - For the 8 residual documents, whether the check fails them on the tolerance clause or on `if not ds`
   needs one `verify_google.py --json` per document with the Google side available.
+
+## 04_chars_missing — the check never opens the .docx, and 63 of 65 lose nothing
+
+**The check compares the source PDF's text layer against Google Docs' PDF EXPORT of the .docx**
+(`verify_google.py:4695-4697`; both sides built by `runs()` + `norm_text()`). It never reads the .docx.
+
+All 213 were converted at HEAD and compared. On **63 of the 65** the .docx is character-for-character
+identical to the source: the group's whole source text is **88,786 non-space characters and the .docx
+lacks 21 of them, in two documents.** Nothing was lost at conversion.
+
+| class | in source | missing from .docx |
+|---|---:|---:|
+| white / invisible text | 647 | **0** |
+| bullet / symbol-font glyph | 170 | **2** |
+| genuinely dropped drawn text | 87,965 | **19** |
+| space (excluded by the check) | 14,746 | 0 |
+| **total** | **88,786** | **21 (0.024 %)** |
+
+**What Google's export lacks is text inside an anchored DrawingML text box**
+(`<wp:anchor><wps:txbx><w:txbxContent>`, `DocxWriter.anchorShape()`), which **Google's DOCX importer
+rasterises**. Proven, not inferred: on `27_two_column_left_short_txtpos` Google's export carries 1558
+characters against the source's 1601, and the missing 43-character multiset is **identical, type for type
+and count for count, to the 43 characters inside that document's text boxes**; the same document with the
+boxes removed exports at 1601 with **zero** missing, and the box's ink reappears in the export's image
+list as a 270x12 px bitmap where the footer line was.
+
+**It is a perfect one-sided separator:** 54 of the 65 failing documents carry text-box text, **0 of the
+125 that pass**. Plus 1 pure check artefact (`38_faux_bold` - one duplicate copy of a heading the source
+draws twice to fake bold, which the .docx correctly carries once), 1 genuine engine loss
+(`601_fillable` - two ZapfDingbats tick marks), and 9 undetermined.
+
+**The verdict that matters for the product:** the check's stated meaning is wrong on 63 of 65, **but the
+engine is wrong on 54 in the way a user feels it** - it encodes text Google cannot carry as text, so a
+Docs user gets a **picture of a footer** instead of a footer. The fix is not to stop emitting text boxes;
+it is to stop using a construct Google rasterises.
+
+**The 9 undetermined** (`25_signature_block_underscores_txtpos`, `381_incident_report_timeline`,
+`383_api_docs_page`, `417_rotate180_and_mirrored`, `58_header_rule_footer_rule`, `602_bookmarked_annual_report`,
+`form16-part-b`, `table-across-page-break-repeated-header`, `very-long-single-column-table`) are all
+character-complete in the .docx and clean in LibreOffice, with no construct found. Five of them fail
+`27_text_off_page` in Google, and text wholly past the paper edge is invisible to the verifier's own
+extractor (proved: MuPDF returns nothing for glyphs drawn outside the mediabox) - the likely but
+**unobserved** mechanism.
+
+### A correction: the stamps are not four builds, they are one
+
+That investigation reported the 65 verdicts spanning four engine builds (`b7699196` 40, `462353f` 17,
+`98be7c3c` 6, `5beb8b9d` 2). Checked against the committed data:
+
+    04_chars_missing fails: 65
+      b7699196  61
+      462353f    3
+      5beb8b9d   1
+    98be7c3c appears nowhere in benchmarks/gverify/
+
+So **61 of 65 are on the current engine**, not 40, and one of the four stamps does not exist. The class is
+current; only 4 documents need re-measuring. This is the third time this week a sub-agent's stamp count
+disagreed with the store - the numbers must be read from `benchmarks/gverify/*.json`, not from prose.
+
+## 60_text_column_right_edge — two disjoint populations, and the earlier claim was half right
+
+The first investigation concluded "60 is a Google font substitution, not a layout class". All 56 were
+converted, rendered and measured: **the claim is true for 28 of 56 and false for the other 28.** Half right
+is the dangerous amount.
+
+**Group A - 28 of 56 - declares `DejaVuSans`/`DejaVuSerif`, which Google Docs does not have.** Google
+substitutes a face with different metrics, every line re-breaks, and the column edge moves **57-122 pt**,
+seven to fifteen times the check's whole allowance.
+
+**Group B - 27 of 56 - declares `Arial`/`Times New Roman`, which Google HAS, at the same advance widths as
+the source's Liberation faces.** No substitution can occur. They render 1.5-5.6 % narrow in **both**
+renderers because a .docx can only store font sizes in half-points and the engine floors to them
+(7.4 to 7.0, 6.8 to 6.5, 6.4 to 6.0; `halfPointsDown()`, `DocxWriter.java:7262`). They then fail an
+estimator that rests on a single line which, on half of them, is 9.8-253.8 pt longer than the second-widest
+line in its own column against a 4-19 pt slack.
+
+**Instrument calibration:** the LibreOffice verdicts were reproduced for **56 of 56** documents, 0
+disagreements. Among the 56, **41 pass in LibreOffice** - so 41 of the 56 are Google-only.
+
+**The decisive intervention:** hold the document, the engine and the renderer fixed and change **only the
+declared face** (DejaVu to Arial/Times metrics, i.e. what Google actually substitutes). On the 24
+measurable Google-only group-A documents, **21 flip PASS to FAIL**, the deciding column moving from a worst
+case of -17 pt to **-57 to -122 pt**. `302_radiology_report` is cleanest: as built its column is
+**0.01 pt** from the source; named in Arial's metrics the same column lands **112.21 pt** short.
+
+**Coverage: 25 of 56** - 25 of the 41 Google-only failures. Not the class.
+
+### What is wrong with the earlier claim
+
+1. **Scope.** It generalises from 4-5 documents to the class. **16 of the 41 Google-only failures name a
+   face Google has at the source's own metrics**, so substitution is excluded for them by construction.
+2. **Its own two measurements contradict each other on the sign.** `b0601de` (23 Nov) measured Google
+   substituting Arial 10-15 % NARROWER, column UNDER by 58-66 pt; `f43e86b` (24 Nov) measured the same
+   document **+4.8 % WIDER**, column OVER by 28.5 pt. This investigation's probe reproduces the first sign
+   and magnitude. **Neither sign has ever been established for the class**, and the committed
+   `gverify/*.json` files store only pass/fail, so no Google-side `(over, under)` pair exists for any of
+   the 56.
+3. **"79 is the only engine defect" is wrong.** Three of the five DejaVu documents (318, 323, 360) also
+   fail in LibreOffice, and all 27 group-B documents carry a real, measured 1.5-5.6 % width deficit in
+   both renderers.
+
+### A data gap worth closing
+
+**`gverify/*.json` stores only pass/fail, not the measured over/under pair.** That is why two runs could
+report opposite signs for the same document a day apart and neither could be checked against the other.
+Storing the pair costs nothing and makes this class falsifiable.
+
+### What is a wall and what is fixable
+
+- **Group A is a wall for the engine** and belongs in the check: naming a Google face moves the fault into
+  LibreOffice (measured, 21 of 27 fail there under Arial metrics, with a 2.8-5.6 % width error introduced
+  into the renderer that used to be exact). The only remaining option is a rule about
+  extent-versus-substitution - `60` must stop charging a column whose re-break is fully explained by a
+  face the renderer does not have - stated generally, with a per-document face-absence test, and
+  re-measured over all 213.
+- **Group B's size half is a wall**: .docx cannot express 7.4 pt, and both rounding directions are wrong
+  (down -5.4 %, up +4.2 %), so 1.4-5.6 % is unavoidable in the format.
+- **Group B's estimator half is fixable**: on 8 of the 16, the widest line is a 9.8-253.8 pt outlier
+  against a 4-19 pt slack, so letting the slack cover the column's own line-break step plus the half-point
+  error fits them without loosening the overrun branch, which is where a real defect shows.
