@@ -13,8 +13,10 @@
       }
     ]
   },
+  "fixer_doing": "relay: proving the phase-budget split - one chunk must both convert and measure",
+  "fixer_doing_since": 1795508513.5860229,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795502846.3435934,
+  "fixer_last_beat": 1795508513.5860236,
   "fixer_started": 1795506139.7604942,
   "history": [
     {

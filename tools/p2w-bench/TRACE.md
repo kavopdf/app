@@ -6,23 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 22 Nov 06:17 | fixer | attempt | 18_displacement -> lead |
-| 22 Nov 07:14 | fixer | claim | fixer claimed the slot |
-| 22 Nov 07:14 | fixer | stale-claim | fixer slot was stale (19 min) - the previous run ended without releasing it |
-| 22 Nov 07:19 | fixer | build-engine | started |
-| 22 Nov 07:20 | fixer | build-engine | engine built in 35s |
-| 22 Nov 07:25 | fixer | attempt | 18_displacement -> lead (0/213 moved) |
-| 22 Nov 08:16 | fixer | claim | fixer claimed the slot |
-| 22 Nov 08:16 | fixer | stale-claim | fixer slot was stale (24 min) - the previous run ended without releasing it |
-| 22 Nov 08:20 | fixer | build-engine | started |
-| 22 Nov 08:21 | fixer | build-engine | engine built in 37s |
-| 22 Nov 08:26 | fixer | attempt | 18_displacement -> reverted (1/16 moved) |
-| 22 Nov 08:56 | fixer | claim | fixer claimed the slot |
-| 22 Nov 08:56 | fixer | stale-claim | fixer slot was stale (30 min) - the previous run ended without releasing it |
-| 22 Nov 09:05 | fixer | build-engine | started |
-| 22 Nov 09:06 | fixer | build-engine | engine built in 47s |
-| 22 Nov 09:09 | fixer | build-engine | started |
-| 22 Nov 09:10 | fixer | build-engine | engine built in 51s |
 | 22 Nov 09:13 | fixer | build-engine | started |
 | 22 Nov 09:14 | fixer | build-engine | engine built in 42s |
 | 22 Nov 09:19 | fixer | attempt | 18_displacement -> lead (6/16 moved) |
@@ -406,3 +389,20 @@
 | 24 Nov 12:17 | fixer | build-engine | engine unchanged, compile skipped |
 | 24 Nov 12:28 | fixer | attempt | 18_displacement -> lead (0/? moved) |
 | 24 Nov 13:07 | ? | attempt | 18_displacement -> lead (0/129 moved) |
+| 24 Nov 13:12 | fixer | claim | fixer claimed the slot |
+| 24 Nov 13:20 | fixer | build-engine | started |
+| 24 Nov 13:21 | fixer | build-engine | engine built in 38s |
+| 24 Nov 13:27 | fixer | build-engine | started |
+| 24 Nov 13:27 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 13:37 | fixer | build-engine | started |
+| 24 Nov 13:38 | fixer | build-engine | engine built in 49s |
+| 24 Nov 13:38 | fixer | build-engine | started |
+| 24 Nov 13:38 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 13:43 | fixer | build-engine | started |
+| 24 Nov 13:43 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 13:45 | fixer | build-engine | started |
+| 24 Nov 13:45 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 13:47 | fixer | build-engine | started |
+| 24 Nov 13:49 | fixer | build-engine | engine built in 64s |
+| 24 Nov 13:52 | fixer | build-engine | started |
+| 24 Nov 13:52 | fixer | build-engine | engine unchanged, compile skipped |

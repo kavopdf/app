@@ -1407,6 +1407,12 @@ def diagnose(n):
 INSTRUMENT_MODE = "scipy"
 
 
+# The share of a --budget window that conversion may take before measurement gets the rest.
+# See the note at the docx()/run() call in main(). 0.55 is not measured against an alternative:
+# conversion is ~39 min of a ~55 min pass, and the point is only that neither phase gets 100%.
+CONVERT_SHARE=0.55
+
+
 def main():
     global INSTRUMENT_MODE
     ap=argparse.ArgumentParser(); ap.add_argument("--budget",type=int,default=250)
@@ -1460,7 +1466,28 @@ def main():
     _invalidate_if_engine_changed()
     if corpus()<100: log("ABORT: corpus"); return 2
     if not engine(): log("ABORT: engine"); return 2
-    docx(end); run(end); r=rank(); status()
+    # CONVERSION AND MEASUREMENT MUST NOT SHARE ONE DEADLINE.
+    #
+    # Measured 24 Nov, three consecutive 245/110/110 s chunks on this pod: every one ended
+    # "docx 37/213 -- converting 213 ... measured 0 of 212". `docx(end)` spends the WHOLE budget
+    # converting, so `run(end)` then finds the deadline gone and measures nothing - every chunk
+    # converts and no chunk measures. The last fixer run saw the same shape from outside (eight
+    # chunks took the corpus to docx 213/213 and measured 36 of 212) and read it as "the pass does
+    # not fit a slot", which is true but not the whole of it: the measurement phase was only ever
+    # entered on a chunk that had already run out of time.
+    #
+    # So conversion gets a share of the window and measurement gets the rest, and BOTH make
+    # progress in every chunk. The split is not a tuning knob for total cost - the work is the
+    # work - it is what makes a chunk's progress visible and a killed run's measurement survive.
+    #
+    # The floor under the total: cpu.max on this pod is 105000/100000, i.e. 1.05 cores, so no
+    # amount of parallelism shortens it (measured: 2 conversion workers on 10 documents gave
+    # 1.10x, with byte-identical .txt). A full pass is ~39 min of conversion at 11 s/document
+    # sustained plus ~15-20 min of measurement, and the only way it lands is a slot that starts
+    # it early and does not stop to investigate first.
+    _now=time.time()
+    _conv_end=_now+max(0.0,(end-_now))*CONVERT_SHARE
+    docx(_conv_end); run(end); r=rank(); status()
     # THE CENSUS IS PART OF THE MEASUREMENT, NOT A SEPARATE TOOL SOMEBODY REMEMBERS TO RUN.
     #
     # BASELINE-BRIEF.md says CENSUS.csv and CENSUS.md "are not optional and they are not

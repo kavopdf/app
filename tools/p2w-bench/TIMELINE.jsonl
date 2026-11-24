@@ -3917,3 +3917,14 @@
 {"t": 1795505972.1358051, "ist": "13:09:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795505972.6019068, "ist": "13:09:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795505974.6122382, "ist": "13:09:34", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795506142.9853256, "ist": "13:12:22", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795506143.2095313, "ist": "13:12:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795506143.3320904, "ist": "13:12:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795506166.1141214, "ist": "13:12:46", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795506168.31802, "ist": "13:12:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795506171.4717739, "ist": "13:12:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795506173.4304686, "ist": "13:12:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795506631.8349109, "ist": "13:20:31", "ev": "beat", "d": "relay: building engine + fetching corpus to time one ConvertOne"}
+{"t": 1795506746.5268314, "ist": "13:22:26", "ev": "beat", "d": "relay: p2w --force --budget 240 to measure real per-doc rate"}
+{"t": 1795507662.3162034, "ist": "13:37:42", "ev": "beat", "d": "relay: uniform-pitch patch applied, building engine for the 213-doc pass"}
+{"t": 1795508513.5850227, "ist": "13:51:53", "ev": "beat", "d": "relay: proving the phase-budget split - one chunk must both convert and measure"}
