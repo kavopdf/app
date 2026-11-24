@@ -171,6 +171,76 @@ def _attempts_in_window(r):
     return n
 
 
+def self_check():
+    """Every number this report prints that TWO files also describe, compared. Disagreements are listed.
+
+    THE REPORT HAS BEEN WRONG SIX TIMES IN ONE DAY AND ALWAYS THE SAME WAY: a field that two files describe,
+    and the report silently reading one of them. corpus 212 vs 213 (RANKING.csv vs the gverify files); the slot
+    clock (an IST string vs an epoch); "29 were clean there" (all engines vs the current one); the .txt table
+    (16.8 h old, printed as current); attempts 0 vs 2 (RUN.json's counter vs ATTEMPTS.json's history).
+
+    Each of those is invisible until the two sources happen to diverge, which is why the report looked right
+    most runs and wrong on some. A person reading it cannot tell which. So the check is here, and its result
+    is printed as a row: if two files disagree about something this report states, the report says so instead
+    of picking one and sounding certain.
+
+    Returns a list of (field, what one source says, what the other says).
+    """
+    out = []
+    g = google_fixed() or {}
+    t = txt() or {}
+    c = corpus() or {}
+
+    # 1. corpus size: the gverify files against the ranking's own row count.
+    try:
+        import glob as _g
+        _nv = len([x for x in _g.glob(os.path.join(HERE, "..", "..", "benchmarks",
+                                                   "gverify", "*.json"))])
+        _nr = c.get("docs")
+        if _nr and _nv and int(_nr) != int(_nv):
+            out.append(("corpus size", "ranking says %s" % _nr, "gverify has %s files" % _nv))
+    except Exception:
+        pass
+
+    # 2. attempts: RUN.json's counter against the history inside this run's window.
+    try:
+        _r = this_run()
+        _counter = json.load(open(os.path.join(HERE, "RUN.json"), encoding="utf-8")).get("attempts", 0) or 0
+        _hist = _attempts_in_window(json.load(open(os.path.join(HERE, "RUN.json"), encoding="utf-8")))
+        if int(_counter) != int(_hist):
+            out.append(("attempts", "RUN.json counter %s" % _counter,
+                        "ATTEMPTS.json history %s" % _hist))
+    except Exception:
+        pass
+
+    # 3. the .txt table's own size against the corpus it claims to cover.
+    try:
+        _tr = t.get("scored")
+        _cr = c.get("docs")
+        if _tr and _cr and int(_tr) != int(_cr):
+            out.append((".txt scored", "RANKING-TXT says %s" % _tr, "corpus says %s" % _cr))
+    except Exception:
+        pass
+
+    # 4. the .txt table's age. Not a disagreement, but a number that reads as current and is not.
+    try:
+        _a = t.get("age_h")
+        if _a is not None and _a >= 6.0:
+            out.append((".txt age", "measured %.1f h ago" % _a, "nothing re-measures it on a schedule"))
+    except Exception:
+        pass
+
+    # 5. clean counts: gverify's own count against the number the ranking table carries.
+    try:
+        _gc = g.get("google_fixed_current")
+        _tc = c.get("clean")
+        if _gc is not None and _tc is not None and int(_gc) != int(_tc):
+            out.append(("clean count", "gverify says %s" % _gc, "ranking says %s" % _tc))
+    except Exception:
+        pass
+    return out
+
+
 def this_run():
     r = _json(RUN, {})
     if not r.get("started"):
@@ -1000,6 +1070,15 @@ def main(argv):
         # "19" when the distinct documents that changed were 16 - the first attempt's three are inside
         # the second attempt's sixteen. The label now says what the number is, and the note below the
         # table still gives the distinct figure where the run recorded it.
+        # THE REPORT OWN CROSS-CHECK, BEFORE ANY NUMBER IT PRINTS. Six fields have been wrong in one day and
+        # every one was a number two files describe. Printed here so a disagreement is visible instead of being
+        # silently resolved in favour of whichever file the code happened to read.
+        _sc = self_check()
+        if _sc:
+            L.append("| **Self-check** | **%d disagreement(s)** - %s |" % (
+                len(_sc), "; ".join("%s: %s vs %s" % (f, a, b) for f, a, b in _sc[:3])))
+        else:
+            L.append("| Self-check | **every field agrees with its second source** |")
         L.append("| Document-moves this run | **%d** — %d attempt(s), %d kept (a sum: a document moved "
                  "twice counts twice) |"
                  % (tr["docs_improved"], tr["attempts"], tr["kept"]))

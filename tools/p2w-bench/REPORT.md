@@ -11,6 +11,7 @@
 
 | | |
 |:--|:--|
+| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 0 vs ATTEMPTS.json history 2 |
 | Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -35,7 +36,7 @@
 
 | | |
 |:--|:--|
-| Measured | **31 min ago** |
+| Measured | **39 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
