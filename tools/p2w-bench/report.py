@@ -391,8 +391,22 @@ def this_run():
 
 
 def engine_now():
-    """The engine commit the corpus is built from right now - the same fingerprint gverify stamps."""
+    """The engine commit the corpus is built from right now - the same fingerprint gverify stamps.
+
+    ON A DEPTH-1 CLONE `git log -1 -- <path>` RETURNS THE TIP FOR EVERY PATH, so this answered
+    9f00dc0 (a claim commit) where the engine commit is b7699196, and google_fixed() compared 191
+    current rows against it and reported "could not be read - 0 of 191 scored were read as
+    current". Same tree, full history: 187 of 191. A shallow checkout is fetched once here rather
+    than reported as a dead instrument.
+    """
     import subprocess as _sp
+    try:
+        if _sp.run(["git", "-C", ROOT, "rev-parse", "--is-shallow-repository"],
+                   capture_output=True, text=True, timeout=20).stdout.strip() == "true":
+            _sp.run(["git", "-C", ROOT, "fetch", "-q", "--unshallow"],
+                    capture_output=True, text=True, timeout=240)
+    except Exception:
+        pass
     try:
         r = _sp.run(["git", "-C", ROOT, "log", "-1", "--format=%h", "--",
                      "app/src/main/java/com/kavopdf/app/engine/"],

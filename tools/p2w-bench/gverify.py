@@ -116,9 +116,32 @@ def stale_by_check():
     return len(older) + len(unstamped), older + unstamped, "; ".join(why)
 
 
+def _unshallow_if_needed():
+    """A DEPTH-1 CLONE ANSWERS EVERY PATH WITH THE TIP COMMIT, SO THE ENGINE LOOKS LIKE HEAD.
+
+    Measured 25 Nov: on `git clone --depth 1` this pipeline's checkout is shallow, and
+    `git log -1 --format=%h -- <engine path>` then returns the tip commit (9f00dc0, a claim
+    commit) instead of the commit that last touched the engine (b7699196, confirmed with
+    `gh api repos/kavopdf/app/commits?path=.../engine/`). The engine is unchanged in the tree,
+    so the result is not stale data - it is a read that can never match. It cost the pipeline
+    its Google verdict: report.py printed "0 of 191 scored were read as current" and
+    gverify._done() saw 22 of 213 documents as done, both from one missing history.
+    """
+    import subprocess as _sp
+    try:
+        sh = _sp.run(["git", "-C", ROOT, "rev-parse", "--is-shallow-repository"],
+                     capture_output=True, text=True, timeout=20).stdout.strip()
+        if sh == "true":
+            _sp.run(["git", "-C", ROOT, "fetch", "-q", "--unshallow"],
+                    capture_output=True, text=True, timeout=240)
+    except Exception:
+        pass
+
+
 def _engine_now():
     """The engine commit the corpus is built from right now."""
     import subprocess as _sp
+    _unshallow_if_needed()
     try:
         r = _sp.run(["git", "-C", ROOT, "log", "-1", "--format=%h", "--",
                      "app/src/main/java/com/kavopdf/app/engine/"],
