@@ -4799,3 +4799,7 @@
 {"t": 1795525071.851046, "ist": "18:27:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795525071.9352312, "ist": "18:27:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795525081.3106318, "ist": "18:28:01", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795525083.5711524, "ist": "18:28:03", "ev": "attempt", "d": "00_page_count -> lead"}
+{"t": 1795525083.7320588, "ist": "18:28:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795525083.839837, "ist": "18:28:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795525084.2677622, "ist": "18:28:04", "ev": "beat", "d": "classrow.py: refreshing the class file"}
