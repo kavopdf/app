@@ -5314,3 +5314,13 @@
 {"t": 1795549250.9329712, "ist": "01:10:50", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795549277.158292, "ist": "01:11:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795549910.3145223, "ist": "01:21:50", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795550394.4073918, "ist": "01:29:54", "ev": "beat", "d": "attempt 1: 18_displacement row-pitch dither - applying and compiling"}
+{"t": 1795550424.4768188, "ist": "01:30:24", "ev": "beat", "d": "measuring the corpus after the dither (chunk 1)"}
+{"t": 1795550707.385318, "ist": "01:35:07", "ev": "beat", "d": "measuring the corpus after the dither (chunk 2)"}
+{"t": 1795550990.8025277, "ist": "01:39:50", "ev": "beat", "d": "measuring the corpus after the dither (chunk 3)"}
+{"t": 1795551302.9783664, "ist": "01:45:02", "ev": "beat", "d": "measuring the corpus after the dither (chunk 4)"}
+{"t": 1795551592.4079564, "ist": "01:49:52", "ev": "beat", "d": "measuring the corpus after the dither (chunk 5)"}
+{"t": 1795551879.8801591, "ist": "01:54:39", "ev": "beat", "d": "measuring the corpus after the dither (chunk 5 retry)"}
+{"t": 1795552195.6969535, "ist": "01:59:55", "ev": "beat", "d": "attempt recorded as lead: dither fires, but p2w --force measured stale docx"}
+{"t": 1795552217.974763, "ist": "02:00:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795552219.898515, "ist": "02:00:19", "ev": "beat", "d": "attempt.py: recording an attempt"}
