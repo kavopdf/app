@@ -603,10 +603,17 @@ def check(allow_engine_change, only=None):
         # handed nothing to read, so the one check that stops a construct Google ignores from spreading
         # never ran and 0 patches landed.
         #
-        # corpus-convert.py --ensure is a stat and a listdir when the corpus is warm, and a parallel
-        # rebuild when the engine moved. Calling it from the gate rather than from a brief is the whole
-        # difference between a mechanism and a paragraph nobody reads: the check can no longer be skipped
-        # because someone forgot, and the cost is paid once per engine instead of once per run.
+        # THE CORPUS IS BUILT HERE, NOT LEFT TO WHOEVER REMEMBERS.
+        #
+        # This gate prints "no .docx output directory - cannot check" when the converted corpus is absent,
+        # and on 24 Nov that is what it did for every run: the 213 .docx are output of the engine, so any
+        # engine change makes them stale, and rebuilding them took 38 minutes sequentially inside a run
+        # shorter than that. The gate was never slow - it finishes in seconds - it was handed nothing to read.
+        #
+        # corpus-slice.py builds it in slices that fit one call and converts only what is missing for THIS
+        # engine, writing the stamp when every document is done. A cold pod needs two gate calls: the first
+        # fills one slice and ends at the ceiling, the second finishes and stamps. That is the design, and
+        # a first call that ends at 290 s is not a refusal.
         _cc = subprocess.run([sys.executable, os.path.join(HERE, "corpus-slice.py"),
                               "--budget", "240", "-j", "4"],
                              capture_output=True, text=True, timeout=2400)
