@@ -150,7 +150,30 @@ def exhausted():
     will have changed by then.
     """
     rot = load(ROTATION, {})
-    return rot.get("exhausted") or {}
+    hand = dict(rot.get("exhausted") or {})
+    # AND THE LEDGER DERIVES THE REST, WHERE THE NAMES ALREADY AGREE.
+    #
+    # The docstring above says the two ledgers do not share a namespace, and for 13 of the 23 attempt
+    # keys that is true - `content-present-partly-displaced` is not a check name. But 10 of them ARE:
+    # 18_displacement (57 attempts), 47_margins (18), 32_stroke_lines (17), 00_page_count (9),
+    # 60_text_column_right_edge (5), 04_chars_missing (4). Those need no mapping, and a mapping written
+    # by hand for the other 13 would be a guess that switches a real class off for good.
+    #
+    # So an exact name match with five attempts and at most one document moved is exhausted, derived
+    # rather than remembered. A hand-written entry still wins: it is loaded first and never overwritten.
+    try:
+        from verify_google import all_check_ids
+        _ids = set(all_check_ids())
+        for _k, _v in (load(ATTEMPTS, {}) or {}).items():
+            if _k not in _ids or _k in hand:
+                continue
+            _h = (_v or {}).get("history") or []
+            _mv = sum(int(x.get("moved") or 0) for x in _h)
+            if len(_h) >= 5 and _mv <= 1:
+                hand[_k] = "derived: %d attempt(s), %d moved, from ATTEMPTS.json" % (len(_h), _mv)
+    except Exception:
+        pass
+    return hand
 
 
 def clean_leverage():
