@@ -1,10 +1,14 @@
 # P2W Google Verify - Run Report
 
-**24 Nov 2026 · 09:27 IST · stage classify**
+**24 Nov 2026 · 10:28 IST · stage classify**
 
 > 190 of 213 measured in Google, 23 refused on page count. Google passes all 42 on 35; LibreOffice on 124.
 
-This run found the measuring stage already finished, so nothing new went to Drive. It regenerated the capability table from the committed results and pushed it, so the classifier cron reads a table that matches the results it describes.
+This run measured nothing: both sides of the corpus were already on disk, so the stage is
+classify and the measuring work is finished. The capability table was regenerated from the committed
+results and committed unchanged in substance - the check counts are the same as the table it
+replaced - and the run stopped there. Grouping the failures into classes belongs to the classifier
+cron, and changing the engine belongs to the fixer; neither is this cron's to do.
 
 ## Measured
 
