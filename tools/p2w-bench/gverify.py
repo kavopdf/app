@@ -490,7 +490,25 @@ def main(argv):
     ap.add_argument("--matrix", action="store_true")
     ap.add_argument("--report", action="store_true")
     a = ap.parse_args(argv)
-    if a.plan:    return plan(a.plan)
+    if a.plan:
+        # THE DOCX PASS ALSO MEASURES THE .TXT HALF. The user asked for one cron to keep both tables fresh,
+        # and there is no cron that measures the whole corpus: :20 runs 60 documents a pass. So the pass
+        # that measures docx measures txt too, here, rather than in a brief nobody reads.
+        #
+        # Nothing regenerates RANKING-TXT.csv except txt_rank.py, and no cron calls it - the table was 16.8 h
+        # old this morning while the report printed its numbers as current. 40 documents a pass at the ~10 s
+        # each measured on 24 Nov is about seven minutes, and it is incremental, so a pass always makes
+        # progress and never spends 35 minutes on a full rescore.
+        rc = plan(a.plan)
+        try:
+            import subprocess as _sp
+            print("")
+            print("  .txt half - scoring the next 40 so that table is never older than this pass")
+            _sp.run([sys.executable, os.path.join(HERE, "txt_gate.py"), "--score", "40"],
+                    timeout=900)
+        except Exception as _e:
+            print("  .txt scoring did not run: %s" % _e)
+        return rc
     if a.stage:   return stage(a.stage)
     if a.collect: return collect(*a.collect)
     if a.lo:
