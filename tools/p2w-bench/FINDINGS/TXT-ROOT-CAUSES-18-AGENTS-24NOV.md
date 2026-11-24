@@ -149,7 +149,41 @@ x 28-271.9, so its **midpoint 149.95 falls inside the ring** and it is swallowed
 paragraph. That paragraph is appended at the end of the page's block list (`ordered.add(ringPara(ring))`,
 line 1629) - after the footer. Replaying the predicate in Python reproduces exactly those 48 lines.
 
-**Fix: give the ring rule a width test** - a line wider than the ring cannot be seal centre text.
+**Fix: a CONTAINMENT test, not a width test** (the width test was my first guess and it is the weaker one).
+Measured over all 211 documents: 7 fire the ring rule, 22 lines are absorbed, and **21 are genuinely
+contained - only 305's is not** (its line is 3.41x the width of the ring, and 70.5 % of its ink lies
+outside). A containment test rejects exactly 1 of 22 and accepts the other 21, including 305's own
+`T`, `INDIA` and `2024`. A width test would need a threshold that separates 6 documents from 1.
+
+The exact code is `PdfToWord.java:1278-1279` - two **point** tests:
+
+    float cx = (ln.x + ln.right) / 2f;
+    if (cx > rx0 && cx < rx1 && ln.y > ry0 && ln.y < ry1) { inner.add(ln); it.remove(); }
+
+So **305 is a membership failure, not an ordering failure**: the rule asks about a point on a line that
+has an extent. Only x needs the change - `ln.y` is a baseline, and the model's vertical unit *is* that
+point.
+
+Counterfactual, measured on the .txt: move that one line back and the document **passes**
+(7/12 applicable, 7 passed, 5 abstained).
+
+**What must NOT be done, and why.** The repo already measured this ground:
+- **Removing the append is a regression** - `60_page_border` lost 15 of 64 lines, `318_court_summons_form`
+  went 81 to 90 lines. The append is load-bearing.
+- **Do not flush by top and do not re-sort the page by top.** A block that is not in the flow cannot be
+  given a flow position for free: the carrier paragraph costs **9.6 pt of flow** whatever it contains and
+  displaces everything below. That was tried and reverted; it fixed `32_stroke_lines` and broke
+  `18_centred_heading_left_body_txtpos` (42/42 to 41/42 through LibreOffice).
+- `orderStamps` shows the right shape: it removes the paragraph from the list and re-inserts it at the
+  index its `blockTop` falls at, so the **model** is reordered and the flow never sees a moved block.
+  That is why the stamp rule (R2) is repaired and the ring rule (R1) is not.
+
+**Also worth knowing:** `ringLines` is not a circle detector. It fires on any page with 8 or more rotated
+glyphs in two opposing directions, which is why `60_page_border` appears in the census.
+
+**Not proven by that investigation:** it did not build a patched engine, did not re-run all 211 with the
+guard, and did not compare a .docx under it. "Only 305 changes" rests on the measured selectivity over
+the 7 ring documents, not on a full regression.
 
 **39_small_caps_letter_spacing — the check is wrong.** The inversion is between a 1 pt **white invisible**
 duplicate of the title and the 15 pt visible title, drawn at the same x on the **identical baseline**
@@ -165,6 +199,11 @@ Decisive test, same predicate, only the vertical key changed:
     39_small_caps_letter_spacing   22/21 FAIL            22/22 PASS
 
 So 305 fails whatever defensible key you use; 39 fails only because the key is bbox top.
+
+**The two documents fail the same check for opposite reasons**, which is worth keeping in one sentence:
+305 - the engine moves an extent by testing a point; 39 - the check orders by an extent where the
+writer's unit is a point. The engine is wrong on the x axis at 305; the check is wrong on the y axis
+at 39.
 **Fix: key on baseline, not bbox top.** The invisible 1 pt layer being emitted at all is a separate real
 fault, owned by t01/t12, not by line order.
 
