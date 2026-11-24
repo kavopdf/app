@@ -134,7 +134,7 @@ def save(d):
 # opens first - so the pointer goes in both. Six of the ten docx classes turn out to be ONE construct, the
 # 120 pt gap cap in DocxWriter, which no class-specific patch can touch.
 CORPUS = ("CORPUS: regress.py --check now builds the converted corpus itself "
-          "(corpus-convert.py --ensure) - do not convert by hand, and do not skip the gate because "
+          "(corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "
           "\"no .docx output directory\" was ever the reason it could not run. ")
 READ_FIRST = ("READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and "
               "FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the "
