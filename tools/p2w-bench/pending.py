@@ -33,6 +33,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 HANDOFF  = os.path.join(HERE, "HANDOFF.json")
 ATTEMPTS = os.path.join(HERE, "ATTEMPTS.json")
 BLOCKERS = os.path.join(HERE, "BLOCKERS.md")
+RATCHET_GOOGLE = os.path.join(HERE, "RATCHET-GOOGLE.json")
 FINDINGS = os.path.join(HERE, "FINDINGS")
 RUN      = os.path.join(HERE, "RUN.json")
 
@@ -138,11 +139,49 @@ def collect():
 
     # 3. A fix that was kept but never ratcheted at corpus scale.
     att = _load(ATTEMPTS, {})
+    # EVIDENCE CLOSES A RATCHET, NOT ONLY A HAND-WRITTEN STAMP. The stamp was the only exit and three runs
+    # in a row did the corpus work without writing it - the 04:20 relay ran a full pass and all 6 ratchets
+    # stayed pending, which keeps the gate shut. Three rows could never clear at all:
+    #   00_page_count, t08_line_order, t09_page_furniture -> 0 documents fail them, nothing to ratchet
+    #   25_invisible_text                                -> the store already covers 43 of 43
+    # So a row is also cleared when the store proves it: no document fails the class, or RATCHET-GOOGLE.json
+    # holds a fresh entry on the current engine for every document that does. The stamp still wins.
+    _gv, _rt, _engine = {}, _load(RATCHET_GOOGLE, {}), ""
+    try:
+        import glob as _glob
+        for _f in _glob.glob(os.path.join(HERE, "..", "..", "benchmarks", "gverify", "*.json")):
+            _j = json.load(open(_f, encoding="utf-8"))
+            if _j.get("status") == "page_count_refused":
+                continue
+            _gv[os.path.basename(_f)[:-5]] = _j
+    except Exception:
+        _gv = {}
+    # THE CURRENT ENGINE IS THE ONE MOST VERDICTS CARRY, not a file. There is no ENGINE file at the repo
+    # root - checked - so reading one left _engine empty and the fresh-store test never ran, which is why
+    # 25_invisible_text stayed pending with its store already covering 43 of 43. gverify re-measures on
+    # HEAD, so the modal engine among its verdicts is HEAD by construction.
+    _engine = ""
+    if _gv:
+        _c = {}
+        for _j in _gv.values():
+            _e = str(_j.get("engine") or "")[:8]
+            if _e:
+                _c[_e] = _c.get(_e, 0) + 1
+        if _c:
+            _engine = max(_c, key=_c.get)
     for cls, row in att.items():
         if "kept" not in (row.get("outcomes") or []):
             continue
         if row.get("ratchet_at"):
             continue
+        _docs = [d for d, j2 in _gv.items() if cls in (j2.get("failed") or [])]
+        if _gv and not _docs:
+            continue                    # nothing fails this class - nothing to ratchet
+        if _gv and _engine:
+            _fresh = [d for d in _docs
+                      if d in _rt and str(_rt[d].get("engine") or "")[:8] == _engine]
+            if len(_fresh) == len(_docs):
+                continue                # the store already covers every document this class fails
         items.append({"kind": "ratchet", "who": cls,
                       "what": "kept, %s/%s moved, never ratcheted at corpus scale"
                               % (row.get("last_moved", "?"), row.get("last_total", "?")),
