@@ -85,3 +85,16 @@ Identical to the `FOOT_BAND = 0.0` build: **39/42, and `26_text_overlap` still 1
 not a consequence of the band being too wide — they are what spending *those particular* mid-page gaps
 does, and the band cannot tell them apart from the ones that are safe. The look-ahead is the guard; the
 constant is not.
+
+## Why the slot released with 20 pending items
+
+Four of the twenty are **this run's own agent records**, and they are a tool artefact, not outstanding work:
+`handoff.py --agent-add` writes an agent row with no `class`/`angle`, and `pending.py`'s landed-test
+(`pending.py:71-92`) returns "" when `cls` is empty — so an agent whose finding is committed and read still
+shows as pending. Their findings are `04_chars_missing-GAPCAP-*`, `04_chars_missing-ZGANCHOR-*` and this
+file. The next run should pass a class and an angle to `--agent-add`, or the landed-test should fall back
+to a plain `FINDINGS/` search when the row carries no class.
+
+The other sixteen are corpus-scale ratchet stamps (`05_chars_extra`, `32_stroke_lines`, ...) that need a
+full 213-document pass — roughly forty minutes — which this slot did not have left after three attempts and
+two Google round trips.

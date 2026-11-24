@@ -5393,3 +5393,9 @@
 {"t": 1795557117.3834145, "ist": "03:21:57", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795557117.7595658, "ist": "03:21:57", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795557119.236398, "ist": "03:21:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795557350.7003758, "ist": "03:25:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795557352.9881704, "ist": "03:25:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795557355.1390538, "ist": "03:25:55", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795557355.2045238, "ist": "03:25:55", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795557357.048148, "ist": "03:25:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795557357.1318626, "ist": "03:25:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
