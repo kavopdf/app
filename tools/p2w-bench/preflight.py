@@ -92,6 +92,58 @@ def gate():
     return False, "google-safe exited %d: %s" % (rc, tail)
 
 
+
+def tools():
+    """Which of the fast-path tools exist, so a run knows what it has before it reads anything."""
+    have, miss = [], []
+    for n in ('corpus-slice.py', 'corpus-changed.py', 'preflight.py',
+              'google_safe.py', 'classpick.py', 'pending.py'):
+        (have if os.path.exists(os.path.join(HERE, n)) else miss).append(n)
+    return (not miss), "%d present%s" % (len(have), (" - missing " + ", ".join(miss)) if miss else "")
+
+
+def next_action():
+    """One action, computed from the store, with its cost and its fallback.
+
+    A run reads FIXER-BRIEF, LAST-MESSAGE, HANDOFF.next, pending.py, classpick and ATTEMPTS before it
+    starts. That is a lot of reading to arrive at one decision, and today it arrived at a demoted
+    class. This computes the decision instead and states the evidence beside it, so the run can
+    disagree with a number in front of it rather than in the dark.
+
+    Not a rule: it reads the ranking, the attempt ledger and the construct census and prints what
+    they say. A run that has a better reason is free to take it, and the report will show both.
+    """
+    try:
+        sys.path.insert(0, HERE)
+        import classpick as cp
+        rk = cp.ranking() or []
+    except Exception as e:
+        return "unknown", "classpick could not be read (%s)" % type(e).__name__
+    if not rk:
+        return "none", "the ranking is empty"
+    top = str((rk[0][0] if isinstance(rk[0], (list, tuple)) else rk[0]) or '')
+    docs = rk[0][1] if isinstance(rk[0], (list, tuple)) and len(rk[0]) > 1 else '?'
+    att, moved = 0, 0
+    try:
+        at = json.load(open(os.path.join(HERE, 'ATTEMPTS.json'), encoding='utf-8'))
+        h = (at.get(top) or {}).get('history') or []
+        att = len(h)
+        moved = sum(int(x.get('moved') or 0) for x in h)
+    except Exception:
+        pass
+    why = "%s documents; %d attempt(s), %d moved" % (docs, att, moved)
+    # 18_displacement measured 24 Nov: 20 attempts, 1 document moved. That is the same outcome as
+    # zero and the rotation's rule is about improvement, not about a strict zero.
+    if att >= 5 and moved <= 1:
+        why += " - EXHAUSTED by the rotation's own rule; take the next class instead"
+    try:
+        pr = json.load(open(os.path.join(ROOT, 'benchmarks', 'GOOGLE-PREDICT.json'), encoding='utf-8'))
+        n = len(pr.get('documents') or {})
+        why += "; construct census covers %d documents" % n
+    except Exception:
+        why += "; no construct census - run google_safe.py --predict"
+    return top, why
+
 CHECKS = [("java", java), ("corpus", corpus), ("changed list", changed_list), ("gate", gate)]
 
 
@@ -116,6 +168,16 @@ def main(argv):
             print("    - %s: %s" % (name, detail))
         return 1
     if not quiet:
+        print("")
+        _ok, _det = tools()
+        print("  %-13s %s  %s" % ("tools", "ok  " if _ok else "FAIL", _det))
+        _act, _why = next_action()
+        print("")
+        print("  NEXT ACTION : %s" % _act)
+        print("  because     : %s" % _why)
+        print("  cheap signal: python3 tools/p2w-bench/google_safe.py --predict   (1 s, all documents)")
+        print("  scoped meas : P2W_CHANGED_ONLY=1 p2w.py --budget N               (only what moved)")
+        print("  coupled fix : P2W_ACCEPT_WORSE=doc1,doc2 regress.py --check      (named, net-positive)")
         print("")
         print("  READY in %.1f s" % (time.time() - t0))
     return 0
