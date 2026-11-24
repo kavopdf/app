@@ -1,0 +1,60 @@
+diff --git a/tools/p2w-bench/verify_txt.py b/tools/p2w-bench/verify_txt.py
+index 208b6130..e516b565 100644
+--- a/tools/p2w-bench/verify_txt.py
++++ b/tools/p2w-bench/verify_txt.py
+@@ -179,6 +179,13 @@ MIN_ACCURACY = 99.0
+ # that happens to repeat on three pages is a heading.
+ FURNITURE_BAND = 0.12
+ 
++# How many non-empty lines at each edge of a page segment count as "in the band" for the .txt
++# side. The source side uses a 12 % geometric band; a .txt has no coordinates, so the same
++# population is recovered as the first and last few lines of each U+000C-delimited segment.
++# 3 is enough for a header, a footer and a page number, and small enough that a form's body
++# cannot leak in.
++FURNITURE_TXT_EDGE_LINES = 3
++
+ # An element has to repeat on this many pages before it is furniture. Two pages is a
+ # coincidence, and on a two-page document every repeated line would qualify.
+ FURNITURE_MIN_PAGES = 3
+@@ -1281,9 +1288,39 @@ def compare(src_pdf, txt_path):
+     # data. A running head or footer carries at least one letter; a column of amounts
+     # does not. Removing an element removes its owed and its present by the same amount,
+     # so this can never turn a pass into a fail.
++      # A ONE-CHARACTER KEY IS NOT A RUNNING HEAD. Measured 24 Nov on
++      # 041122-Account_Opening_Form: the form draws its date field as eight one-character
++      # spans (D D M M Y Y Y Y), three date boxes fall inside the band on three pages, and
++      # so 'Y', 'D' and 'M' each cleared FURNITURE_MIN_PAGES and were declared furniture.
++      # They are field glyphs; a real running head is a word.
+     elements = {k: v for k, v in element_pages.items()
+-                if len(v) >= FURNITURE_MIN_PAGES and any(ch.isalpha() for ch in k)}
+-    txt_furniture = Counter(_furniture_key(ln.strip()) for ln in lines)
++                if len(v) >= FURNITURE_MIN_PAGES and any(ch.isalpha() for ch in k)
++                  and len(k.replace("#", "").strip()) > 1}
++    # PRESENT IS COUNTED IN THE SAME BAND AS OWED. It used to be a Counter over every line of
++    # the whole file while owed counted only band lines - two different populations, so any
++    # furniture key that also occurs in body text made present > owed unconditionally.
++    # Measured on 041122: owed 29, present 125, over a file that carries the page numbers once
++    # each, in order. A .txt has no coordinates, so the band is recovered from the page
++    # segments the writer emits (U+000C) and the first/last FURNITURE_TXT_EDGE_LINES non-empty
++    # lines of each - the same population the source band describes.
++    txt_furniture = Counter()
++    _segs = [[]]
++    # SPLIT ON THE SEPARATOR BY STRIPPING THE FORM FEED FIRST. chr(12) IS WHITESPACE IN PYTHON,
++    # so `_ln.strip() == chr(12)` is never true for a line that holds only a form feed - the
++    # segments never split and the whole file becomes one page, which makes the band the first and
++    # last three lines of the document instead of of each page. Caught by a unit test on a
++    # three-page synthetic file: the intact document reported 1 copy of a header that appears 3 times.
++    for _ln in lines:
++        if _ln.replace(chr(12), '').strip() == '':
++            _segs.append([])
++        else:
++            _segs[-1].append(_ln)
++    for _seg in _segs:
++        _ne = [_l for _l in _seg if _l.strip()]
++        if not _ne:
++            continue
++        for _l in _ne[:FURNITURE_TXT_EDGE_LINES] + _ne[-FURNITURE_TXT_EDGE_LINES:]:
++            txt_furniture[_furniture_key(_l.strip())] += 1
+     owed = 0
+     present = 0
+     for key, pgs in elements.items():
