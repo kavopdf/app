@@ -3627,3 +3627,11 @@
 {"t": 1795482673.7019248, "ist": "06:41:13", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795482674.1563828, "ist": "06:41:14", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795482674.2687101, "ist": "06:41:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795483830.1336858, "ist": "07:00:30", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795483830.2544658, "ist": "07:00:30", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795483834.1606731, "ist": "07:00:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795483834.6589088, "ist": "07:00:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795483839.0932398, "ist": "07:00:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795483840.3696637, "ist": "07:00:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795484154.232746, "ist": "07:05:54", "ev": "beat", "d": "building the engine (build-engine.sh)"}
+{"t": 1795484489.3915956, "ist": "07:11:29", "ev": "beat", "d": "attempt.py: recording an attempt"}

@@ -405,6 +405,32 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "25_invisible_text": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-24 07:11",
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42",
+    "total": 5
+   }
+  ],
+  "last": null,
+  "last_engine": "b7699196",
+  "last_moved": 2,
+  "last_total": 5,
+  "outcomes": [
+   "kept"
+  ],
+  "reason": "check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42",
+  "reasons": [
+   "check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42"
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "32_stroke_lines": {
   "attempts": 17,
   "first_seen": 1794543973.3763752,
