@@ -135,6 +135,42 @@ def _share5(path):
     return d
 
 
+def _attempts_in_window(r):
+    """How many attempt records ATTEMPTS.json holds inside this run's own window.
+
+    The `at` field is IST wall-clock ("2026-11-24 08:18"); started_ts/ended_ts are epochs. Both are
+    converted to IST before comparing, because a bare strftime here would compare UTC against IST and
+    lose or gain 5h30m - the mistake that put an end before its own start at line 155.
+    """
+    try:
+        st = float(r.get("started_ts") or 0)
+        en = float(r.get("ended_ts") or 0)
+    except Exception:
+        return 0
+    if not st:
+        return 0
+    if not en:
+        en = time.time()
+    lo, hi = st - 60, en + 60          # a minute either side: a run writes its own first record
+    n = 0
+    try:
+        d = json.load(open(os.path.join(HERE, "ATTEMPTS.json"), encoding="utf-8"))
+        for row in d.values():
+            if not isinstance(row, dict):
+                continue
+            for x in (row.get("history") or []):
+                at = str(x.get("at") or "")
+                try:
+                    ts = time.mktime(time.strptime(at, "%Y-%m-%d %H:%M")) - 19800
+                except Exception:
+                    continue
+                if lo <= ts <= hi:
+                    n += 1
+    except Exception:
+        return 0
+    return n
+
+
 def this_run():
     r = _json(RUN, {})
     if not r.get("started"):
@@ -155,7 +191,15 @@ def this_run():
         _end_label = time.strftime("%H:%M", time.gmtime(r["ended_ts"] + 19800))
     return {"present": True, "started": r.get("started"), "ended": _end_label,
             "minutes": mins, "class": r.get("class") or "-",
-            "attempts": r.get("attempts", 0), "kept": r.get("kept", 0),
+            # ATTEMPTS FROM TWO PLACES, AND THE BIGGER ONE WINS. RUN.json carries an `attempts` counter
+            # that the run is expected to bump; ATTEMPTS.json carries the per-class history that
+            # attempt.py writes. On 24 Nov the 08:18 run recorded `60_text_column_right_edge -> lead` in
+            # ATTEMPTS.json and left RUN.json at 0, so the report printed "0 attempt(s), 0 kept" over a
+            # run that had made one. A zero that is not true is the worst kind: it reads as idle.
+            # Counted from the history inside the run window, which is evidence rather than a counter
+            # someone had to remember to increment.
+            "attempts": max(r.get("attempts", 0) or 0, _attempts_in_window(r)),
+            "kept": r.get("kept", 0),
             "docs_improved": r.get("docs_improved", 0),
             "agents": r.get("agents") or [], "obstacles_cleared": r.get("obstacles_cleared", 0),
             "needs_human": r.get("needs_human", 0)}

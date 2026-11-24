@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 08:18 → running IST · 2 min**
+**24 Nov 2026 · slot 08:18 → 08:21 IST · 2 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -35,7 +35,7 @@
 
 | | |
 |:--|:--|
-| Measured | **23 min ago** |
+| Measured | **31 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -53,9 +53,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 08:18 → running · 2 min |
+| Slot window | 08:18 → 08:21 · 2 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 8 |
+| Tool beats | 12 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
@@ -64,8 +64,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **1 min** | `############` |
-| report - the report and the chain | **1 min** | `##########` |
+| record - attempt, handoff, class rows | **1 min** | `###########` |
+| report - the report and the chain | **1 min** | `###########` |
 ## Best results this round
 
 | Document | Before | After | Change |
