@@ -1324,6 +1324,21 @@ def main(argv):
     else:
         _note = ' - **the pending list could not be read**: %s' % _why
     L.append('| Working on | `%s`%s |' % (working, _note))
+    # A RUN THAT PICKS A DEMOTED CLASS BY HAND IS INVISIBLE IN ITS OWN REPORT.
+    # Measured 24 Nov: the rotation's first five classes were attempted zero times while the run
+    # hand-picked 04_chars_missing (4 attempts, nothing moved) and 60_text_column_right_edge (5,
+    # nothing moved). The report said 'Working on 04_chars_missing' and nothing said the rotation
+    # disagreed. This does not block the run - a gate that waits for agreement never opens - it makes
+    # the disagreement readable in the one place a person looks.
+    _rot = ''
+    try:
+        import classpick as _cp
+        _rk = _cp.ranking()
+        _rot = str((_rk[0][0] if isinstance(_rk[0], (list, tuple)) else _rk[0]) or '') if _rk else ''
+    except Exception:
+        _rot = ''
+    if _rot and working and _rot.split()[0][:20] not in str(working):
+        L.append('| The rotation says | `%s` - the run chose `%s` by hand instead |' % (_rot, working))
     cm = committed()
     if cm:
         L.append("| Committed | **%d** files in %d commit(s) from `%s` — %s |"
