@@ -354,3 +354,7 @@ but contradicts the one-paragraph-per-source-line model that `17_matched_runs`, 
 engine built from this tree and the corpus fetched by `corpus-fetch.sh`. The Google column of §1f's
 last row is *recorded*, from `FINDINGS/60_...-2322`'s live round trips, and is labelled as recorded. No
 live Google render was made in this run and none is claimed.
+
+---
+
+**Agent:** `60ed60_text_column_right_edge-01` - deployed by the 24 Nov 18:28 fixer slot, landed here. `HANDOFF.json` carries the same id and this path.

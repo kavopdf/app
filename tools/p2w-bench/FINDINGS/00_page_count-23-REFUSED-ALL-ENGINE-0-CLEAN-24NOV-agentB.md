@@ -298,3 +298,7 @@ against `page.rect.height`; render at 110 dpi with `get_pixmap(dpi=110)`.
   which is primary.
 - No `.docx` was built in this pod (no JVM), so every "our render" number in §2 is LibreOffice's, read
   from the store, on a retired engine.
+
+---
+
+**Agent:** `pc2300_page_count-01` - deployed by the 24 Nov 18:28 fixer slot, landed here. `HANDOFF.json` carries the same id and this path.
