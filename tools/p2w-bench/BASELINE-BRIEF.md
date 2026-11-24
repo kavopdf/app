@@ -7,8 +7,41 @@ engine code, you do not classify, and you do not fix anything. The fixer fixes.
     cd /scratch/work/base
     python3 tools/p2w-bench/round.py --phase
 
-If the phase is not `measure`, output exactly `not my turn - phase is <PHASE>` and STOP. Only one
-phase works at a time; that is what stops two crons editing the same thing.
+If the phase is not `measure`, do the `.txt` refresh in section 0 first, then output exactly
+`not my turn - phase is <PHASE>` and STOP. Only one phase works at a time; that is what stops two
+crons editing the same thing.
+
+## 0. Outside `measure`: the `.txt` table still has to be current
+
+Added 24 Nov by the watchdog. A table refreshed only in `measure` cannot stay current through a long
+`fix` phase, and both inputs to a `.txt` score change during `fix`: the engine (the fixer commits it)
+and `verify_txt.py` (an instrument correction is an engine-free commit). Measured 24 Nov: the table
+was from 23 Nov 05:57 UTC, `verify_txt.py` had changed 4.4 h before the pass, and the engine had moved
+at 23 Nov 11:04 - so the published `14 failing` was taken with a retired verifier over renders from a
+retired engine. A score you cannot reproduce is not a score, and `health.py` is right to call the row
+`stopped`.
+
+So, on any run whose phase is not `measure`, before you print `not my turn`:
+
+    python3 tools/p2w-bench/health.py --json | python3 -c "import json,sys; print(json.load(sys.stdin)['stages']['txt']['state'])"
+
+If that prints `superseded`, the table is current - print `not my turn` and stop. If it prints
+anything else, refresh the `.txt` half and commit only the `.txt` files:
+
+    cp benchmarks/p2w.py /scratch/work/ && python3 /scratch/work/p2w.py --validate
+    python3 /scratch/work/p2w.py --budget 250            # repeat until it says complete
+    python3 tools/p2w-bench/restamp_txt.py --run --budget 260
+    python3 tools/p2w-bench/restamp_txt.py --report
+    python3 tools/p2w-bench/restamp_txt.py --apply
+
+`restamp_txt.py` alone is not enough and this is the correction to the 24 Nov 03:12 decision: it
+re-scores the `.txt` files already on disk, and `ensure_inputs()` refuses in a fresh pod, because
+`p2w.py` is what builds the corpus and writes both formats. A restamp over renders from a retired
+engine is a fresh instrument over stale evidence.
+
+**This is not a measure phase.** Do not claim the round, do not run `round.py --advance`, do not
+write `RANKING.csv`, do not touch `app/`. Claim the baseline slot with `--claim-baseline` before you
+start so two runs cannot convert at once, and release it when you finish. Then print `not my turn`.
 
     python3 tools/p2w-bench/round.py --claim-baseline
 

@@ -459,3 +459,79 @@ cron's work, not this pass's.
 
 **Trend:** `progress.py` appended nothing this pass — today's row already exists — and no past row was
 edited.
+
+---
+
+## 2026-11-24 06:07 IST (00:37 UTC) — watchdog: the `txt` decision is implemented in BASELINE-BRIEF, and the 03:12 replacement was wrong on the evidence
+
+**What is stopped.** `health.py` reads `txt` **stopped**: 199 clean, 14 failing, table age 18.7 h
+against a 12 h threshold, `inputs_age_h` 4.4. Third consecutive watchdog pass with this row red
+(12.7 h, 15.6 h, 18.7 h). `measure-google` and `matrix` are done at 2.3 h, `classify` is superseded,
+`fix` is moving at 0.3 h with 3 attempts in 3 h. The pipeline is moving; one row is not.
+
+**Why the 03:12 decision did not fix it.** That pass decided the approach was wrong and named
+replacement (a): "let the baseline cron run `restamp_txt.py --run --apply` during `fix`". It then
+recorded the decision and changed nothing, so the row has read the same on three passes. Reading the
+tool this pass shows (a) as written cannot work: `restamp_txt.py` re-scores the `.txt` files already
+on disk and `ensure_inputs()` refuses unless the corpus and 200+ `.txt` exist in the pod. Both come
+from `p2w.py`, which is the baseline's `measure` work. So a restamp is not a cheap exception to the
+phase gate — it is the whole conversion, and the 03:12 note would have had the baseline print
+`refused: 0 pdf ... 0 .txt` on every run and look like it had tried.
+
+**The evidence, re-read this pass.**
+
+* `tools/p2w-bench/txt/RANKING-TXT.csv` last committed 23 Nov 05:57 UTC (42a9496a), 199 clean / 14 failing.
+* `verify_txt.py` changed after it, 23 Nov 20:12 UTC — that is the 4.4 h `inputs_age_h` this pass reads.
+* The engine moved at 23 Nov 11:04 UTC (b7699196, `00_page_count`, "21 documents, 0 regressions") —
+  after the table was written and before it was scored against.
+* `ROUND.json` `baseline_started` is 33.1 h old: the :00 baseline has not claimed since.
+* It has not claimed because `BASELINE-BRIEF.md` line 10 told it to print `not my turn` and stop for
+  every phase but `measure`, and the phase has been `fix` since 22 Nov 22:52.
+
+So the 14-failing number is a retired verifier over renders from a retired engine. It is not
+reproducible, which is exactly what `health.py`'s `superseded` state exists to separate from a false
+alarm — the table is older than its newest input, so this is real staleness.
+
+**What I decided, and did.** The approach is wrong, not the class and not the instrument. A table
+refreshed only in `measure` cannot stay current through a long `fix` phase while the engine and the
+verifier both move underneath it. Replacement: the baseline's `.txt` half is lifted out of the phase
+gate, and nothing else is. Written into `BASELINE-BRIEF.md` as section 0 — on a non-`measure` run it
+checks `health.py --json`'s `stages.txt.state`, and if that is not `superseded` it runs
+`p2w.py --validate`, `p2w.py --budget 250` until complete, then `restamp_txt.py --run --report
+--apply`, commits only the `.txt` files, and only then prints `not my turn`. It claims the baseline
+slot so two runs cannot convert at once, and it may not claim the round, advance the phase, write
+`RANKING.csv` or touch `app/`.
+
+This is a brief correction, not a measurement: this pass produced no `.txt` number and no engine
+change. The next :00 baseline run owns the refresh.
+
+**What would overturn this.** A `.txt` row reading `superseded` on a pass where the phase is `fix`
+and no baseline run refreshed it — that would show the phase gate was never the blocker. Or a
+baseline run that follows section 0, restamps, and leaves `14 failing` unchanged — that would show the
+stale table was hiding nothing and the row was only late.
+
+## 2026-11-24 06:07 IST — no `cron` tool this pass, so neither cron guard ran
+
+The declared tool list carries no `cron` operation, so a paused, zombie or stale-fire cron cannot be
+moved by automation from here. `health.py` reads files and cannot see the platform; a paused cron is
+the quietest way for this pipeline to die and nothing in the repository can notice it.
+
+The exact calls that would have been made and were not:
+
+    cron(action="list")                                          # status and next_fire_at, all ids
+    cron(action="runs", cron_id="01M7N3RTAM7SATT9TXMQPP7QRM")    # baseline :00 - the txt row's owner
+    cron(action="runs", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")    # fixer :50 - zombie?
+    cron(action="runs", cron_id="01M7Y6DSBB2KBYAREFVMHYAB4D")    # fixer relay :10
+    cron(action="pause", cron_id=...); cron(action="resume", cron_id=...)   # same pass, never left paused
+
+**STEP 4 C did not apply.** `round.py --phase` prints `fix`, not `done`, so `round.py --reopen`
+refuses by its own guard.
+
+**STEP 4 D did not apply.** `status.py` reads the fixer claim 10 min old against
+`CLAIM_STALE_MIN["fixer"] = 45`, and `health.py` puts `fix` at 0.3 h with 3 attempts in 3 h. A slot
+claimed ten minutes ago is a working run; `round.py --release-fixer --force` would have put a second
+run into the engine. Neither fixer cron was touched — the `:10` relay is the designed answer to a
+wedged `:50` and deleting one of the pair puts the silent-dead failure back.
+
+**Can I fix it:** no. A missing tool is a missing tool. Until a watchdog run's tool list contains
+`cron`, a paused cron stays silent with nothing in the repository able to see it.
