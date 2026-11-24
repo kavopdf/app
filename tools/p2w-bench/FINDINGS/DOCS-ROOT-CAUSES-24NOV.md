@@ -585,3 +585,70 @@ any "scale by k" rule even less viable - and it is another reason face identity 
 **41 fail only in Google, 15 fail in both.** The committed `gverify-lo` files and an independent
 re-implementation of the check's own `columns()`/`edge()` agree on the same 15. The repo's
 `GOOGLE-VS-LIBREOFFICE.md` figure of 18 is an older snapshot.
+
+## 18_displacement, from the real Google renders: the check is right and the encoding is sufficient
+
+This investigation did what the other two could not - it found that the corpus's Google Docs **already
+exist in Drive**, exported all 102 to PDF, verified provenance by re-running `verify_google.py`, and
+measured real coordinates on both sides: **12,012 matched run pairs in Google, 12,286 in LibreOffice,
+434 pages.**
+
+**The distribution settles it.**
+
+| | Google | LibreOffice (same .docx) |
+|---|---:|---:|
+| \|dy\| median | **6.38 pt** | 0.59 pt |
+| \|dy\| p90 | **69.01 pt** | 2.81 pt |
+| \|dy\| p99 | **114.53 pt** | 17.76 pt |
+| runs out by more than 4.5 pt | **60.5 %** | 3.0 % |
+
+Page boxes are identical on both sides (595.3 x 841.9 against 596 x 842), so this is **not proportional
+scaling**. Fitting `dy = a + b·y` gives a residual sd of **0.37 pt** on the 332 continuation pages - **a
+constant translation, not scatter and not a ramp.**
+
+**On the 332 continuation pages: `shift = 0.961 x gap - 0.58 pt`, r = 0.975, median ratio 0.96.** The
+cleanest control is inside one file: `412_page_labels_roman` writes `w:before="1227"` (61.4 pt) on the first
+paragraph of every page. **Page 0 reads +2.3 pt - honoured. Pages 1 to 4 read -58.8 pt - dropped.** Same
+value, same file; the only difference is that the paragraph follows a page break. `416_many_tiny_pages`:
+89.5 pt becomes -85.6 pt on 299 of 300 pages.
+
+**On page 0 it is a staircase**: 81 pages carry a step over 3 pt (median 7.2, p75 11.5, max 148.8). The
+boundary is always the table's first row; above it |dy| is under 1 pt. And **Google delivers 5-10 pt of
+whatever exact line height the empty spacer requests, regardless of what was asked** - measured across five
+documents asking 15.2 to 23.9 pt.
+
+### Coverage
+
+| cause | documents | exclusive |
+|---|---:|---:|
+| B - the spacer's exact line height is not honoured | **81** | 71 |
+| A - `w:before` dropped after a page break | **16** | 6 |
+| A and B in the same document | 10 | - |
+| C - row growth under substitution (`hRule="atLeast"`, 99.5 % of 1,710) | 27 drift-dominant | 0 |
+| residue only | 15 | 15 |
+
+**Union of A and B: 87 of the 102.**
+
+### "The format cannot express position" is refuted by measurement
+
+None of the 102 has a single `w:framePr`; `w:pgMar` is 0 on all four sides; every body paragraph is
+positioned purely by `w:before` plus `w:line ... exact`. **And LibreOffice places that flow at |dy| median
+0.59 pt, p90 2.81 pt - well inside the check's own `clamp(0.35·size, 1.5, 4.5)`.** The encoding is
+sufficient. Two of the three constructs it relies on are simply not honoured by Google, and constructs that
+*are* honoured exist - `w:pgMar w:top` already took `bank-statement-5-pages` from 37/42 to 40/42 and its
+pages 1-4 from -59.5 pt to -4.3 pt.
+
+**The engine is wrong; the check is right in substance.**
+
+### The honest caveat
+
+**The 15 residue documents fail on 1.5 to 3 pt**, which is inside what a flowing .docx can hold across
+renderers. There the **1.5 pt floor**, not the layout, is the binding constraint. And **20 of the 102 also
+fail in LibreOffice** - those are a genuine engine-geometry class and are not explained here.
+
+### Why this one could measure what the others could not
+
+The other two sandboxes hit a wall: every Drive write path needs an `s3key` the platform upload tool would
+stage. This one did not need to write - **the Google Docs already existed**, because the gverify cron has
+been uploading them for weeks. That is worth remembering: the measurement was available all along, in the
+place the pipeline had already put it.
