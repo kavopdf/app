@@ -41,7 +41,7 @@ RATE LIMITS. Google Drive allows ~1000 requests per 100 s per user and this is t
 twenty documents per run is comfortable and leaves room for the retry the doc describes: on 403 with
 userRateLimitExceeded, wait 60 s and retry once; if it fails again record SKIPPED, never PASS.
 """
-import argparse, json, os, subprocess, sys
+import argparse, json, os, subprocess, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -281,7 +281,8 @@ def collect(name, url):
         # the export returned something else. Recording that as "42 checks failed" would hide a real
         # finding under a false one.
         print("REFUSED: %s rendered to %d page(s), the source has %d" % (name, got, want))
-        _write(name, {"name": name, "status": "page_count_refused", "pages": got, "want": want})
+        _write(name, {"name": name, "status": "page_count_refused", "pages": got, "want": want,
+                        "at": time.strftime("%Y-%m-%dT%H:%M:%S")})
         return 4
     os.replace(tmp, pdf)
     out_json = os.path.join(RES, name + ".json")
@@ -300,7 +301,13 @@ def collect(name, url):
     # see whether a construct is even large enough to matter. verify_google.py computes
     # med_dy/worst_dy/med_dx and now carries them as the check's detail; store them here so the
     # next run steers with a distance. Reported only - `failed` above is what scores.
-    rec = {"name": name, "status": "ok", "rc": r.returncode,
+    # `at` is what makes a verdict expirable. The `engine` stamp only catches an ENGINE change, and a
+    # check can be fixed without the engine moving: on 24 Nov 25_invisible_text was found to be reading
+    # the paper (a Google export opens with a page-sized white rectangle and rasterises the bands), so
+    # 48 documents were failing a check that was wrong. Five were re-measured and went 42/42; the other
+    # 43 kept verdicts stamped with the same engine and looked current, because nothing recorded WHEN
+    # they were taken. A timestamp cannot be wrong about that.
+    rec = {"name": name, "status": "ok", "rc": r.returncode, "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
            "passed": d.get("passed"), "total": d.get("total"), "failed": fails}
     disp = ((d.get("checks") or {}).get("18_displacement") or {}).get("detail")
     if disp:
