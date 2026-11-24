@@ -1,16 +1,16 @@
 {
- "started_ts": 1795523040.3234458,
- "started": "17:54",
- "ended_ts": null,
- "ended": null,
- "class": "",
- "attempts": 0,
- "kept": 0,
- "docs_improved": 0,
  "agents": [
   "60ed60_text_column_right_edge-01",
   "pc2300_page_count-01"
  ],
+ "attempts": 1,
+ "class": "",
+ "docs_improved": 0,
+ "ended": null,
+ "ended_ts": null,
+ "kept": 0,
+ "needs_human": 0,
  "obstacles_cleared": 0,
- "needs_human": 0
+ "started": "17:54",
+ "started_ts": 1795523040.3234458
 }

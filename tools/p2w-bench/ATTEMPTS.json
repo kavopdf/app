@@ -1,6 +1,6 @@
 {
  "00_page_count": {
-  "attempts": 7,
+  "attempts": 8,
   "first_seen": null,
   "history": [
    {
@@ -44,12 +44,19 @@
     "outcome": "lead",
     "reason": "No engine change. classpick refused a class because 5 pending ratchet items cannot close: ratchet.py reads the RETIRED BASELINE.md (rows u59, live instrument 47 checks, no RATCHET.json) so it compares",
     "total": null
+   },
+   {
+    "at": "2026-11-24 18:28",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Recorded as a lead, not a fix: the class's 23 refusals are all engine (the page's furniture as N page-positioned shapes, Google charges 0.10-0.96 pt per shape) but zero of them can go clean - a refusa",
+    "total": 23
    }
   ],
   "last": null,
   "last_engine": "b7699196",
   "last_moved": 0,
-  "last_total": 213,
+  "last_total": 23,
   "outcomes": [
    "error",
    "lead",
@@ -57,9 +64,10 @@
    "lead",
    "partial",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "No engine change. classpick refused a class because 5 pending ratchet items cannot close: ratchet.py reads the RETIRED BASELINE.md (rows u59, live instrument 47 checks, no RATCHET.json) so it compares 0 of 211 documents. Wrote ratchet_google.py over benchmarks/gverify: 190 compared against marks, 0 fell, 23 page_count_refused uncomparable - those 23 are this class and are why a fifth of the corpus is outside every gate. Falsified 3 ways incl. a clean 42/42 doc made to fail 47_margins -> exit 1 naming it. See FINDINGS/RATCHET-WAS-GATING-A-RETIRED-PIPELINE-0420-fixer.md",
+  "reason": "Recorded as a lead, not a fix: the class's 23 refusals are all engine (the page's furniture as N page-positioned shapes, Google charges 0.10-0.96 pt per shape) but zero of them can go clean - a refusal skips all 47 checks. This run fixed the instrument that records them: --collect deleted the refused export and wrote a record with no engine stamp (21 of 23), so what the extra page holds was never kept. Now the export is kept and the record carries engine/checks/at plus a per-page census. Re-measure the 23 in Google to turn that census into a verdict.",
   "reasons": [
    "namespace test",
    "Mechanism measured, fix not landed: Google converts each page-positioned floating shape into an inline image in the flow, ~0.79 pt each; 22 of 23 refused documents emit their shapes AFTER the last text paragraph, so a full page overflows. Six docx-level variants measured through Google (drop last, merge into one paragraph, attach to text paragraphs, prstGeom, wrapSquare, framePr) - all still 2 pages; deleting all shapes is 1 page, which proves the cause. Fix needs the table writer (w:tcBorders). FINDINGS/00_page_count-GOOGLE-INLINES-EVERY-SHAPE-0530-fixer.md",
@@ -67,7 +75,8 @@
    "Merged the shape-only paragraphs that columnPage() still emitted one-per-shape. Google A/B (not LibreOffice): 361_product_catalogue_grid 2 pages at HEAD -> 1 page with the patch, 41/42 checks, scorable for the first time; 401_trifold_brochure 2->2. Patch committed as FINDINGS/00_page_count-MERGE-SHAPE-PARAGRAPHS.patch. Not landed because the docx table re-measure (benchmarks/gate.py --budget 250) does not finish inside one 290s call; txt half re-measured (213 scored, 0 moved).",
    "LANDED the column-page shape merge (21 documents change in document.xml, 361 124->40 paragraphs, 401 52->27, 301 untouched at 85). Corpus on this tree: 212/212 scored, 0 documents worse, regress PASS, measure_gate READY. The 2 moved are GOOGLE moves measured by the 04:47 run on this construct - 361 2 pages->1 at 41/42, 375 2 pages->1 at 35/42->37/42 - and 0 documents move in the LibreOffice table because LibreOffice honours w:line=1 exact on the carrier paragraph and Google does not; the proxy is blind to this construct by construction. 22 of 23 page-count-refused documents were scoring zero of 42 known checks and are now measurable. Four instrument defects blocked the landing and are fixed with findings: p2w --force read REPO's class instead of ENGINE_SRC's; measure_gate demanded 213 rows from a 212-row table; regress --stamp and the pre-commit hook deadlocked; gverify --collect could not read artifacts[0].workspace_path. NOT done: a Google measurement of 041122-Account_Opening_Form (2464 drawing-only paragraphs, the scale test) and 350_question_paper's inline-picture mechanism (agent finding + uncompiled patch in FINDINGS).",
    "23 page_count_refused docs: 21 render the RIGHT page count in LibreOffice and one too many in Google (proxy is blind); the 350 inline-picture construct is REFUTED - 0 wp:inline across all 23, the engine already anchors every picture; the two bank forms anchor a picture taller than the sheet (842.1pt on an 841.9pt page) and are a genuine pagination fault",
-   "No engine change. classpick refused a class because 5 pending ratchet items cannot close: ratchet.py reads the RETIRED BASELINE.md (rows u59, live instrument 47 checks, no RATCHET.json) so it compares 0 of 211 documents. Wrote ratchet_google.py over benchmarks/gverify: 190 compared against marks, 0 fell, 23 page_count_refused uncomparable - those 23 are this class and are why a fifth of the corpus is outside every gate. Falsified 3 ways incl. a clean 42/42 doc made to fail 47_margins -> exit 1 naming it. See FINDINGS/RATCHET-WAS-GATING-A-RETIRED-PIPELINE-0420-fixer.md"
+   "No engine change. classpick refused a class because 5 pending ratchet items cannot close: ratchet.py reads the RETIRED BASELINE.md (rows u59, live instrument 47 checks, no RATCHET.json) so it compares 0 of 211 documents. Wrote ratchet_google.py over benchmarks/gverify: 190 compared against marks, 0 fell, 23 page_count_refused uncomparable - those 23 are this class and are why a fifth of the corpus is outside every gate. Falsified 3 ways incl. a clean 42/42 doc made to fail 47_margins -> exit 1 naming it. See FINDINGS/RATCHET-WAS-GATING-A-RETIRED-PIPELINE-0420-fixer.md",
+   "Recorded as a lead, not a fix: the class's 23 refusals are all engine (the page's furniture as N page-positioned shapes, Google charges 0.10-0.96 pt per shape) but zero of them can go clean - a refusal skips all 47 checks. This run fixed the instrument that records them: --collect deleted the refused export and wrote a record with no engine stamp (21 of 23), so what the extra page holds was never kept. Now the export is kept and the record carries engine/checks/at plus a per-page census. Re-measure the 23 in Google to turn that census into a verdict."
   ],
   "requeues": 0,
   "status": "OPEN"
