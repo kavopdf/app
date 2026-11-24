@@ -67,6 +67,55 @@ def _names():
     return sorted(f[:-5] for f in os.listdir(OUT) if f.endswith(".docx"))
 
 
+def _checks_now():
+    """A fingerprint of the check code that produced a verdict: the file's size and mtime.
+
+    Size and mtime rather than a git hash, because a sandbox clone is shallow and a hash would be a
+    lookup that can fail; a rewrite always changes one of the two. Not a version number - a fingerprint
+    is all a staleness test needs.
+    """
+    try:
+        st = os.stat(os.path.join(HERE, "verify_google.py"))
+        return "%d-%d" % (st.st_size, int(st.st_mtime))
+    except Exception:
+        return "unknown"
+
+
+def stale_by_check():
+    """(count, names, reason) for verdicts that predate the current check code.
+
+    THE REPORT SAID "25_invisible_text: Google fails 43" ON 24 NOV, hours after the check was fixed and
+    measured to fail 0 of 43. Those verdicts were real measurements of a check that no longer exists, and
+    nothing in the pipeline could say so: `engine` had not moved, and the records carried no `at` at all.
+
+    A verdict with no `checks` stamp cannot be vouched for, because it was written before the stamp
+    existed; those are counted separately rather than assumed current.
+    """
+    cur = _checks_now()
+    older, unstamped = [], []
+    try:
+        for f in sorted(os.listdir(RES)):
+            if not f.endswith(".json"):
+                continue
+            try:
+                d = json.load(open(os.path.join(RES, f), encoding="utf-8"))
+            except Exception:
+                continue
+            got = d.get("checks")
+            if not got:
+                unstamped.append(f[:-5])
+            elif got != cur:
+                older.append(f[:-5])
+    except Exception:
+        return 0, [], "could not read the results"
+    why = []
+    if older:
+        why.append("%d measured against an older check" % len(older))
+    if unstamped:
+        why.append("%d carry no check stamp" % len(unstamped))
+    return len(older) + len(unstamped), older + unstamped, "; ".join(why)
+
+
 def _engine_now():
     """The engine commit the corpus is built from right now."""
     import subprocess as _sp
@@ -380,6 +429,14 @@ def _write(name, rec):
     """
     if isinstance(rec, dict) and not rec.get("engine"):
         rec["engine"] = _engine_now()
+        # THE CHECK IS A SECOND THING THAT CAN MOVE, AND ONLY THE ENGINE WAS TRACKED.
+        # `engine` catches an engine change; `at` catches a verdict taken before the file was rewritten.
+        # Neither catches what bit on 24 Nov: 25_invisible_text was found to be reading the paper, the
+        # check was fixed at 01:41 (79ef7075), and the 43 verdicts written at 20:17 the night before kept
+        # the same engine stamp and carried no `at` at all - so the report printed "43" for a check that
+        # now fails 0 of 43. A verdict is current only if it is newer than BOTH the engine and the check.
+        if isinstance(rec, dict) and not rec.get("checks"):
+            rec["checks"] = _checks_now()
     os.makedirs(RES, exist_ok=True)
     with open(os.path.join(RES, name + ".json"), "w", encoding="utf-8") as f:
         json.dump(rec, f, indent=1)
