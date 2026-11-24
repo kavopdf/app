@@ -116,6 +116,8 @@ def save(d):
             _cur = str(d.get("next") or "")
             if not _cur.startswith("PENDING FIRST"):
                 _cur = _lead + _cur
+            if not _cur.startswith("CORPUS:"):
+                _cur = CORPUS + _cur
             if not _cur.startswith("READ FIRST:"):
                 _cur = READ_FIRST + _cur
             d["next"] = _cur
@@ -131,6 +133,9 @@ def save(d):
 # results are two files. The brief names them, but the brief is prose and `next` is the data a run actually
 # opens first - so the pointer goes in both. Six of the ten docx classes turn out to be ONE construct, the
 # 120 pt gap cap in DocxWriter, which no class-specific patch can touch.
+CORPUS = ("CORPUS: regress.py --check now builds the converted corpus itself "
+          "(corpus-convert.py --ensure) - do not convert by hand, and do not skip the gate because "
+          "\"no .docx output directory\" was ever the reason it could not run. ")
 READ_FIRST = ("READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and "
               "FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the "
               "measurement that proves it. ")

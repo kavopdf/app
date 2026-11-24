@@ -571,6 +571,27 @@ def check(allow_engine_change, only=None):
     # memory. A ratchet, not a ban: the corpus already carries them, and what is refused is a
     # document that GAINS one.
     try:
+        # THE CORPUS IS BUILT HERE, NOT LEFT TO WHOEVER REMEMBERS.
+        #
+        # This gate prints "no .docx output directory - cannot check" when the converted corpus is
+        # absent, and on 24 Nov that is exactly what it did for every run: the 213 .docx are output of the
+        # engine, so any engine change makes them stale, and rebuilding them took 38 minutes sequentially
+        # inside a run shorter than that. The gate was never slow - it finishes in 12.6 s - it was being
+        # handed nothing to read, so the one check that stops a construct Google ignores from spreading
+        # never ran and 0 patches landed.
+        #
+        # corpus-convert.py --ensure is a stat and a listdir when the corpus is warm, and a parallel
+        # rebuild when the engine moved. Calling it from the gate rather than from a brief is the whole
+        # difference between a mechanism and a paragraph nobody reads: the check can no longer be skipped
+        # because someone forgot, and the cost is paid once per engine instead of once per run.
+        _cc = subprocess.run([sys.executable, os.path.join(HERE, "corpus-convert.py"),
+                              "--ensure", "-j", "4", "-q"],
+                             capture_output=True, text=True, timeout=2400)
+        if _cc.returncode != 0:
+            print("  corpus : could not be built (%d) - the .docx checks below cannot run"
+                  % _cc.returncode)
+            for _l in (_cc.stdout or "").strip().splitlines()[-3:]:
+                print("    %s" % _l.strip())
         _gs = subprocess.run([sys.executable, os.path.join(HERE, "google_safe.py"),
                               "--corpus", "--check"], capture_output=True, text=True, timeout=180)
         if _gs.returncode == 1:
