@@ -18,8 +18,9 @@ not an intuition:
                             17_matched_runs.
   w:before-page-top      -> Google drops w:before at a page top after a hard break; 55.15 pt asked,
                             0.33 rendered. 18_displacement, 103 documents.
-  a rule as a floating <w:drawing> -> has NEVER passed 32_stroke_lines in 192 scored documents. The
-                            two that pass carry it as a table-cell border.
+    a rule as a floating <w:drawing> -> CORRECTED 24 Nov: 163 of 191 scored documents carry
+                              w:drawing and PASS 32_stroke_lines; only 9 fail. The old
+                              "never passed" claim was false at the document level.
   embedded-font          -> Google ignores character width from an embedded face.
   w:spacing-letter       -> letter spacing is not honoured.
 

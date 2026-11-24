@@ -92,10 +92,15 @@ def corpus_dir():
 def predict(only=None, quiet=False):
     """Which known-ignored constructs does each .docx carry, and so which checks will fail.
 
-    THIS IS A LAW, NOT A GUESS. Measured 22 Nov across 192 scored documents: a rule carried only
-    as a floating <w:drawing> has NEVER passed 32_stroke_lines in Google, with no counter-example;
-    the two that pass carry it as a table-cell border. An anchored text box is rasterised by
-    Google on import, which is 166 of the failures in 04_chars_missing, 45_char_accuracy,
+    THIS IS A LAW AT THE CONSTRUCT LEVEL, AND IT WAS OVERSTATED AT THE DOCUMENT LEVEL.
+    Corrected 24 Nov after an agent measured the store: of 191 scored documents, 163 carry
+    w:drawing and PASS 32_stroke_lines, 19 pass without it, and only 9 fail with it - so
+    "a floating drawing has never passed" is FALSE as a document-level statement. What survives
+    is the narrower per-rule reading: the check scores RULE GEOMETRY, and a rule whose only
+    carrier is a floating drawing is not counted as an isolated rule. Do not price a patch for
+    32_stroke_lines against 192 documents; the real number is 9. An anchored text box is
+    rasterised by Google on import, which is 166 of the failures in 04_chars_missing,
+    45_char_accuracy, 13_text_colours, 44_header_footer and 17_matched_runs.
     13_text_colours, 44_header_footer and 17_matched_runs.
 
     So a patch can be judged in SECONDS instead of a 54-minute restamp: if the construct counts
