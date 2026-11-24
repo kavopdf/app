@@ -1,44 +1,33 @@
-# P2W Watchdog - Run Report
+watchdog - run report, 24 Nov 2026
 
-**24 Nov 2026**
-
-> **1 stage stopped: txt**
-
-The pipeline is moving. The fixer holds the slot and the ledger records its attempts inside the window. One row is red: the `.txt` table is 18.8 h old and both of its inputs moved underneath it. This pass implemented the refresh route rather than describing it again.
-
-## Stages
+One stage is stopped: the .txt table. Everything else is done or moving, and the stopped stage's owner has just taken the slot to refresh it.
 
 | stage | state | progress | age |
-|:--|:--|--:|--:|
-| measure-google | done | 213 of 212 | 2.4 h |
-| matrix | done | 213 of 213 | 2.4 h |
-| classify | superseded | | 1.8 h |
-| fix | moving | | 0.4 h |
-| txt | **stopped** | 199 clean, 14 failing | 18.8 h |
+|:--|:--|:--|--:|
+| measure-google | done | 213 of 212 | 0.8 h |
+| matrix | done | 213 of 213 | 5.4 h |
+| classify | moving | | 1.9 h |
+| fix | moving | attempts logged | 0.8 h |
+| txt | stopped | 199 clean, 14 failing | 21.7 h |
 
 ## Trend
 
-| | 2026-11-23 | 2026-11-24 | |
-|:--|--:|--:|:--|
-| .docx open | 59 | **59** | no change |
-| .txt failing | 14 | **14** | no change |
-| Google measured | 190 | **190** | no change |
-| Google clean | 30 | **29** | -1 |
-
-A row that does not move is the signal. The `.txt` row has not moved on consecutive watchdog passes.
+Today's row was already in the progress table from an earlier pass, so nothing was appended and nothing was edited. Against yesterday's row: docx open 59 to 59, txt failing 14 to 14, google 190 to 190, google clean 30 to 29. Three columns did not move and the one that did fell by one. That is the signal to watch, not a failure by itself.
 
 ## Round
 
-The phase is `fix`.
+Phase fix, round 1, 212 of 212 documents scored. round.py still lists open classes, so the phase is right to stay in fix.
 
-## What this pass did
+## The stopped stage, on the evidence
 
-* Read health.py, health.py --stalled, stage.py, progress.py --json, round.py --phase and status.py.
-* Appended today's row to benchmarks/PROGRESS.md and committed it. No past row was edited.
-* **txt stopped - acted, not noted.** restamp_txt.py alone cannot refresh the table: it re-scores the `.txt` files already on disk and refuses in a fresh pod, so the refresh needs p2w.py first. Written into BASELINE-BRIEF.md as a new section, so the next baseline run refreshes the `.txt` half outside the measure phase, claims the baseline slot, and touches nothing else. The evidence and what would overturn it are in BLOCKERS.md.
-* No slot was released and none was forced: the fixer claim is fresh, well inside the stale threshold, so it is a working run.
-* Nothing was reopened: the phase is `fix`, not `done`.
+The .txt table is 21.7 h old while its newest input is 7.4 h old, so it is genuinely stale, not a false alarm from an old clock. The earlier pass today corrected the baseline brief so the .txt refresh runs outside the measure phase, and that correction is now being exercised: a baseline run claimed the baseline slot minutes before this pass and owns the refresh. If that run finishes and the table is still 21.7 h old, then the phase gate was not the blocker and the next pass treats it as the instrument.
 
-## The blind spot
+## The fixer
 
-This run has **no cron tool**. A paused, zombie or stale-fire cron cannot be moved from here, and health.py reads files - it cannot see the platform. The exact calls that would have been made are named in BLOCKERS.md. No cron was recreated, so no id changed.
+The claim is 9 minutes old and the current run has 0 attempts and has not beaconed since it claimed. status.py calls that SILENT. I did not force-release the slot: the claim is inside its stale window, and a release would have put a second run into the engine. The relay cron that runs ten minutes after the fixer is the designed answer to a wedged fixer, so both fixer crons were left alone.
+
+## What this run could not do
+
+This run's tool list has no cron operation, so nothing on the platform could be read or moved. The calls that would have been made and were not: cron(action="list") for every id in the brief, cron(action="runs") for the baseline id and for both fixer ids, and cron(action="pause") then cron(action="resume") in the same pass for any stale fire. A paused or zombie cron therefore cannot be moved by automation from here, and health.py reads files and cannot see the platform. This is recorded in BLOCKERS.md.
+
+round.py --reopen refused, correctly: the phase is fix, not done, so there was nothing to reopen.

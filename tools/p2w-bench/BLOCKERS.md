@@ -542,3 +542,43 @@ wedged `:50` and deleting one of the pair puts the silent-dead failure back.
 
 **Can I fix it:** no. A missing tool is a missing tool. Until a watchdog run's tool list contains
 `cron`, a paused cron stays silent with nothing in the repository able to see it.
+
+## 2026-11-24 09:12 IST — watchdog: .txt still stopped, the baseline has just claimed, and still no cron tool
+
+**The evidence this pass.** health.py puts txt at `stopped`, 21.7 h, 199 clean / 14 failing, with its
+newest input 7.4 h old. progress.py found today's row already committed and appended nothing; against
+yesterday's row it reads docx open 59 to 59, txt failing 14 to 14, google 190 to 190, google clean 30
+to 29. round.py --phase: fix, round 1, 212 of 212 scored, open classes still listed.
+
+**The .txt stall is now inside the 06:07 correction, not beside it.** ROUND.json `baseline_started` is
+0.0 h old and commit ee43f1f6 ("claim: baseline takes the slot", 03:33:46 UTC) landed minutes before
+this pass - a :00 baseline run holds the slot and owns the refresh that BASELINE-BRIEF.md section 0
+describes. So this pass did not touch the brief again; writing the same instruction twice is noise, not
+a fix. **What would overturn this:** that run finishing and the table still reading 21.7 h old. That
+would mean the phase gate was never the blocker, and the next pass reads it as the instrument (the
+restamp path in section 0), not as a missing run.
+
+**A number two files disagree about.** progress.py --json prints google_clean 34 while today's
+committed row reads 29 - the row was appended before the google measurement that is 0.8 h old. The past
+row is not edited; the next row will carry the newer value. Recorded so nobody reads the 29 as current.
+
+**The fixer.** status.py says SILENT: claim 9 min old, run 48 min elapsed, 0 attempts, last beacon 9 min
+ago. The claim is inside `CLAIM_STALE_MIN`, so STEP 4 D does not apply and
+`round.py --release-fixer --force` was not run - a release would have put a second run into the engine.
+Both fixer crons were left alone: the :10 relay is the designed answer to a wedged :50, and deleting one
+of the pair puts the silent-dead failure back.
+
+**STEP 4 C did not apply.** round.py --phase prints `fix`, not `done`, so `round.py --reopen` refused by
+its own guard (exit 1). Nothing to reopen.
+
+**No `cron` tool in this pass's tool list**, same as 06:07. This is a missing tool, not a decision
+waiting for a person. The exact calls that would have been made and were not:
+
+    cron(action="list")
+    cron(action="runs", cron_id="01M7N3RTAM7SATT9TXMQPP7QRM")    # baseline :00, the txt row's owner
+    cron(action="runs", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")    # fixer :50
+    cron(action="runs", cron_id="01M7Y6DSBB2KBYAREFVMHYAB4D")    # fixer relay :10
+    cron(action="pause", cron_id=...); cron(action="resume", cron_id=...)   # same pass, never left paused
+
+Until a watchdog run's tool list contains `cron`, a paused or zombie cron stays silent with nothing in
+the repository able to see it, and health.py cannot tell a stage that is stuck from a cron that is off.
