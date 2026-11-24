@@ -365,3 +365,100 @@ it decides whether 54 documents carry their body text as text or as a picture.
 One worked from the documents and found the missing character multiset identical to the text boxes'
 contents; the other worked from the writer and found the routing path and the 120 pt cap. Both say **54 of
 65**, and both say the boxes are body text. That is the strongest agreement of any class so far.
+
+## 18_displacement, check side: the engine is wrong, and the fix is measured
+
+A third investigation converted all 102 failing documents, read every emitted `document.xml`, and ran three
+constructions against the repo's unmodified `compare()`. Its verdict: **the engine is wrong, not the
+check** - though the check is wrong at the margin, and that margin is worth fixing too.
+
+**The engine's .docx does not encode absolute vertical positions at all.** It encodes Word spacing hints
+that each renderer resolves differently, and `DocxWriter.java` says so itself (`:78-95`): Word and
+LibreOffice advance by `w:before + w:line/20`; Google advances by
+`w:before + max((w:line/240) · lineHeight(face, size), 0.069 · size)` - **one sign, every line, so it
+accumulates down the page.**
+
+**Two sites, both measured on the corpus:**
+
+1. **The page's whole top gap is emitted as `w:spacing w:before` on the first paragraph after
+   `<w:br w:type="page"/>`, and Google DROPS space-before at a page top.** The emitted gap was matched
+   against Google's own measured displacement, document by document:
+
+   | document | gap emitted | Google's displacement |
+   |---|---:|---:|
+   | 412_page_labels_roman | 61.4 pt | **-59.0** |
+   | 416_many_tiny_pages | 89.5 | **-87.2** |
+   | 602_bookmarked_annual_report | 69.5 | **-67.6** |
+   | academic-paper-ieee-2col | 59.7 | **-56.1** |
+   | table-across-page-break | 49.2 | **-48.5** |
+   | bank-statement-5-pages | 55.2 | **-57.1** |
+
+2. **Every row height is emitted `hRule="atLeast"` - 1,701 of 1,710 `<w:trHeight>` across the 102.** A
+   row's laid height is therefore the renderer's own content height, and rows stretch differently in
+   Google, giving the progressive drift the repo already censused at +1.85 to +3.6 pt per 100 pt of depth.
+
+**The corpus-wide split settles whose fault it is: 102 of 190 fail in Google, 22 of 213 in LibreOffice on
+the same files.** Nothing in the document is misplaced; Google lays it elsewhere.
+
+### Sizing, on the 72 documents that carry a stored Google displacement record
+
+| group | count | cause | side |
+|---|---:|---|---|
+| page break, fails on a continuation page | **13** | page-top gap as `w:before`, dropped by Google | engine |
+| first page only, `worst_dy` 5-400 pt | **40** | per-line advance / `atLeast` row height | engine |
+| block offset <= 4.5 pt AND internal spread <= 4.5 pt | **19** | nothing exceeds the check's own cap | **check** |
+| `worst_dy` <= 4.5 pt at all | **8** | entirely inside the tolerance band | **check** |
+
+So the engine explains about 53 of the 72 (about 75 of 102 scaled) and the check's over-sensitivity about
+19 (about 27). Note 58 of 72 fail on page 0 only, and only 16 of the 102 contain a page break at all - the
+page-top family is the **biggest-magnitude** mechanism, not the most numerous.
+
+### The earlier suspicion: true about the instrument, false as the root cause
+
+Both halves reproduced on the unmodified `compare()`:
+
+- **A rigid shift fails.** `370_offer_letter` translated by `1 0 0 1 0 -dy cm` on every page: PASS at 2.0 pt,
+  **FAIL at 3.0 pt**, through the `n_out == len(ds)` block clause. Every glyph keeps its position relative
+  to every other glyph.
+- **A colliding line passes.** 12 lines at 16 pt pitch, source min ink gap 2.26 pt: one line moved 7.0 pt
+  gives **PASS with 4.74 pt of ink overlap**; 8.0 pt gives FAIL. The single-run crossover is exactly 2x
+  tolerance while a rigid shift is charged at 1x.
+
+**But neither is the root cause of the class.** Every rigid shift this check actually charges in the corpus
+is 56-87 pt (2-3 cm), which is a genuine visible fault, and 8 of 72 documents have no run more than 4.5 pt
+out at all. **The check is wrong at the margin, not at the centre.**
+
+### The measured fix
+
+**Engine, and it is measured:** make every vertical dimension the .docx carries a *length both renderers
+read as a length*.
+
+- **The page-first path** - `spacing(int beforeTw, int lineTw, float size, boolean auto, boolean pageFirst)`
+  (`DocxWriter.java:149`) and its caller - must stop carrying the page's top gap as `w:before`. **The repo's
+  own controlled probe measured the replacement: a 1x1 `w:tbl` with `w:trHeight w:val="G" w:hRule="exact"`
+  delivers 55.83 of 55.15 pt in Google, against 0.33 pt for `w:before`.** It must also be charged to the
+  page's fill budget or pages overflow - the 20 Nov attempt turned 6 pages into 10.
+- **Row height** must write `hRule="exact"` instead of `"atLeast"`; the file already argues at
+  `:2243-2253` that exact is safe inside cells.
+
+**Both are Google-only changes.** LibreOffice is already exact, so `regress.py` cannot see them - which is
+exactly the gate conflict `BLOCKERS.md` recorded at 2026-11-24 03:25. That is a sequencing problem for the
+fixer, and it is the same wall the other two 18_displacement investigations hit.
+
+**Check, second order:** judge `dy` on the baseline rather than the bbox top - a face swap alone moves the
+bbox top 0.20 pt (helv to tiro) and 1.40 pt (helv to cour) at 10 pt, so part of the 1-3 pt medians the
+first-page failures carry is the instrument, not the document. And stop forgiving a single colliding line at
+2x tolerance while charging a rigid shift at 1x; a rigid translation changes ink contact by zero at every
+displacement, so the block clause is measured by nothing in the ink-contact curve that defends the
+tolerance.
+
+### Three investigations on 18_displacement, one conclusion
+
+All three name the same two constructs - the page-top `w:before` Google drops, and the row height - and all
+three say the fix is engine-side and blocked by the LibreOffice proxy that `regress.py` gates on. The third
+adds the measured replacement (1x1 exact table, 55.83 of 55.15 pt) and the sizing split.
+
+**Not measured by any of them: a live Google render.** All three sandboxes hit the same wall - every Drive
+write path needs an `s3key` the platform `upload` tool would stage, and that tool is not bound here. The
+Google-side numbers come from the stored per-document records and the repo's committed census, not from a
+fresh round trip.
