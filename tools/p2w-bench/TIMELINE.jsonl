@@ -3574,3 +3574,14 @@
 {"t": 1795482266.1002445, "ist": "06:34:26", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795482266.5073154, "ist": "06:34:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795482266.605626, "ist": "06:34:26", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482289.1588027, "ist": "06:34:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795482293.9003587, "ist": "06:34:53", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795482297.8823185, "ist": "06:34:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795482298.0165274, "ist": "06:34:58", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795482300.001333, "ist": "06:35:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795482300.175939, "ist": "06:35:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795482326.7285573, "ist": "06:35:26", "ev": "beat", "d": "attempt 2: measuring 8 more guard-B documents, baseline vs patched"}
+{"t": 1795482371.8689284, "ist": "06:36:11", "ev": "beat", "d": "proxy: baseline side of the 8-document sample"}
+{"t": 1795482416.776923, "ist": "06:36:56", "ev": "beat", "d": "proxy: patched side of the 8-document sample"}
+{"t": 1795482463.3585002, "ist": "06:37:43", "ev": "beat", "d": "proxy: last two documents of the sample, both sides"}
+{"t": 1795482510.6086454, "ist": "06:38:30", "ev": "beat", "d": "attempt.py: recording an attempt"}
