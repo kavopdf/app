@@ -134,6 +134,80 @@ The same loop then duplicates the FreeText's sentence (13 more characters) becau
   `ringLines` emits one Line per seal character (05), the 0.18 em space threshold (39), `logicalOrder`
   RTL reversal (77), superscript baseline clustering (journal).
 
+
+## t08_line_order — one real engine defect and one check artefact
+
+The check builds its expected order as `sorted(page lines, key=(round(y,1), x))` where `y` is the **top of
+the line's bbox**, then compares within column buckets by LCS.
+
+**305_vaccination_certificate — the .txt is wrong, and the engine defect is named.** The inversion:
+the footer at y=776.95 is written 504.3 pt *before* a body line at y=272.68. Cause, proven with an engine
+probe: the "words inside the ring" rule (`PdfToWord` ~1259-1284) tests only a line's **midpoint x and y**
+against the seal ring's bounding box, with no width or containment test. On this page the ring spans
+x 81.22-158.78 and the 244 pt-wide `Issued: 18-03-2022 14:22 IST | Certificate ID: ...` line spans
+x 28-271.9, so its **midpoint 149.95 falls inside the ring** and it is swallowed into the 48-line seal
+paragraph. That paragraph is appended at the end of the page's block list (`ordered.add(ringPara(ring))`,
+line 1629) - after the footer. Replaying the predicate in Python reproduces exactly those 48 lines.
+
+**Fix: give the ring rule a width test** - a line wider than the ring cannot be seal centre text.
+
+**39_small_caps_letter_spacing — the check is wrong.** The inversion is between a 1 pt **white invisible**
+duplicate of the title and the 15 pt visible title, drawn at the same x on the **identical baseline**
+(user-space y 775.89), one after the other in the content stream. The engine has both at `top = 66.0` and
+keeps drawing order. The check's key is bbox top, which for a 15 pt caps line sits 12.5 pt above a 1 pt
+line on the same baseline - so it invents a top-to-bottom relation between two pieces of text that are
+one visual line.
+
+Decisive test, same predicate, only the vertical key changed:
+
+    document                       key=bbox_top          key=baseline
+    305_vaccination_certificate    33/32 FAIL            33/32 FAIL
+    39_small_caps_letter_spacing   22/21 FAIL            22/22 PASS
+
+So 305 fails whatever defensible key you use; 39 fails only because the key is bbox top.
+**Fix: key on baseline, not bbox top.** The invisible 1 pt layer being emitted at all is a separate real
+fault, owned by t01/t12, not by line order.
+
+
+## t02_position — the whole population, and three corrections that clear it
+
+Corpus-wide measurement: **these four are the only documents that fail t02** (213 converted, 4 fail), so
+this is the entire population, not a sample.
+
+Each document flips on exactly one correction and is untouched by the other two:
+
+| x model | ruler | pairing | 332 | 334 | 74 | price-list |
+|---|---|---|---|---|---|---|
+| x0 (today) | median | text (today) | 78.8 F | 68.8 F | 81.5 F | 86.1 F |
+| x0 | median | **nearest column** | **100.0 P** | 68.8 F | 81.5 F | **98.4 P** |
+| x0 | **least squares** | text | 78.8 F | **100.0 P** | 81.5 F | 86.1 F |
+| **first inked glyph** | median | text | 78.8 F | 68.8 F | **96.3 P** | 85.8 F |
+
+- **332** - the page draws `1` both as a drawing callout (x 77.91, col 20) and as the table's Item
+  (x 314.93, col 81). The .txt has both, both right. The check pairs callout to table-cell (+61) and
+  table-cell to callout (-61).
+- **price-list** - the column multiset per text is identical on both sides (`Nos`: {43x14, 100x18} both).
+  The mirrored +-56/57 failures are the two columns swapped, because the writer orders cells row-major
+  while the PDF's block order is column-major.
+- **74** - every failure is a space-indented line at x0 = 56.0; first ink is at 73.40 (col ~14.5) and
+  92.98 (col ~18.4), which is what the .txt has. The check wants 11.
+- **334** - 22 of 32 pairs are (28, 5), so the median returns 5.600 where the writer used 5.100
+  (= 0.6 x 8.5, per `TxtWriter.documentCharWidth`). A single width of 5.100 explains all 32 pairs.
+
+**All three together: 213/213 pass, 0 regressions** - and it still fails a .txt with randomised indents
+(3.6-13.8 % against 96-100 % clean), so it is not a weakening.
+
+**The guards are not optional.** Sorted-multiset pairing alone newly fails 23 documents; first-ink applied
+to rotated or RTL lines newly fails 4 (in RTL the first glyph in the array is the rightmost). Both must be
+restricted: first-ink on upright, non-RTL lines only, and least-squares over columns of at least 3.
+
+Candidates disproved: right-alignment is not the cause (a right-aligned cell still has an x0 the writer
+pads to); rotation is not the cause (0 non-upright lines on all four pages).
+
+**A stale ranking cell, found in passing:** `RANKING-TXT.csv` records 74 as also failing
+`t13_amount_columns`, which does **not** reproduce on HEAD - that cell was measured on an older engine
+(`b97d8172ce642eb0`). Worth a full rescore, not a hand edit.
+
 ## t06_encoding — real, but fixing it alone makes t01 and t12 worse
 
 127 U+FFFD in each account form, which are exactly the ligature inventory: ff 13, fi 89, ffi 23, ffl 2.
