@@ -66,7 +66,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:38` agent landed: 18_displacement / A -> FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied)
 - `04:38` agent landed: 18_displacement / B -> step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40
 - `04:39` attempt 7 on 00_page_count -> lead
 - `05:50` attempt 45 on 18_displacement -> lead
@@ -91,6 +90,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `12:28` agent deployed: 04_chars_missing / A - real writer defect or instrument, and how much t01/t12 already explains
 - `12:28` agent landed: 04_chars_missing / A -> FINDINGS/04_chars_missing-REAL-WRITER-DEFECT-1115-fixer.md
 - `12:28` agent landed: 60_text_column_right_edge / B -> FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md
+- `13:07` attempt 54 on 18_displacement -> lead (0/129 moved)
 
 ## Where the rest of the state lives
 
