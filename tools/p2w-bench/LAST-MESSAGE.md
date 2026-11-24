@@ -1,8 +1,8 @@
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 05:59 → running IST · 0 min**
+**24 Nov 2026 · slot 06:32 → running IST · 1 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> No change was kept this run. The numbers below say what was tried, and the last section says why the next run must not try it again.
 
 ## Progress
 
@@ -21,6 +21,81 @@
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
 | Working on | `-` |
 
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 06:32 | **lead** | 0/None | Built the uniform-pitch cumulative-pixel snap the 04:52 finding asked for: compiles, and reproduces the measured Google-winning distribution on 362_price_list_dense (168x28 -> 165/165/180, total prese |
+
+## What the run did
+
+`18_displacement` was the class, on the strength of the 04:52 handoff: Google lays a table row out on
+whole CSS pixels and truncates the fraction, so a 168-twip row renders at 11 px instead of 11.2 and
+loses 0.15 pt. Carrying the remainder across rows takes the document to 42/42 in Google. That run
+measured it, could not land it (17 documents worse in the proxy) and left one question: **the guard**.
+
+**The guard is built.** `DocxWriter.java` cannot take a true pre-pass - `rowHeightTw` depends on
+`recutTopPt`, a running sum of the rows above it - so the patch buffers each row's `w:trHeight` and
+rewrites the digits back-to-front once every height is known. Nothing but the digits changes:
+`rowHeightTw` itself is untouched, so the flow charge, the table's own bottom edge and everything
+after it are bit-identical.
+
+It emits, on the real engine, from `word/document.xml`:
+
+| | `w:trHeight` | n | sum |
+|---|---|---:|---:|
+| before | `[240, 168 x 28]` | 29 | 4944 |
+| after | `[240, 165, 165, 180, ... 174]` | 29 | **4944** |
+
+That is the distribution that measured 42/42 in Google, with the total held. The 04:52 array summed
+to 4950 from a source that sums to 4944; this one does not move the table's bottom edge.
+
+**The guard question is answered with a census, not an argument.** All 211 corpus PDFs were converted
+on the baseline engine and every table's `atLeast` heights read back:
+
+| guard | rule | fires on |
+|---|---|---:|
+| A (in the patch) | one fractional height repeating ≥3 times | **85** |
+| B (line grid) | as A, and every whole-pixel row is a header or footer | **54** |
+| old, refuted | `ruleTwHere == 0` | 17 documents worse |
+
+The literal "all rows equal" test the 04:52 run proposed **skips the target** - `362` is a 240-twip
+header over 28 rows at 168. Guard B exists because `electricity-bill` alternates 360/380: one
+fractional height, but two heights interleaved, so it is not a pitch.
+
+## Why it is not committed
+
+The LibreOffice proxy, `p2w.py`'s own instrument, each document measured twice:
+
+| document | guard | share@5 before | after | verdict |
+|---|:--:|---:|---:|---|
+| `362_price_list_dense` | A, B | 0.03 | **0.04** | **worse** |
+| `electricity-bill` | A only | 1.33 | **1.40** | **worse** |
+| `16_right_aligned_amounts_txtpos` | A, B | 0.00 | 0.00 | unchanged |
+| `351_omr_answer_sheet` | A, B | 0.00 | 0.00 | unchanged |
+
+Both readings repeat exactly on a second run, so neither is noise. `regress.py` refuses any rise in
+share@5, so the gate refuses this patch **on the one document the class exists for**, before any
+other document is considered. `330_cad_drawing_sheet`, named as a cost in the 04:52 table, is
+untouched by both guards - its `.docx` is byte-identical between the two engines.
+
+**No guard can fix this.** The redistribution is forced: Google truncates each row to a whole pixel,
+so 168 twips can never be kept, and the minimum-movement cycle is `165, 165, 165, 165, 180` - four
+rows 0.15 pt short, one 0.6 pt long. LibreOffice places 168 correctly, so every one of those rows is
+a loss there. The cost is the definition of the fix, not a guard defect.
+
+The engine was reverted; the patch is kept at
+`FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch` and the full measurement at
+`FINDINGS/18_displacement-UNIFORM-PITCH-GUARD-MEASURED-0559-fixer.md`.
+
+## What the next run should do
+
+**Do not rebuild this.** Do not look for a better guard. The decision to make is about the bar: either
+`18_displacement` tolerates one pixel of accumulated quantisation per page - a waiver for a measured
+Google gain with a bounded proxy cost, or a share@5 floor below which a movement is not a regression -
+or the class is **closed** and the slot goes to a class whose two renderers agree. Working it a third
+time will produce this same finding.
+
 ## The txt
 
 | | |
@@ -33,33 +108,37 @@
 
 ## Subagents
 
-*None deployed this run.*
+Two, both deployed before the run's own attempt, both returned inside the turn.
+
+| agent | what it was given | what it returned |
+|:--|:--|:--|
+| row-height pre-pass | `DocxWriter.java` and the 04:52 finding | the buffer-and-rewrite patch that is now in FINDINGS, plus the catch that an all-equal test would skip the target document |
+| row-pitch census | the mechanism and the corpus brief | **no corpus was copied into its sandbox** - it built and validated the census tool against four synthetic PDFs with known pitch (8.40 pt → 11.2 px, 4.5 pt lost over 30 rows) and reported zero documents rather than inventing numbers. The census was then run here, on the 211 real `.docx`, and is in the table above |
+
+## Gates
+
+The attempt is recorded as attempt 46 in `ATTEMPTS.json`, but the row above reads **0 attempt(s)**:
+`round.py --heartbeat` rewrites `fixer_started` on every beat, so the window report.py counts from
+moved to 06:32 mid-run and the attempt, made at 06:30, fell outside it. That is the pending blocker
+of 2026-11-21 (a beat must not restart the window), now with a second run's evidence.
+
+Not blocked. `regress.py --check` PASS on the reverted tree, `measure_gate.py` READY with 212 of 212
+scored and one engine on both sides. The pipeline was healthy; the attempt is what did not land.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 05:59 → running · 0 min |
+| Slot window | 06:32 → running · 1 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 3 |
+| Tool beats | 6 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-## Best results this round
 
-| Document | Before | After | Change |
-|:--|--:|--:|--:|
-| `415_inline_images` | 89.04 | 0.00 | -89.04 |
-| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
-| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
-| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
-| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+### Where the time went
 
-## Next run
-
-NEXT RUN: (1) THE PREVIOUS PAIR IS REFUTED - do not spend a slot on it. content+rule==pitch and hRule=atLeast make a trHeight-only change a no-op, and a cell-level gap escapes fitPage/shaveToFit (FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md). (2) The class is two disjoint halves: a spacer half (the step at each table top = 0.784 x the declared w:line of an unspendable spacer, confirmed on 4 of 4 documents) and a row half (+0.75 pt per row, 21.75 pt over 362_price_list_dense's 29 rows). (3) FIRST MOVE: one Google round trip on 362_price_list_dense with trHeight = max(content, line-15) on rows where line > content only - LO-invariant by construction, and it tells you whether Google lays trHeight+rule or max(trHeight, content+rule). (4) The 4 ratchet rows need one corpus pass (~40 min) - start the slot with it, do not end with it. (5) The 9 REOPEN rows in PENDING-AUDIT.md are decisions with evidence attached.
-
-> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
-
----
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+| Phase | Time | |
+|:--|--:|:--|
+| report - the report and the chain | **1 min** | `##############` |
+| other - not attributed to a tool | **0 min** | `########` |

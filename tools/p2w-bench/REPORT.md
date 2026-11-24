@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 05:59
+# Fixer report - 2026-11-24 06:32
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 05:59 → running IST · 0 min**
+**24 Nov 2026 · slot 06:32 → running IST · 1 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -24,6 +24,12 @@
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
 | Working on | `-` |
 
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 06:32 | **lead** | 0/None | Built the uniform-pitch cumulative-pixel snap the 04:52 finding asked for: compiles, and reproduces the measured Google-winning distribution on 362_price_list_dense (168x28 -> 165/165/180, total prese |
+
 ## The txt
 
 | | |
@@ -42,12 +48,19 @@
 
 | | |
 |:--|:--|
-| Slot window | 05:59 → running · 0 min |
+| Slot window | 06:32 → running · 1 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 3 |
+| Tool beats | 6 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| report - the report and the chain | **1 min** | `##############` |
+| other - not attributed to a tool | **0 min** | `########` |
 ## Best results this round
 
 | Document | Before | After | Change |
