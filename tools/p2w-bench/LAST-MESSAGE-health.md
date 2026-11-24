@@ -1,8 +1,8 @@
 # P2W Watchdog - Run Report
 
-**25 Nov 2026 · 00:18 IST**
+**25 Nov 2026 · 00:22 IST**
 
-> **2 stage(s) stopped: fix, txt**
+> **1 stage(s) stopped: txt**
 
 ## Stages
 
@@ -11,11 +11,11 @@
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 3.5 h |
-| matrix | done | 213 of 213 | 20.5 h |
-| classify | moving |  | 4.8 h |
-| fix | **stopped** | 1 attempt(s) in 3 h | 1.7 h |
-| txt | **stopped** | 199 clean, 14 failing | 14.5 h |
+| measure-google | done | 213 of 213 | 3.6 h |
+| matrix | done | 213 of 213 | 20.6 h |
+| classify | moving |  | 4.9 h |
+| fix | moving | 2 attempt(s) in 3 h | 0.2 h |
+| txt | **stopped** | 199 clean, 14 failing | 14.6 h |
 
 ## Trend
 
@@ -32,13 +32,14 @@
 * **A stage is stopped** - see BLOCKERS.md.
 
 
-## fix: stopped on the beacon, not on output
+## The state moved while this pass was reading it
 
-The run that holds the slot claimed it, beaconed once, and has been silent inside one long step since.
-Its claim is still inside round.py's release window, so a forced release would have put a second run
-into the engine while the first may still be alive. The slot was left alone; the next scheduled fixer
-takes it when the window closes. What would overturn that: the same claim still silent past the
-window, with a clean engine tree.
+When this pass started, the fix row read stopped: a run had claimed the slot, beaconed once, and gone
+silent inside one long step. The claim was still inside round.py's release window, so a forced release
+would have put a second run into the engine while the first may still be alive. The slot was left
+alone. It then cleared itself the way the design says it should: a relay claimed the slot, recorded an
+attempt, and health.py now reads fix moving with 2 attempt(s) in 3 h. That is the pair of fixer crons
+doing their job, and it is why this pass released nothing.
 
 ## txt: 14 failing that the baseline cannot move
 

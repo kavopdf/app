@@ -782,3 +782,10 @@ and passed `lastmessage.py --file /tmp/report.md --for health`.
    header row and its first data row, so the five stage rows rendered as pipe-delimited text with no
    header - the same "a table that swallows its own rows" fault the layout rule forbids. The banner is
    now printed above the table. No number changed; the generator prints what `health.py --json` returns.
+
+**Addendum, same pass, 00:52 IST — the fix row cleared itself while this entry was being written.** By
+the time the report was regenerated, a relay had claimed the fixer slot, beaconed, and recorded an
+attempt, so `health.py` read `fix moving, 2 attempt(s) in 3 h, 0.2 h` and `--stalled` named `txt` only.
+The release this pass declined was the right call for the wrong-looking reason: nothing needed
+releasing, and the pair of fixer crons took the slot exactly as the design says. The `fix` row above is
+left as it read at the start of the pass, not rewritten.
