@@ -1275,18 +1275,29 @@ def main(argv):
     # 18_displacement" while 22 pending items were open, which reads as the gate being bypassed. It was
     # not: pending.py's item 1 IS an 18_displacement question, so the run took the pending item and the
     # row lost the distinction. Say which it was, because the difference is the whole gate.
-    _pend = 0
+    # AND IF IT CANNOT BE READ, SAY SO. The first version fell back to _pend = 0 on any exception,
+    # which silently printed the old wording - and that is what happened: the 11:54 report HAS this
+    # code and still showed no note, so pending.py failed in that environment and the fallback hid it.
+    # A fallback that looks exactly like success is the fault this whole day was about.
+    _pend, _why = None, ''
     try:
         import subprocess as _sp
-        _r = _sp.run([sys.executable, os.path.join(HERE, "pending.py")], capture_output=True, text=True,
-                     timeout=120)
-        _m = re.search(r"PENDING \((\d+)\)", _r.stdout or "")
-        _pend = int(_m.group(1)) if _m else 0
-    except Exception:
-        _pend = 0
-    L.append("| Working on | `%s`%s |"
-             % (working, "" if not _pend else
-                " - taken from the pending list (%d still open), not a new class" % _pend))
+        _r = _sp.run([sys.executable, os.path.join(HERE, 'pending.py')],
+                     capture_output=True, text=True, timeout=120)
+        _m = re.search(r'PENDING \((\d+)\)', _r.stdout or '')
+        if _m:
+            _pend = int(_m.group(1))
+        else:
+            _why = 'pending.py printed no PENDING line (exit %d)' % _r.returncode
+    except Exception as _e:
+        _why = 'pending.py could not be run (%s)' % type(_e).__name__
+    if _pend:
+        _note = ' - taken from the pending list (%d still open), not a new class' % _pend
+    elif _pend == 0:
+        _note = ' - the pending list is empty, so this is a new class'
+    else:
+        _note = ' - **the pending list could not be read**: %s' % _why
+    L.append('| Working on | `%s`%s |' % (working, _note))
     cm = committed()
     if cm:
         L.append("| Committed | **%d** files in %d commit(s) from `%s` — %s |"
