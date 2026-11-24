@@ -1,13 +1,10 @@
 {
- "agents": [],
- "attempts": 2,
- "class": "04_chars_missing",
- "docs_improved": 0,
- "ended": "20:51",
- "ended_ts": 1795533690.046079,
+ "started": "21:54",
+ "started_ts": 1795537470.621247,
+ "ended": null,
+ "ended_ts": null,
+ "attempts": 0,
  "kept": 0,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "20:25",
- "started_ts": 1795532112.1909893
+ "agents": [],
+ "docs_improved": 0
 }
