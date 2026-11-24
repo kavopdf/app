@@ -1,4 +1,3 @@
-| 21 Nov 11:52 | fixer | slot claimed - fixer running |
 | 21 Nov 13:43 | fixer | attempt 47_margins -> error |
 | 21 Nov 13:54 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 13:54 | fixer | slot claimed - fixer running |
