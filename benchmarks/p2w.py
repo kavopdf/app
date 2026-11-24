@@ -1485,6 +1485,22 @@ def main():
     # 1.10x, with byte-identical .txt). A full pass is ~39 min of conversion at 11 s/document
     # sustained plus ~15-20 min of measurement, and the only way it lands is a slot that starts
     # it early and does not stop to investigate first.
+    # BUILD THE CORPUS ONCE PER ENGINE, NOT ONCE PER PASS.
+    #
+    # corpus-convert.py --ensure is a stat and a listdir when the 213 .docx are already current for this
+    # engine, and a rebuild when they are not. Either way the conversion below then finds them done and
+    # spends its share of the budget measuring instead. This is NOT a parallelism win - the pod is capped
+    # at 1.05 cores (measured: 2 workers gave 1.10x), so the only saving that exists is not converting
+    # the same bytes twice.
+    try:
+        _sp0 = subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                           '..', 'p2w-bench', 'corpus-convert.py'),
+                               '--ensure', '-j', '2', '-q'],
+                              capture_output=True, text=True, timeout=2700)
+        if _sp0.returncode not in (0, 3):
+            print('  corpus : could not be prepared (%d) - the pass below converts from scratch' % _sp0.returncode)
+    except Exception as _e0:
+        print('  corpus : could not be prepared (%s) - the pass below converts from scratch' % type(_e0).__name__)
     _now=time.time()
     _conv_end=_now+max(0.0,(end-_now))*CONVERT_SHARE
     docx(_conv_end); run(end); r=rank(); status()
