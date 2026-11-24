@@ -215,7 +215,16 @@ def text_of(p):
 # THE SOFFICE BINARY, DEFINED ONCE. This constant was lost on 19 Nov when a duplicated block was
 # removed by line number, and p2w.py then died with NameError on every document - the whole
 # measurement path, not one function. The regression gate caught it, which is what it is for.
-SOFFICE_BIN = "/usr/lib/libreoffice/program/soffice.bin"
+# THE WRAPPER, NOT THE .bin - MEASURED ON A FRESH POD, 24 NOV.
+#
+# /usr/lib/libreoffice/program/soffice.bin exits 0 having written NOTHING on this image:
+# a hand-run of it on a known-good .docx produced no PDF and no diagnostic, while the
+# /usr/bin/soffice wrapper on the same file printed "convert ... -> ... .pdf" and wrote
+# it. The wrapper is what sets up the profile environment the .bin needs; calling the
+# .bin directly is what the four silent "measured 0 of 213" passes on 21 Nov were.
+# The .bin stays as the fallback so an image without the wrapper behaves as before.
+SOFFICE_BIN = ("/usr/bin/soffice" if os.path.exists("/usr/bin/soffice")
+               else "/usr/lib/libreoffice/program/soffice.bin")
 
 # SOFFICE NEEDS A PROFILE OF ITS OWN, AND WITHOUT ONE THE FIRST LAUNCH ON A FRESH POD
 # CONVERTS NOTHING AND SAYS NOTHING.
