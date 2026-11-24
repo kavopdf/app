@@ -1,19 +1,5 @@
 [
  {
-  "started_ts": 1795275682.7897158,
-  "started": "21:11",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "",
-  "attempts": 0,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795274857.0317433,
   "started": "20:57",
   "ended_ts": null,
@@ -1083,5 +1069,21 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795482513.6252432,
+  "started": "05:59",
+  "window_for_claim": 1795482513.6252432,
+  "ended_ts": null,
+  "ended": "(never)",
+  "attempts": 3,
+  "kept": 0,
+  "agents": [
+   "18_drowheight-prepass-01",
+   "18_drowpitch-census-01"
+  ],
+  "docs_improved": 0,
+  "class": "18_displacement",
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
