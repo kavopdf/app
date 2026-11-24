@@ -41,6 +41,17 @@ RUN      = os.path.join(HERE, "RUN.json")
 # still arrive - that is what the file is for - but the next run should not wait on it silently.
 AGENT_SILENT_MIN = 40
 
+# AND AN AGENT THAT NEVER CAME BACK MUST EVENTUALLY LEAVE THE QUEUE.
+#
+# AGENT_SILENT_MIN only changes the WORDING of the row - it still appends an item, so a subagent
+# that died with its run produces a pending row for ever. Measured 24 Nov: five rows sat at
+# status=running with finding='' from 08:20 and 14:00, and the watchdog's own diagnosis was that
+# the queue can never shrink, so classpick.py refuses to name a class, so every fixer run
+# hand-picks, and today it hand-picked three classes the rotation had already demoted.
+#
+# Past this age with no finding, the agent is dead: it is counted once and dropped.
+AGENT_DROP_MIN = 180
+
 
 def _load(p, default):
     try:
@@ -112,6 +123,7 @@ def collect():
                           "why": "HANDOFF.md says this is the first work. It is ahead of any new class."})
 
     # 2. Agents that were deployed and have not landed a finding.
+    _dead = []
     for a in h.get("agents") or []:
         if a.get("status") != "running":
             continue
@@ -126,6 +138,9 @@ def collect():
             pass
         landed = _finding_landed(a)
         silent = age is not None and age >= AGENT_SILENT_MIN and not landed
+        if age is not None and age >= AGENT_DROP_MIN and not landed:
+            _dead.append((a.get('id'), a.get('class'), age))
+            continue
         items.append({"kind": "agent", "who": a.get("id") or (a.get("class", "") + "/" + a.get("angle", "")),
                       "what": "%s / %s - %s" % (a.get("class", ""), a.get("angle", ""),
                                                 (a.get("question") or "")[:100]),
