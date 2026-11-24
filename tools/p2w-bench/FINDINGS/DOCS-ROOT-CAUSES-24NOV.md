@@ -215,3 +215,88 @@ Storing the pair costs nothing and makes this class falsifiable.
 - **Group B's estimator half is fixable**: on 8 of the 16, the widest line is a 9.8-253.8 pt outlier
   against a 4-19 pt slack, so letting the slack cover the column's own line-break step plus the half-point
   error fits them without loosening the overrun branch, which is where a real defect shows.
+
+## 60_right_edge, engine side: the right edge is never in the file at all
+
+**The engine never puts a column's right edge into the .docx.** A body paragraph is flowing text whose only
+horizontal controls are `w:ind` and `w:jc`. The engine writes `w:ind w:left` = the page x, `w:right="0"`,
+no `w:jc`, `w:pgMar right="0"`, and **exactly one paragraph per source line**. With the right indent at
+zero and the margins at zero, the text area is the whole 595 pt paper, and a left-aligned paragraph has
+**no right constraint whatsoever**. Because each paragraph holds exactly one source line's string, its
+extent is `x + sum(advance widths)` **in the renderer's face** - nothing in the file says where the line
+should stop.
+
+That single fact explains the whole class: LibreOffice, which *has* DejaVu, reproduces the source's column
+edge to 0.2-0.5 pt on 40 of the 56 - **the identical face did that, not the document** - and any renderer
+that substitutes a face moves the edge 3-190 pt in either direction.
+
+**Census over the 55 convertible failing documents, 4,536 paragraphs:** `w:ind w:right>0`: **0**.
+`w:jc="both"`: **0**. `w:framePr`: **0**. `w:pgMar right="0"`: every section. 3,324 paragraphs carry only
+`w:ind w:left`. One single `w:jc="right"`. The engine writes `w:right="0"` explicitly - it states the
+absence.
+
+### The four-construct experiment: bounding is not pinning
+
+Same text, same 9 pt, same left edge, target edge 395 pt; rendered in LibreOffice once with a face it has
+and once with one it lacks:
+
+| construct | face present | face substituted | delta |
+|---|---:|---:|---:|
+| A - the engine's (one line per paragraph, `w:ind left`, right=0) | 352.4 | 329.4 | **-23.0** |
+| B - `w:ind w:right` = paper minus edge | 352.4 | 329.4 | **-23.0** |
+| C - fixed-width table cell (`tcW`) wider than the text | 352.4 | 329.4 | **-23.0** |
+| D - **justified (`w:jc=both`) + right indent, one multi-line paragraph** | 394.8 | 394.4 | **-0.4** |
+
+**A right indent and a cell width BOUND text but do not PIN a ragged line's edge.** Only a justified
+multi-line paragraph puts the widest line on the boundary, and it survives substitution. The engine has
+neither that construct nor a justified alignment - `Para.align` is 0 left, 1 centre, 2 right, and there is
+no justified class.
+
+### Corpus measurement: one attribute, no other change
+
+| render | documents failing `60` (of 55) |
+|---|---:|
+| as emitted (LibreOffice, has DejaVu) | **15** |
+| only `w:rFonts` changed to Verdana | **44** |
+| only `w:rFonts` changed to Courier New | **52** |
+| only `w:rPr/w:spacing` stripped (what Google does to the stretch) | **15** - identical set, not one verdict changes |
+
+Of the 40 that pass as emitted, **29 flip to FAIL from the face change alone**, and the column edge moved
+on **40 of 40** (`302_radiology_report` -0.48 to -42.09 to +36.06; `65_two_col_full_width_figure_caption`
+-7.70 to **+189.43**). One file, one attribute, no indent, no table, no text changed.
+
+**Ink versus text-run edge is not the cause.** On both the source PDF and the render, the line bbox right
+edge exceeds the rightmost dark pixel in that line's band by 0.3-1.3 pt. The check reads the advance edge on
+both sides, and its 8 pt tolerance is six times the discrepancy.
+
+### Where the fix belongs, and what is a wall
+
+- **The check's arithmetic is fine** - it measures one quantity on both sides. But it compares a *document*
+  property against a *renderer* property, and an **attribution rule** is available and measurable: if the
+  render PDF's embedded faces differ from the `w:rFonts` the .docx declares, the column edge is not
+  comparable and belongs to `53_embedded_faces`' residual. That is a class-wide rule, not a per-document
+  loosening, and it would clear the ~25 DejaVu documents and nothing else.
+- **An engine fix is a redesign, not a patch.** The one construct that pins the edge contradicts the
+  engine's line model (one paragraph per source line, align 0/1/2, positions from the baseline flow).
+  Adopting it trades away the per-line model that `17_matched_runs`, `23_line_pitch` and `18_displacement`
+  rest on. **That trade must not be made silently.**
+- **Wall for the DejaVu-named documents.** No face in Google's library is metrically DejaVu, naming a Google
+  face makes LibreOffice wrong, and embedding the face is ignored by Google.
+- **The 15 that fail under the correct face are a DIFFERENT defect, not this one.** Their widest line is not
+  the source's line (e.g. `purchase-order`: the engine's own table grid ends at 553.0 where the source's
+  column ends at 449.7), or the text was displaced. Those belong to `18_displacement` and to the table grid,
+  and were not root-caused here.
+
+### One correction to the record
+
+The earlier attribution of `313_power_of_attorney` and `321_auditors_report` to the lost character-spacing
+stretch **does not survive measurement**: stripping every `w:rPr/w:spacing` moves their column edge by
+**1.2 pt and 0.6 pt**, not 58 pt. Their Google failure is the face (`DejaVuSerif` to Arial), the same
+mechanism as the other 23.
+
+### Agreement between the two 60 investigations
+
+Two independent investigations, different methods, same split: **~25 of the 56 are the DejaVu wall**, the
+rest are either the half-point size floor or a different defect. One measured the substitution by changing
+the declared face (21 of 24 flip), the other by changing `w:rFonts` in the emitted file (29 of 40 flip).
+Both agree the engine cannot express the edge.
