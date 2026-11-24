@@ -582,3 +582,113 @@ waiting for a person. The exact calls that would have been made and were not:
 
 Until a watchdog run's tool list contains `cron`, a paused or zombie cron stays silent with nothing in
 the repository able to see it, and health.py cannot tell a stage that is stuck from a cron that is off.
+
+## 2026-11-24 12:05 IST — watchdog: nothing stopped, the .txt stall has cleared, and the flat row is a run-lifetime problem
+
+**The evidence this pass**, all read at 12:03-12:05 IST.
+
+`health.py` and `health.py --stalled`: nothing is stopped. measure-google done, 213 of 213, 2.8 h.
+matrix done, 213 of 213, 8.3 h. classify moving, 4.9 h. fix moving, 2 attempt(s) in 3 h, 0.7 h.
+txt superseded, 199 clean / 14 failing, 2.3 h, inputs 10.4 h.
+
+`progress.py`: today's row was already committed, so nothing was appended and there is no new row to
+commit. Against 23 Nov it reads docx open 59 to 59, txt failing 14 to 14, google 190 to 190,
+google clean 30 to 29.
+
+`round.py --phase`: `fix`.
+
+**The .txt stall recorded at 09:12 is cleared.** That pass left txt at `stopped`, 21.7 h, and named its
+own overturn condition: that the baseline run then finishing and the table still reading 21.7 h old
+would mean the phase gate was never the blocker. The baseline run finished. `health.py` now reads txt
+`superseded`, table 2.3 h old against inputs 10.4 h, and says re-scoring reproduces it. The restamp path
+in BASELINE-BRIEF.md section 0 did what it was written to do, and nothing needed to be touched.
+
+**The row that does not move, with the fixer's attempt count beside it, as the brief asks.** docx open
+has read 59 on 21, 22, 23 and 24 Nov - four rows. txt failing has read 14 on 23 and 24 Nov. The fixer's
+attempt count beside that flat row, from `health.py --json`, is 2 attempts in the last 3 h.
+
+**Why it is flat, measured rather than guessed.** RUN-HISTORY.json holds the last 60 fixer runs, which
+is the cap `round.py` writes at. Read at 12:04 IST: 5 ended on their own terms, 55 were killed, 54 kept
+nothing, 21 made zero attempts, and across the whole window there were 57 attempts, 8 kept and 31
+documents improved. So the class is not the problem and the instrument is not lying: a run does
+occasionally land work - the 07:12 run kept 2 attempts and improved 5 documents - and then a run of
+claims is taken by runs that die before making one. This is the same condition `round.py`'s own comment
+above `CLAIM_STALE_MIN` records ("of the last 60 fixer runs, ZERO ended on their own terms"); recomputed
+today it is 5 of 60, so it has eased and has not gone away.
+
+**What I did about it: nothing, deliberately, and here is the check.** STEP 4 D was tested and does not
+apply. `status.py` at 12:04 reads the fixer SILENT - claim 12 min old, no beacon for 12 min, run started
+11:23, 43 min elapsed, 0 attempts - and `CLAIM_STALE_MIN["fixer"]` is 45. A 12-minute-old claim is
+inside the window the tool itself defines as a working run, so `round.py --release-fixer --force` would
+have put a second run into the engine while the first may still be alive. Both fixer crons were left
+alone: the `:10` relay is the designed answer to a wedged `:50`, and deleting one of the pair puts the
+silent-dead failure back. **What would overturn this:** the same claim still silent past 45 minutes,
+where the release is the documented action rather than a guess.
+
+**STEP 4 C does not apply** either: `round.py --phase` prints `fix`, not `done`, so `round.py --reopen`
+is refused by its own guard.
+
+**STEP 5 does not fire, and this is the test I applied.** The brief asks for a decision on a stall older
+than 24 h that nothing moved. docx open has been 59 for four rows, but that is the soffice number and
+the renderer that counts is Google: google clean read 7 on 19 Nov, 23 on 22 Nov, 30 on 23 Nov and 29 on
+today's committed row. The corpus is moving on the measure that matters while the proxy is flat, which
+is what COORDINATION.md says to expect once the model is flowing text for Google rather than tuned to
+soffice. So this is neither a class to park with `classpick.py --exhaust` nor an approach to replace.
+**What would overturn that:** two more rows with google clean also flat and the run ledger still
+showing killed runs, at which point the finding is the run lifetime itself and the answer is a run
+lifetime fix, not a class decision.
+
+**A number two files disagree about, again.** `progress.py --json` prints a google_clean above today's
+committed row's 29: the row was appended earlier today, before the newest google measurement. The past
+row is not edited; the next row carries the newer value. Recorded so nobody reads the 29 as current.
+
+**No `cron` tool in this pass's tool list**, same as 06:07 and 09:12. This is a missing tool, not a
+decision waiting for a person: this watchdog has no cron tool, so a paused or zombie cron cannot be
+moved by automation. The ids are from HEALTH-BRIEF.md's table, not from memory. The exact calls that
+would have been made and were not:
+
+    cron(action="list")
+    cron(action="runs", cron_id="01M7N3RTAM7SATT9TXMQPP7QRM")    # baseline :00
+    cron(action="runs", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")    # fixer :50
+    cron(action="runs", cron_id="01M7Y6DSBB2KBYAREFVMHYAB4D")    # fixer relay :10
+    cron(action="pause", cron_id=...); cron(action="resume", cron_id=...)   # same pass, never left paused
+
+STEP 3 and STEP 4 A and B did not run, and nothing in this entry claims they did.
+
+---
+
+## 2026-11-24 12:20 IST — gverify: four scored results predate the current engine, and no corpus exists to re-measure them
+
+**What I was doing.** The run opened at `stage.py` = `classify`, and before writing the capability
+table it checked the results for the engine stamp that `--plan` uses.
+
+**The obstacle.** `stage.py` counts a document as measured whenever a `.json` exists, so it prints
+`measured 213`. `gverify.py`'s own `_done()` is stricter: a scored result counts only when its
+`engine` matches `_engine_now()` (`b7699196`). Measured this run, from the committed results:
+
+    186 scored results carry b7699196   (current)
+     21 page_count_refused carry none   (counted as done by _done(), by design)
+      4 scored results carry an older stamp and are NOT done
+
+The four: `15_stamp_on_scanned_page` (5beb8b9d), `magazine-2col-pullquote-spanning`,
+`newspaper-2col-fullwidth-headline`, `very-long-single-column-table` (all 462353f). So the honest
+count is 209 of 213 measured against the current engine, not 213 — and the capability table's
+`190 scored` includes those four.
+
+**What I tried.** `gverify.py --plan` cannot even be run in this slot: it lists documents from
+`/scratch/work/p2w/out`, which no call in this cron populates, and it dies with
+`FileNotFoundError: '/scratch/work/p2w/out'`. Building that corpus needs `p2w.py` and a built engine
+(`java -cp <classpath> ConvertOne <pdf> /scratch/work/p2w/out` per FIXER-BRIEF.md), which is a
+corpus pass, not a measurement step, and cannot be done from a `git clone` inside this slot.
+
+**Decision.** The measurement work this run could do is done and the table is written from it. The
+four stale documents are left in the table and named here, not silently counted as current. The
+matrix does not change materially: all four already fail, and re-measuring them can move their
+per-check rows, not the shape of the table.
+
+**Can I fix it.** No — it needs a corpus pass.
+
+**What is needed.** One run that builds `/scratch/work/p2w/out` with the current engine, then
+`gverify.py --plan` to confirm it prints `0 to go`, then `gverify.py --collect` on the four names
+above. Until then, `stage.py`'s `measured` line overstates by exactly the number of stale scored
+results, and any report that quotes it as "213 measured against this engine" is wrong.

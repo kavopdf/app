@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 11:54
+# Fixer report - 2026-11-24 11:15
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 11:54 → running IST · 1h 10m**
+**24 Nov 2026 · slot 11:15 → running IST · 1h 13m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Self-check | **every field agrees with its second source** |
+| **Self-check** | **1 disagreement(s)** - self-check: the subagent check raised AttributeError vs it did not run, so it cannot vouch for anything |
 | Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -29,7 +29,7 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 13:04 | **lead** | 0/129 | Uniform-pitch patch applied, built, all 213 converted on the patched engine; 129 of 212 measured in slot. Against RANKING.csv: 2 worse (404_sudoku_grid 0.27->0.49, 03_stamp_vertical_90deg 16.98->17.20 |
+| 12:27 | **lead** | 0/None | uniform-pitch patch applied and built; the 212-document --force pass measured 38 min to convert and 19 s/doc to measure, extrapolating to ~105 min - it cannot finish in a 90-minute slot. 36 of 36 meas |
 
 ## The txt
 
@@ -44,16 +44,19 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `60_tB-02` | is 60 or 18 reading the paper - the 25_invisible_tex | 12:28 | - | not recorded |
+| `04_cA-01` | real writer defect or instrument, and how much t01/t | 12:28 | - | not recorded |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 11:54 → running · 1h 10m |
+| Slot window | 11:15 → running · 1h 13m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 24 |
-| Longest silence | **9.9 min** — from 12:48:05, after `measure pass 3` |
+| Tool beats | 35 |
+| Longest silence | **9.0 min** — from 11:24:37, after `relay: corpus pass 1/8, p2w --force --budget 250` |
 | Silences over 2 min | 13 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
@@ -62,10 +65,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **6 min** | `##` |
-| measure or build - a conversion, screen or compile writes no beacon | **43 min** | `##############` |
-| record - attempt, handoff, class rows | **7 min** | `##` |
-| other - not attributed to a tool | **11 min** | `####` |
+| fix - diagnose and change the engine | **10 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **25 min** | `########` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **35 min** | `###########` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -78,7 +82,7 @@
 
 ## Next run
 
-PENDING FIRST: 23 item(s) you can close - run pending.py and take them in its order before the class below. 18_displacement: the uniform-pitch guard is measured on 200 of 212 corpus documents with zero worse in docx and txt and no construct spread - it is refused ONLY for an unstamped engine. Re-apply tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, run the remaining 12 documents of the corpus pass (P2W_ENGINE_SRC=/scratch/work/CS python3 benchmarks/p2w.py --budget 275, repeat until measured 212/212), then regress.py --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. The 12 unmeasured are the largest page counts, so order the pass by page count descending. Do NOT re-run the trHeight=max(content,line-15) probe.
+PENDING FIRST: 23 item(s) you can close - run pending.py and take them in its order before the class below. 18_displacement: APPLY tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, then START the slot with the 212-document pass (p2w.py --force --budget 250, repeat) - that pass is the whole cost. It is measured: 362_price_list_dense 41/42 -> 42/42 in Google, electricity-bill and 330_cad_drawing_sheet byte-identical. Do NOT re-run the trHeight=max(content,line-15) probe - it is refuted and the guard makes it unnecessary. After the pass: regress.py --check, --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. Then check the 9 documents named in FINDINGS/18_displacement-UNIFORM-PITCH-GUARD-GOOGLE-42of42-0450-fixer.md for a uniform pitch.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

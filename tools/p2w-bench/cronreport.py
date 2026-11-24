@@ -203,6 +203,22 @@ def progress_rows():
     return rows
 
 
+def progress_stale():
+    """Where today's committed row disagrees with what the data says now.
+
+    THE WATCHDOG READS THE COMMITTED ROW AND THAT RULE IS RIGHT - rows() is history. But today's row is not
+    history yet. On 24 Nov it said google_clean 29 while progress.py's own today() computed 35, and the
+    watchdog reported 29 over live data that said 35: six documents adrift, with nothing in the pipeline able
+    to notice because the two numbers were never compared. Same shape as every reporting fault fixed this
+    week - two sources describe one quantity, one is read, the other never asked.
+    """
+    try:
+        import progress as _p
+        return _p.today_is_stale()
+    except Exception as e:
+        return ["could not compare today's row: %s" % type(e).__name__]
+
+
 def classes():
     """(signature, open_count, lo_count) from the Google class table, biggest first."""
     out = []
@@ -423,6 +439,14 @@ def watchdog():
          "| stage | state | progress | age |", "|:--|:--|--:|--:|"]
     for name in ("measure-google", "matrix", "classify", "fix", "txt"):
         v = stages.get(name) or {}
+    # TODAY'S ROW IS NOT HISTORY YET. The trend is read from the committed table, which is right - rows()
+    # must not be recomputed. But when today's row disagrees with the live data it is reported, not served
+    # as if current. On 24 Nov it said google_clean 29 against a live 35: six documents adrift.
+    _stale = progress_stale()
+    if _stale:
+        L.append("> **Today's row is stale** - %s. The trend below is the committed row; the data has moved."
+                 % "; ".join(_stale))
+        L.append("")
         prog = ""
         if v.get("done") is not None and v.get("of"):
             prog = "%d of %d" % (v["done"], v["of"])

@@ -1005,8 +1005,8 @@
   "ended_how": "killed - slot cleared by a force release"
  },
  {
-  "started": "10:00",
-  "started_ts": 1795494644.7785444,
+  "started": "11:15",
+  "started_ts": 1795499119.2478187,
   "ended": "(never)",
   "ended_ts": null,
   "attempts": 0,
@@ -1016,15 +1016,20 @@
   "ended_how": "killed - never released the slot"
  },
  {
-  "started_ts": 1795499626.5693936,
-  "started": "11:23",
-  "window_for_claim": 1795499626.5693936,
+  "started_ts": 1795499135.5713508,
+  "started": "11:15",
   "ended_ts": null,
   "ended": "(never)",
-  "attempts": 0,
+  "class": "18_displacement",
+  "attempts": 1,
   "kept": 0,
-  "agents": [],
   "docs_improved": 0,
+  "agents": [
+   "60_tB-02",
+   "04_cA-01"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
   "ended_how": "killed - slot cleared by a force release"
  },
  {

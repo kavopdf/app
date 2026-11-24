@@ -6,6 +6,25 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
+| 22 Nov 06:13 | fixer | attempt | 32_stroke_lines -> kept (16/213 moved) |
+| 22 Nov 06:17 | fixer | attempt | 18_displacement -> lead |
+| 22 Nov 07:14 | fixer | claim | fixer claimed the slot |
+| 22 Nov 07:14 | fixer | stale-claim | fixer slot was stale (19 min) - the previous run ended without releasing it |
+| 22 Nov 07:19 | fixer | build-engine | started |
+| 22 Nov 07:20 | fixer | build-engine | engine built in 35s |
+| 22 Nov 07:25 | fixer | attempt | 18_displacement -> lead (0/213 moved) |
+| 22 Nov 08:16 | fixer | claim | fixer claimed the slot |
+| 22 Nov 08:16 | fixer | stale-claim | fixer slot was stale (24 min) - the previous run ended without releasing it |
+| 22 Nov 08:20 | fixer | build-engine | started |
+| 22 Nov 08:21 | fixer | build-engine | engine built in 37s |
+| 22 Nov 08:26 | fixer | attempt | 18_displacement -> reverted (1/16 moved) |
+| 22 Nov 08:56 | fixer | claim | fixer claimed the slot |
+| 22 Nov 08:56 | fixer | stale-claim | fixer slot was stale (30 min) - the previous run ended without releasing it |
+| 22 Nov 09:05 | fixer | build-engine | started |
+| 22 Nov 09:06 | fixer | build-engine | engine built in 47s |
+| 22 Nov 09:09 | fixer | build-engine | started |
+| 22 Nov 09:10 | fixer | build-engine | engine built in 51s |
+| 22 Nov 09:13 | fixer | build-engine | started |
 | 22 Nov 09:14 | fixer | build-engine | engine built in 42s |
 | 22 Nov 09:19 | fixer | attempt | 18_displacement -> lead (6/16 moved) |
 | 22 Nov 09:51 | fixer | claim | fixer claimed the slot |
@@ -362,47 +381,28 @@
 | 24 Nov 09:01 | fixer | build-engine | started |
 | 24 Nov 09:02 | fixer | build-engine | engine built in 37s |
 | 24 Nov 09:17 | fixer | attempt | 18_displacement -> lead (1/10 moved) |
-| 24 Nov 10:00 | fixer | claim | fixer claimed the slot |
-| 24 Nov 10:22 | fixer | build-engine | started |
-| 24 Nov 10:24 | fixer | build-engine | engine built in 62s |
-| 24 Nov 10:30 | fixer | build-engine | started |
-| 24 Nov 10:30 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 10:34 | fixer | build-engine | started |
-| 24 Nov 10:34 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 10:39 | fixer | build-engine | started |
-| 24 Nov 10:39 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 10:44 | fixer | build-engine | started |
-| 24 Nov 10:44 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 10:49 | fixer | build-engine | started |
-| 24 Nov 10:49 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 10:54 | fixer | build-engine | started |
-| 24 Nov 10:54 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 10:59 | fixer | build-engine | started |
-| 24 Nov 10:59 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 11:04 | fixer | build-engine | started |
-| 24 Nov 11:04 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 11:09 | fixer | build-engine | started |
-| 24 Nov 11:09 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 11:14 | fixer | build-engine | started |
-| 24 Nov 11:14 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 11:19 | fixer | build-engine | started |
-| 24 Nov 11:19 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 11:23 | fixer | attempt | 18_displacement -> lead (0/200 moved) |
-| 24 Nov 11:54 | fixer | claim | fixer claimed the slot |
-| 24 Nov 12:02 | fixer | build-engine | started |
-| 24 Nov 12:04 | fixer | build-engine | engine built in 57s |
-| 24 Nov 12:09 | fixer | build-engine | started |
-| 24 Nov 12:09 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 12:16 | fixer | build-engine | started |
-| 24 Nov 12:16 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 12:21 | fixer | build-engine | started |
-| 24 Nov 12:21 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 12:38 | fixer | build-engine | started |
-| 24 Nov 12:38 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 12:43 | fixer | build-engine | started |
-| 24 Nov 12:43 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 12:48 | fixer | build-engine | started |
-| 24 Nov 12:48 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 12:58 | fixer | build-engine | started |
-| 24 Nov 12:58 | fixer | build-engine | engine unchanged, compile skipped |
-| 24 Nov 13:04 | fixer | attempt | 18_displacement -> lead (0/129 moved) |
+| 24 Nov 11:15 | fixer | claim | fixer claimed the slot |
+| 24 Nov 11:15 | fixer | stale-claim | fixer slot was stale (75 min) - the previous run ended without releasing it |
+| 24 Nov 11:22 | fixer | build-engine | started |
+| 24 Nov 11:24 | fixer | build-engine | engine built in 53s |
+| 24 Nov 11:33 | fixer | build-engine | started |
+| 24 Nov 11:33 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 11:38 | fixer | build-engine | started |
+| 24 Nov 11:38 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 11:43 | fixer | build-engine | started |
+| 24 Nov 11:43 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 11:48 | fixer | build-engine | started |
+| 24 Nov 11:48 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 11:53 | fixer | build-engine | started |
+| 24 Nov 11:53 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 11:58 | fixer | build-engine | started |
+| 24 Nov 11:58 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 12:03 | fixer | build-engine | started |
+| 24 Nov 12:03 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 12:08 | fixer | build-engine | started |
+| 24 Nov 12:08 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 12:12 | fixer | build-engine | started |
+| 24 Nov 12:12 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 12:17 | fixer | build-engine | started |
+| 24 Nov 12:17 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 12:28 | fixer | attempt | 18_displacement -> lead (0/? moved) |

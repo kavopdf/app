@@ -149,7 +149,41 @@ x 28-271.9, so its **midpoint 149.95 falls inside the ring** and it is swallowed
 paragraph. That paragraph is appended at the end of the page's block list (`ordered.add(ringPara(ring))`,
 line 1629) - after the footer. Replaying the predicate in Python reproduces exactly those 48 lines.
 
-**Fix: give the ring rule a width test** - a line wider than the ring cannot be seal centre text.
+**Fix: a CONTAINMENT test, not a width test** (the width test was my first guess and it is the weaker one).
+Measured over all 211 documents: 7 fire the ring rule, 22 lines are absorbed, and **21 are genuinely
+contained - only 305's is not** (its line is 3.41x the width of the ring, and 70.5 % of its ink lies
+outside). A containment test rejects exactly 1 of 22 and accepts the other 21, including 305's own
+`T`, `INDIA` and `2024`. A width test would need a threshold that separates 6 documents from 1.
+
+The exact code is `PdfToWord.java:1278-1279` - two **point** tests:
+
+    float cx = (ln.x + ln.right) / 2f;
+    if (cx > rx0 && cx < rx1 && ln.y > ry0 && ln.y < ry1) { inner.add(ln); it.remove(); }
+
+So **305 is a membership failure, not an ordering failure**: the rule asks about a point on a line that
+has an extent. Only x needs the change - `ln.y` is a baseline, and the model's vertical unit *is* that
+point.
+
+Counterfactual, measured on the .txt: move that one line back and the document **passes**
+(7/12 applicable, 7 passed, 5 abstained).
+
+**What must NOT be done, and why.** The repo already measured this ground:
+- **Removing the append is a regression** - `60_page_border` lost 15 of 64 lines, `318_court_summons_form`
+  went 81 to 90 lines. The append is load-bearing.
+- **Do not flush by top and do not re-sort the page by top.** A block that is not in the flow cannot be
+  given a flow position for free: the carrier paragraph costs **9.6 pt of flow** whatever it contains and
+  displaces everything below. That was tried and reverted; it fixed `32_stroke_lines` and broke
+  `18_centred_heading_left_body_txtpos` (42/42 to 41/42 through LibreOffice).
+- `orderStamps` shows the right shape: it removes the paragraph from the list and re-inserts it at the
+  index its `blockTop` falls at, so the **model** is reordered and the flow never sees a moved block.
+  That is why the stamp rule (R2) is repaired and the ring rule (R1) is not.
+
+**Also worth knowing:** `ringLines` is not a circle detector. It fires on any page with 8 or more rotated
+glyphs in two opposing directions, which is why `60_page_border` appears in the census.
+
+**Not proven by that investigation:** it did not build a patched engine, did not re-run all 211 with the
+guard, and did not compare a .docx under it. "Only 305 changes" rests on the measured selectivity over
+the 7 ring documents, not on a full regression.
 
 **39_small_caps_letter_spacing — the check is wrong.** The inversion is between a 1 pt **white invisible**
 duplicate of the title and the 15 pt visible title, drawn at the same x on the **identical baseline**
@@ -165,6 +199,11 @@ Decisive test, same predicate, only the vertical key changed:
     39_small_caps_letter_spacing   22/21 FAIL            22/22 PASS
 
 So 305 fails whatever defensible key you use; 39 fails only because the key is bbox top.
+
+**The two documents fail the same check for opposite reasons**, which is worth keeping in one sentence:
+305 - the engine moves an extent by testing a point; 39 - the check orders by an extent where the
+writer's unit is a point. The engine is wrong on the x axis at 305; the check is wrong on the y axis
+at 39.
 **Fix: key on baseline, not bbox top.** The invisible 1 pt layer being emitted at all is a separate real
 fault, owned by t01/t12, not by line order.
 
@@ -248,6 +287,90 @@ that share a page feature, not a mechanism.
 **An open format decision, not a bug:** whether a .txt should carry a `/Text` sticky-note body at all.
 Either the writer stops emitting it, or the check is told the format includes it. That decision belongs
 to the format's owner, and it changes whether 600's 7 words are a defect or a feature.
+
+
+## t08, independently verified: both claims confirmed, three corrections, and one settled question
+
+A second investigation built the engine from scratch, converted both documents and the whole corpus, and
+re-implemented the check so its numbers are its own. **t08 fails on exactly 2 of 213 documents** - these
+two - so the baseline is measured, not assumed.
+
+### 305 confirmed, with the ring measured from the ENGINE's box, not PyMuPDF's
+
+The earlier claim quoted the ring as x 81.22-158.78 with midpoint 149.95. Those are PyMuPDF's **ink**
+boxes. The engine's own box, read from the ring paragraph's `Box` list (each ring character carries
+`x`, `right`, `y`), is **x 86.96-158.49, y 270.89-318.24, width 71.53**. The captured line is
+x 28.00 to 271.93, y 278.00, width 243.93, midpoint (149.97, 278.00). Same verdict - 86.96 < 149.97 <
+158.49 and 270.89 < 278.00 < 318.24 - but **a fix must be written against the engine's box, not the ink
+box**, or it will be tuned to the wrong numbers.
+
+The page has 11 text blocks: `[9]` is the footer (top 781.89), `[10]` is the seal paragraph, 48 lines,
+appended at line 1629 - after the footer. The .txt writes the footer at line 66 and `Issued:` at 112,
+delta 504.27 pt.
+
+**Containment strictly subsumes a width test, so "both" is redundant.** A line wider than the ring cannot
+be contained, so anything a width test rejects, containment also rejects. And containment additionally
+rejects a *narrower* line that straddles the ring edge: a line spanning x 60 to 130 against a ring at
+86.96-158.49 is 70 pt wide, would pass a width test, and would still be swallowed.
+
+**Nothing in the corpus is at risk.** 7 documents produce a ring paragraph; 22 inner lines are captured;
+**21 are genuine seal-centre words** - `TRAINING &`, `PLACEMENT CELL`, `2025`, `SEAL`, `INDIA`, `2024`,
+and single ring-top letters `A`, `S`, `T`. The `Issued:` line is the **only** capture that fails either
+test. The widest genuine centre line is 05's `PLACEMENT CELL`, 81.92 pt inside a 129.82 pt ring (63 %),
+and it is contained. Simulated: with `Issued:` back in the body flow, t08 on 305 goes **33/33 - pass**.
+
+**Two things to know before landing it:**
+1. It also changes the **.docx** - `Issued:` becomes its own paragraph - so `verify_google` must be re-run
+   across the 7 ring documents. Not measured here; no render was available.
+2. **The same fault has a second symptom:** `ringPara`'s recorded `left`/`right` are contaminated by the
+   swallowed line (28.00/271.93 instead of the ring's own 86.96/158.49). Fixing the membership test fixes
+   both.
+
+### 39 confirmed, but the earlier wording was wrong
+
+"Keyed on baseline it passes 22/22" is true and I measured it - **but the pass comes from the stable sort
+preserving content-stream order, not from the baseline key ordering anything.** The two lines tie
+completely on (baseline 66.0, x 56.0). The honest statement is:
+
+> Two lines on one baseline have no order between them, and the check should not assert one.
+
+That matters, because "key on baseline" sounds like a fix that orders correctly, and what is actually
+needed is a check that does not claim an order it cannot know.
+
+**Blast radius, measured over all 213 - which the earlier investigation did not establish:** 53 documents
+have a source sequence that differs between the two keys, but running both keys over every .txt,
+**exactly 1 verdict changes** (39, 21/22 to 22/22), **0 partner counts change**, and the failure set goes
+from 2 documents to 1. So the check-side change is corpus-safe.
+
+### The 1 pt white layer: settled - emitting it is RIGHT
+
+This was the open question, and it is answered by a counterfactual: **delete the invisible line from the
+.txt and t01 gets worse** - 97.4 to 95.1, lost words 8 to 15. The .txt checks' source side is glyph
+truth, which is what the page *draws*, and those white glyphs are drawn.
+
+The repo already says so in three places: `verify_google.py`'s `_visual_counts` docstring (a document with
+genuine white-on-white text "failed against ITSELF"), `:5997` ("Text that was already invisible ... is the
+document's own shape, and a faithful conversion reproduces it"), and
+`FINDINGS/04_chars_missing-25_invisible_text-TXBX-IS-RASTERISED-1750-agent.md`. The .docx already carries
+it faithfully as `<w:color w:val="FFFFFF"/><w:sz w:val="2"/>`.
+
+**And there is a corpus precedent that names the whole difference:**
+`text-held-twice-shadow-text` holds its text twice by design (white copy plus black copy) and **passes**
+t08 - because its two copies are offset by 0.2-0.35 pt, so their bbox tops differ. 39 is the same
+construct with a **zero** offset. That is the entire difference, and it is the check's key that cannot see
+it.
+
+**So: keep emitting invisible runs in both writers.** Making the .txt drop them would be a layer-policy
+change, not a writer fix - it would have to move the source side of t01/t03/t07 in the same commit, it
+costs t01 on this document, and it breaks the one-model-two-writers invariant that `ConvertOne` and
+`check-writer-independence.py` assert.
+
+### What remains genuinely unruled
+
+- No corpus document has a seal-centre word wider than, or poking out of, its ring - so containment's
+  behaviour on such a seal is untested, and nothing in the repo settles it.
+- Whether editing `verify_txt.py` for t08's key is permitted is a project decision. The precedent exists
+  (the sanctioned t12/t13 corrections with a corpus-wide restamp), but it is a decision.
 
 ## t06_encoding — real, but fixing it alone makes t01 and t12 worse
 

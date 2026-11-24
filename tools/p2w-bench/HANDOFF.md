@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 11:54 |
-| ended | still running |
-| how it ended | - |
+| started | 11:15 |
+| ended | 12:31 |
+| how it ended | forced |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -30,14 +30,12 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> PENDING FIRST: 23 item(s) you can close - run pending.py and take them in its order before the class below. 18_displacement: the uniform-pitch guard is measured on 200 of 212 corpus documents with zero worse in docx and txt and no construct spread - it is refused ONLY for an unstamped engine. Re-apply tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, run the remaining 12 documents of the corpus pass (P2W_ENGINE_SRC=/scratch/work/CS python3 benchmarks/p2w.py --budget 275, repeat until measured 212/212), then regress.py --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. The 12 unmeasured are the largest page counts, so order the pass by page count descending. Do NOT re-run the trHeight=max(content,line-15) probe.
+> PENDING FIRST: 23 item(s) you can close - run pending.py and take them in its order before the class below. 18_displacement: APPLY tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, then START the slot with the 212-document pass (p2w.py --force --budget 250, repeat) - that pass is the whole cost. It is measured: 362_price_list_dense 41/42 -> 42/42 in Google, electricity-bill and 330_cad_drawing_sheet byte-identical. Do NOT re-run the trHeight=max(content,line-15) probe - it is refuted and the guard makes it unnecessary. After the pass: regress.py --check, --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. Then check the 9 documents named in FINDINGS/18_displacement-UNIFORM-PITCH-GUARD-GOOGLE-42of42-0450-fixer.md for a uniform pitch.
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 18_dresidual-census-01 | 18_d | residual-census | which current-engine documents fail 18_displacement, and what has FIND | 06:17 | a per-document table plus the check arithmetic, from committed files only | landed | FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - 58 of 213 Google results are on the current engine (98be7c3c); 24 fail 18_displacement, only 2 fail it alone (16_right_aligned_amounts_txtpos, 31_times_body_arial_headings); the 16-document solo population is stamped 462353f9, not current. Killed the row-pitch lead before a round trip was spent. |
-| 18_dblast-radius-01 | 18_d | blast-radius | the exact writer rule for w:trHeight/w:hRule, what the row-pitch patch | 06:17 | a blast-radius list and a verdict on whether the 18.5 pt rung is worth a Google round trip | landed | FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build. |
 | A118_displacement-01 | A1 | 18_displacement | writer-construct | 13:21 | Which single .docx writer construct causes the 18_displacement failures that 13+ documents fail alone, and which documents go CLEAN if fixed | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
 | B160_text_column_right_edge-01 | B1 | 60_text_column_right_edge | right-edge+shape_anchor | 13:21 | Is 60_text_column_right_edge the same construct as 59_shape_anchor (they travel together) and what minimal writer change clears both | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
 | 00_pA-02 | 00_page_count | A | which construct costs 350_question_paper its second page in Google - i | 16:37 | a charged line in DocxWriter and one general rule | landed | tools/p2w-bench/FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md |
@@ -59,17 +57,15 @@ unfinished work, not as a result.
 | A1 | 25_invisible_text | check-definition | what does 25_invisible_text compare, and which construct makes 48 docu | 07:03 | the check's operands and a named Java site, so a fix could be attempted | landed | the check stopped at the FIRST fill under a run's corner. A Google export opens with a page-sized white rect and rasterises our bands into images, so white type on an orange band matched the sheet. This run's fix; 5 documents went 42/42. |
 | A2 | 18_displacement | row-height-law | what law does Google use to lay a table row's height, and what LO-inva | 07:22 | a law fitted to the committed Google numbers, and one falsifiable change | landed | row = 0.75*round((max(trHeight,content)+rule)/0.75): trHeight is a quantised floor, not a length. 362 is unruled, so it does not ramp +0.75/row - the carry-over's 21.75 pt is ruled-table arithmetic. The LO-invariant change is DocxWriter:6468 declaring the row one rule short; it must be tested on a ruled document, not 362. |
 | 18_dA-05 | 18_displacement | A | is the page-height guard why no table-top spacer is ever spent on the  | 08:20 | 08:05 | running |  |
-| 60_tB-01 | 60_text_column_right_edge | B | is 60 or 18 reading the paper instead of the defect - the 25_invisible | 08:20 | 08:05 | running |  |
+| 60_tB-01 | 60_text_column_right_edge | B | is 60 or 18 reading the paper instead of the defect - the 25_invisible | 08:20 | 08:05 | landed | FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md |
+| 60_tB-02 | 60_text_column_right_edge | B | is 60 or 18 reading the paper - the 25_invisible_text precedent | 12:28 | 11:19 | landed | FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md |
+| 04_cA-01 | 04_chars_missing | A | real writer defect or instrument, and how much t01/t12 already explain | 12:28 | 11:21 | landed | FINDINGS/04_chars_missing-REAL-WRITER-DEFECT-1115-fixer.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `02:37` agent landed: 18_dB-01 /  -> 18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md
-- `03:30` attempt 44 on 18_displacement -> lead
-- `04:38` agent deployed: 18_displacement / A - what is settled, refuted and left as a patch on this class
-- `04:38` agent deployed: 18_displacement / B - if the table-top step were removed, which documents become CLEAN
 - `04:38` agent landed: 18_displacement / A -> FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied)
 - `04:38` agent landed: 18_displacement / B -> step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40
 - `04:39` attempt 7 on 00_page_count -> lead
@@ -89,8 +85,12 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `08:20` agent deployed: 18_displacement / A - is the page-height guard why no table-top spacer is ever spent on the 14 documen
 - `08:20` agent deployed: 60_text_column_right_edge / B - is 60 or 18 reading the paper instead of the defect - the 25_invisible_text prec
 - `09:17` attempt 51 on 18_displacement -> lead (1/10 moved)
-- `11:23` attempt 52 on 18_displacement -> lead (0/200 moved)
-- `13:04` attempt 53 on 18_displacement -> lead (0/129 moved)
+- `12:28` attempt 52 on 18_displacement -> lead
+- `12:28` agent deployed: 60_text_column_right_edge / B - is 60 or 18 reading the paper - the 25_invisible_text precedent
+- `12:28` agent landed: 60_text_column_right_edge / B -> FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md
+- `12:28` agent deployed: 04_chars_missing / A - real writer defect or instrument, and how much t01/t12 already explains
+- `12:28` agent landed: 04_chars_missing / A -> FINDINGS/04_chars_missing-REAL-WRITER-DEFECT-1115-fixer.md
+- `12:28` agent landed: 60_text_column_right_edge / B -> FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md
 
 ## Where the rest of the state lives
 
