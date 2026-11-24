@@ -439,8 +439,7 @@ def watchdog():
          "**%s · %s IST**" % (d, t), "",
          "> %s" % ("**%d stage(s) stopped: %s**" % (len(stopped), ", ".join(stopped)) if stopped
                    else "Nothing is stopped."), "",
-         "## Stages", "",
-         "| stage | state | progress | age |", "|:--|:--|--:|--:|"]
+         "## Stages", ""]
     # THE STAGES TABLE WAS EMPTY ON EVERY CLEAN PASS. The row-building lines below used to sit inside
     # `if _stale:`, so the five rows were written only when today's progress row disagreed with the
     # live data, and only for the last stage name the loop had reached. Measured 24 Nov: the generated
@@ -451,9 +450,15 @@ def watchdog():
         # TODAY'S ROW IS NOT HISTORY YET. The trend is read from the committed table, which is right -
         # rows() must not be recomputed. But when today's row disagrees with the live data it is
         # reported, not served as if current. On 24 Nov it said google_clean 29 against a live 35.
-        L.append("> **Today's row is stale** - %s. The trend below is the committed row; the data has moved."
-                 % "; ".join(_stale))
-        L.append("")
+        #
+        # AND IT IS PRINTED ABOVE THE TABLE, NOT BETWEEN THE HEADER AND THE FIRST ROW. Appended where
+        # the old code appended it, the banner landed after `|:--|:--|--:|--:|` and split the table in
+        # two: the five stage rows rendered as a solid block of pipe-delimited text with no header,
+        # which is the same "a table that swallows its own rows" fault the layout rule forbids. Measured
+        # 25 Nov 00:14 IST on this generator's own output.
+        L += ["> **Today's row is stale** - %s. The trend below is the committed row; the data has moved."
+              % "; ".join(_stale), ""]
+    L += ["", "| stage | state | progress | age |", "|:--|:--|--:|--:|"]
     for name in ("measure-google", "matrix", "classify", "fix", "txt"):
         v = stages.get(name) or {}
         prog = ""

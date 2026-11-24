@@ -313,9 +313,31 @@ def compute():
         "attempts_3h": recent, "age_h": round(_age(ATTEMPTS), 1),
         "state": "stopped" if hung else ("moving" if recent else "stopped")}
     if hung:
-        out["stages"]["fix"]["why"] = ("a run is still marked running but has not beaconed for %d min "
-                                       "- the slot is free, so the next scheduled run takes over; if "
-                                       "the platform keeps the old one running it never will" % hung)
+        # THE SLOT IS NOT "FREE" BECAUSE A RUN STOPPED SPEAKING - THAT IS A SECOND FACT, NOT THIS ONE.
+        #
+        # This line read "the slot is free, so the next scheduled run takes over". Measured 25 Nov
+        # 00:43 IST: the fixer had claimed at 23:45 and its claim was 24 min old, inside round.py's
+        # CLAIM_STALE_MIN["fixer"] of 45, so --claim-fixer refused every run for another 21 min. The
+        # slot was held. That sentence has been quoted as evidence in BLOCKERS.md more than once
+        # (22 Nov 18:11 read it as "the slot is free" while ROUND.json still carried fixer_started).
+        # A watchdog line that asserts a state it never read is the instrument lying in the one place
+        # a reader looks first, so it now prints the two facts it has: the beacon age, and the age at
+        # which round.py releases the claim. No threshold moves - CLAIM_STALE_MIN is read, not copied.
+        _limit = 45
+        try:
+            # Loaded by path, not by `import round`: a module called `round` on sys.path is one
+            # bad day from shadowing the builtin this file calls on almost every line.
+            import importlib.util as _ilu
+            _spec = _ilu.spec_from_file_location("_roundmod", os.path.join(HERE, "round.py"))
+            _mod = _ilu.module_from_spec(_spec)
+            _spec.loader.exec_module(_mod)
+            _limit = int(_mod.CLAIM_STALE_MIN.get("fixer", 45))
+        except Exception:
+            pass
+        out["stages"]["fix"]["why"] = (
+            "a run is still marked running but has not beaconed for %d min - round.py frees a fixer "
+            "claim %d min after it is taken, so a run before then stands down and one after it takes "
+            "over; if the platform keeps the old one running it never will" % (hung, _limit))
 
     # A TABLE NEWER THAN EVERYTHING THAT CAN CHANGE IT IS CURRENT, NOT LATE - the same rule the
     # `classify` row uses, applied to the inputs a .txt score actually has.
