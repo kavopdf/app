@@ -198,3 +198,4 @@
 | 24 Nov 07:11 | fixer | attempt 25_invisible_text -> kept (2/5 moved) |
 | 24 Nov 07:12 | fixer | attempt 25_invisible_text -> kept (5/5 moved) |
 | 24 Nov 07:21 | fixer | attempt 18_displacement -> reverted (0/2 moved) |
+| 24 Nov 07:23 | fixer | slot FORCED released - see INCIDENTS.md for why |
