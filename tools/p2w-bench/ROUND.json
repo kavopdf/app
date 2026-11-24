@@ -13,11 +13,11 @@
       }
     ]
   },
-  "fixer_doing": "reconvert slice 2 (160 to go, 12 workers)",
+  "fixer_doing": "relay: cloned, claiming slot",
   "fixer_doing_since": 1795545023.1739159,
   "fixer_engine_at_claim": "b7699196",
   "fixer_last_beat": 1795545023.1739166,
-  "fixer_started": 1795544326.5109313,
+  "fixer_started": 1795545970.8554485,
   "history": [
     {
       "at": "2026-11-12 09:46",
