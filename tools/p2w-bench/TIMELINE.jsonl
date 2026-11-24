@@ -3389,3 +3389,26 @@
 {"t": 1795475364.7406044, "ist": "04:39:24", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795475364.806837, "ist": "04:39:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795475364.8207572, "ist": "04:39:24", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795476168.983008, "ist": "04:52:48", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795476169.113435, "ist": "04:52:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795476170.5321116, "ist": "04:52:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795476174.9020405, "ist": "04:52:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795476176.1334295, "ist": "04:52:56", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795476313.0957708, "ist": "04:55:13", "ev": "beat", "d": "fetching the corpus (6 min) to build a docx for the Google round trip"}
+{"t": 1795476611.3863063, "ist": "05:00:11", "ev": "beat", "d": "corpus pass: building 213 docx + measuring (p2w --budget 250)"}
+{"t": 1795476857.9203422, "ist": "05:04:17", "ev": "beat", "d": "corpus pass 2: converting docx"}
+{"t": 1795477117.301381, "ist": "05:08:37", "ev": "beat", "d": "corpus pass 3 + starting the Google round trip on 362"}
+{"t": 1795477473.2206042, "ist": "05:14:33", "ev": "beat", "d": "patched DocxWriter: carry the sub-pixel remainder across table rows; building engine"}
+{"t": 1795477555.496091, "ist": "05:15:55", "ev": "beat", "d": "engine proven on 362 (41/42 -> 42/42 Google); full corpus pass on the patched engine"}
+{"t": 1795477788.6967273, "ist": "05:19:48", "ev": "beat", "d": "corpus pass on patched engine (2/3)"}
+{"t": 1795478026.3809743, "ist": "05:23:46", "ev": "beat", "d": "corpus pass on patched engine (3)"}
+{"t": 1795478264.3992155, "ist": "05:27:44", "ev": "beat", "d": "corpus pass on patched engine (4)"}
+{"t": 1795478498.051259, "ist": "05:31:38", "ev": "beat", "d": "corpus pass on patched engine (5, finishing)"}
+{"t": 1795478731.1973867, "ist": "05:35:31", "ev": "beat", "d": "corpus pass complete, reading the ranking"}
+{"t": 1795478981.1451879, "ist": "05:39:41", "ev": "beat", "d": "regress check on the patched engine"}
+{"t": 1795479005.3453617, "ist": "05:40:05", "ev": "beat", "d": "re-scoring the 213 txt on the new engine"}
+{"t": 1795479081.4805353, "ist": "05:41:21", "ev": "beat", "d": "gate.py: writing STATE.json for the patched engine"}
+{"t": 1795479285.3868754, "ist": "05:44:45", "ev": "beat", "d": "narrowed to unruled rows; re-measuring the corpus"}
+{"t": 1795479514.8305845, "ist": "05:48:34", "ev": "beat", "d": "re-measuring (2)"}
+{"t": 1795479620.8963828, "ist": "05:50:20", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795479623.394197, "ist": "05:50:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
