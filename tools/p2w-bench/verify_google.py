@@ -810,18 +810,35 @@ def _visual_counts(doc):
     invisible = off_page = 0
     for p in doc:
         W, H = p.rect.width, p.rect.height
-        fills = fill_rects(p)
+        # THE SHEET IS NOT A BAND BEHIND THE TEXT, AND THE FIRST FILL IS NOT THE ONE A READER SEES.
+        #
+        # This used to stop at the FIRST fill whose rect held the run's corner. A Google export
+        # opens with a page-sized white rectangle - Google paints the sheet itself - so on
+        # 10_stamp_as_image a white heading on an ORANGE band matched that white sheet and counted
+        # as invisible text, while the export rendered it white-on-orange, exactly as the source
+        # has it (verified by eye on the exported PDF, 24 Nov: the band arrives as an image, so
+        # get_drawings() never sees it at all). 48 documents fail this check and LibreOffice passes
+        # all 48 - a check that reads the paper instead of the band behind the words.
+        #
+        # Two corrections, both of which only ever REMOVE a false count: a fill covering the sheet
+        # is dropped, and among the fills that remain the TOPMOST one wins (get_drawings() is in
+        # paint order, so the last one containing the corner is the last one painted there).
+        sheet_area = p.rect.width * p.rect.height
+        fills = [f for f in fill_rects(p)
+                 if sheet_area <= 0 or f["rect"].width * f["rect"].height < 0.90 * sheet_area]
         rs = runs(p)
         for r in rs:
+            pt = fitz.Point(r["x"] + 1, r["y"] + 1)
+            behind = None
             for f in fills:
-                fr = f["rect"]
-                if fr.contains(fitz.Point(r["x"] + 1, r["y"] + 1)):
-                    tr = (((r["colour"] >> 16) & 255) / 255.0,
-                          ((r["colour"] >> 8) & 255) / 255.0,
-                          (r["colour"] & 255) / 255.0)
-                    if colour_close(tr, f["fill"], 0.08):
-                        invisible += 1
-                    break
+                if f["rect"].contains(pt):
+                    behind = f
+            if behind is not None:
+                tr = (((r["colour"] >> 16) & 255) / 255.0,
+                      ((r["colour"] >> 8) & 255) / 255.0,
+                      (r["colour"] & 255) / 255.0)
+                if colour_close(tr, behind["fill"], 0.08):
+                    invisible += 1
             if r["x"] < -1 or r["y"] < -1 or r["x1"] > W + 1 or r["y1"] > H + 1:
                 off_page += 1
     return invisible, off_page
