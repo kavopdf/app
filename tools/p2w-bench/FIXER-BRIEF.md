@@ -79,6 +79,39 @@ every measurement, and the whole history in `FINDINGS/`, `LESSONS.md`, `SETTLED.
 **If a tool you need does not exist, write it.** Sixty in `tools/p2w-bench/` were written by runs that
 needed one.
 
+## READ THESE TWO FIRST. THEY ARE THE MOST VALUABLE THING IN THE REPOSITORY.
+
+On 24 November thirty sub-agents root-caused every open docx class and eighteen did the same for txt. The
+results are two files, and they change what the work is:
+
+- **`FINDINGS/DOCS-ROOT-CAUSES-24NOV.md`** - all ten docx classes, each with the measurement that proves it.
+- **`FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md`** - the txt classes and their mechanisms.
+
+**Read both before you pick anything.** They say, among other things:
+
+- **Six of the ten docx classes are one construct.** `DocxWriter` routes body text into an anchored
+  DrawingML text box once a page's flow enters `ctx.positioned`, triggered by a vertical gap wider than
+  `gapCapTw()` = 120 pt. Google rasterises every anchored box on import, so that text leaves the exported
+  text layer. That single threshold is ~166 document-failures across `04_chars_missing`,
+  `45_char_accuracy`, `13_text_colours`, `44_header_footer` and `17_matched_runs`. **It is the largest
+  engine defect anyone has found, and no class-specific patch will touch it.**
+- **`18_displacement` is the engine too**, and it is two constructs: Google drops `w:before` on the first
+  paragraph after a page break, and delivers only 5-10 pt of an exact line height asked of an empty spacer.
+  Measured on real Google renders: `shift = 0.961 x gap - 0.58 pt`, r = 0.975.
+- **`59_shape_anchor` is closed with zero engine defects** - 32 documents are `18_displacement` charged a
+  second time, 11 are `04_chars_missing`, and 2 are a proven check false positive where `_box_moved`
+  convicted on the source box in the source box's own place.
+- **`47_margins` never reads the document.** It measures ink on the rendered page, and the engine's
+  zero-`w:pgMar` design is invisible to it. Do not "fix" the margins by writing a real `w:pgMar`: `w:ind`
+  and every tab stop resolve FROM the margin, so it would shift the whole body and fix nothing.
+- **`25_invisible_text` was fixed on 24 Nov at 01:41 and the fix left it blind** - after the sheet filter,
+  `fills` is empty on every Google page, so the check can only ever pass. Two documents now pass while
+  their text really is invisible. The 43 recorded failures predate the fix.
+
+**The findings files also record what was tried and failed, so you do not spend a run on it again.** Where a
+finding says a patch is written but not applied, the reason is the rule you already follow: no check or
+engine change is committed without a full-corpus regression run.
+
 ## HOW TO DECIDE, WHEN NOBODY TELLS YOU
 
 **Research the repository first** - most of what you are about to try has been tried and written down.

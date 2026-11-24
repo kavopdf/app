@@ -115,11 +115,25 @@ def save(d):
                      "order before the class below. " % _n)
             _cur = str(d.get("next") or "")
             if not _cur.startswith("PENDING FIRST"):
-                d["next"] = _lead + _cur
+                _cur = _lead + _cur
+            if not _cur.startswith("READ FIRST:"):
+                _cur = READ_FIRST + _cur
+            d["next"] = _cur
     except Exception:
         pass
     json.dump(_trim(d), open(JS, "w", encoding="utf-8"), indent=1)
     render(d)
+
+
+# A FILE NOBODY IS SENT TO IS A FILE NOBODY READS.
+#
+# On 24 Nov thirty sub-agents root-caused every open docx class and eighteen did the same for txt. The
+# results are two files. The brief names them, but the brief is prose and `next` is the data a run actually
+# opens first - so the pointer goes in both. Six of the ten docx classes turn out to be ONE construct, the
+# 120 pt gap cap in DocxWriter, which no class-specific patch can touch.
+READ_FIRST = ("READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and "
+              "FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the "
+              "measurement that proves it. ")
 
 
 def render(d):
