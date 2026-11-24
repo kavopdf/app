@@ -584,8 +584,8 @@ def check(allow_engine_change, only=None):
         # rebuild when the engine moved. Calling it from the gate rather than from a brief is the whole
         # difference between a mechanism and a paragraph nobody reads: the check can no longer be skipped
         # because someone forgot, and the cost is paid once per engine instead of once per run.
-        _cc = subprocess.run([sys.executable, os.path.join(HERE, "corpus-convert.py"),
-                              "--ensure", "-j", "4", "-q"],
+        _cc = subprocess.run([sys.executable, os.path.join(HERE, "corpus-slice.py"),
+                              "--budget", "240", "-j", "4"],
                              capture_output=True, text=True, timeout=2400)
         if _cc.returncode != 0:
             # A GATE THAT PRINTS A WARNING AND THEN PASSES IS NOT A GATE. Measured 24 Nov: this
