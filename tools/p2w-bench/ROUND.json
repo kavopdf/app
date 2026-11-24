@@ -13,9 +13,11 @@
       }
     ]
   },
+  "fixer_doing": "corpus slice 4, the last one",
+  "fixer_doing_since": 1795529555.6324468,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795525179.256404,
-  "fixer_started": 0,
+  "fixer_last_beat": 1795529555.6324477,
+  "fixer_started": 1795526963.971557,
   "history": [
     {
       "at": "2026-11-12 09:46",
