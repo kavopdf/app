@@ -1,16 +1,10 @@
 {
- "agents": [
-  "anch-01",
-  "clea-01"
- ],
- "attempts": 2,
- "class": "18_displacement",
- "docs_improved": 0,
- "ended": "22:46",
- "ended_ts": 1795540562.2362742,
+ "started": "22:58",
+ "started_ts": 1795541281.3160095,
+ "ended": null,
+ "ended_ts": null,
+ "attempts": 0,
  "kept": 0,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "22:20",
- "started_ts": 1795539018.8077652
+ "agents": [],
+ "docs_improved": 0
 }
