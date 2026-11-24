@@ -160,7 +160,43 @@ def next_action():
         why += "; no construct census - run google_safe.py --predict"
     return top, why
 
-CHECKS = [("java", java), ("corpus", corpus), ("changed list", changed_list), ("gate", gate)]
+def verdicts():
+    """Are the Google verdicts from THIS engine? If not, no fixer attempt can show an improvement."""
+    import glob as _g
+    try:
+        cur = (json.load(open(STAMP, encoding='utf-8')).get('engine') or '')[:12]
+    except Exception:
+        return False, 'no stamp - the corpus engine is unknown'
+    if not cur:
+        return False, 'the stamp names no engine'
+    seen = {}
+    n = 0
+    for f in _g.glob(os.path.join(ROOT, 'benchmarks', 'gverify', '*.json')):
+        try:
+            d = json.load(open(f, encoding='utf-8'))
+        except Exception:
+            continue
+        if d.get('status') == 'page_count_refused':
+            continue
+        n += 1
+        e = (d.get('engine') or 'none')[:12]
+        seen[e] = seen.get(e, 0) + 1
+    if not n:
+        return False, 'no scored verdicts'
+    same = seen.get(cur, 0)
+    # A VERDICT FROM ANOTHER ENGINE DOES NOT DESCRIBE THIS CORPUS. Measured 24 Nov: 191 scored
+    # verdicts, 187 on b7699196, 3 on 462353f, 1 on 5beb8b9d, and ZERO on the current b97d8172. So
+    # "36 of 191 clean" describes a mix of three older engines, and a patch that helped could not
+    # move the count - which is one mechanical reason 218 attempts produced 0 kept changes.
+    if same == 0:
+        top = max(seen.items(), key=lambda x: x[1])   # max by count; -x[1] returns the minimum
+        return False, ('0 of %d verdicts are from this engine (%s); %d are on %s - re-measure before trusting any moved count' % (n, cur, top[1], top[0]))
+    if same < n:
+        return False, '%d of %d verdicts are from this engine (%s) - %d are stale' % (same, n, cur, n - same)
+    return True, 'all %d verdicts are from engine %s' % (n, cur)
+
+
+CHECKS = [("java", java), ("corpus", corpus), ("changed list", changed_list), ("gate", gate), ("verdicts", verdicts)]
 
 
 def main(argv):
