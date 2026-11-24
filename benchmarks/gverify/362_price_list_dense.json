@@ -1,19 +1,16 @@
 {
  "name": "362_price_list_dense",
  "status": "ok",
- "rc": 1,
- "passed": 41,
+ "rc": 0,
+ "at": "2026-11-24T03:46:47",
+ "passed": 42,
  "total": 42,
- "failed": [
-  "18_displacement"
- ],
+ "failed": [],
  "displacement": {
-  "med_dy": -2.8,
-  "worst_dy": 5.4,
+  "med_dy": -0.9,
+  "worst_dy": 2.6,
   "med_dx": -0.2,
-  "bad_pages": [
-   0
-  ],
+  "bad_pages": [],
   "runs_matched": 257
  },
  "engine": "b7699196"
