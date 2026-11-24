@@ -73,7 +73,7 @@
   "status": "OPEN"
  },
  "04_chars_missing": {
-  "attempts": 1,
+  "attempts": 2,
   "first_seen": null,
   "history": [
    {
@@ -82,6 +82,13 @@
     "outcome": "lead",
     "reason": "txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - t",
     "total": 5
+   },
+   {
+    "at": "2026-11-24 15:43",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "anchored-text-box census: the 120 pt cap is 16% of the box text and the pagepos cascade 17%; spending every gap removes 15.9% but displaces 3 documents worse, and no document has 04/45 as its only fai",
+    "total": null
    }
   ],
   "last": null,
@@ -89,11 +96,13 @@
   "last_moved": 0,
   "last_total": 5,
   "outcomes": [
+   "lead",
    "lead"
   ],
-  "reason": "txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - the proxy is blind to this class in both directions; patch saved to patches/foot-band-spend-the-gap.patch, Google render is the next run's measurement",
+  "reason": "anchored-text-box census: the 120 pt cap is 16% of the box text and the pagepos cascade 17%; spending every gap removes 15.9% but displaces 3 documents worse, and no document has 04/45 as its only failure, so emptying boxes would clean ZERO documents today. Recorded in FINDINGS/ANCHORED-BOX-CENSUS-CAP-IS-16PCT-24NOV.md",
   "reasons": [
-   "txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - the proxy is blind to this class in both directions; patch saved to patches/foot-band-spend-the-gap.patch, Google render is the next run's measurement"
+   "txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - the proxy is blind to this class in both directions; patch saved to patches/foot-band-spend-the-gap.patch, Google render is the next run's measurement",
+   "anchored-text-box census: the 120 pt cap is 16% of the box text and the pagepos cascade 17%; spending every gap removes 15.9% but displaces 3 documents worse, and no document has 04/45 as its only failure, so emptying boxes would clean ZERO documents today. Recorded in FINDINGS/ANCHORED-BOX-CENSUS-CAP-IS-16PCT-24NOV.md"
   ],
   "requeues": 0,
   "status": "OPEN"
