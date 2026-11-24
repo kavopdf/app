@@ -2,23 +2,6 @@
  {
   "started_ts": 1795265226.0,
   "started": "18:17",
-  "ended_ts": 1795268419.2906115,
-  "ended": "19:10",
-  "class": "32_stroke_lines",
-  "attempts": 4,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   "47_margins-docx-half",
-   "zero-flow-carrier"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
-  "started_ts": 1795265226.0,
-  "started": "18:17",
   "ended_ts": 1795269141.0639663,
   "ended": "19:22",
   "class": "32_stroke_lines",
@@ -1079,5 +1062,32 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795476169.125516,
+  "started": "04:52",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "18_displacement",
+  "attempts": 1,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   {
+    "id": "trHeight-code-path",
+    "agent": "Explore",
+    "what": "read the engine's trHeight path: every emit site, the units, whether a per-row conditional is expressible",
+    "returned": "two emit sites, units confirmed as twips, and the finding that trHeight alone is a no-op because the cell's w:line is the binding content"
+   },
+   {
+    "id": "row-height-report",
+    "agent": "Explore",
+    "what": "unzipped engine source: file:line for trHeight, content height, w:line/w:lineRule and any existing per-row shave",
+    "returned": "trheight-report.md - DocxWriter.java:6558 ordinary tables (atLeast), :2256 band tables (exact), content height never measured on the default path"
+   }
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
