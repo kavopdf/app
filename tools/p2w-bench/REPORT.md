@@ -11,8 +11,8 @@
 
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 1; subagents: 2 deployed vs no FINDINGS file for gap--01, zero-01 |
-| Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 6 vs ATTEMPTS.json history 1; subagents: 3 deployed vs no FINDINGS file for gap--01, zero-01 |
+| Document-moves this run | **0** — 6 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -23,7 +23,7 @@
 | Not scored - page count did not match | **22** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `04_chars_missing` - taken from the pending list (18 still open), not a new class |
+| Working on | `04_chars_missing` - taken from the pending list (19 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `04_chars_missing` by hand instead |
 
 ## What was tried
@@ -36,7 +36,7 @@
 
 | | |
 |:--|:--|
-| Measured | **39 min ago** |
+| Measured | **52 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -49,6 +49,7 @@
 |:--|:--|--:|--:|--:|
 | `gap--01` | gap-cap patch: traced DocxWriter, produced spendWide | 02:59 | - | - |
 | `zero-01` | zero-gap census: the latch is 655 lines/24920 chars  | 02:59 | - | - |
+| `Goog-01` | Google verification: 69_two_col_legal 35/42 -> 39/42 | 03:12 | - | - |
 
 ## Timing
 
@@ -83,7 +84,7 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 17 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. Land the latch change (anchorkeep=0 semantics: flow resumes at the anchored baseline instead of latching the page), then run the corpus pass and a Google read on 69_two_col_legal_numbered_clauses and 323_credit_card_statement. Do not spend the slot on gapCapTw - it is the smaller half. Expect 04 to stay OPEN on the 47 stamp documents: that needs a rule about what kind of text a box may carry.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 18 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 18 item(s) you can close - run pending.py and take them in its order before the class below. Add the look-ahead guard to spendWideGap: spend the gap only when no line remaining on this page targets a baseline BELOW this one. The engine has the page in hand, so it is a comparison, not a pass. Target: keep 39/42 on 69_two_col_legal_numbered_clauses and drive 26_text_overlap back to 0. Then re-measure 330_cad_drawing_sheet (spend-everywhere cost it 3.14 -> 16.77 pt median) and the 47 stamp documents that carry <200 boxed chars - those will not close by any writer change.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 

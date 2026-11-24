@@ -1,18 +1,6 @@
 {
  "agents": [
   {
-   "angle": "A",
-   "class": "18_displacement",
-   "deployed": "02:07",
-   "deployed_at": "2026-11-24T02:07",
-   "expected": "landed",
-   "finding": "FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md",
-   "id": "18_dA-02",
-   "landed_at": "2026-11-24T02:07",
-   "question": "which single failing Google check, if fixed, makes the most documents CLEAN",
-   "status": "landed"
-  },
-  {
    "angle": "B",
    "class": "04_chars_missing",
    "deployed": "02:07",
@@ -280,9 +268,20 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-25T02:59"
+  },
+  {
+   "id": "Goog-01",
+   "class": "Google verification: 69_two_col_legal 35/42 -> 39/42 on the spendWideGap build, 26_text_overlap=11 is the price",
+   "angle": "",
+   "question": "",
+   "expected": "",
+   "deployed": "03:12",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-25T03:12"
   }
  ],
- "context": "04_chars_missing: the 120pt gap cap is NOT the main cause of anchored text boxes. The page-local latch ctx.positioned (DocxWriter 3126-3144) multiplies one anchored line into every later line on the page: 655 lines / 24,920 chars vs the cap's 1,469. Measured: -Dp2w.pagepos=0 -Dp2w.anchorkeep=0 cuts 69_two_col_legal 36 boxes/1358c -> 9/367, academic-paper 51/2942 -> 3/181, 323_credit_card 13/222 -> 6/35, 311_fir 3/206 -> 1/30, and changes NOTHING on 47 other 04-failing docs. Adding -Dp2w.zganchor=false: 69 -> 7/242, 323 -> 4/26. No combination reaches 0 boxes, so 04 does not flip. Separately: 47 of the 64 04-failing documents carry FEWER THAN 200 boxed characters - their box is a stamp, not body text, so emptying boxes cannot clean them. A spendWideGap foot-band patch was applied, rebuilt and is a no-op on 69/323/311; reverted.",
+ "context": "04_chars_missing: PROVEN IN GOOGLE. spendWideGap() (FINDINGS/04_chars_missing-GAPCAP-PATCH-0225-agent.patch) with FOOT_BAND=0.0f and -Dp2w.pagepos=0 -Dp2w.anchorkeep=0 -Dp2w.zganchor=false takes 69_two_col_legal_numbered_clauses from 36 anchored boxes/1358 chars to 0/0 and the Google render from 35/42 to 39/42: 04_chars_missing, 45_char_accuracy, 13_text_colours, 44_header_footer, 17_matched_runs, 10_font_sizes and 38_list_markers all PASS. The price is 26_text_overlap render=11 and new 18_displacement + 60_text_column_right_edge. Engine reverted, nothing committed to it. The foot-band guard (0.90) is why the patch was a no-op before: this document's signature block sits mid-page.",
  "history": [
   {
    "at": "16:38",
@@ -393,17 +392,9 @@
    "what": "the widget-AP walk is refused by one document, and the decision is not a fixer's"
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 17 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. Land the latch change (anchorkeep=0 semantics: flow resumes at the anchored baseline instead of latching the page), then run the corpus pass and a Google read on 69_two_col_legal_numbered_clauses and 323_credit_card_statement. Do not spend the slot on gapCapTw - it is the smaller half. Expect 04 to stay OPEN on the 47 stamp documents: that needs a rule about what kind of text a box may carry.",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 18 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 18 item(s) you can close - run pending.py and take them in its order before the class below. Add the look-ahead guard to spendWideGap: spend the gap only when no line remaining on this page targets a baseline BELOW this one. The engine has the page in hand, so it is a comparison, not a pass. Target: keep 39/42 on 69_two_col_legal_numbered_clauses and drive 26_text_overlap back to 0. Then re-measure 330_cad_drawing_sheet (spend-everywhere cost it 3.14 -> 16.77 pt median) and the 47 stamp documents that carry <200 boxed chars - those will not close by any writer change.",
  "next_class": "",
  "notes": [
-  {
-   "at": "02:07",
-   "text": "agent landed: 04_cB-01 /  -> DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those."
-  },
-  {
-   "at": "02:07",
-   "text": "agent landed: 18_dA-02 /  -> FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md"
-  },
   {
    "at": "02:07",
    "text": "agent landed: 04_cB-02 /  -> FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md"
@@ -635,6 +626,14 @@
   {
    "at": "02:59",
    "text": "agent deployed: zero-gap census: the latch is 655 lines/24920 chars vs the rule's 12 lines/358; pagepos=0 + anchorkeep=0 changes no page count across 213 /  - "
+  },
+  {
+   "at": "03:12",
+   "text": "attempt 6 on 04_chars_missing -> lead (1/64 moved)"
+  },
+  {
+   "at": "03:12",
+   "text": "agent deployed: Google verification: 69_two_col_legal 35/42 -> 39/42 on the spendWideGap build, 26_text_overlap=11 is the price /  - "
   }
  ],
  "plan": "",
