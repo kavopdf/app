@@ -38,6 +38,7 @@ stamp is written only after every conversion in the batch succeeded, so a half-b
 mistaken for a whole one - which is the same rule the verdict tables follow.
 """
 import argparse
+import hashlib
 import concurrent.futures as cf
 import json
 import os
@@ -79,7 +80,13 @@ def pdf_dir():
 
 
 def engine_now():
-    """The commit the engine was built from, or 'unknown'. Same rule the verdict tables use."""
+    """The ENGINE SOURCES the corpus was built from, or 'unknown'.
+
+    Was the git commit; see engine_sources() for why that was wrong.
+    """
+    src = engine_sources()
+    if src:
+        return src
     for f in ("ENGINE", ".engine"):
         p = os.path.join(HERE, f)
         if os.path.exists(p):
@@ -93,6 +100,32 @@ def engine_now():
         return (r.stdout or "").strip() or "unknown"
     except Exception:
         return "unknown"
+
+
+def engine_sources():
+    """A hash of the ENGINE SOURCES - the same quantity regress.py:engine_fingerprint() uses.
+
+    WHY NOT THE COMMIT. This used to key the cache on `git rev-parse HEAD`, so EVERY commit moved the
+    key: a commit that only adds a FINDINGS file, or a claim, or a report, made all 213 .docx stale and
+    the next `--ensure` paid a 200 s rebuild for it. regress.py calls --ensure from inside the gate, so
+    the gate then ran past the 300 s call limit and a run could not commit at all - the same
+    "0 patches landed" failure the tool was written to fix, moved one step later. Measured 24 Nov
+    15:03 slot: two findings-only commits, each forcing a full rebuild.
+
+    The engine is the .java in app/src/main/java/com/kavopdf/app/engine. Nothing else can change a
+    converted byte, so nothing else may invalidate the cache.
+    """
+    d = os.path.join(ROOT, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
+    if not os.path.isdir(d):
+        return None
+    h = hashlib.sha256()
+    for name in sorted(os.listdir(d)):
+        if not name.endswith(".java"):
+            continue
+        h.update(name.encode())
+        with open(os.path.join(d, name), "rb") as f:
+            h.update(f.read())
+    return h.hexdigest()[:16]
 
 
 def java_bin():
