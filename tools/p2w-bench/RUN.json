@@ -1,20 +1,10 @@
 {
- "started_ts": 1795560796.0857558,
- "started": "04:23",
- "window_for_claim": 1795560796.0857558,
- "ended_ts": 1795561183.2809243,
- "ended": "04:29",
- "attempts": 1,
+ "started": "04:56",
+ "started_ts": 1795562798.5848136,
+ "ended": null,
+ "ended_ts": null,
+ "attempts": 0,
  "kept": 0,
- "agents": [
-  {
-   "id": "invisible-text-blind",
-   "class": "25_invisible_text",
-   "angle": "instrument",
-   "question": "is 25_invisible_text blind after the 24 Nov sheet filter, and can it be made to fail again",
-   "status": "running"
-  },
-  "25_iinvisible-text-blind-01"
- ],
+ "agents": [],
  "docs_improved": 0
 }
