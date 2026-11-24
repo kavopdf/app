@@ -220,7 +220,7 @@ def collect():
             if len(cells) < 6 or "what I was doing" in cells[1]:
                 continue
             can = (cells[4] or "").lower()
-            if can.startswith(("yes", "fixed", "solved", "cleared", "done")):
+            if can.startswith(("yes", "fixed", "solved", "cleared", "done", "decided")):
                 continue                      # the run cleared it; it is not a wall any more
             items.append({"kind": "blocker", "who": cells[0],
                           "what": "%s - %s" % (cells[1][:80], cells[2][:80]),
