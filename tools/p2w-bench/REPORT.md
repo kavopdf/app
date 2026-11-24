@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 06:38 → running IST · 1 min**
+**24 Nov 2026 · slot 05:59 → 06:40 IST · 2 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -43,15 +43,18 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_drowheight-prepass-01` | produce a minimal compilable two-pass emit for the a | 06:34 | 06:35 | 1 min |
+| `18_drowpitch-census-01` | census the table row pitch of every corpus PDF and c | 06:34 | 06:35 | 1 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 06:38 → running · 1 min |
+| Slot window | 05:59 → 06:40 · 2 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 10 |
+| Tool beats | 16 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
@@ -60,7 +63,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| other - not attributed to a tool | **1 min** | `######################` |
+| record - attempt, handoff, class rows | **0 min** | `########` |
+| other - not attributed to a tool | **1 min** | `##############` |
 ## Best results this round
 
 | Document | Before | After | Change |

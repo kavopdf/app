@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 06:38 → running IST · 1 min**
+**24 Nov 2026 · slot 05:59 → 06:40 IST · 2 min**
 
 > No change was kept this run. The numbers below say what was tried, and the last section says why the next run must not try it again.
 
@@ -8,7 +8,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -86,7 +86,7 @@ The LibreOffice proxy, `p2w.py`'s own instrument, each document measured twice:
 **Twelve documents measured: eight unchanged at share@5, four worse.** The largest table in the
 corpus - 246 rows across six tables - does not move at all, so the cost does not grow with the row
 count, which is what a cumulative snap is for. The four that move are the
-target itself and three documents already displaced by 12-17 share points; the seven that hold are
+target itself and three documents already displaced by 12-17 share points; the eight that hold are
 the clean ones. The largest cost found anywhere is **+0.25 share@5**, on a document whose share@5 is
 12.09. A 12-document sample is not the corpus and is not offered as one - it bounds the cost, it does
 not clear it, because the bar is zero movement.
@@ -134,10 +134,11 @@ Two, both deployed before the run's own attempt, both returned inside the turn.
 
 ## Gates
 
-The attempt is recorded as attempt 46 in `ATTEMPTS.json`, but the row above reads **0 attempt(s)**:
-`round.py --heartbeat` rewrites `fixer_started` on every beat, so the window report.py counts from
-moved to 06:32 mid-run and the attempt, made at 06:30, fell outside it. That is the pending blocker
-of 2026-11-21 (a beat must not restart the window), now with a second run's evidence.
+Three attempts are recorded in `ATTEMPTS.json` (46, 47, 48), but the row above counts **1**: every
+`round.py --heartbeat` rewrites `fixer_started`, so report.py's window kept moving and two of the
+three fell outside it. That is the pending blocker of 2026-11-21 - a beat must not restart the run
+window - now with a second run's evidence, and it is also why `--release-fixer` refused three times
+before `--force`: the gate could not see the attempts it had itself timestamped out of range.
 
 Not blocked. `regress.py --check` PASS on the reverted tree, `measure_gate.py` READY with 212 of 212
 scored and one engine on both sides. The pipeline was healthy; the attempt is what did not land.
@@ -146,9 +147,9 @@ scored and one engine on both sides. The pipeline was healthy; the attempt is wh
 
 | | |
 |:--|:--|
-| Slot window | 06:38 → running · 1 min |
+| Slot window | 05:59 → 06:40 · 2 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 10 |
+| Tool beats | 16 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
@@ -157,4 +158,5 @@ scored and one engine on both sides. The pipeline was healthy; the attempt is wh
 
 | Phase | Time | |
 |:--|--:|:--|
-| other - not attributed to a tool | **1 min** | `######################` |
+| record - attempt, handoff, class rows | **0 min** | `########` |
+| other - not attributed to a tool | **1 min** | `##############` |
