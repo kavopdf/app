@@ -1,0 +1,7 @@
+document,pages_source,pages_render,ink_iou_d1_pct,ssim_pct,agree_pct,agree_ink_pct,ink_iou_pct,ssim_worst,worst_page,defects
+01_stamp_rotated_15deg_upright,1,1,56.62,83.85,96.22,68.31,52.48,83.85,1,
+310_court_judgment,1,1,41.94,82.99,95.29,40.71,20.33,82.99,1,
+360_restaurant_menu,1,1,17.09,86.88,97.74,49.41,12.79,86.88,1,
+362_price_list_dense,1,1,73.56,92.45,98.29,56.02,40.86,92.45,1,
+academic-paper-ieee-2col-abstract,2,2,37.78,77.3,95.56,58.53,19.23,72.82,1,
+gst-invoice-multipage-item-table,4,4,20.65,81.64,97.19,60.83,13.91,78.7,3,

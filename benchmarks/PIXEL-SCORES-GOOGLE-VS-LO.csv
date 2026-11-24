@@ -1,0 +1,7 @@
+document,pages_source,pages_render,google_ink_iou_d1,google_ssim,libreoffice_ink_iou_d1,libreoffice_ssim,ssim_gap_lo_minus_google,google_doc_content_identical_to_current_engine
+01_stamp_rotated_15deg_upright,1,1,56.62,83.85,91.13,97.63,13.78,no
+310_court_judgment,1,1,41.94,82.99,76.12,92.23,9.24,YES
+360_restaurant_menu,1,1,17.09,86.88,29.09,89.95,3.07,no
+362_price_list_dense,1,1,73.56,92.45,82.2,94.79,2.34,YES
+academic-paper-ieee-2col-abstract,2,2,37.78,77.3,62.42,83.63,6.33,no
+gst-invoice-multipage-item-table,4,4,20.65,81.64,73.37,91.68,10.04,no
