@@ -250,8 +250,9 @@ def collect():
     elif _ta >= 6.0:
         items.append({"kind": "measure", "who": "the .txt table",
                       "what": "RANKING-TXT.csv is %.1f h old - the .txt numbers are not today's" % _ta,
-                      "why": "actionable - run `python3 tools/p2w-bench/txt_gate.py --score 40`; nothing "
-                             "else regenerates it"})
+                      "why": "actionable - run `python3 tools/p2w-bench/txt_gate.py --score 40`. It is "
+                             "incremental: 40 documents a pass at ~10 s each, so ~7 passes cover 213 and a "
+                             "full `--all` would take 35 min of a 90-min slot. Nothing else regenerates it"})
 
     # The docx table: fresh if the newest verdict is recent AND every scored document is on the current
     # engine. The engine is the modal one among the verdicts, for the reason classpick.py gives.
