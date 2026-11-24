@@ -11,8 +11,8 @@
 
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3; subagents: 2 deployed vs no FINDINGS file for 60ed60_text_colu, pc2300_page_coun |
-| Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -37,7 +37,7 @@
 
 | | |
 |:--|:--|
-| Measured | **43 min ago** |
+| Measured | **44 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
