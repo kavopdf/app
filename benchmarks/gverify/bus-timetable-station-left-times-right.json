@@ -2,19 +2,21 @@
  "name": "bus-timetable-station-left-times-right",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-24T11:15:35",
  "passed": 41,
  "total": 42,
  "failed": [
   "18_displacement"
  ],
  "displacement": {
-  "med_dy": -3.0,
-  "worst_dy": 4.9,
+  "med_dy": -4.8,
+  "worst_dy": 5.3,
   "med_dx": 0.2,
   "bad_pages": [
    0
   ],
   "runs_matched": 177
  },
- "engine": "b7699196"
+ "engine": "b7699196",
+ "checks": "369550-1795516197"
 }

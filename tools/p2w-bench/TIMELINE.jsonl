@@ -4443,3 +4443,22 @@
 {"t": 1795515199.6217585, "ist": "15:43:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795515212.0133514, "ist": "15:43:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795515214.940896, "ist": "15:43:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795516251.7648396, "ist": "16:00:51", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795516251.9843602, "ist": "16:00:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795516252.1447413, "ist": "16:00:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795516262.4918404, "ist": "16:01:02", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795516264.9029775, "ist": "16:01:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795516270.1880755, "ist": "16:01:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795516275.1509044, "ist": "16:01:15", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795517699.4122841, "ist": "16:24:59", "ev": "beat", "d": "measuring gate cost"}
+{"t": 1795517819.0691457, "ist": "16:26:59", "ev": "beat", "d": "fetching corpus from corpus-v1 release"}
+{"t": 1795517880.703186, "ist": "16:28:00", "ev": "beat", "d": "running corpus-fetch.sh"}
+{"t": 1795517918.8627486, "ist": "16:28:38", "ev": "beat", "d": "applying uniform-pitch patch and building engine"}
+{"t": 1795518021.0579758, "ist": "16:30:21", "ev": "beat", "d": "screening 13 sole-failure docs on the patched engine"}
+{"t": 1795518307.7682662, "ist": "16:35:07", "ev": "beat", "d": "screening part 2"}
+{"t": 1795518633.1037173, "ist": "16:40:33", "ev": "beat", "d": "converting the 13 sole-failure docs on the patched engine"}
+{"t": 1795518743.0826604, "ist": "16:42:23", "ev": "beat", "d": "rebuilding unpatched to diff the 13"}
+{"t": 1795518868.1222475, "ist": "16:44:28", "ev": "beat", "d": "staging bank statement for Google"}
+{"t": 1795518896.7536893, "ist": "16:44:56", "ev": "beat", "d": "collecting Google score for bank statement"}
+{"t": 1795518965.1181107, "ist": "16:46:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795518970.669301, "ist": "16:46:10", "ev": "beat", "d": "committing the finding"}

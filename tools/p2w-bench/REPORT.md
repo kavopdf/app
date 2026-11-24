@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 15:43
+# Fixer report - 2026-11-24 16:00
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 15:43 → running IST · 12 min**
+**24 Nov 2026 · slot 16:00 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -12,7 +12,7 @@
 | | |
 |:--|:--|
 | Self-check | **every field agrees with its second source** |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -23,19 +23,13 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `04_chars_missing` - taken from the pending list (26 still open), not a new class |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 15:43 | **lead** | 0/None | anchored-text-box census: the 120 pt cap is 16% of the box text and the pagepos cascade 17%; spending every gap removes 15.9% but displaces 3 documents worse, and no document has 04/45 as its only fai |
+| Working on | `-` - taken from the pending list (27 still open), not a new class |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **58 min ago** |
+| Measured | **1 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -50,20 +44,12 @@
 
 | | |
 |:--|:--|
-| Slot window | 15:43 → running · 12 min |
+| Slot window | 16:00 → running · 0 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 65 |
-| Longest silence | **6.4 min** — from 15:43:41, after `classrow.py: refreshing the class file` |
-| Silences over 2 min | 1 |
+| Tool beats | 4 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| record - attempt, handoff, class rows | **3 min** | `######` |
-| report - the report and the chain | **9 min** | `################` |
 ## Best results this round
 
 | Document | Before | After | Change |
