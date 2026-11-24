@@ -13,7 +13,7 @@ told apart from a hope.
     python3 tools/p2w-bench/report.py            # the report
     python3 tools/p2w-bench/report.py --json     # same, machine-readable
 """
-import csv, json, os, sys, time
+import csv, json, os, re, sys, time
 
 try:
     from beacon import beat
@@ -328,7 +328,13 @@ def self_check():
             _have = set(os.listdir(_fd)) if os.path.isdir(_fd) else set()
             _missing = []
             for _a in _claimed:
-                _id = str((_a or {}).get("id") or (_a or {}).get("class") or "")
+                # `agents` HOLDS STRINGS, NOT DICTS. RUN.json writes ["60_tB-02", "04_cA-01"], so
+                # `_a.get("id")` raised AttributeError on every run with a subagent and the whole check
+                # reported nothing but that error - the second time this block has hidden itself, the
+                # first being an undefined name. A string is the id; a dict may carry one under id or
+                # class; anything else is skipped rather than guessed.
+                _id = (_a.strip() if isinstance(_a, str)
+                       else str((_a or {}).get("id") or (_a or {}).get("class") or ""))
                 if _id and not any(_id[:12] in _n for _n in _have):
                     _missing.append(_id[:16])
             if _missing:
@@ -1265,7 +1271,22 @@ def main(argv):
         L.append("| Corpus improvement | not measurable — %s |" % co.get("why"))
     L.append("| Classes solved | %d of %d clear — %d class(es) still have an OPEN document |"
              % (solved, total, openc))
-    L.append("| Working on | `%s` |" % working)
+    # A CLASS NAME IN THIS ROW DOES NOT MEAN A CLASS WAS TAKEN. On 24 Nov the report said "Working on
+    # 18_displacement" while 22 pending items were open, which reads as the gate being bypassed. It was
+    # not: pending.py's item 1 IS an 18_displacement question, so the run took the pending item and the
+    # row lost the distinction. Say which it was, because the difference is the whole gate.
+    _pend = 0
+    try:
+        import subprocess as _sp
+        _r = _sp.run([sys.executable, os.path.join(HERE, "pending.py")], capture_output=True, text=True,
+                     timeout=120)
+        _m = re.search(r"PENDING \((\d+)\)", _r.stdout or "")
+        _pend = int(_m.group(1)) if _m else 0
+    except Exception:
+        _pend = 0
+    L.append("| Working on | `%s`%s |"
+             % (working, "" if not _pend else
+                " - taken from the pending list (%d still open), not a new class" % _pend))
     cm = committed()
     if cm:
         L.append("| Committed | **%d** files in %d commit(s) from `%s` — %s |"
