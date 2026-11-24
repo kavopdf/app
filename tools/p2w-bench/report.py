@@ -15,6 +15,11 @@ told apart from a hope.
 """
 import csv, json, os, re, sys, time
 
+# THE REPORT IS NOT WORK, AND IT MUST NOT BE COUNTED AS ANY. This is set BEFORE the helpers below
+# are called, so the beats pending.py, chain.py and gaps.py write while building this report are
+# not written at all - the count then cannot move between the report and lastmessage.py's re-read.
+os.environ.setdefault("P2W_BEAT_QUIET", "1")
+
 try:
     from beacon import beat
 except Exception:
@@ -700,6 +705,17 @@ def silences():
         # report that report.py itself had just written was REFUSED for "Tool beats 35" against
         # its own 36, and no report could be committed while the run was live. The beats that
         # count are the run's work; the reader's own footsteps are not.
+        # AND THE FILTER ABOVE WAS NOT ENOUGH - THE CUTOFF IT NEEDED IS GONE, BECAUSE THE BEATS
+        # ARE NO LONGER WRITTEN. Excluding report.py's own beat still left the count moving, because
+        # report.py calls pending.py, chain.py and gaps.py while it builds and each of those beats
+        # under its OWN name. Measured 24 Nov 19:51, three report.py runs on an idle repository:
+        # "Tool beats 25", then 26, then 27 - so a report report.py had just written was refused
+        # against its own next reading, and no report could be committed while the run was live.
+        #
+        # report.py now sets P2W_BEAT_QUIET before it calls anything, and beacon.beat() writes
+        # nothing while it is set (see beacon.py). Nothing moves the count, so no cutoff is needed
+        # and the number is the run's work rather than the reader's footsteps.
+
         def _work(r):
             d = str(r.get("d") or "")
             return not (d.startswith("report.py") or d.startswith("lastmessage.py"))

@@ -29,7 +29,18 @@ ROUND = os.path.join(HERE, "ROUND.json")
 
 
 def beat(tool, what=""):
-    """Append one line to TIMELINE.jsonl. Never raises, never blocks the caller."""
+    """Append one line to TIMELINE.jsonl. Never raises, never blocks the caller.
+
+    A READER'S FOOTSTEPS ARE NOT THE RUN'S WORK, AND P2W_BEAT_QUIET IS HOW A READER SAYS SO.
+    report.py builds the report by calling pending.py, chain.py and gaps.py, and each of those
+    beats under its OWN name - so a blacklist of "report.py" in report.py's beat counter never
+    matched them. Measured 24 Nov 19:51, three report.py runs in a row on an idle repository:
+    "Tool beats 25", then 26, then 27. The count moved between the report being written and
+    lastmessage.py re-reading it, so no report could be validated or committed while the run was
+    live - the gate refused a report against its own next reading.
+    """
+    if os.environ.get("P2W_BEAT_QUIET"):
+        return
     try:
         ist = time.strftime("%H:%M:%S", time.gmtime(time.time() + 19800))
         rec = {"t": time.time(), "ist": ist, "ev": "beat",
