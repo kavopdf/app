@@ -1324,6 +1324,30 @@ def main(argv):
     else:
         _note = ' - **the pending list could not be read**: %s' % _why
     L.append('| Working on | `%s`%s |' % (working, _note))
+    # INVESTIGATING IS CHEAPER THAN LANDING, SO IT HAPPENS INSTEAD. 32_stroke_lines has 26
+    # findings files and 2 documents still failing it. That is not laziness - writing a finding is
+    # one commit and cannot regress anything, while a change must survive the gate and a 54-minute
+    # restamp. Nothing in the report said so, so the imbalance was invisible.
+    #
+    # Counted from the findings filenames, which carry the class name, so this needs no mapping
+    # between the attempt ledger and the capability table. Report only: it names the imbalance and
+    # leaves the decision to the run.
+    _fn, _mv = 0, 0
+    try:
+        import glob as _g, os as _o, json as _j
+        _fd = _o.path.join(HERE, 'FINDINGS')
+        _key = str(working).split()[0] if working else ''
+        if _key and len(_key) >= 5 and _key not in ('-', 'none', 'None'):
+            _fn = len([x for x in _g.glob(_o.path.join(_fd, '*.md')) if _key in _o.path.basename(x)])
+            _at = _j.load(open(_o.path.join(HERE, 'ATTEMPTS.json'), encoding='utf-8'))
+            _mv = sum(int(h.get('moved') or 0) for h in ((_at.get(_key) or {}).get('history') or []))
+    except Exception:
+        _fn, _mv = 0, 0
+    if _fn >= 10 and _mv <= 1:
+    # 18_displacement measured 24 Nov: 64 findings files and 1 document moved. 32_stroke_lines has
+    # 24 findings and 33 moved - it landed its changes. The ratio is what separates the two.
+        L.append('| Findings vs landing | **%d** finding(s) on this class and **0** documents moved - '
+                 'writing is cheaper than landing, and nothing else says so |' % _fn)
     # A RUN THAT PICKS A DEMOTED CLASS BY HAND IS INVISIBLE IN ITS OWN REPORT.
     # Measured 24 Nov: the rotation's first five classes were attempted zero times while the run
     # hand-picked 04_chars_missing (4 attempts, nothing moved) and 60_text_column_right_edge (5,
