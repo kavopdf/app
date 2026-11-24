@@ -1,27 +1,20 @@
 {
-<<<<<<< Updated upstream
- "agents": [
-  "gap--01",
-  "zero-01",
-  "Goog-01",
-  "band-01"
- ],
- "attempts": 8,
- "class": "04_chars_missing",
- "docs_improved": 0,
- "ended": "02:01",
- "ended_ts": 1795552309.3346412,
- "kept": 0,
- "started": "01:24",
- "started_ts": 1795550070.5188742
-=======
- "started": "03:00",
- "started_ts": 1795555823.7848885,
- "ended": null,
+ "started_ts": 1795560796.0857558,
+ "started": "04:23",
+ "window_for_claim": 1795560796.0857558,
  "ended_ts": null,
- "attempts": 0,
+ "ended": null,
+ "attempts": 1,
  "kept": 0,
- "agents": [],
+ "agents": [
+  {
+   "id": "invisible-text-blind",
+   "class": "25_invisible_text",
+   "angle": "instrument",
+   "question": "is 25_invisible_text blind after the 24 Nov sheet filter, and can it be made to fail again",
+   "status": "running"
+  },
+  "25_iinvisible-text-blind-01"
+ ],
  "docs_improved": 0
->>>>>>> Stashed changes
 }

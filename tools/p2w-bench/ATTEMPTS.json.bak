@@ -91,7 +91,7 @@
   "status": "OPEN"
  },
  "04_chars_missing": {
-  "attempts": 6,
+  "attempts": 7,
   "first_seen": null,
   "history": [
    {
@@ -143,6 +143,17 @@
     "outcome": "lead",
     "reason": "GOOGLE: 69_two_col_legal_numbered_clauses 35/42 -> 39/42 with spendWideGap + FOOT_BAND=0 + pagepos=0/anchorkeep=0/zganchor=false; 04_chars_missing, 45_char_accuracy, 13_text_colours, 44_header_footer,",
     "total": 64
+   },
+   {
+    "at": "2026-11-25 03:21",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "00_page_count: land the column-page shape merge - 21 documents, 0 regressions"
+    },
+    "moved": 1,
+    "outcome": "lead",
+    "reason": "band sweep on the spend-gap build: -Dp2w.footband 0.80 takes 69_two_col_legal to 0 boxes while leaving 330_cad exactly as HEAD (0.85 leaves 7 boxes, 0.70 spends in the drawing sheet); Google at 0.80 i",
+    "total": 64
    }
   ],
   "last": null,
@@ -155,16 +166,18 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "GOOGLE: 69_two_col_legal_numbered_clauses 35/42 -> 39/42 with spendWideGap + FOOT_BAND=0 + pagepos=0/anchorkeep=0/zganchor=false; 04_chars_missing, 45_char_accuracy, 13_text_colours, 44_header_footer, 17_matched_runs, 10_font_sizes and 38_list_markers all pass now (36 boxes/1358 chars -> 0/0); the price is 26_text_overlap render=11 plus new 18_displacement and 60; engine reverted, the missing guard is a look-ahead (spend only when no remaining line targets a lower baseline)",
+  "reason": "band sweep on the spend-gap build: -Dp2w.footband 0.80 takes 69_two_col_legal to 0 boxes while leaving 330_cad exactly as HEAD (0.85 leaves 7 boxes, 0.70 spends in the drawing sheet); Google at 0.80 is 39/42 with 26_text_overlap still 11, identical to band 0.0 - the overlap is what those gaps do, not a band that is too wide, so the look-ahead is the guard and the constant is not",
   "reasons": [
    "txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - the proxy is blind to this class in both directions; patch saved to patches/foot-band-spend-the-gap.patch, Google render is the next run's measurement",
    "anchored-text-box census: the 120 pt cap is 16% of the box text and the pagepos cascade 17%; spending every gap removes 15.9% but displaces 3 documents worse, and no document has 04/45 as its only failure, so emptying boxes would clean ZERO documents today. Recorded in FINDINGS/ANCHORED-BOX-CENSUS-CAP-IS-16PCT-24NOV.md",
    "the anchored-text-box patch is written and measured, not applied: 381 -> 6 anchored boxes on 8 documents (-98.4%), character multiset identical (041122 42,319 -> 42,319, nothing lost). Not landed because the slot went to the cold-pod wall first (no corpus, no JDK, no compiled engine, so the pre-commit gate refused every commit including the claim). The next run's first measurement is DISPLACEMENT on the 23 changed documents, not page count: the census already measured page counts changing on 0 of 23 and names displacement as the refuter (330_cad_drawing_sheet 3.14 -> 16.77 pt median).",
    "four-site foot-band patch applied to DocxWriter (patches/foot-band-spend-the-gap.patch), engine rebuilt, 5 documents converted: w:txbxContent 2 -> 0 on 27/46/55/61/67, page counts unchanged, character multiset preserved (+1 space). 61_two_col_abstract_spanning measured in Google through the real path: 40/42 FAIL -> 42/42 PASS (04_chars_missing and 44_header_footer both cleared). Not landed: an engine change needs the full 213-document restamp (~54 min: 26 docs per 250 s budget plus one JVM per document) and the slot had 50 min left. Next run: take displacement on 27 and 61 in p2w, then restamp and stamp.",
    "anchor latch census: the page-local ctx.positioned latch multiplies one anchored line into every later line (655 lines/24920 chars) against the 120pt cap's 1469 chars; -Dp2w.pagepos=0 -Dp2w.anchorkeep=0 cuts boxed chars 1358->367 on 69_two_col_legal, 2942->181 on academic-paper, 222->35 on 323_credit_card, 206->30 on 311_fir, and nothing on 47 of 64; no combination reaches 0 boxes so no document flipped; 47 of 64 04-failing docs carry <200 boxed chars and their box is a stamp, not body text",
-   "GOOGLE: 69_two_col_legal_numbered_clauses 35/42 -> 39/42 with spendWideGap + FOOT_BAND=0 + pagepos=0/anchorkeep=0/zganchor=false; 04_chars_missing, 45_char_accuracy, 13_text_colours, 44_header_footer, 17_matched_runs, 10_font_sizes and 38_list_markers all pass now (36 boxes/1358 chars -> 0/0); the price is 26_text_overlap render=11 plus new 18_displacement and 60; engine reverted, the missing guard is a look-ahead (spend only when no remaining line targets a lower baseline)"
+   "GOOGLE: 69_two_col_legal_numbered_clauses 35/42 -> 39/42 with spendWideGap + FOOT_BAND=0 + pagepos=0/anchorkeep=0/zganchor=false; 04_chars_missing, 45_char_accuracy, 13_text_colours, 44_header_footer, 17_matched_runs, 10_font_sizes and 38_list_markers all pass now (36 boxes/1358 chars -> 0/0); the price is 26_text_overlap render=11 plus new 18_displacement and 60; engine reverted, the missing guard is a look-ahead (spend only when no remaining line targets a lower baseline)",
+   "band sweep on the spend-gap build: -Dp2w.footband 0.80 takes 69_two_col_legal to 0 boxes while leaving 330_cad exactly as HEAD (0.85 leaves 7 boxes, 0.70 spends in the drawing sheet); Google at 0.80 is 39/42 with 26_text_overlap still 11, identical to band 0.0 - the overlap is what those gaps do, not a band that is too wide, so the look-ahead is the guard and the constant is not"
   ],
   "requeues": 0,
   "status": "OPEN"

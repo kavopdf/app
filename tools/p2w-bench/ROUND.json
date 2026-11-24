@@ -13,11 +13,11 @@
       }
     ]
   },
-  "fixer_doing": "gate refused: re-measuring corpus (LO) after instrument",
-  "fixer_doing_since": 1795559835.5775013,
+  "fixer_doing": "writing the report",
+  "fixer_doing_since": 1795560798.4337685,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795559835.5775023,
-  "fixer_started": 1795555823.7837212,
+  "fixer_last_beat": 1795560798.4337692,
+  "fixer_started": 1795560796.0857558,
   "history": [
     {
       "at": "2026-11-12 09:46",

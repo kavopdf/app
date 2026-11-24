@@ -1,4 +1,3 @@
-| 22 Nov 00:15 | fixer | slot claimed - fixer running |
 | 22 Nov 01:16 | fixer | slot claimed - fixer running |
 | 22 Nov 01:43 | fixer | attempt 32_stroke_lines -> lead (0/? moved) |
 | 22 Nov 01:53 | fixer | slot claimed - fixer running |
@@ -198,3 +197,4 @@
 | 25 Nov 02:59 | fixer | attempt 04_chars_missing -> lead (0/64 moved) |
 | 25 Nov 03:12 | fixer | attempt 04_chars_missing -> lead (1/64 moved) |
 | 25 Nov 03:21 | fixer | attempt 04_chars_missing -> lead (1/64 moved) |
+| 25 Nov 04:23 | fixer | attempt 04_chars_missing -> lead (1/? moved) |
