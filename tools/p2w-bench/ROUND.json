@@ -13,11 +13,9 @@
       }
     ]
   },
-  "fixer_doing": "relay: measuring 24/212, ~14s/doc - full pass may not fit the slot",
-  "fixer_doing_since": 1795502846.3435924,
   "fixer_engine_at_claim": "b7699196",
   "fixer_last_beat": 1795502846.3435934,
-  "fixer_started": 1795503482.6465526,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
