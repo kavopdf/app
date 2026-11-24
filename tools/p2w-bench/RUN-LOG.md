@@ -198,3 +198,4 @@
 | 24 Nov 19:48 | fixer | slot claimed - fixer running |
 | 24 Nov 19:49 | fixer | slot claimed - fixer running |
 | 24 Nov 19:53 | fixer | attempt 04_chars_missing -> lead (0/? moved) |
+| 24 Nov 19:54 | fixer | slot FORCED released - see INCIDENTS.md for why |
