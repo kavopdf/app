@@ -551,7 +551,7 @@ yesterday's row it reads docx open 59 to 59, txt failing 14 to 14, google 190 to
 to 29. round.py --phase: fix, round 1, 212 of 212 scored, open classes still listed.
 
 **The .txt stall is now inside the 06:07 correction, not beside it.** ROUND.json `baseline_started` is
-0.0 h old and commit ee43f1f6 ("claim: baseline takes the slot", 03:33:46 UTC) landed minutes before
+0.0 h old and commit ee43f1f6 ("claim: baseline takes the slot", 03:33:46 UTC) landed seconds before
 this pass - a :00 baseline run holds the slot and owns the refresh that BASELINE-BRIEF.md section 0
 describes. So this pass did not touch the brief again; writing the same instruction twice is noise, not
 a fix. **What would overturn this:** that run finishing and the table still reading 21.7 h old. That

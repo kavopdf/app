@@ -20,7 +20,7 @@ Phase fix, round 1, 212 of 212 documents scored. round.py still lists open class
 
 ## The stopped stage, on the evidence
 
-The .txt table is 21.7 h old while its newest input is 7.4 h old, so it is genuinely stale, not a false alarm from an old clock. The earlier pass today corrected the baseline brief so the .txt refresh runs outside the measure phase, and that correction is now being exercised: a baseline run claimed the baseline slot minutes before this pass and owns the refresh. If that run finishes and the table is still 21.7 h old, then the phase gate was not the blocker and the next pass treats it as the instrument.
+The .txt table is 21.7 h old while its newest input is 7.4 h old, so it is genuinely stale, not a false alarm from an old clock. The earlier pass today corrected the baseline brief so the .txt refresh runs outside the measure phase, and that correction is now being exercised: a baseline run claimed the baseline slot in the same minute this pass started and owns the refresh. If that run finishes and the table is still 21.7 h old, then the phase gate was not the blocker and the next pass treats it as the instrument.
 
 ## The fixer
 
