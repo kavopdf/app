@@ -187,7 +187,15 @@ def self_check():
     Returns a list of (field, what one source says, what the other says).
     """
     out = []
-    g = google_fixed() or {}
+    # google_fixed() RETURNS A 5-TUPLE, NOT A DICT. Written as g.get(...) every check below raised
+    # AttributeError into its own try/except and reported nothing - five checks that were dead code and
+    # looked like passing ones. Caught by planting a known-wrong value and watching for a report.
+    try:
+        _gf, _gs, _gfc, _gsc, _grf = google_fixed()
+    except Exception:
+        _gf = _gs = _gfc = _gsc = _grf = 0
+    g = {"google_fixed": _gf, "google_scored": _gs, "google_fixed_current": _gfc,
+         "google_scored_current": _gsc, "google_refused": _grf}
     t = txt() or {}
     c = corpus() or {}
 
@@ -236,6 +244,83 @@ def self_check():
         _tc = c.get("clean")
         if _gc is not None and _tc is not None and int(_gc) != int(_tc):
             out.append(("clean count", "gverify says %s" % _gc, "ranking says %s" % _tc))
+    except Exception:
+        pass
+    # 6. THE ARITHMETIC IDENTITIES. A report can lie without any second file disagreeing, by printing
+    # three numbers that cannot all be true at once. Each of these is a sum that must close.
+    try:
+        _gf = g.get("google_fixed", 0) or 0
+        _gfc = g.get("google_fixed_current", 0) or 0
+        _gs = g.get("google_scored", 0) or 0
+        _gsc = g.get("google_scored_current", 0) or 0
+        if int(_gs) and int(_gsc):
+            _older_clean = int(_gf) - int(_gfc)
+            if _older_clean < 0:
+                out.append(("clean split", "all-engine clean %s is less than current-engine clean %s"
+                            % (_gf, _gfc), "the difference cannot be negative"))
+            if int(_gsc) > int(_gs):
+                out.append(("scored split", "current %s exceeds all %s" % (_gsc, _gs),
+                            "a subset cannot be larger than its set"))
+        if _gs and _gsc and int(_gsc) + (int(_gs) - int(_gsc)) != int(_gs):
+            out.append(("scored total", "does not add up", "current + older must equal scored"))
+        if int(_gfc) > int(_gsc):
+            out.append(("clean vs scored", "clean %s exceeds scored %s" % (_gfc, _gsc),
+                        "more documents cannot be clean than were scored"))
+    except Exception:
+        pass
+
+    # 7. scored + refused must equal the corpus. 190 + 23 = 213 is the identity the report relies on.
+    try:
+        _docs = c.get("docs")
+        _scored = g.get("google_scored")
+        _refused = g.get("google_refused")
+        if _docs and _scored is not None and _refused is not None:
+            if int(_scored) + int(_refused) != int(_docs):
+                out.append(("corpus identity", "scored %s + refused %s" % (_scored, _refused),
+                            "does not equal the corpus %s" % _docs))
+    except Exception:
+        pass
+
+    # 8. the .txt table's own arithmetic: clean + failing must equal scored.
+    try:
+        _ts, _tc, _tf = t.get("scored"), t.get("clean"), t.get("failing")
+        if _ts and _tc is not None and _tf is not None:
+            if int(_tc) + int(_tf) != int(_ts):
+                out.append((".txt identity", "clean %s + failing %s" % (_tc, _tf),
+                            "does not equal scored %s" % _ts))
+    except Exception:
+        pass
+
+    # 9. classes solved cannot exceed the class count, and the count must match the file the classes
+    # come from. "0 of 34 clear" is a claim about 34 rows somewhere.
+    try:
+        _cl = classes() or {}
+        _total = len(_cl) if isinstance(_cl, (list, dict)) else 0
+        if _total:
+            _open = sum(1 for _k, _v in (_cl.items() if isinstance(_cl, dict) else enumerate(_cl))
+                        if (_v.get("open") if isinstance(_v, dict) else 0))
+            if _open > _total:
+                out.append(("classes", "%s open of %s" % (_open, _total),
+                            "more open classes than classes"))
+    except Exception:
+        pass
+
+    # 10. a subagent the run says it deployed should have left a FINDINGS file. An agent claimed and not
+    # found is the same false-zero shape as attempts.
+    try:
+        _r = this_run()
+        _claimed = _r.get("agents") or []
+        if _claimed:
+            _fd = os.path.join(HERE, "FINDINGS")
+            _have = set(os.listdir(_fd)) if os.path.isdir(_fd) else set()
+            _missing = []
+            for _a in _claimed:
+                _id = str((_a or {}).get("id") or (a or {}).get("class") or "")
+                if _id and not any(_id[:12] in _n for _n in _have):
+                    _missing.append(_id[:16])
+            if _missing:
+                out.append(("subagents", "%d deployed" % len(_claimed),
+                            "no FINDINGS file for %s" % ", ".join(_missing[:2])))
     except Exception:
         pass
     return out
