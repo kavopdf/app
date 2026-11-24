@@ -105,6 +105,32 @@ def today():
             "google": g, "google_clean": gclean}
 
 
+def today_is_stale():
+    """The committed row for today against what the data says now. Returns a list of disagreements.
+
+    rows() is history and must not be recomputed - that rule is right. But TODAY'S row is not history yet,
+    and on 24 Nov it said google_clean 29 while the same function's today() computed 35. The watchdog read the
+    committed row, as it is told to, and reported 29 over live data that said 35 - six documents adrift, with
+    nothing in the pipeline able to notice because the two numbers are never compared.
+
+    That is the same shape as every reporting fault fixed this week: two sources describe one quantity, one is
+    read, and the other is never asked. Here both live in the same module, so the comparison is free.
+    """
+    out = []
+    try:
+        t = today()
+        rs = [r for r in rows() if r.get("date") == t["date"]]
+        if not rs:
+            return out                       # no row for today yet: appending one is the watchdog's job
+        r = rs[-1]
+        for k in ("docx_open", "txt_failing", "google", "google_clean"):
+            if k in r and k in t and int(r[k]) != int(t[k]):
+                out.append("%s: committed row says %s, the data says %s" % (k, r[k], t[k]))
+    except Exception as e:
+        out.append("could not compare today's row: %s" % type(e).__name__)
+    return out
+
+
 def rows():
     """Every committed row, in order. The table is the only history - read it, do not recompute it."""
     out = []
