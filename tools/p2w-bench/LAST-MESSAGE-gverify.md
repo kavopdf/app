@@ -1,22 +1,36 @@
-**gverify: stage is `classify`, so nothing was measured this run — the capability table was regenerated from the committed results and landed.**
+# P2W Google Verify - Run Report
 
-`stage.py` reads `classify`: 213 of 213 documents measured through Google (190 scored, 23 refused), 155 still failing, and the live table `DEFECT-CLASSES-GOOGLE.md` older than the results it summarises. Measurement and the LibreOffice half are both done, so this slot did the one action its stage allows — write the capability table from the tool's own output, commit, stop. No document was uploaded, no engine code was touched, nothing was classified.
+**24 Nov 2026 · 19:32 IST · stage fix**
 
-| check | LibreOffice fails | Google fails |
-|---|---:|---:|
-| `18_displacement` | 20 | 102 |
-| `04_chars_missing` | 2 | 65 |
-| `60_text_column_right_edge` | 18 | 56 |
-| `59_shape_anchor` | 9 | 45 |
-| `25_invisible_text` | 0 | 43 |
-| `45_char_accuracy` | 2 | 37 |
-| `13_text_colours` | 1 | 32 |
-| `44_header_footer` | 0 | 30 |
-| `17_matched_runs` | 4 | 30 |
-| `47_margins` | 15 | 25 |
+> 191 of 213 measured in Google, 22 refused on page count. Google passes every check on 35; LibreOffice on 125 of the same 191.
 
-LibreOffice passes 124 of 190 documents, Google passes 35 of 190, and 35 pass every check offered in Google. The table's header used to say "pass all 42"; the tool now says "every check offered", which is the corrected claim, and the counts did not move.
+| checks applied | **42, 44, 47 (mixed - a document is clean only against its own set)** |
+| measured against the current set | **62 of 191** |
+## Measured
 
-**The commit gate was refusing everything, and this run found out why.** Since the gate began failing on an unbuildable corpus, no run on a fresh pod could commit: `corpus-convert.py` spawns one JVM per document, which does not finish inside a single call and writes no stamp, so every retry started from nothing. One `ConvertAll` over the whole corpus directory — which reuses a single JVM — converted all 213 documents with 0 failed, the stamp then read WARM, and `regress.py --check` printed PASS. Recorded in `BLOCKERS.md` with what would overturn it.
+| | |
+|:--|--:|
+| scored | **191** |
+| refused on page count | **22** |
+| clean in Google | **35** |
+| clean in LibreOffice | **125** |
 
-Next stage is `classify`: 155 failing documents need a row in `DEFECT-CLASSES-GOOGLE.md` from the classifier, which is not this cron.
+## Checks Google fails and LibreOffice does not
+
+| check | Google | LibreOffice |
+|:--|--:|--:|
+| `18\_displacement` | **103** | 20 |
+| `04\_chars\_missing` | **65** | 2 |
+| `25\_invisible\_text` | **43** | 0 |
+| `60\_text\_column\_right\_edge` | **56** | 18 |
+| `59\_shape\_anchor` | **45** | 9 |
+| `45\_char\_accuracy` | **38** | 2 |
+| `13\_text\_colours` | **32** | 1 |
+| `44\_header\_footer` | **30** | 0 |
+
+The first row is the class to take: `18\_displacement`, 103 documents in Google against 20 in LibreOffice.
+
+
+## What this run did
+
+The slot opened at `classify`, and the classify work is finished: the capability table and the class table were both regenerated from the committed results and committed through the gate, which passed on a corpus rebuilt on this pod. `stage.py` now reads `fix`, with 156 documents still failing a check, so the next work on these classes belongs to the fixer.
