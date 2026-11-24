@@ -288,6 +288,90 @@ that share a page feature, not a mechanism.
 Either the writer stops emitting it, or the check is told the format includes it. That decision belongs
 to the format's owner, and it changes whether 600's 7 words are a defect or a feature.
 
+
+## t08, independently verified: both claims confirmed, three corrections, and one settled question
+
+A second investigation built the engine from scratch, converted both documents and the whole corpus, and
+re-implemented the check so its numbers are its own. **t08 fails on exactly 2 of 213 documents** - these
+two - so the baseline is measured, not assumed.
+
+### 305 confirmed, with the ring measured from the ENGINE's box, not PyMuPDF's
+
+The earlier claim quoted the ring as x 81.22-158.78 with midpoint 149.95. Those are PyMuPDF's **ink**
+boxes. The engine's own box, read from the ring paragraph's `Box` list (each ring character carries
+`x`, `right`, `y`), is **x 86.96-158.49, y 270.89-318.24, width 71.53**. The captured line is
+x 28.00 to 271.93, y 278.00, width 243.93, midpoint (149.97, 278.00). Same verdict - 86.96 < 149.97 <
+158.49 and 270.89 < 278.00 < 318.24 - but **a fix must be written against the engine's box, not the ink
+box**, or it will be tuned to the wrong numbers.
+
+The page has 11 text blocks: `[9]` is the footer (top 781.89), `[10]` is the seal paragraph, 48 lines,
+appended at line 1629 - after the footer. The .txt writes the footer at line 66 and `Issued:` at 112,
+delta 504.27 pt.
+
+**Containment strictly subsumes a width test, so "both" is redundant.** A line wider than the ring cannot
+be contained, so anything a width test rejects, containment also rejects. And containment additionally
+rejects a *narrower* line that straddles the ring edge: a line spanning x 60 to 130 against a ring at
+86.96-158.49 is 70 pt wide, would pass a width test, and would still be swallowed.
+
+**Nothing in the corpus is at risk.** 7 documents produce a ring paragraph; 22 inner lines are captured;
+**21 are genuine seal-centre words** - `TRAINING &`, `PLACEMENT CELL`, `2025`, `SEAL`, `INDIA`, `2024`,
+and single ring-top letters `A`, `S`, `T`. The `Issued:` line is the **only** capture that fails either
+test. The widest genuine centre line is 05's `PLACEMENT CELL`, 81.92 pt inside a 129.82 pt ring (63 %),
+and it is contained. Simulated: with `Issued:` back in the body flow, t08 on 305 goes **33/33 - pass**.
+
+**Two things to know before landing it:**
+1. It also changes the **.docx** - `Issued:` becomes its own paragraph - so `verify_google` must be re-run
+   across the 7 ring documents. Not measured here; no render was available.
+2. **The same fault has a second symptom:** `ringPara`'s recorded `left`/`right` are contaminated by the
+   swallowed line (28.00/271.93 instead of the ring's own 86.96/158.49). Fixing the membership test fixes
+   both.
+
+### 39 confirmed, but the earlier wording was wrong
+
+"Keyed on baseline it passes 22/22" is true and I measured it - **but the pass comes from the stable sort
+preserving content-stream order, not from the baseline key ordering anything.** The two lines tie
+completely on (baseline 66.0, x 56.0). The honest statement is:
+
+> Two lines on one baseline have no order between them, and the check should not assert one.
+
+That matters, because "key on baseline" sounds like a fix that orders correctly, and what is actually
+needed is a check that does not claim an order it cannot know.
+
+**Blast radius, measured over all 213 - which the earlier investigation did not establish:** 53 documents
+have a source sequence that differs between the two keys, but running both keys over every .txt,
+**exactly 1 verdict changes** (39, 21/22 to 22/22), **0 partner counts change**, and the failure set goes
+from 2 documents to 1. So the check-side change is corpus-safe.
+
+### The 1 pt white layer: settled - emitting it is RIGHT
+
+This was the open question, and it is answered by a counterfactual: **delete the invisible line from the
+.txt and t01 gets worse** - 97.4 to 95.1, lost words 8 to 15. The .txt checks' source side is glyph
+truth, which is what the page *draws*, and those white glyphs are drawn.
+
+The repo already says so in three places: `verify_google.py`'s `_visual_counts` docstring (a document with
+genuine white-on-white text "failed against ITSELF"), `:5997` ("Text that was already invisible ... is the
+document's own shape, and a faithful conversion reproduces it"), and
+`FINDINGS/04_chars_missing-25_invisible_text-TXBX-IS-RASTERISED-1750-agent.md`. The .docx already carries
+it faithfully as `<w:color w:val="FFFFFF"/><w:sz w:val="2"/>`.
+
+**And there is a corpus precedent that names the whole difference:**
+`text-held-twice-shadow-text` holds its text twice by design (white copy plus black copy) and **passes**
+t08 - because its two copies are offset by 0.2-0.35 pt, so their bbox tops differ. 39 is the same
+construct with a **zero** offset. That is the entire difference, and it is the check's key that cannot see
+it.
+
+**So: keep emitting invisible runs in both writers.** Making the .txt drop them would be a layer-policy
+change, not a writer fix - it would have to move the source side of t01/t03/t07 in the same commit, it
+costs t01 on this document, and it breaks the one-model-two-writers invariant that `ConvertOne` and
+`check-writer-independence.py` assert.
+
+### What remains genuinely unruled
+
+- No corpus document has a seal-centre word wider than, or poking out of, its ring - so containment's
+  behaviour on such a seal is untested, and nothing in the repo settles it.
+- Whether editing `verify_txt.py` for t08's key is permitted is a project decision. The precedent exists
+  (the sanctioned t12/t13 corrections with a corpus-wide restamp), but it is a decision.
+
 ## t06_encoding — real, but fixing it alone makes t01 and t12 worse
 
 127 U+FFFD in each account form, which are exactly the ligature inventory: ff 13, fi 89, ffi 23, ffl 2.
