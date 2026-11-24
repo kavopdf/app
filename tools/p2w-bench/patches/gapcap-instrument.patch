@@ -1,0 +1,75 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index f0439044..7e81a0a3 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -400,6 +400,25 @@ public final class DocxWriter {
+         return ctx.spendGaps ? GAP_CAP_SPEND_TW : GAP_CAP_TW;
+     }
+ 
++    /**
++     * The cap as an experiment can see it: {@code -Dp2w.gapcap=<twips>} overrides the non-spend
++     * ceiling so one build can be dosed across the corpus without a recompile per value.
++     *
++     * <p>An instrument, not a change: with no property set it returns exactly what
++     * {@link #gapCapTw} returns, so the default build is byte-identical in behaviour. It exists
++     * because the 120 pt ceiling decides whether body text is written as a paragraph or as an
++     * anchored DrawingML box, which Google rasterises - and that question needs a dose-response
++     * over 213 documents, not an opinion.
++     */
++    private static int gapCapTwEff(Ctx ctx) {
++        if (ctx.spendGaps) return GAP_CAP_SPEND_TW;
++        String v = System.getProperty("p2w.gapcap");
++        if (v != null && !v.isEmpty()) {
++            try { return Integer.parseInt(v.trim()); } catch (NumberFormatException e) { /* keep default */ }
++        }
++        return GAP_CAP_TW;
++    }
++
+     /**
+      * Charges one paragraph against the page's budget, and says how much of it may be used.
+      *
+@@ -3564,7 +3583,7 @@ public final class DocxWriter {
+             float edgeGap = topPt - ctx.afterTablePt;
+             placeTopPt = ctx.afterTablePt;
+             ctx.afterTablePt = -1f;
+-            if (edgeGap * TWIPS_PER_PT > gapCapTw(ctx)) {
++            if (edgeGap * TWIPS_PER_PT > gapCapTwEff(ctx)) {
+                 // Too far below the table to be a gap - a running footer on the last line of
+                 // the sheet. It is a position, so the row's fields are anchored where the page
+                 // drew them rather than spaced from the table's bottom edge.
+@@ -3590,7 +3609,7 @@ public final class DocxWriter {
+                 // gap was written as 120 pt - 152 pt short of the gap the page drew, and the
+                 // footer landed 130.6 pt above its own baseline. flowFromBox anchors the same
+                 // gap rather than truncating it.
+-                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)) {
++                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTwEff(ctx)) {
+                     ctx.positioned = true;
+                     for (PdfToWord.Box ab : cols) anchorBox(sb, p, ab, ctx);
+                     return;
+@@ -4446,7 +4465,7 @@ public final class DocxWriter {
+             // line where the page put it and keeps it as text. Anchoring it instead made a text
+             // box - not editable in Google Docs - and on brochure-3col-with-sidebar-box, whose
+             // columns hold more than one band, that turned 24 lines into text boxes.
+-            if (!ctx.inColumn && edgeGap * TWIPS_PER_PT > gapCapTw(ctx)) {
++            if (!ctx.inColumn && edgeGap * TWIPS_PER_PT > gapCapTwEff(ctx)) {
+                 // A footer 340 pt below the columns is not a gap the flow may spend, it is a
+                 // position - the rule the pitch branch below already applies. Spending what the
+                 // cap allows instead put 62's running footer 246 pt above the foot of the page.
+@@ -4483,7 +4502,7 @@ public final class DocxWriter {
+                 // what the page did, and from here on the page is placed rather than flowed.
+                 // Same rule inside a cell: a gap between two bands of the same column is space
+                 // the cell can hold, not a reason to float the line out of the text.
+-                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)) {
++                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTwEff(ctx)) {
+                     ctx.positioned = true;
+                     anchorBox(sb, p, b, ctx);
+                     return;
+@@ -4503,7 +4522,7 @@ public final class DocxWriter {
+         float absTop = b.y - LINE_BASE * linePt;
+         if (ctx.flowY >= 0f) {
+             absBeforeTw = (int) Math.max(0L,
+-                    Math.round(Math.min(absTop - ctx.flowY, gapCapTw(ctx) / TWIPS_PER_PT) * TWIPS_PER_PT));
++                    Math.round(Math.min(absTop - ctx.flowY, gapCapTwEff(ctx) / TWIPS_PER_PT) * TWIPS_PER_PT));
+         }
+         // ZERO-GAP MEASUREMENT. A gap is white space the flow spends going down, so it cannot
+         // be negative: when the page puts this line ABOVE where the flow already is, the gap
