@@ -31,6 +31,33 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 MARK = os.path.join(HERE, "GOOGLE-SAFE-MARK.json")
 
+# A CONSTRUCT THAT IS RENAMED KEEPS ITS MARK, OR THE GATE REFUSES EVERY COMMIT FOR A WHOLE RUN.
+#
+# MEASURED 24 Nov: commit fe15f40a renamed the "page-top" construct to "w:before-any" (the pattern
+# always matched any w:before; the label was the lie) and added the real page-top pattern as
+# "w:before-after-pagebreak". The mark still held the old key. The next scan found w:before-any in
+# 213 documents against a mark of 0 and refused the commit - and --mark could not repair it either,
+# because the mark may only fall and 213 > 0. That is a rename presented as a spread: the corpus did
+# not change, the label did. Carrier counts prove it, 213 before and 213 after.
+#
+# An alias is a statement about NAMES, not a way to raise a number: the count still has to fall from
+# where the old name was.
+RENAMED = {
+    "w:before-any": "w:before-page-top",
+}
+
+
+def _marked(was, key):
+    """The mark for this construct, following one rename. None when the mark never had it."""
+    c = (was or {}).get("carriers", {})
+    if key in c:
+        return c[key]
+    old = RENAMED.get(key)
+    if old and old in c:
+        return c[old]
+    return None
+
+
 # Every entry is a construct Google Docs does not honour, measured, with the finding that proves it.
 IGNORED = [
     ("w:framePr", "framePr",
@@ -234,8 +261,12 @@ def main(argv):
         if was:
             raised = []
             for k, v in carriers.items():
-                if v > was.get("carriers", {}).get(k, 0):
-                    raised.append("%s: %d now, the mark is %d" % (k, v, was.get("carriers", {}).get(k, 0)))
+                _was_k = _marked(was, k)
+                # A construct the mark never carried is not a rise from zero: it is a new
+                # measurement, and the first --mark records it. A construct whose old NAME it
+                # carried is compared against that name, so a rename cannot raise it.
+                if _was_k is not None and v > _was_k:
+                    raised.append("%s: %d now, the mark is %d" % (k, v, _was_k))
             if raised:
                 print()
                 print("  REFUSED - the mark may only fall, and this would raise it:")
@@ -265,9 +296,9 @@ def main(argv):
             return 3
         bad = []
         for k, v in carriers.items():
-            if v > was.get("carriers", {}).get(k, 0):
-                bad.append("%s: %d documents carry it, the mark is %d"
-                           % (k, v, was.get("carriers", {}).get(k, 0)))
+            _was_k = _marked(was, k)
+            if _was_k is not None and v > _was_k:
+                bad.append("%s: %d documents carry it, the mark is %d" % (k, v, _was_k))
         if bad:
             print()
             print("  REFUSED - a construct Google ignores has spread:")
