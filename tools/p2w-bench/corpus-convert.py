@@ -53,6 +53,10 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 # google_safe.py looks here first, so the cache and the gate agree without either being told twice.
 CACHE = "/scratch/work/p2w/out"
 STAMP = os.path.join(os.path.dirname(CACHE), ".stamp")
+# WHAT ENGINE THE DOCUMENTS ALREADY IN CACHE WERE CONVERTED BY. Without this a resumed build cannot tell
+# a document converted on THIS engine from one left behind by the engine before it, and would skip the
+# second kind as if it were the first - the cache equivalent of trusting a fossil.
+PROGRESS = os.path.join(os.path.dirname(CACHE), ".progress.json")
 
 # The build runs from tools/engine-verify and writes its classes to out/ there, so both the working
 # directory and this classpath are relative to THAT, not to the repo root. Measured by finding
@@ -188,7 +192,79 @@ def convert_one(args):
         return (name, False, time.time() - t0, "%s: %s" % (type(e).__name__, e))
 
 
-def build(jobs, quiet=False):
+def _docx_ok(path):
+    """Is this a document we may skip, or a corpse a killed worker left behind?
+
+    A call that hits the 290 s limit kills the JVM mid-write, so the output name can exist while the
+    file is truncated. "The name is on disk" is not evidence that the document was converted; a zip
+    that opens and holds word/document.xml is.
+    """
+    try:
+        if os.path.getsize(path) < 2048:
+            return False
+        import zipfile
+        with zipfile.ZipFile(path) as z:
+            return "word/document.xml" in z.namelist()
+    except Exception:
+        return False
+
+
+def _read_progress():
+    try:
+        return json.load(open(PROGRESS, encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _write_progress(engine):
+    try:
+        os.makedirs(os.path.dirname(PROGRESS), exist_ok=True)
+        json.dump({"engine": engine, "at": time.strftime("%Y-%m-%dT%H:%M:%S")},
+                  open(PROGRESS, "w", encoding="utf-8"), indent=1)
+    except Exception:
+        pass
+
+
+def convert_shard(args):
+    """One JVM, many documents. Returns [(name, ok, seconds, message)].
+
+    convert_one() gives every document its own JVM, which is right when the unit of work is a document
+    and wrong when it is the corpus: 213 start-ups is minutes of the budget spent before a page is read.
+    ConvertAll takes a directory and converts every PDF in it in one JVM, so the unit of work here is a
+    shard of BATCH documents.
+    """
+    srcs, out, cp, java = args
+    t0 = time.time()
+    shard = "/scratch/work/.cc-shard-%s" % str(abs(hash(tuple(sorted(srcs)))) % 100000)
+    try:
+        if os.path.isdir(shard):
+            shutil.rmtree(shard, ignore_errors=True)
+        os.makedirs(shard, exist_ok=True)
+        for src in srcs:
+            os.symlink(src, os.path.join(shard, os.path.basename(src)))
+        r = subprocess.run([java, "-cp", cp, "ConvertAll", shard, out],
+                           cwd=WORK, capture_output=True, text=True, timeout=280)
+        msg = ""
+        if r.returncode != 0:
+            msg = ((r.stdout or "")[-300:] + (r.stderr or "")[-300:]).strip()
+        res = []
+        for src in srcs:
+            name = os.path.basename(src)
+            docx = os.path.join(out, name[:-4] + ".docx")
+            good = _docx_ok(docx)
+            res.append((name, good, time.time() - t0,
+                        "" if good else (msg or "no .docx written")))
+        return res
+    except subprocess.TimeoutExpired:
+        return [(os.path.basename(s), False, time.time() - t0, "timed out after 280 s") for s in srcs]
+    except Exception as e:
+        return [(os.path.basename(s), False, time.time() - t0,
+                 "%s: %s" % (type(e).__name__, e)) for s in srcs]
+    finally:
+        shutil.rmtree(shard, ignore_errors=True)
+
+
+def build(jobs, quiet=False, batch=10):
     d = pdf_dir()
     if not d:
         print("  no corpus PDFs found in %s" % ", ".join(PDF_DIRS))
@@ -206,24 +282,51 @@ def build(jobs, quiet=False):
     except Exception:
         pass
 
+    # RESUME, BECAUSE A BUILD IS LONGER THAN ONE CALL. 213 documents at ~10.8 s is 19 minutes on this
+    # two-core pod and a bash call is 290 s, so a build that starts from zero can never finish inside a
+    # run: it was rebuilt from zero every time and every run ended with the "corpus could not be built"
+    # the gate refuses. A document already converted by THIS engine is not work, it is the progress the
+    # last call made. Anything left by a different engine is stale and is converted again.
+    eng = engine_now()
+    prog = _read_progress()
+    if prog.get("engine") != eng:
+        todo = list(pdfs)
+    else:
+        todo = [p for p in pdfs
+                if not _docx_ok(os.path.join(CACHE, os.path.basename(p)[:-4] + ".docx"))]
+    _write_progress(eng)
+    done = len(pdfs) - len(todo)
+    if done and not quiet:
+        print("    %d/%d already converted on engine %s - resuming" % (done, len(pdfs), eng))
+    if not todo:
+        write_stamp(eng, len(pdfs))
+        if not quiet:
+            print("  %d converted, nothing left to do - cached for engine %s" % (len(pdfs), eng))
+        return 0
+
     t0 = time.time()
-    # ONE TASK PER WORKER, NOT PER DOCUMENT. Each worker gets a slice of the corpus and converts it with
-    # a single ConvertAll, so JVM start-up is paid `jobs` times instead of `len(pdfs)` times.
-    n = max(1, min(jobs, len(pdfs)))
+    # ONE JVM PER SHARD, AND ONE SHARD AT A TIME PER WORKER. ConvertAll converts every PDF it is handed
+    # in a single JVM, so the unit of work is a shard of `batch` documents: 213 JVM start-ups cost more
+    # than the conversions they precede.
+    n = max(1, min(jobs, len(todo)))
     shards = [[] for _ in range(n)]
-    for i, p in enumerate(pdfs):
+    for i, p in enumerate(todo):
         shards[i % n].append(p)
-    work = [(p, CACHE, DEFAULT_CP, java) for sh in shards for p in sh]
-    ok = bad = 0
+    work = []
+    for sh in shards:
+        for i in range(0, len(sh), max(1, batch)):
+            work.append((sh[i:i + max(1, batch)], CACHE, DEFAULT_CP, java))
+    ok, bad = done, 0
     failures = []
     with cf.ProcessPoolExecutor(max_workers=n) as ex:
-        for name, good, secs, msg in ex.map(convert_one, work, chunksize=max(1, len(pdfs) // n)):
-            if good:
-                ok += 1
-            else:
-                bad += 1
-                failures.append((name, msg))
-            if not quiet and (ok + bad) % 25 == 0:
+        for res in ex.map(convert_shard, work, chunksize=1):
+            for name, good, secs, msg in res:
+                if good:
+                    ok += 1
+                else:
+                    bad += 1
+                    failures.append((name, msg))
+            if not quiet:
                 print("    %d/%d  %.0f s elapsed" % (ok + bad, len(pdfs), time.time() - t0))
 
     took = time.time() - t0
@@ -234,9 +337,9 @@ def build(jobs, quiet=False):
         print("  no stamp written - a partial corpus must not look like a whole one")
         return 1
 
-    write_stamp(engine_now(), ok)
+    write_stamp(eng, ok)
     print("  %d converted in %.1f min (%d workers) - cached for engine %s"
-          % (ok, took / 60, jobs, engine_now()))
+          % (ok, took / 60, jobs, eng))
     return 0
 
 
