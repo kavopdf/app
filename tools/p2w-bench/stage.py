@@ -186,7 +186,8 @@ def compute():
                 "next": "fix one class at a time; %d documents still fail a check" % len(bad)}
     return {"stage": "ship", "total": total, "measured": done,
             "scored": ok, "refused": refused, "failing": 0,
-            "next": "every document passes all 42 checks - nothing to ship unless a release is due"}
+            "next": "every document passes every check that applies to it - nothing to ship unless a "
+                        "release is due"}
 
 
 def main(argv):
