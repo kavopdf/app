@@ -3712,3 +3712,21 @@
 {"t": 1795485209.8660874, "ist": "07:23:29", "ev": "release", "d": "fixer released (forced)"}
 {"t": 1795485209.9545317, "ist": "07:23:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795485209.9698896, "ist": "07:23:29", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795487236.0059469, "ist": "07:57:16", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795487236.143245, "ist": "07:57:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795487249.6212275, "ist": "07:57:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795487250.2001677, "ist": "07:57:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795487253.0422711, "ist": "07:57:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795487255.3517072, "ist": "07:57:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795487286.576251, "ist": "07:58:06", "ev": "beat", "d": "deploying two agents"}
+{"t": 1795488025.1312983, "ist": "08:10:25", "ev": "beat", "d": "reading 18_displacement check code"}
+{"t": 1795488053.2326262, "ist": "08:10:53", "ev": "beat", "d": "fetching corpus"}
+{"t": 1795488068.2902176, "ist": "08:11:08", "ev": "beat", "d": "building engine"}
+{"t": 1795488130.8987942, "ist": "08:12:10", "ev": "beat", "d": "reading 60_text_column_right_edge"}
+{"t": 1795488156.8624272, "ist": "08:12:36", "ev": "beat", "d": "reading regress.py"}
+{"t": 1795488174.4886, "ist": "08:12:54", "ev": "beat", "d": "converting 6 docs on current engine"}
+{"t": 1795488245.4407067, "ist": "08:14:05", "ev": "beat", "d": "scoring 6 docs against LO proxy"}
+{"t": 1795488284.826851, "ist": "08:14:44", "ev": "beat", "d": "google round trip 302"}
+{"t": 1795488373.1002197, "ist": "08:16:13", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795488384.8092034, "ist": "08:16:24", "ev": "beat", "d": "writing findings"}
+{"t": 1795488442.3370442, "ist": "08:17:22", "ev": "beat", "d": "writing up the embedding result"}

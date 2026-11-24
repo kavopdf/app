@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-24 07:12
+# Fixer report - 2026-11-24 07:57
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 07:12 → 07:23 IST · 10 min**
+**24 Nov 2026 · slot 07:57 → running IST · 0 min**
 
-> **5 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **5** — 3 attempt(s), 2 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -22,15 +22,7 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 07:11 | **kept** | 2/5 | check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42 |
-| 07:12 | **kept** | 5/5 | all five single-check documents re-measured 42/42 in Google on this engine after the check fix |
-| 07:21 | **reverted** | 0/2 | A2's row declared one rule short is NOT LO-invariant: mobile-bill 104/112 lines moved up to -10.5 pt, electricity-bill 117/125 up to -10.0 pt; ruleTwHere is 10 tw not 15, and LibreOffice lays the decl |
+| Working on | `-` |
 
 ## The txt
 
@@ -51,21 +43,12 @@
 
 | | |
 |:--|:--|
-| Slot window | 07:12 → 07:23 · 10 min |
+| Slot window | 07:57 → running · 0 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
-| Longest silence | **4.1 min** — from 07:13:44, after `report.py: building the report` |
-| Silences over 2 min | 2 |
+| Tool beats | 2 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| fix - diagnose and change the engine | **2 min** | `#####` |
-| record - attempt, handoff, class rows | **2 min** | `####` |
-| report - the report and the chain | **5 min** | `############` |
 ## Best results this round
 
 | Document | Before | After | Change |
