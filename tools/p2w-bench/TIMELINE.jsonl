@@ -3585,3 +3585,18 @@
 {"t": 1795482416.776923, "ist": "06:36:56", "ev": "beat", "d": "proxy: patched side of the 8-document sample"}
 {"t": 1795482463.3585002, "ist": "06:37:43", "ev": "beat", "d": "proxy: last two documents of the sample, both sides"}
 {"t": 1795482510.6086454, "ist": "06:38:30", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795482513.6247182, "ist": "06:38:33", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795482513.691165, "ist": "06:38:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795482513.784569, "ist": "06:38:33", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795482517.1786737, "ist": "06:38:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482517.7045448, "ist": "06:38:37", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795482517.8084328, "ist": "06:38:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482518.230556, "ist": "06:38:38", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795482518.3578103, "ist": "06:38:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482518.5520499, "ist": "06:38:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795482518.655398, "ist": "06:38:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482519.0798366, "ist": "06:38:39", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795482519.1968462, "ist": "06:38:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482524.2609577, "ist": "06:38:44", "ev": "beat", "d": "attempt 3: the 41-row x 6-table document, both sides"}
+{"t": 1795482561.9597318, "ist": "06:39:21", "ev": "beat", "d": "attempt 3: the 41-row x 6-table document, patched side"}
+{"t": 1795482601.0577962, "ist": "06:40:01", "ev": "beat", "d": "attempt.py: recording an attempt"}
