@@ -1279,6 +1279,12 @@ def run(end):
         got=prerender(grp,end)
         if got: log(f"prerender {got} docx in soffice batches of {CHUNK}")
         for b in grp:
+            # NEVER START A DOCUMENT YOU CANNOT FINISH. `if time.time()>=end: break` fires only once the
+            # deadline has already passed, and measure_doc_chunked is then given max(30, ...) seconds - so a
+            # document begun 5 s before the deadline runs 30 s past it. Measured 24 Nov: --budget 170 was
+            # killed at 290 s. A guard that stops STARTING work 25 s early is what makes the budget a budget.
+            if time.time() >= end - 25:
+                break
             if time.time()>=end: break
             jf=f"{DIST}/{b}.json"
             if os.path.exists(jf): continue

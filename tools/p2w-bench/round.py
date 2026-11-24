@@ -566,14 +566,29 @@ def claim(name):
         mine = s.get(key)
         sh("git fetch -q origin main", timeout=120)
         other = _remote_json().get("%s_started" % name)
+        # A CLAIM THAT NEVER BEATS IS NOT A LIVE RUN. fixer_started alone kept a claim reading busy for
+        # the full window even when the run had died on its first call. Measured 24 Nov: a claim at
+        # 20:24:41 from another sandbox whose beacon never advanced past 19:53:40 read as alive for 45
+        # minutes. The beat is the activity; the claim is only an intention. When a beat exists, it is
+        # what decides - a stale beat means dead, whatever the start time says.
+        _other_beat = _remote_json().get('%s_last_beat' % name)
+        _act = claim_age_min(_other_beat) if _other_beat else claim_age_min(other)
         if (other and other != mine and claim_age_min(other) is not None
-                and claim_age_min(other) < limit):
+                and _act is not None and _act < limit):
             print("%s busy - another run claimed and pushed first (%s). Standing down."
                   % (name, _remote_json().get("%s_doing" % name) or "no detail"))
             return 1
         # NO RIVAL - so the claim has to actually reach origin, or it is not a claim. The old code
         # printed "claimed at HH:MM" after a rejected push, which told the run it held a slot that
         # the other fixer could not see. Two runs then edited the engine at once.
+        # A DIRTY TREE IS THE NORMAL STATE HERE, NOT AN ERROR. Every tool in this directory writes
+        # ROUND.json and RUN.json, so `git pull --rebase` refuses exactly when a run is working. The
+        # 19:59 slot was refused this way: "--claim-fixer refused because RUN.json / ROUND.json were
+        # dirty from the run's own heartbeat and git pull --rebase will not run on a dirty tree".
+        # Commit the state files first, then the rebase has nothing to complain about.
+        sh("git add tools/p2w-bench/ROUND.json tools/p2w-bench/RUN.json 2>/dev/null", timeout=60)
+        sh("git -c user.email=320240581+Onyx-Node@users.noreply.github.com -c user.name=Onyx-Node "
+           "commit -q -m 'claim: %s' 2>/dev/null" % name, timeout=90)
         r = sh("git pull -q --rebase origin main && git push -q origin main", timeout=180)
         if r[0] != 0:
             print("%s - the claim never reached origin (%s). Standing down rather than working a "
