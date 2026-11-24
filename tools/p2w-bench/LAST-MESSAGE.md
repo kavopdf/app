@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 08:57 → running IST · 20 min**
+**24 Nov 2026 · slot 08:57 → 09:19 IST · 21 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -35,7 +35,7 @@
 
 | | |
 |:--|:--|
-| Measured | **20 min ago** |
+| Measured | **22 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -50,11 +50,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 08:57 → running · 20 min |
+| Slot window | 08:57 → 09:19 · 21 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 17 |
-| Longest silence | **5.0 min** — from 09:07:46, after `screen pass 2` |
-| Silences over 2 min | 4 |
+| Tool beats | 4 |
+| Longest silence | **4.5 min** — from 09:14:15, after `lastmessage.py: running a tool for its numbers` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 5 parked, with the evidence to re-open them |
 | Still a wall | 74_balance_sheet_indented_subitems scores 41/42 in Google on an older engine and the result was never committe |
 
@@ -63,9 +63,7 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `######` |
-| record - attempt, handoff, class rows | **3 min** | `####` |
-| other - not attributed to a tool | **11 min** | `############` |
+| other - not attributed to a tool | **10 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -78,7 +76,7 @@
 
 ## Next run
 
-NEXT RUN: (1) THE PREVIOUS PAIR IS REFUTED - do not spend a slot on it. content+rule==pitch and hRule=atLeast make a trHeight-only change a no-op, and a cell-level gap escapes fitPage/shaveToFit (FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md). (2) The class is two disjoint halves: a spacer half (the step at each table top = 0.784 x the declared w:line of an unspendable spacer, confirmed on 4 of 4 documents) and a row half (+0.75 pt per row, 21.75 pt over 362_price_list_dense's 29 rows). (3) FIRST MOVE: one Google round trip on 362_price_list_dense with trHeight = max(content, line-15) on rows where line > content only - LO-invariant by construction, and it tells you whether Google lays trHeight+rule or max(trHeight, content+rule). (4) The 4 ratchet rows need one corpus pass (~40 min) - start the slot with it, do not end with it. (5) The 9 REOPEN rows in PENDING-AUDIT.md are decisions with evidence attached.
+18_displacement: APPLY tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, then START the slot with the 212-document pass (p2w.py --force --budget 250, repeat) - that pass is the whole cost. It is measured: 362_price_list_dense 41/42 -> 42/42 in Google, electricity-bill and 330_cad_drawing_sheet byte-identical. Do NOT re-run the trHeight=max(content,line-15) probe - it is refuted and the guard makes it unnecessary. After the pass: regress.py --check, --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. Then check the 9 documents named in FINDINGS/18_displacement-UNIFORM-PITCH-GUARD-GOOGLE-42of42-0450-fixer.md for a uniform pitch.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
