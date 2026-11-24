@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 04:23 → running IST · 1 min**
+**25 Nov 2026 · slot 04:23 → 04:29 IST · 6 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - subagents: 2 deployed vs no FINDINGS file for 25_iinvisible-te |
+| Self-check | **every field agrees with its second source** |
 | Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -36,7 +36,7 @@
 
 | | |
 |:--|:--|
-| Measured | **1.5 h ago** |
+| Measured | **1.6 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -53,10 +53,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 04:23 → running · 1 min |
+| Slot window | 04:23 → 04:29 · 6 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 12 |
-| Silences over 2 min | 0 |
+| Tool beats | 18 |
+| Longest silence | **4.8 min** — from 04:24:22, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -64,7 +65,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| other - not attributed to a tool | **0 min** | `######################` |
+| record - attempt, handoff, class rows | **0 min** | `###` |
+| report - the report and the chain | **5 min** | `#################` |
+| other - not attributed to a tool | **0 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
