@@ -164,7 +164,7 @@ def _done():
         # `git log --format=%h` prints 7 characters in a repository that has never needed 8 and 8
         # once a collision forces it - and the machine that wrote the committed results printed 7.
         # A plain string compare therefore matched NOTHING: measured 22 Nov, `--report` said
-        # "21 verified | 0 pass all 42 | 0 fail at least one" while 192 documents were scored and
+        # "21 verified | 0 pass every check offered | 0 fail at least one" while 192 documents were scored and
         # 6 passed all 42. An instrument that reports zero is not a quiet instrument, it is a wrong
         # one, and it was one character away from being believed.
         _e = d.get("engine") or ""
@@ -477,8 +477,8 @@ def matrix():
         return 2
     print("# Google Docs vs LibreOffice - the 42 checks, %d documents, same engine\n" % both)
     print("Same source PDF, same .docx, same instrument. Only the renderer differs.\n")
-    print("    LibreOffice : %d of %d pass all 42" % (lpass, both))
-    print("    Google Docs : %d of %d pass all 42\n" % (gpass, both))
+    print("    LibreOffice : %d of %d pass every check offered" % (lpass, both))
+    print("    Google Docs : %d of %d pass every check offered\n" % (gpass, both))
     print("## Where they disagree\n")
     print("| check | LibreOffice fails | Google fails | who is stricter |")
     print("|---|---:|---:|---|")
@@ -528,7 +528,7 @@ def report():
             partial.append(n)
         else:
             full.append(n)
-    print("  %d verified | %d pass all 42 | %d fail at least one | %d refused (page count)"
+    print("  %d verified | %d pass every check offered | %d fail at least one | %d refused (page count)"
           % (len(done), len(full), len(partial), len(refused)))
     print()
     if fails:
