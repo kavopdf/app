@@ -1,34 +1,29 @@
-# P2W Google Verify - Run Report
+# Google verify - run report
 
-**24 Nov 2026 · 21:47 IST · stage classify**
+**Stage: `classify`.** All 213 documents now have a Google result: 191 scored, 22 refused on page count. stage.py's next line is "classify 155 failing documents - the table is older than the results", so this run measured nothing. Its remaining job was the capability table, and that is what it wrote.
 
-> 191 of 213 measured in Google, 22 refused on page count. Google passes every check on 36; LibreOffice on 125 of the same 191.
+**The pair, from `gverify.py --matrix`** - same source PDF, same .docx, same instrument, only the renderer differs:
 
-This run's stage was classify, so it did no measuring. It regenerated the capability table from the committed results and pushed it: the table had been one result stale, and it now matches the corpus. The classifier cron takes it from here.
+| renderer | pass every check offered |
+|---|---:|
+| Google Docs | 36 of 191 |
+| LibreOffice | 125 of 191 |
 
-| checks applied | **42, 44, 47 (mixed - a document is clean only against its own set)** |
-| measured against the current set | **62 of 191** |
-## Measured
+**What landed.** `benchmarks/GOOGLE-VS-LIBREOFFICE.md` regenerated verbatim from `gverify.py --matrix` and committed. No number in it changed - the diff is row order only, because the previous copy had been hand-sorted.
 
-| | |
-|:--|--:|
-| scored | **191** |
-| refused on page count | **22** |
-| clean in Google | **36** |
-| passes in LibreOffice (proxy, not the renderer the user opens) | **125** |
+**Where Google is the stricter renderer** - top rows of `gverify.py --report`:
 
-## Checks Google fails and LibreOffice does not
+| check | Google fails | LibreOffice fails |
+|---|---:|---:|
+| `18\_displacement` | 103 | 20 |
+| `04\_chars\_missing` | 64 | 2 |
+| `60\_text\_column\_right\_edge` | 56 | 18 |
+| `59\_shape\_anchor` | 45 | 9 |
+| `25\_invisible\_text` | 43 | 0 |
+| `44\_header\_footer` | 29 | 0 |
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `18\_displacement` | **103** | 20 |
-| `04\_chars\_missing` | **64** | 2 |
-| `25\_invisible\_text` | **43** | 0 |
-| `60\_text\_column\_right\_edge` | **56** | 18 |
-| `59\_shape\_anchor` | **45** | 9 |
-| `45\_char\_accuracy` | **38** | 2 |
-| `13\_text\_colours` | **32** | 1 |
-| `44\_header\_footer` | **29** | 0 |
+`32\_stroke_lines` is 9 in Google against 1 in LibreOffice and `05\_chars\_extra` is 5 against 3 - both are the floating drawing whose shape Google drops and whose anchor it keeps, already recorded in `FINDINGS/`.
 
-The first row is the class to take: `18\_displacement`, 103 documents in Google against 20 in LibreOffice.
+**The counts, quoted.** `gverify.py --report`: 209 verified | 36 pass every check offered | 151 fail at least one | 22 refused (page count). stage.py counts 155 failing from every result on disk; the difference of 4 is results whose stamp `--report` will not accept as current.
 
+**Next.** Classify those failing documents - `benchmarks/DEFECT-CLASSES-GOOGLE.md` is older than the results, which is the classifier's slot. No engine code was touched and no Drive file was created this run.
