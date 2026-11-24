@@ -1,22 +1,5 @@
 [
  {
-  "started_ts": 1795297445.0,
-  "started": "03:14",
-  "ended_ts": 1795300302.461052,
-  "ended": "(never)",
-  "class": "32_stroke_lines",
-  "attempts": 2,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   "Drawing XML discriminator (general-purpose, 5.5 min): compared word/document.xml of 51_two_cm_margins against documents Google fails 32_stroke_lines on. Negative result: no attribute separates them; 51 passes vacuously (0 isolated source rules). 45 scored docs have 0 isolated rules and all 45 pass; 147 have >=1 and 145 fail.",
-   "Carrier collateral checks (general-purpose, 4.8 min): read verify_google.py and named the checks a correctly placed border can newly fail - 46_text_crossing_rule plus 18/59/60/61/62/63/47 conditional. None fired on the two documents measured."
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "started_ts": 1795301334.0620563,
   "started": "04:18",
   "ended_ts": null,
@@ -1043,5 +1026,16 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "11:54",
+  "started_ts": 1795501449.2066798,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]

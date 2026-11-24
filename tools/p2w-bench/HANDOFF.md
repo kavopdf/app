@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 10:00 |
-| ended | 11:27 |
-| how it ended | forced |
+| started | 11:54 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -66,7 +66,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `02:37` agent landed: 18_dA-03 /  -> PENDING-AUDIT.md
 - `02:37` agent landed: 18_dB-01 /  -> 18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md
 - `03:30` attempt 44 on 18_displacement -> lead
 - `04:38` agent deployed: 18_displacement / A - what is settled, refuted and left as a patch on this class
@@ -91,6 +90,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `08:20` agent deployed: 60_text_column_right_edge / B - is 60 or 18 reading the paper instead of the defect - the 25_invisible_text prec
 - `09:17` attempt 51 on 18_displacement -> lead (1/10 moved)
 - `11:23` attempt 52 on 18_displacement -> lead (0/200 moved)
+- `13:04` attempt 53 on 18_displacement -> lead (0/129 moved)
 
 ## Where the rest of the state lives
 
