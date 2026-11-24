@@ -178,3 +178,4 @@
 {"at": "2026-11-24 18:28", "attempt": 8, "class": "00_page_count", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-24 18:30", "attempt": 9, "class": "00_page_count", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-24 18:34", "attempt": 5, "class": "60_text_column_right_edge", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-24 19:53", "attempt": 3, "class": "04_chars_missing", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
