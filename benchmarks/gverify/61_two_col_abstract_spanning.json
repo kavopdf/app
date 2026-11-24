@@ -1,19 +1,18 @@
 {
  "name": "61_two_col_abstract_spanning",
  "status": "ok",
- "rc": 1,
- "passed": 40,
+ "rc": 0,
+ "at": "2026-11-24T15:12:39",
+ "passed": 42,
  "total": 42,
- "failed": [
-  "04_chars_missing",
-  "44_header_footer"
- ],
+ "failed": [],
  "displacement": {
   "med_dy": 0.7,
   "worst_dy": 1.0,
   "med_dx": -0.1,
   "bad_pages": [],
-  "runs_matched": 37
+  "runs_matched": 39
  },
- "engine": "b7699196"
+ "engine": "b7699196",
+ "checks": "369550-1795531302"
 }

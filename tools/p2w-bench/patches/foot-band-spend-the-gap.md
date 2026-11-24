@@ -1,6 +1,9 @@
 # foot-band: spend the gap instead of anchoring a floating text box
 
-**Status: PROVED on the construct, NOT measured in Google. Apply, then measure Google.**
+**Status: MEASURED IN GOOGLE on two documents - `27_two_column_left_short_txtpos` 40/42 -> 42/42
+(one-site variant) and `61_two_col_abstract_spanning` 40/42 -> 42/42 (this four-site patch, 24 Nov).
+NOT LANDED: an engine change needs the full 213-document restamp (~54 min) before
+`regress.py --check` will pass. See FINDINGS/FOOTBAND-FOUR-SITES-61-IS-CLEAN-24NOV.md.**
 
 ## The construct
 
