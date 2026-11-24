@@ -494,6 +494,19 @@ def decide():
 
 def main(argv):
     if "--leverage" in argv:
+        # THE GATE MUST REACH THIS PATH TOO. decide() refuses a class while pending work is open, but
+        # --leverage is a separate branch that never calls decide(), so a run that reads the leverage
+        # table sees a ranked list and picks from it without ever being told the gate is shut. The 04:52
+        # run did exactly that: classpick exited 3 with "PENDING FIRST: 18 item(s)" on the plain path,
+        # and the run went to 18_displacement anyway because it had read --leverage instead.
+        _np, _nd, _nw = _pending()
+        if _np > 0:
+            print("refused: PENDING FIRST: %d item(s) you can close - take them in the order "
+                  "pending.py gives before any new class. (%d more need a decision and do not block "
+                  "you.) %s" % (_np, _nd, _nw))
+            print("")
+            print("The leverage table below is what each check is WORTH, not permission to take one.")
+            print("")
         # WHAT EACH CHECK IS WORTH IN CLEAN DOCUMENTS.
         #
         # "Documents affected" is the metric the table ranks by, and it is the wrong one: fixing
@@ -535,7 +548,7 @@ def main(argv):
             print()
             print("  Checks that always travel together are ONE CONSTRUCT. One fix clears all of them;")
             print("  fixing one of five has done a fifth of the work.")
-        return 0
+        return 3 if _np > 0 else 0   # same exit code the plain path uses when the gate is shut
 
     # IT ADVISES. IT DOES NOT DECIDE.
     #
