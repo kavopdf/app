@@ -295,6 +295,31 @@ def collect():
                                       % _ga,
                               "why": "actionable - `python3 tools/p2w-bench/gverify.py --plan 60`"})
 
+    # 6. THE SAME WALL WRITTEN DOWN AGAIN AND AGAIN. The watchdog's prompt tells it, every run, to write
+    # "this watchdog has no cron tool" into BLOCKERS.md with the call it would have made. Twenty-six copies
+    # accumulated, and the queue read as 26 problems when it was one. The prompt cannot be edited from here
+    # (no cron tool), so the collapse happens where the list is built: identical `what` text becomes one
+    # row carrying how many times it was recorded and the span of dates.
+    _by = {}
+    _out = []
+    for it in items:
+        key = (it.get("kind"), " ".join(str(it.get("what") or "").split())[:120])
+        if it.get("kind") in ("blocker",) and key in _by:
+            first = _by[key]
+            first["_n"] = first.get("_n", 1) + 1
+            first["_span"] = (first.get("_span") or [str(it.get("who"))]) + [str(it.get("who"))]
+            continue
+        _by[key] = it
+        _out.append(it)
+    for it in _out:
+        if it.get("_n", 1) > 1:
+            _w = sorted(set(it.get("_span") or []))
+            it["who"] = "%s  (recorded %d times, %s to %s)" % (
+                it.get("who"), it["_n"], _w[0][:10], _w[-1][:10])
+            it.pop("_span", None)
+        it.pop("_n", None)
+    items = _out
+
     return items
 
 

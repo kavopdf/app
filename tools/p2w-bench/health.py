@@ -172,6 +172,33 @@ def _count(d):
 
 
 def _corpus_total():
+    """Every document that exists - NOT every row of RANKING.csv.
+
+    The ranking has 212 rows because 416_many_tiny_pages is exempt from the round-one baseline and so
+    is absent from it, while still being a document. Counting rows printed "corpus: 212 documents" and
+    then "measure-google done 213 of 212" - a stage that measured more documents than the corpus was
+    said to contain. The watchdog reported that impossible line, and lastmessage.py passed it because
+    213 and 212 both appear in the tool output.
+
+    The corpus is what gverify saw: scored + page-count-refused. The ranking row count is the fallback
+    for when gverify has not run. Same rule as report.py's corpus().
+    """
+    try:
+        import glob as _g
+        scored = refused = 0
+        for f in _g.glob(os.path.join(HERE, "..", "..", "benchmarks", "gverify", "*.json")):
+            try:
+                j = json.load(open(f, encoding="utf-8"))
+            except Exception:
+                continue
+            if j.get("status") == "page_count_refused":
+                refused += 1
+            else:
+                scored += 1
+        if scored + refused:
+            return scored + refused
+    except Exception:
+        pass
     try:
         with open(RANK, encoding="utf-8") as f:
             return len([r for r in csv.DictReader(f) if r.get("document")])
