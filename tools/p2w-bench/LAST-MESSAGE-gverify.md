@@ -1,21 +1,23 @@
 # P2W Google Verify - Run Report
 
-**24 Nov 2026 · stage classify · both renderers**
+**24 Nov 2026 · 13:30 IST · stage classify**
 
-> 190 of 213 documents scored in Google, 23 refused on page count. Google passes every check on 35 of them; LibreOffice passes on 124 of the same 190.
+> 190 of 213 scored in Google, 23 refused on page count. Google passes every check on 35 of the 190, LibreOffice on 124 of the same 190. This run regenerated the capability table and committed it; not one count moved.
 
 ## Measured
 
 | | |
 |:--|--:|
-| scored | **190** |
+| scored in Google | **190** |
 | refused on page count | **23** |
-| clean in Google | **35** |
-| clean in LibreOffice | **124** |
+| pass all 42 checks - Google | **35** |
+| pass all 42 checks - LibreOffice | **124** |
+| fail at least one check | **151** |
+| scored, but on an older engine stamp | **4** |
 
-## Where the two renderers disagree
+## Where Google fails a check and LibreOffice passes it
 
-| check | Google fails | LibreOffice fails |
+| check | Google | LibreOffice |
 |:--|--:|--:|
 | `18\_displacement` | **102** | 20 |
 | `04\_chars\_missing` | **65** | 2 |
@@ -26,16 +28,18 @@
 | `13\_text\_colours` | **32** | 1 |
 | `44\_header\_footer` | **30** | 0 |
 
-Every check Google fails and LibreOffice passes is a construct LibreOffice honours and Google does not. Two are already known and were not re-derived: `32\_stroke\_lines` (a rule emitted as a floating drawing - Google drops the shape and keeps the anchor) and `05\_chars\_extra` (the same anchor, counted as a character).
+Every row is a construct LibreOffice honours and Google does not. Two were settled earlier and were not re-derived: `32\_stroke\_lines` (a rule emitted as a floating drawing - Google drops the shape, keeps the anchor) and `05\_chars\_extra` (the same anchor counted as a character).
+
+## What this run did
+
+Regenerated `benchmarks/GOOGLE-VS-LIBREOFFICE.md` from `gverify.py --matrix` and committed it as `27bb458b`. Parsed both the old and the new file row by row: the same 34 check rows, the same 190 documents, and no row differs in either count column. The only difference is the order of rows where the two renderers fail equally - `--matrix` resolves those ties by iteration order, so two consecutive runs on identical results produce two different files. Recorded in `BLOCKERS.md` so the churn is not mistaken for movement.
 
 ## Stage
 
-`stage.py` says **classify**, so this cron's measuring work is done and it stops here. The capability table `benchmarks/GOOGLE-VS-LIBREOFFICE.md` was regenerated from `gverify.py --matrix` and committed this run; its counts are identical to the copy it replaced - the only difference was the order of rows where the two renderers fail equally.
+`stage.py` says **classify**, so this cron's measuring work is done and it stops here. Its next line reads: classify 155 failing documents.
 
-Next is the classifier cron: group the failing documents into classes in `DEFECT-CLASSES-GOOGLE.md`. Until that file's commit is newer than the results, the stage stays `classify`.
+The stage cannot advance from this side. Its exit condition is `benchmarks/DEFECT-CLASSES-GOOGLE.md` committed later than the Google results, and that file belongs to the classifier cron, whose own gate (`round.py --phase`) answers `fix` this run - so the classifier stops before writing it. The fixer is working, so the pipeline is moving; only this label is pinned. Until that file is rewritten, every gverify slot in classify regenerates a table whose counts cannot change.
 
-## One caveat this run found
-
-209 of 213 carry the current engine stamp, not 213. 4 of the 190 scored results measure a previous engine: `15\_stamp\_on\_scanned\_page`, `magazine-2col-pullquote-spanning`, `newspaper-2col-fullwidth-headline` and `very-long-single-column-table`. `stage.py` counts them as measured; `gverify.py --plan` would not, but it cannot run in this slot - it lists documents from a corpus directory that no run of this cron builds, and it exits on `FileNotFoundError` for it. All 4 already fail, so the table's shape does not depend on them, but their rows are not current. Recorded in `BLOCKERS.md` with what would clear it: one corpus pass, then `--collect` on those four names.
+The 4 stale results - `15_stamp_on_scanned_page`, `magazine-2col-pullquote-spanning`, `newspaper-2col-fullwidth-headline`, `very-long-single-column-table` - are still on an older engine stamp and still count as measured in `stage.py`. Clearing them needs the corpus converted with the current engine, which this slot cannot do: it has `soffice` but no `java`, and `gverify.py --plan` dies on the missing `/scratch/work/p2w/out`. They all fail already, so the table's shape does not rest on them.
 
 No engine code was touched this run.
