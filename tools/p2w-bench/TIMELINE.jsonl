@@ -3930,3 +3930,7 @@
 {"t": 1795508513.5850227, "ist": "13:51:53", "ev": "beat", "d": "relay: proving the phase-budget split - one chunk must both convert and measure"}
 {"t": 1795508882.173629, "ist": "13:58:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795508942.0543756, "ist": "13:59:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795508946.8744693, "ist": "13:59:06", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795508947.0411212, "ist": "13:59:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795508947.1882665, "ist": "13:59:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795508947.7577987, "ist": "13:59:07", "ev": "beat", "d": "classrow.py: refreshing the class file"}
