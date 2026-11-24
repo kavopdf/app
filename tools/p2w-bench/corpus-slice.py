@@ -46,6 +46,8 @@ _spec.loader.exec_module(cc)
 
 def missing():
     d = cc.pdf_dir()
+    _st = cc.read_stamp()
+    _fresh = bool(_st) and _st.get('engine') == cc.engine_now()
     if not d:
         return None
     out = []
@@ -53,7 +55,12 @@ def missing():
         if not f.endswith(".pdf"):
             continue
         stem = f[:-4]
-        if not os.path.exists(os.path.join(cc.CACHE, stem + ".docx")):
+        # # A .docx ON DISK IS NOT A .docx FROM THIS ENGINE. Skipping on existence alone is right on an
+        # # empty cache and wrong the moment the engine moves: the old bytes stay, the corpus becomes a
+        # # mix of two engines, and every measurement after it is against the wrong file. The stamp is the
+        # # only thing that says which engine the bytes came from, so a stamp for a different engine means
+        # # nothing on disk may be trusted.
+        if not (_fresh and os.path.exists(os.path.join(cc.CACHE, stem + '.docx'))):
             out.append(os.path.join(d, f))
     return out
 
