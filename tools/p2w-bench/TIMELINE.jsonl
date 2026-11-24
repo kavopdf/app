@@ -4388,3 +4388,7 @@
 {"t": 1795509480.8890533, "ist": "14:08:00", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795509481.0496955, "ist": "14:08:01", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795509482.3261497, "ist": "14:08:02", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795510227.2693527, "ist": "14:20:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795510238.149593, "ist": "14:20:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795510242.5992231, "ist": "14:20:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795510250.7496874, "ist": "14:20:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
