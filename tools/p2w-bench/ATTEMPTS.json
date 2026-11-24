@@ -91,7 +91,7 @@
   "status": "OPEN"
  },
  "04_chars_missing": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": null,
   "history": [
    {
@@ -107,6 +107,13 @@
     "outcome": "lead",
     "reason": "anchored-text-box census: the 120 pt cap is 16% of the box text and the pagepos cascade 17%; spending every gap removes 15.9% but displaces 3 documents worse, and no document has 04/45 as its only fai",
     "total": null
+   },
+   {
+    "at": "2026-11-24 19:53",
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "the anchored-text-box patch is written and measured, not applied: 381 -> 6 anchored boxes on 8 documents (-98.4%), character multiset identical (041122 42,319 -> 42,319, nothing lost). Not landed beca",
+    "total": null
    }
   ],
   "last": null,
@@ -115,12 +122,14 @@
   "last_total": 5,
   "outcomes": [
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "anchored-text-box census: the 120 pt cap is 16% of the box text and the pagepos cascade 17%; spending every gap removes 15.9% but displaces 3 documents worse, and no document has 04/45 as its only failure, so emptying boxes would clean ZERO documents today. Recorded in FINDINGS/ANCHORED-BOX-CENSUS-CAP-IS-16PCT-24NOV.md",
+  "reason": "the anchored-text-box patch is written and measured, not applied: 381 -> 6 anchored boxes on 8 documents (-98.4%), character multiset identical (041122 42,319 -> 42,319, nothing lost). Not landed because the slot went to the cold-pod wall first (no corpus, no JDK, no compiled engine, so the pre-commit gate refused every commit including the claim). The next run's first measurement is DISPLACEMENT on the 23 changed documents, not page count: the census already measured page counts changing on 0 of 23 and names displacement as the refuter (330_cad_drawing_sheet 3.14 -> 16.77 pt median).",
   "reasons": [
    "txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - the proxy is blind to this class in both directions; patch saved to patches/foot-band-spend-the-gap.patch, Google render is the next run's measurement",
-   "anchored-text-box census: the 120 pt cap is 16% of the box text and the pagepos cascade 17%; spending every gap removes 15.9% but displaces 3 documents worse, and no document has 04/45 as its only failure, so emptying boxes would clean ZERO documents today. Recorded in FINDINGS/ANCHORED-BOX-CENSUS-CAP-IS-16PCT-24NOV.md"
+   "anchored-text-box census: the 120 pt cap is 16% of the box text and the pagepos cascade 17%; spending every gap removes 15.9% but displaces 3 documents worse, and no document has 04/45 as its only failure, so emptying boxes would clean ZERO documents today. Recorded in FINDINGS/ANCHORED-BOX-CENSUS-CAP-IS-16PCT-24NOV.md",
+   "the anchored-text-box patch is written and measured, not applied: 381 -> 6 anchored boxes on 8 documents (-98.4%), character multiset identical (041122 42,319 -> 42,319, nothing lost). Not landed because the slot went to the cold-pod wall first (no corpus, no JDK, no compiled engine, so the pre-commit gate refused every commit including the claim). The next run's first measurement is DISPLACEMENT on the 23 changed documents, not page count: the census already measured page counts changing on 0 of 23 and names displacement as the refuter (330_cad_drawing_sheet 3.14 -> 16.77 pt median)."
   ],
   "requeues": 0,
   "status": "OPEN"
