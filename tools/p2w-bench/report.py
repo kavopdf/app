@@ -1240,10 +1240,20 @@ def main(argv):
         _gsc = co.get("google_scored_current", 0)
         _gs = co.get("google_scored", 0)
         _to_go = max(0, _gs - _gsc)
-        L.append("| **Fixed - Google, every applicable check** | **%d** of the **%d** re-measured on this "
-                 "engine - **%d** of the %d scored are still on an older engine, and **%d** of those "
-                 "were clean on the engine they were measured with |"
-                 % (_gfc, _gsc, _to_go, _gs, max(0, co.get("google_fixed", 0) - _gfc)))
+        # A TRANSIENT FAILURE IS NOT A ZERO. google_fixed() raised once on 24 Nov and the except
+        # above turned it into "0 of the 0 re-measured ... 190 of the 190 scored are still on an
+        # older engine" - a confident sentence with a denominator of zero, when the store held 186
+        # of 190 current. Zero current out of N scored is a failed read, not a measurement.
+        if _gsc == 0 and _gs > 0:
+            L.append("| **Fixed - Google, every applicable check** | **could not be read** - 0 of %d "
+                     "scored were read as current, which is a failed read and not a measurement. "
+                     "No count is stated rather than a zero |" % _gs)
+            L.append("| Who re-measures them | the **:20 gverify** cron, once the read works |")
+        else:
+            L.append("| **Fixed - Google, every applicable check** | **%d** of the **%d** re-measured on this "
+                     "engine - **%d** of the %d scored are still on an older engine, and **%d** of those "
+                     "were clean on the engine they were measured with |"
+                     % (_gfc, _gsc, _to_go, _gs, max(0, co.get("google_fixed", 0) - _gfc)))
         if _to_go:
             L.append("| Who re-measures them | the **:20 gverify** cron, up to %d documents a run "
                      "- about **%d** run(s) for the %d outstanding. Until then \"fixed\" means "
