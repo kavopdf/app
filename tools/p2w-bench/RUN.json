@@ -2,9 +2,10 @@
  "agents": [
   "gap--01",
   "zero-01",
-  "Goog-01"
+  "Goog-01",
+  "band-01"
  ],
- "attempts": 7,
+ "attempts": 8,
  "class": "04_chars_missing",
  "docs_improved": 0,
  "ended": "02:01",

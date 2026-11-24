@@ -26,17 +26,16 @@ unfinished work, not as a result.
 
 ## The picture, in the words of the run that left it
 
-> 04_chars_missing: PROVEN IN GOOGLE. spendWideGap() (FINDINGS/04_chars_missing-GAPCAP-PATCH-0225-agent.patch) with FOOT_BAND=0.0f and -Dp2w.pagepos=0 -Dp2w.anchorkeep=0 -Dp2w.zganchor=false takes 69_two_col_legal_numbered_clauses from 36 anchored boxes/1358 chars to 0/0 and the Google render from 35/42 to 39/42: 04_chars_missing, 45_char_accuracy, 13_text_colours, 44_header_footer, 17_matched_runs, 10_font_sizes and 38_list_markers all PASS. The price is 26_text_overlap render=11 and new 18_displacement + 60_text_column_right_edge. Engine reverted, nothing committed to it. The foot-band guard (0.90) is why the patch was a no-op before: this document's signature block sits mid-page.
+> 04_chars_missing, PROVEN IN GOOGLE. spendWideGap() + -Dp2w.pagepos=0 -Dp2w.anchorkeep=0 -Dp2w.zganchor=false takes 69_two_col_legal_numbered_clauses 36 boxes/1358 chars -> 0/0 and 35/42 -> 39/42 (04, 45, 13, 44, 17, 10_font_sizes, 38_list_markers all pass). -Dp2w.footband=0.80 is the only value that zeroes 69 AND leaves 330_cad exactly as HEAD; 0.85 leaves 7 boxes, 0.70 spends in the drawing sheet. But 26_text_overlap is render=11 at BOTH band 0.80 and band 0.0, so the band cannot separate safe gaps from unsafe ones - the missing guard is a look-ahead. Engine reverted, nothing committed to it.
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 18 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 18 item(s) you can close - run pending.py and take them in its order before the class below. Add the look-ahead guard to spendWideGap: spend the gap only when no line remaining on this page targets a baseline BELOW this one. The engine has the page in hand, so it is a comparison, not a pass. Target: keep 39/42 on 69_two_col_legal_numbered_clauses and drive 26_text_overlap back to 0. Then re-measure 330_cad_drawing_sheet (spend-everywhere cost it 3.14 -> 16.77 pt median) and the 47 stamp documents that carry <200 boxed chars - those will not close by any writer change.
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 19 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 19 item(s) you can close - run pending.py and take them in its order before the class below. Implement the look-ahead in spendWideGap: spend the gap only when no line remaining on this page targets a baseline below this one. Keep -Dp2w.footband=0.80. Target: 39/42 on 69 with 26_text_overlap back to 0, 330_cad unchanged. Then the corpus pass + ratchet. Do not work gapCapTw (1469 chars) - the latch (24920 chars) is the multiplier. The 47 04-failing docs with <200 boxed chars are stamps and need a check-side rule, not a writer change.
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 04_cB-02 | 04_chars_missing | B | is the missing-char multiset fully explained by anchored text boxes | 02:07 | landed | landed | FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md |
 | 18_dA-03 | 18_displacement | A | audit the pending gate: which of the 21 closable items are still true | 02:35 | 03:05 | landed | PENDING-AUDIT.md |
 | 18_dB-01 | 18_displacement | B | table block-top gap and per-row height in DocxWriter | 02:35 | 03:10 | landed | 18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md |
 | 18_dA-04 | 18_displacement | A | what is settled, refuted and left as a patch on this class | 04:38 | 10 min | landed | FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied) |
@@ -60,14 +59,13 @@ unfinished work, not as a result.
 | gap--01 | gap-cap patch: traced DocxWriter, produced spendWideGap() foot-band patch, applied and reverted as a no-op on 69/323/311; census: cap = 1469 chars over 23 of 35 positioned pages |  |  | 02:59 |  | running |  |
 | zero-01 | zero-gap census: the latch is 655 lines/24920 chars vs the rule's 12 lines/358; pagepos=0 + anchorkeep=0 changes no page count across 213 |  |  | 02:59 |  | running |  |
 | Goog-01 | Google verification: 69_two_col_legal 35/42 -> 39/42 on the spendWideGap build, 26_text_overlap=11 is the price |  |  | 03:12 |  | running |  |
+| band-01 | band sweep: footband 0.80 zeroes 69 and spares 330_cad; 26_text_overlap=11 at both 0.80 and 0.0 |  |  | 03:21 |  | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `13:07` attempt 54 on 18_displacement -> lead (0/129 moved)
-- `13:59` attempt 55 on 18_displacement -> lead
 - `14:00` agent deployed: conversion cost /  - 
 - `14:00` agent deployed: txt discrepancy /  - 
 - `14:00` agent deployed: 18_displacement / A - where does the 11 s/doc conversion go, and the smallest change that makes --forc
@@ -91,6 +89,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `02:59` agent deployed: zero-gap census: the latch is 655 lines/24920 chars vs the rule's 12 lines/358; pagepos=0 + anchorkeep=0 changes no page count across 213 /  - 
 - `03:12` attempt 6 on 04_chars_missing -> lead (1/64 moved)
 - `03:12` agent deployed: Google verification: 69_two_col_legal 35/42 -> 39/42 on the spendWideGap build, 26_text_overlap=11 is the price /  - 
+- `03:21` attempt 7 on 04_chars_missing -> lead (1/64 moved)
+- `03:21` agent deployed: band sweep: footband 0.80 zeroes 69 and spares 330_cad; 26_text_overlap=11 at both 0.80 and 0.0 /  - 
 
 ## Where the rest of the state lives
 

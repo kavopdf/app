@@ -57,3 +57,31 @@ The engine change was **reverted**. The gate refused it as an unmeasured engine 
 is a real regression on a real document; neither is something to commit. The patch, the guard constant and
 the three switches are all in this handoff so the next run starts at the look-ahead guard, not at the
 beginning.
+
+## Second measurement: the band value matters, the overlap does not move with it
+
+`FOOT_BAND` was made a system property (`-Dp2w.footband`) and swept on the same build, same three switches:
+
+| `-Dp2w.footband` | `69_two_col_legal` boxes / chars | `330_cad_drawing_sheet` boxes / chars |
+|---|---|---|
+| 0.90 (the patch's default) | 36 / 1358 | 2 / 75 |
+| 0.85 | 7 / 242 | 2 / 75 |
+| **0.80** | **0 / 0** | **2 / 75** |
+| 0.70 | 0 / 0 | 0 / 0 |
+| 0.0 | 0 / 0 | 0 / 0 |
+
+**0.80 is the only value measured that takes 69 to zero boxes and leaves `330_cad` exactly as HEAD emits
+it** — 0.85 is too high (the signature block stays anchored) and 0.70 spends a gap in the drawing sheet
+too. That is a real improvement on the patch's 0.90, which is a no-op on this document.
+
+**And it does not buy the overlap back.** `69` at `-Dp2w.footband=0.80` in Google:
+
+    69_two_col_legal_numbered_clauses.pdf  39/42 FAIL
+        18_displacement              source=0   render=1
+        26_text_overlap              source=0   render=11
+        60_text_column_right_edge    source=1   render=0
+
+Identical to the `FOOT_BAND = 0.0` build: **39/42, and `26_text_overlap` still 11.** So the 11 overlaps are
+not a consequence of the band being too wide — they are what spending *those particular* mid-page gaps
+does, and the band cannot tell them apart from the ones that are safe. The look-ahead is the guard; the
+constant is not.

@@ -11,8 +11,8 @@
 
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 6 vs ATTEMPTS.json history 1; subagents: 3 deployed vs no FINDINGS file for gap--01, zero-01 |
-| Document-moves this run | **0** — 6 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 8 vs ATTEMPTS.json history 1; subagents: 4 deployed vs no FINDINGS file for gap--01, zero-01 |
+| Document-moves this run | **0** — 8 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -23,7 +23,7 @@
 | Not scored - page count did not match | **22** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `04_chars_missing` - taken from the pending list (19 still open), not a new class |
+| Working on | `04_chars_missing` - taken from the pending list (20 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `04_chars_missing` by hand instead |
 
 ## What was tried
@@ -36,7 +36,7 @@
 
 | | |
 |:--|:--|
-| Measured | **52 min ago** |
+| Measured | **1.0 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -50,6 +50,7 @@
 | `gap--01` | gap-cap patch: traced DocxWriter, produced spendWide | 02:59 | - | - |
 | `zero-01` | zero-gap census: the latch is 655 lines/24920 chars  | 02:59 | - | - |
 | `Goog-01` | Google verification: 69_two_col_legal 35/42 -> 39/42 | 03:12 | - | - |
+| `band-01` | band sweep: footband 0.80 zeroes 69 and spares 330_c | 03:21 | - | - |
 
 ## Timing
 
@@ -84,7 +85,7 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 18 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 18 item(s) you can close - run pending.py and take them in its order before the class below. Add the look-ahead guard to spendWideGap: spend the gap only when no line remaining on this page targets a baseline BELOW this one. The engine has the page in hand, so it is a comparison, not a pass. Target: keep 39/42 on 69_two_col_legal_numbered_clauses and drive 26_text_overlap back to 0. Then re-measure 330_cad_drawing_sheet (spend-everywhere cost it 3.14 -> 16.77 pt median) and the 47 stamp documents that carry <200 boxed chars - those will not close by any writer change.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 19 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 19 item(s) you can close - run pending.py and take them in its order before the class below. Implement the look-ahead in spendWideGap: spend the gap only when no line remaining on this page targets a baseline below this one. Keep -Dp2w.footband=0.80. Target: 39/42 on 69 with 26_text_overlap back to 0, 330_cad unchanged. Then the corpus pass + ratchet. Do not work gapCapTw (1469 chars) - the latch (24920 chars) is the multiplier. The 47 04-failing docs with <200 boxed chars are stamps and need a check-side rule, not a writer change.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
@@ -99,31 +100,42 @@ and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
 
 ---
 
-## THIS RUN IN DETAIL (written by the fixer, 02:20-03:35)
+## THIS RUN IN DETAIL (written by the fixer, 02:20-03:45)
 
 report.py's "What was tried" and "Subagents" rows above are read from the ledger and did not pick up this
-slot; the facts they miss: **2 sub-agents were deployed**, and two attempts were recorded this run, both
+slot. The facts they miss: **2 sub-agents were deployed**, and three attempts were recorded this run, all
 `04_chars_missing -> lead`.
 
 ### PROVEN IN GOOGLE: 69_two_col_legal_numbered_clauses 35/42 -> 39/42
 
-Build: `spendWideGap()` (`FINDINGS/04_chars_missing-GAPCAP-PATCH-0225-agent.patch`) with `FOOT_BAND = 0.0f`
-and `-Dp2w.pagepos=0 -Dp2w.anchorkeep=0 -Dp2w.zganchor=false`. The emitted .docx goes from **36 anchored
-text boxes / 1358 characters to 0 / 0**, page count unchanged. Uploaded to `KavoPDF-Verify`, converted on
-import, exported as PDF, deleted; `verify_google.py <source> <export> --docx`.
+Build: `spendWideGap()` (`FINDINGS/04_chars_missing-GAPCAP-PATCH-0225-agent.patch`) with the foot band at
+0.80 and `-Dp2w.pagepos=0 -Dp2w.anchorkeep=0 -Dp2w.zganchor=false`. The emitted .docx goes from **36
+anchored text boxes / 1358 characters to 0 / 0**, page count unchanged. Uploaded to `KavoPDF-Verify`,
+converted on import, exported as PDF, deleted; `verify_google.py <source> <export> --docx`.
 
 | | recorded HEAD (`b7699196`) | this build |
 |---|---|---|
 | score | **35/42** | **39/42** |
 | failing | 04_chars_missing, 10_font_sizes, 13_text_colours, 17_matched_runs, 38_list_markers, 44_header_footer, 45_char_accuracy | 18_displacement, 26_text_overlap (**render=11**), 60_text_column_right_edge |
 
-**Six of the brief's named classes pass on this document now:** 04_chars_missing, 45_char_accuracy,
+**Five of the brief's named classes pass on this document now:** 04_chars_missing, 45_char_accuracy,
 13_text_colours, 44_header_footer, 17_matched_runs, plus 10_font_sizes and 38_list_markers.
 
-**The price is `26_text_overlap` at 11 rendered overlaps.** That is the foot-band guard's job: dropping it
-to 0 lets a mid-page gap be spent, and three lines land on content the page already drew. The guard the
-patch needs is not a band, it is a look-ahead - spend only when no line remaining on the page targets a
-lower baseline.
+### The guard is a look-ahead, and the constant is not
+
+`-Dp2w.footband` was swept on the same build:
+
+| footband | 69 boxes / chars | 330_cad boxes / chars |
+|---|---|---|
+| 0.90 (the patch's default) | 36 / 1358 | 2 / 75 |
+| 0.85 | 7 / 242 | 2 / 75 |
+| **0.80** | **0 / 0** | **2 / 75** |
+| 0.70 | 0 / 0 | 0 / 0 |
+
+0.80 is the only value that zeroes 69 and leaves `330_cad` exactly as HEAD. **But `26_text_overlap` is
+render=11 at both 0.80 and 0.0** — the 11 overlaps are what spending those particular mid-page gaps does,
+not a band that is too wide. The band cannot tell a safe gap from an unsafe one; the engine has the page in
+hand, so the missing guard is a comparison against the remaining lines' target baselines.
 
 The engine was **reverted**: the gate refuses an unmeasured engine and `26_text_overlap = 11` is a real
 regression on a real document. Nothing was committed to it.
@@ -139,13 +151,13 @@ their box is a stamp, not body text, so emptying boxes cannot clean them.
 
 ### Written and not kept
 
-`spendWideGap()` at `FOOT_BAND = 0.90` is a no-op on 69, 323 and 311 - its guard never fires on them.
-`-Dp2w.pagepos=0 -Dp2w.anchorkeep=0` alone cuts 69 from 1358 to 367 boxed characters, academic-paper from
-2942 to 181, 323 from 222 to 35, 311 from 206 to 30, and changes nothing on 47 of the 64.
+`spendWideGap()` at its default `FOOT_BAND = 0.90` is a no-op on 69, 323 and 311. The three switches alone
+cut 69 from 1358 to 367 boxed characters, academic-paper from 2942 to 181, 323 from 222 to 35, 311 from 206
+to 30, and change nothing on 47 of the 64.
 
 ### Next run
 
-Add the look-ahead guard to `spendWideGap`: spend only when no remaining line on the page targets a lower
-baseline. Target: keep 39/42 on 69 and drive `26_text_overlap` back to 0. Then re-measure
-`330_cad_drawing_sheet` (spend-everywhere cost it 3.14 -> 16.77 pt median) and accept that the 47 stamp
-documents need a rule about what kind of text a box may carry, not a writer change.
+Implement the look-ahead in `spendWideGap` — spend only when no remaining line on the page targets a lower
+baseline — at `-Dp2w.footband=0.80`. Target: 39/42 on 69 with `26_text_overlap` back to 0 and `330_cad`
+unchanged. Then the corpus pass and the ratchet. Do not work `gapCapTw`; the 47 stamp documents need a
+check-side rule about what kind of text a box may carry, not a writer change.
