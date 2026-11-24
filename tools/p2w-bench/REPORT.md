@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 13:12 → running IST · 54 min**
+**24 Nov 2026 · slot 13:12 → 14:07 IST · 55 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -35,7 +35,7 @@
 
 | | |
 |:--|:--|
-| Measured | **54 min ago** |
+| Measured | **55 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -55,9 +55,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 13:12 → running · 54 min |
+| Slot window | 13:12 → 14:07 · 55 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 150 |
+| Tool beats | 155 |
 | Longest silence | **15.3 min** — from 13:22:26, after `relay: p2w --force --budget 240 to measure real per-doc rate` |
 | Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -69,7 +69,7 @@
 |:--|--:|:--|
 | fix - diagnose and change the engine | **6 min** | `##` |
 | measure or build - a conversion, screen or compile writes no beacon | **39 min** | `################` |
-| record - attempt, handoff, class rows | **5 min** | `##` |
+| record - attempt, handoff, class rows | **6 min** | `###` |
 | report - the report and the chain | **3 min** | `#` |
 ## Best results this round
 
