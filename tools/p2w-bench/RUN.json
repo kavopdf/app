@@ -3,13 +3,13 @@
   "60ed60_text_column_right_edge-01",
   "pc2300_page_count-01"
  ],
- "attempts": 2,
+ "attempts": 3,
+ "class": "00_page_count",
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
  "started": "18:28",
  "started_ts": 1795525083.5720527,
- "window_for_claim": 1795525083.5720527,
- "class": "00_page_count"
+ "window_for_claim": 1795525083.5720527
 }
