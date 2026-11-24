@@ -21,7 +21,7 @@ unfinished? - and the brief makes it a gate: while it lists something, that is t
 Exit 0  nothing pending - a new class may be taken
 Exit 1  pending - the items printed are the work, in the order they should be done
 """
-import json, os, sys, time
+import json, os, sys, time, time
 
 try:
     from beacon import beat
@@ -227,6 +227,72 @@ def collect():
                           "why": "can I fix it: %s | needed: %s" % (cells[4], cells[5])})
     except Exception:
         pass
+
+    # 5. THE TWO DATASETS MUST NEVER BE OLD. The user's instruction, 24 Nov: measure both continuously so
+    # the latest information is always available. Neither measurement is automatic today - the :20 gverify
+    # cron keeps the docx table fresh, but RANKING-TXT.csv is regenerated only by txt_gate.py, and no cron
+    # calls it. Measured: the .txt table was 16.8 h old while the report printed "213 of 213 scored" as if
+    # it were current, which is how 28.5 h of nothing read as progress.
+    #
+    # So staleness is work, here, where a run cannot skip it - the same argument as the pending gate itself.
+    # A fresh table is not a nice-to-have: every decision downstream reads it.
+    def _age_h(path):
+        try:
+            return (time.time() - os.path.getmtime(path)) / 3600.0
+        except Exception:
+            return None
+
+    _ta = _age_h(os.path.join(HERE, "txt", "RANKING-TXT.csv"))
+    if _ta is None:
+        items.append({"kind": "measure", "who": "the .txt table",
+                      "what": "RANKING-TXT.csv is missing - the .txt half has no score at all",
+                      "why": "actionable - run `python3 tools/p2w-bench/txt_gate.py --score 40`"})
+    elif _ta >= 6.0:
+        items.append({"kind": "measure", "who": "the .txt table",
+                      "what": "RANKING-TXT.csv is %.1f h old - the .txt numbers are not today's" % _ta,
+                      "why": "actionable - run `python3 tools/p2w-bench/txt_gate.py --score 40`; nothing "
+                             "else regenerates it"})
+
+    # The docx table: fresh if the newest verdict is recent AND every scored document is on the current
+    # engine. The engine is the modal one among the verdicts, for the reason classpick.py gives.
+    _gv = {}
+    try:
+        import glob as _g2
+        for _f in _g2.glob(os.path.join(HERE, "..", "..", "benchmarks", "gverify", "*.json")):
+            _j = json.load(open(_f, encoding="utf-8"))
+            if _j.get("status") == "page_count_refused":
+                continue
+            _gv[os.path.basename(_f)[:-5]] = _j
+    except Exception:
+        _gv = {}
+    if _gv:
+        _c = {}
+        for _j in _gv.values():
+            _e = str(_j.get("engine") or "")[:8]
+            if _e:
+                _c[_e] = _c.get(_e, 0) + 1
+        _eng = max(_c, key=_c.get) if _c else ""
+        _old = [d for d, _j in _gv.items() if str(_j.get("engine") or "")[:8] != _eng]
+        if _old:
+            items.append({"kind": "measure", "who": "the docx table",
+                          "what": "%d document(s) still carry a verdict from an older engine: %s"
+                                  % (len(_old), ", ".join(_old[:3])),
+                          "why": "actionable - `python3 tools/p2w-bench/gverify.py --plan %d`; until then "
+                                 "'fixed' means fixed on an engine that is not this one" % len(_old)})
+        _newest = None
+        try:
+            import glob as _g3
+            _newest = max(os.path.getmtime(x) for x in
+                          _g3.glob(os.path.join(HERE, "..", "..", "benchmarks", "gverify", "*.json")))
+        except Exception:
+            _newest = None
+        if _newest is not None:
+            _ga = (time.time() - _newest) / 3600.0
+            if _ga >= 3.0:
+                items.append({"kind": "measure", "who": "the docx table",
+                              "what": "the newest Google verdict is %.1f h old - the :20 cron has not run"
+                                      % _ga,
+                              "why": "actionable - `python3 tools/p2w-bench/gverify.py --plan 60`"})
 
     return items
 
