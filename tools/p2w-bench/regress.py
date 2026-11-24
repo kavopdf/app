@@ -588,8 +588,12 @@ def check(allow_engine_change, only=None):
                               "--ensure", "-j", "4", "-q"],
                              capture_output=True, text=True, timeout=2400)
         if _cc.returncode != 0:
-            print("  corpus : could not be built (%d) - the .docx checks below cannot run"
-                  % _cc.returncode)
+            # A GATE THAT PRINTS A WARNING AND THEN PASSES IS NOT A GATE. Measured 24 Nov: this
+            # printed "corpus : could not be built (3) - no corpus PDFs found" and then PASS, so both
+            # regress.py and measure_gate.py certified a state neither could read. The fix that added
+            # this call introduced that; a failed input is a failed gate.
+            print("  corpus : could not be built (%d) - the .docx checks cannot run" % _cc.returncode)
+            fail = 1
             for _l in (_cc.stdout or "").strip().splitlines()[-3:]:
                 print("    %s" % _l.strip())
         _gs = subprocess.run([sys.executable, os.path.join(HERE, "google_safe.py"),
