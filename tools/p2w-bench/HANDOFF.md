@@ -30,7 +30,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> 18_displacement: APPLY tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, then START the slot with the 212-document pass (p2w.py --force --budget 250, repeat) - that pass is the whole cost. It is measured: 362_price_list_dense 41/42 -> 42/42 in Google, electricity-bill and 330_cad_drawing_sheet byte-identical. Do NOT re-run the trHeight=max(content,line-15) probe - it is refuted and the guard makes it unnecessary. After the pass: regress.py --check, --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. Then check the 9 documents named in FINDINGS/18_displacement-UNIFORM-PITCH-GUARD-GOOGLE-42of42-0450-fixer.md for a uniform pitch.
+> PENDING FIRST: 23 item(s) you can close - run pending.py and take them in its order before the class below. 18_displacement: APPLY tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, then START the slot with the 212-document pass (p2w.py --force --budget 250, repeat) - that pass is the whole cost. It is measured: 362_price_list_dense 41/42 -> 42/42 in Google, electricity-bill and 330_cad_drawing_sheet byte-identical. Do NOT re-run the trHeight=max(content,line-15) probe - it is refuted and the guard makes it unnecessary. After the pass: regress.py --check, --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. Then check the 9 documents named in FINDINGS/18_displacement-UNIFORM-PITCH-GUARD-GOOGLE-42of42-0450-fixer.md for a uniform pitch.
 
 ## Agents deployed and not yet accounted for
 
