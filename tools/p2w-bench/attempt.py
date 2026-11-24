@@ -556,6 +556,11 @@ def add(args):
                   # sandbox clock, which is UTC, so the history said 08:14 for an attempt made at
                   # 13:44 - a five-and-a-half-hour lie in a file whose job is to be checkable.
                   "at": time.strftime("%Y-%m-%d %H:%M", time.gmtime(time.time() + 19800)),
+                  # WHAT WAS TRIED, NOT ONLY WHAT IT SCORED. The record held moved/total and nothing else, so
+                  # 04_chars_missing's four attempts read as four identical "moved=0" rows and the next run had no
+                  # way to know which three were the same idea. Taken from git rather than from a flag the run has
+                  # to remember: the engine files it touched are the attempt.
+                  "changed": _why_tried(),
                   "moved": args.moved, "total": args.total})
     del _hist[:-20]                      # twenty attempts of memory is more than any class gets
     row["reason"] = args.reason or "(no reason recorded for this attempt)"
@@ -718,6 +723,24 @@ def _engine_hash():
         return h or "unknown"
     except Exception:
         return "unknown"
+
+
+def _why_tried():
+    """The engine files this attempt touched, from git - no flag for the run to remember."""
+    import subprocess
+    out = []
+    try:
+        r = subprocess.run(['git', 'diff', '--name-only', 'HEAD', '--',
+                            'app/src/main/java/com/kavopdf/app/engine/'],
+                           capture_output=True, text=True, timeout=30, cwd=ROOT)
+        out = [os.path.basename(x) for x in (r.stdout or '').split() if x.endswith('.java')]
+        r2 = subprocess.run(['git', 'log', '-1', '--format=%s', '--',
+                             'app/src/main/java/com/kavopdf/app/engine/'],
+                            capture_output=True, text=True, timeout=30, cwd=ROOT)
+        last = (r2.stdout or '').strip()[:90]
+    except Exception:
+        last = ''
+    return {'files': sorted(set(out))[:6], 'last_engine_commit': last}
 
 
 def main(argv):
