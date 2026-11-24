@@ -13,10 +13,10 @@
       }
     ]
   },
-  "fixer_doing": "corpus stamped 213/213, running gate",
-  "fixer_doing_since": 1795544051.3523388,
+  "fixer_doing": "gate repaired, verifying",
+  "fixer_doing_since": 1795544247.0200956,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795539453.665067,
+  "fixer_last_beat": 1795544247.0200963,
   "fixer_started": 1795544136.7089078,
   "history": [
     {
