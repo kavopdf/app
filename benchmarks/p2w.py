@@ -1065,10 +1065,28 @@ def docx(end):
     #
     # ConvertOne takes one PDF and one output directory. It is the only way to get a measurement
     # that is a property of the document rather than of its neighbours.
+    # A DOCUMENT IS NOT STARTED UNLESS IT CAN FINISH INSIDE THE WINDOW.
+    #
+    # The flat 6 s headroom was measured 24 Nov, on the chunk that converted 87 of 213:
+    #   09:16:54  docx 87/213 -- converting 126      (conv_end = now + 55% of the window)
+    #   09:20:43  prerender 12 docx in soffice batches of 12
+    #   09:20:46  chunk 1: measured 85 of 213        <- ONE document measured
+    # Conversion was due to stop at 09:19:02 and ran 100 s past it, because the 6 s test is
+    # checked BETWEEN documents and one document may run for up to 90 s. CONVERT_SHARE
+    # cannot hold while a single unit of work can overrun it by a factor of fifteen, and the
+    # measurement phase then gets a deadline that has already gone.
+    #
+    # So the headroom is what this chunk's own conversions have cost: stop starting new work
+    # when twice the observed median no longer fits. The factor of two is a variance
+    # allowance, not a tuned constant. The first document of a chunk always starts.
+    _costs = []
     for p in miss:
-        if time.time() > end - 6: break
+        _est = 2.0 * sorted(_costs)[len(_costs) // 2] if _costs else 6.0
+        if time.time() > end - max(6.0, _est): break
+        _t0 = time.time()
         sh('cd ' + E + ' && ' + env + ' java -Xmx700m -cp "' + cp + '" ConvertOne '
            + p + ' ' + DOCX, min(max(25, int(end - time.time())), 90))
+        _costs.append(time.time() - _t0)
     return len(glob.glob(DOCX+"/*.docx"))
 def measure_doc_chunked(pdf, dx, chunk=40, budget=240.0, first=0, seed=None):
     """Measure a long document in page windows, merging the windows into one result.
