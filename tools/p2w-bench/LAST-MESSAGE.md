@@ -1,9 +1,6 @@
-# Fixer report - 2026-11-24 11:23
-
-```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 11:23 → running IST · 1 min**
+**24 Nov 2026 · slot 11:15 → running IST · 1h 13m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +8,7 @@
 
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 0 vs ATTEMPTS.json history 1 |
+| **Self-check** | **1 disagreement(s)** - self-check: the subagent check raised AttributeError vs it did not run, so it cannot vouch for anything |
 | Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -23,19 +20,19 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `18_displacement` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 11:23 | **lead** | 0/200 | Uniform-pitch guard applied+build ok; corpus measured 200 of 212 on the patched engine (12 largest documents unmeasured in slot). regress.py --check: docx no document worse, txt no document worse, goo |
+| 12:27 | **lead** | 0/None | uniform-pitch patch applied and built; the 212-document --force pass measured 38 min to convert and 19 s/doc to measure, extrapolating to ~105 min - it cannot finish in a 90-minute slot. 36 of 36 meas |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.4 h ago** |
+| Measured | **1.2 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -44,16 +41,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `60_tB-02` | is 60 or 18 reading the paper - the 25_invisible_tex | 12:28 | - | not recorded |
+| `04_cA-01` | real writer defect or instrument, and how much t01/t | 12:28 | - | not recorded |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 11:23 → running · 1 min |
+| Slot window | 11:15 → running · 1h 13m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 5 |
-| Silences over 2 min | 0 |
+| Tool beats | 35 |
+| Longest silence | **9.0 min** — from 11:24:37, after `relay: corpus pass 1/8, p2w --force --budget 250` |
+| Silences over 2 min | 13 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -61,7 +62,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **1 min** | `######################` |
+| fix - diagnose and change the engine | **10 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **25 min** | `########` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **35 min** | `###########` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -74,15 +79,10 @@
 
 ## Next run
 
-18_displacement: the uniform-pitch guard is measured on 200 of 212 corpus documents with zero worse in docx and txt and no construct spread - it is refused ONLY for an unstamped engine. Re-apply tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, run the remaining 12 documents of the corpus pass (P2W_ENGINE_SRC=/scratch/work/CS python3 benchmarks/p2w.py --budget 275, repeat until measured 212/212), then regress.py --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. The 12 unmeasured are the largest page counts, so order the pass by page count descending. Do NOT re-run the trHeight=max(content,line-15) probe.
+PENDING FIRST: 23 item(s) you can close - run pending.py and take them in its order before the class below. 18_displacement: APPLY tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, then START the slot with the 212-document pass (p2w.py --force --budget 250, repeat) - that pass is the whole cost. It is measured: 362_price_list_dense 41/42 -> 42/42 in Google, electricity-bill and 330_cad_drawing_sheet byte-identical. Do NOT re-run the trHeight=max(content,line-15) probe - it is refuted and the guard makes it unnecessary. After the pass: regress.py --check, --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. Then check the 9 documents named in FINDINGS/18_displacement-UNIFORM-PITCH-GUARD-GOOGLE-42of42-0450-fixer.md for a uniform pitch.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
 
-```
-
-Written by report.py from committed files only. Every number above is read from
-ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
-and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
