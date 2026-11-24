@@ -1,26 +1,13 @@
 {
- "started_ts": 1795476169.125516,
- "started": "04:52",
- "ended_ts": 1795479704.2155993,
- "ended": "05:51",
- "class": "18_displacement",
- "attempts": 1,
+ "started_ts": 1795480150.1504607,
+ "started": "05:59",
+ "ended_ts": null,
+ "ended": null,
+ "class": "",
+ "attempts": 0,
  "kept": 0,
  "docs_improved": 0,
- "agents": [
-  {
-   "id": "trHeight-code-path",
-   "agent": "Explore",
-   "what": "read the engine's trHeight path: every emit site, the units, whether a per-row conditional is expressible",
-   "returned": "two emit sites, units confirmed as twips, and the finding that trHeight alone is a no-op because the cell's w:line is the binding content"
-  },
-  {
-   "id": "row-height-report",
-   "agent": "Explore",
-   "what": "unzipped engine source: file:line for trHeight, content height, w:line/w:lineRule and any existing per-row shave",
-   "returned": "trheight-report.md - DocxWriter.java:6558 ordinary tables (atLeast), :2256 band tables (exact), content height never measured on the default path"
-  }
- ],
+ "agents": [],
  "obstacles_cleared": 0,
  "needs_human": 0
 }
