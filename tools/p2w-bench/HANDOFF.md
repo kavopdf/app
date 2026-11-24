@@ -20,8 +20,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 10:00 |
-| ended | still running |
-| how it ended | - |
+| ended | 11:27 |
+| how it ended | forced |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -30,7 +30,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> 18_displacement: the uniform-pitch guard is measured on 200 of 212 corpus documents with zero worse in docx and txt and no construct spread - it is refused ONLY for an unstamped engine. Re-apply tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, run the remaining 12 documents of the corpus pass (P2W_ENGINE_SRC=/scratch/work/CS python3 benchmarks/p2w.py --budget 275, repeat until measured 212/212), then regress.py --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. The 12 unmeasured are the largest page counts, so order the pass by page count descending. Do NOT re-run the trHeight=max(content,line-15) probe.
+> PENDING FIRST: 23 item(s) you can close - run pending.py and take them in its order before the class below. 18_displacement: the uniform-pitch guard is measured on 200 of 212 corpus documents with zero worse in docx and txt and no construct spread - it is refused ONLY for an unstamped engine. Re-apply tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, run the remaining 12 documents of the corpus pass (P2W_ENGINE_SRC=/scratch/work/CS python3 benchmarks/p2w.py --budget 275, repeat until measured 212/212), then regress.py --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. The 12 unmeasured are the largest page counts, so order the pass by page count descending. Do NOT re-run the trHeight=max(content,line-15) probe.
 
 ## Agents deployed and not yet accounted for
 
