@@ -163,6 +163,21 @@ def save(d):
             pass
     with open(LEDGER, "w", encoding="utf-8") as f:
         json.dump(d, f, indent=1, sort_keys=True)
+    # THE COUNTER IN RUN.json HAS TO MOVE WITH THE HISTORY. report.py's self-check compares
+    # RUN.json's `attempts` against the records inside this run's window, and this tool only ever
+    # wrote ATTEMPTS.json - so a run that recorded an attempt correctly still reported
+    # "1 disagreement(s) - attempts: RUN.json counter 0 vs ATTEMPTS.json history 1". Measured
+    # 24 Nov. A failure inside this bump must not lose the record, so it is caught and reported.
+    try:
+        _rp = os.path.join(HERE, "RUN.json")
+        with open(_rp, encoding="utf-8") as _f:
+            _r = json.load(_f)
+        _r["attempts"] = int(_r.get("attempts", 0) or 0) + 1
+        with open(_rp, "w", encoding="utf-8") as _f:
+            json.dump(_r, _f, indent=1, sort_keys=True)
+    except Exception as _e:
+        print("  note: could not bump RUN.json attempts (%s) - the record is still in ATTEMPTS.json"
+              % _e.__class__.__name__)
 
 
 def ist(fmt="%d %b %H:%M"):

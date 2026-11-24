@@ -1,10 +1,403 @@
 {
- "plan": "",
- "notes": [
+ "agents": [
   {
-   "at": "00:09",
-   "text": "attempt 16 on content-present-partly-displaced -> lead (0/13 moved)"
+   "angle": "A",
+   "class": "18_displacement",
+   "deployed": "20:15",
+   "deployed_at": "2026-11-23T20:15",
+   "expected": "is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact",
+   "finding": "FINDINGS/18_displacement-LO-PROXY-VERDICT-2013-agentA.md",
+   "id": "18A-01",
+   "landed_at": "2026-11-23T14:44",
+   "question": "is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact",
+   "status": "landed"
   },
+  {
+   "angle": "B",
+   "class": "18_displacement",
+   "deployed": "20:44",
+   "deployed_at": "2026-11-23T20:44",
+   "expected": "is there a construct that gives Google the row pitch without changing what LibreOffice draws",
+   "finding": "FINDINGS/18_displacement-TRHEIGHT-CROSS-RENDERER-1506-agentB.md",
+   "id": "18B-01",
+   "landed_at": "2026-11-23T14:44",
+   "question": "is there a construct that gives Google the row pitch without changing what LibreOffice draws",
+   "status": "landed"
+  },
+  {
+   "angle": "",
+   "class": "04_chars_missing construct: Google drops wps:txbx text; missing multiset fully explained by anchored boxes on 9 docs",
+   "deployed": "23:32",
+   "deployed_at": "2026-11-23T23:32",
+   "expected": "",
+   "finding": "DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.",
+   "id": "04_c-01",
+   "landed_at": "2026-11-24T02:07",
+   "question": "",
+   "status": "landed"
+  },
+  {
+   "angle": "",
+   "class": "44_header_footer: .txt half clean (0 lost/duplicated across 31); 20 of 28 feet are floating anchors, 8 flow and still fail",
+   "deployed": "23:32",
+   "deployed_at": "2026-11-23T23:32",
+   "expected": "",
+   "finding": "DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.",
+   "id": "44_h-01",
+   "landed_at": "2026-11-24T02:07",
+   "question": "",
+   "status": "landed"
+  },
+  {
+   "angle": "A",
+   "class": "18_displacement",
+   "deployed": "02:00",
+   "deployed_at": "2026-11-24T02:00",
+   "expected": "landed",
+   "finding": "DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.",
+   "id": "18_dA-01",
+   "landed_at": "2026-11-24T02:07",
+   "question": "which single failing Google check, if fixed, makes the most documents CLEAN",
+   "status": "landed"
+  },
+  {
+   "angle": "B",
+   "class": "04_chars_missing",
+   "deployed": "02:00",
+   "deployed_at": "2026-11-24T02:00",
+   "expected": "landed",
+   "finding": "DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.",
+   "id": "04_cB-01",
+   "landed_at": "2026-11-24T02:07",
+   "question": "is the missing-char multiset fully explained by anchored text boxes on 9 docs",
+   "status": "landed"
+  },
+  {
+   "angle": "A",
+   "class": "18_displacement",
+   "deployed": "02:07",
+   "deployed_at": "2026-11-24T02:07",
+   "expected": "landed",
+   "finding": "FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md",
+   "id": "18_dA-02",
+   "landed_at": "2026-11-24T02:07",
+   "question": "which single failing Google check, if fixed, makes the most documents CLEAN",
+   "status": "landed"
+  },
+  {
+   "angle": "B",
+   "class": "04_chars_missing",
+   "deployed": "02:07",
+   "deployed_at": "2026-11-24T02:07",
+   "expected": "landed",
+   "finding": "FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md",
+   "id": "04_cB-02",
+   "landed_at": "2026-11-24T02:07",
+   "question": "is the missing-char multiset fully explained by anchored text boxes",
+   "status": "landed"
+  },
+  {
+   "angle": "A",
+   "class": "18_displacement",
+   "deployed": "02:35",
+   "deployed_at": "2026-11-24T02:35",
+   "expected": "03:05",
+   "finding": "PENDING-AUDIT.md",
+   "id": "18_dA-03",
+   "landed_at": "2026-11-24T02:37",
+   "question": "audit the pending gate: which of the 21 closable items are still true",
+   "status": "landed"
+  },
+  {
+   "angle": "B",
+   "class": "18_displacement",
+   "deployed": "02:35",
+   "deployed_at": "2026-11-24T02:35",
+   "expected": "03:10",
+   "finding": "18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md",
+   "id": "18_dB-01",
+   "landed_at": "2026-11-24T02:37",
+   "question": "table block-top gap and per-row height in DocxWriter",
+   "status": "landed"
+  },
+  {
+   "angle": "A",
+   "class": "18_displacement",
+   "deployed": "04:38",
+   "deployed_at": "2026-11-24T04:38",
+   "expected": "10 min",
+   "finding": "FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied)",
+   "id": "18_dA-04",
+   "landed_at": "2026-11-24T04:38",
+   "question": "what is settled, refuted and left as a patch on this class",
+   "status": "landed"
+  },
+  {
+   "angle": "B",
+   "class": "18_displacement",
+   "deployed": "04:38",
+   "deployed_at": "2026-11-24T04:38",
+   "expected": "10 min",
+   "finding": "step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40",
+   "id": "18_dB-02",
+   "landed_at": "2026-11-24T04:38",
+   "question": "if the table-top step were removed, which documents become CLEAN",
+   "status": "landed"
+  },
+  {
+   "angle": "rowheight-prepass",
+   "class": "18_displacement",
+   "deployed": "06:34",
+   "deployed_at": "2026-11-24T06:34",
+   "expected": "a unified diff that applies and compiles, plus the catch that an all-equal test skips the target document",
+   "finding": "FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch",
+   "id": "18_drowheight-prepass-01",
+   "landed_at": "2026-11-24T06:35",
+   "question": "produce a minimal compilable two-pass emit for the atLeast trHeight that applies the cumulative pixel snap only on a uniform pitch",
+   "status": "landed"
+  },
+  {
+   "angle": "rowpitch-census",
+   "class": "18_displacement",
+   "deployed": "06:34",
+   "deployed_at": "2026-11-24T06:34",
+   "expected": "a CSV and a count per class, so the guard's population is measured rather than assumed",
+   "finding": "no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B.",
+   "id": "18_drowpitch-census-01",
+   "landed_at": "2026-11-24T06:35",
+   "question": "census the table row pitch of every corpus PDF and classify uniform-fractional, uniform-whole-pixel, non-uniform",
+   "status": "landed"
+  },
+  {
+   "angle": "check-definition",
+   "class": "25_invisible_text",
+   "deployed": "07:03",
+   "deployed_at": "2026-11-24T07:03",
+   "expected": "the check's operands and a named Java site, so a fix could be attempted",
+   "finding": "the check stopped at the FIRST fill under a run's corner. A Google export opens with a page-sized white rect and rasterises our bands into images, so white type on an orange band matched the sheet. This run's fix; 5 documents went 42/42.",
+   "id": "A1",
+   "landed_at": "2026-11-24T07:07",
+   "question": "what does 25_invisible_text compare, and which construct makes 48 documents fail it in Google and none in LibreOffice",
+   "status": "landed"
+  },
+  {
+   "angle": "row-height-law",
+   "class": "18_displacement",
+   "deployed": "07:22",
+   "deployed_at": "2026-11-24T07:22",
+   "expected": "a law fitted to the committed Google numbers, and one falsifiable change",
+   "finding": "row = 0.75*round((max(trHeight,content)+rule)/0.75): trHeight is a quantised floor, not a length. 362 is unruled, so it does not ramp +0.75/row - the carry-over's 21.75 pt is ruled-table arithmetic. The LO-invariant change is DocxWriter:6468 declaring the row one rule short; it must be tested on a ruled document, not 362.",
+   "id": "A2",
+   "landed_at": "2026-11-24T07:26",
+   "question": "what law does Google use to lay a table row's height, and what LO-invariant change removes the +0.75 pt/row ramp",
+   "status": "landed"
+  },
+  {
+   "angle": "A",
+   "class": "18_displacement",
+   "deployed": "08:20",
+   "deployed_at": "2026-11-24T08:20",
+   "expected": "08:05",
+   "finding": "",
+   "id": "18_dA-05",
+   "question": "is the page-height guard why no table-top spacer is ever spent on the 14 documents that fail only 18",
+   "status": "running"
+  },
+  {
+   "angle": "B",
+   "class": "60_text_column_right_edge",
+   "deployed": "08:20",
+   "deployed_at": "2026-11-24T08:20",
+   "expected": "08:05",
+   "finding": "FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md",
+   "id": "60_tB-01",
+   "landed_at": "2026-11-24T12:28",
+   "question": "is 60 or 18 reading the paper instead of the defect - the 25_invisible_text precedent",
+   "status": "landed"
+  },
+  {
+   "angle": "B",
+   "class": "60_text_column_right_edge",
+   "deployed": "12:28",
+   "deployed_at": "2026-11-24T12:28",
+   "expected": "11:19",
+   "finding": "FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md",
+   "id": "60_tB-02",
+   "landed_at": "2026-11-24T12:28",
+   "question": "is 60 or 18 reading the paper - the 25_invisible_text precedent",
+   "status": "landed"
+  },
+  {
+   "angle": "A",
+   "class": "04_chars_missing",
+   "deployed": "12:28",
+   "deployed_at": "2026-11-24T12:28",
+   "expected": "11:21",
+   "finding": "FINDINGS/04_chars_missing-REAL-WRITER-DEFECT-1115-fixer.md",
+   "id": "04_cA-01",
+   "landed_at": "2026-11-24T12:28",
+   "question": "real writer defect or instrument, and how much t01/t12 already explains",
+   "status": "landed"
+  },
+  {
+   "angle": "",
+   "class": "conversion cost",
+   "deployed": "14:00",
+   "deployed_at": "2026-11-24T14:00",
+   "expected": "",
+   "finding": "",
+   "id": "conv-01",
+   "question": "",
+   "status": "running"
+  },
+  {
+   "angle": "",
+   "class": "txt discrepancy",
+   "deployed": "14:00",
+   "deployed_at": "2026-11-24T14:00",
+   "expected": "",
+   "finding": "",
+   "id": "txt -01",
+   "question": "",
+   "status": "running"
+  },
+  {
+   "angle": "A",
+   "class": "18_displacement",
+   "deployed": "14:00",
+   "deployed_at": "2026-11-24T14:00",
+   "expected": "13:16",
+   "finding": "",
+   "id": "18_dA-06",
+   "question": "where does the 11 s/doc conversion go, and the smallest change that makes --force incremental",
+   "status": "running"
+  },
+  {
+   "angle": "B",
+   "class": "18_displacement",
+   "deployed": "14:00",
+   "deployed_at": "2026-11-24T14:00",
+   "expected": "13:18",
+   "finding": "",
+   "id": "18_dB-03",
+   "question": "why do RANKING-TXT.csv and the report disagree by 50 documents",
+   "status": "running"
+  }
+ ],
+ "context": "18_displacement: the residual on the 13 sole-failure documents is TWO constructs whose errors cancel, and that is why 20 attempts moved 4. Four live Google round trips this slot: med_dy -2.8 (362_price_list_dense), -3.0 (bus-timetable), -6.7 (mobile-bill), -13.0 (72_bank_statement); worst_dy 5.4/4.9/10.0/28.2; med_dx -0.2..+0.2 on all four; bad_pages [0] on all four. Run-by-run profiles: at every table's block top the gap is lost (-8.76, -4.19, -4.08 pt on mobile-bill) and inside every table each row is laid 0.75 pt too tall, so dy climbs back to 0 at the footer. 24 rows x 0.75 = 18 pt of ramp against 17.0 pt of step. Each half refuted alone because spending the spacer overflows (the DocxWriter guard at :6074 names mobile-bill and insurance-policy-schedule) and the row declaration change alone leaves the step uncompensated. The untried pair: deliver the gap through the first-row cell w:before (measured 1:1 by Google, 66 probes, error 0.000000) AND reduce w:trHeight by the same per-row amount, so the table total is unchanged. 362_price_list_dense has no step, only a monotone ramp, so it is the document that proves or refutes the pair. All 13 are converted in /scratch/work/p2w/out.",
+ "history": [
+  {
+   "at": "02:33",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "04:11",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "05:13",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "05:30",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "06:18",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "16:38",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "22:43",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "00:32",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "02:09",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "02:37",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "03:58",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "04:39",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "05:51",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "06:40",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "07:23",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "08:21",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "09:19",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "12:31",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "13:09",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "14:07",
+   "how": "forced",
+   "plan": ""
+  }
+ ],
+ "needs_human": [
+  {
+   "at": "10:40",
+   "change": "a person must either authorise the trade (a 1.03 rise on a document already at 97.62 for 601 going to 0.00), or give share@5px a companion axis that separates 'more ink, some far' from 'the same ink, further' - see FINDINGS/widget-walk-REFUSED-BY-ONE-DOCUMENT-1050-f1x.md",
+   "tried": "measured all three variants corpus-wide: 601 52.39 -> 0.00 and 42/42 docx checks, Account form 97.62 -> 98.65 (+1.03) in every variant that emits widget text, 0 other documents worse of 205 scored",
+   "what": "the widget-AP walk is refused by one document, and the decision is not a fixer's"
+  }
+ ],
+ "next": "1. CORPUS FIRST, AND IT COSTS 16 s: `bash tools/p2w-bench/corpus-fetch.sh` puts all 213 PDFs on a fresh pod (212 scored in RANKING.csv, 0 missing). Measured 24 Nov 16:05 IST. Without it every gate reports 'corpus : could not be built (3) - no corpus PDFs found' and still prints PASS, so a run can believe it cleared a gate that read nothing. Run this before anything else. 2. DO NOT SPEND A CORPUS PASS ON THE UNIFORM-PITCH SNAP. Measured in Google on 24 Nov: the patch rewrites the w:trHeight values on 11 of the 13 sole-failure documents and both probes stayed 41/42 failing 18_displacement (72_bank_statement_no_rules_right_amounts, 17 of 18 rows rewritten; bus-timetable-station-left-times-right, 33 of 33). 0 of 13 moved. See FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-INERT-ON-THE-13-1120-fixer.md. The 42/42 on 362_price_list_dense stands and is a different table. 3. screen.py CANNOT SCREEN ON A FRESH POD. It converts, then hangs in 'prerender ... soffice batches of 12' past 280 s on two consecutive calls, because soffice is broken on a fresh pod. Fix the prerender or make it optional; until then the only number that comes back is Google's, at about 4 minutes per document (upload -> CREATE_FILE as a Google Doc in KavoPDF-Verify (id 1WpTvoWqJ9VymwDSzaMAVa0enZSwcUesB) -> EXPORT pdf -> gverify.py --collect). 4. A full --force pass is ~38 min conversion + ~15-20 min measurement on this 1.05-core pod, and parallelism is worth 1.0x. The remaining lever for landing anything is a cache that outlives the pod. 5. Next class: 60_text_column_right_edge is worth 19.8 clean documents and 5 documents fail only it - the second-largest single-check leverage, and nothing has been measured against it.",
+ "next_class": "electricity-bill",
+ "notes": [
   {
    "at": "00:25",
    "text": "attempt 17 on content-present-partly-displaced -> lead (0/13 moved)"
@@ -240,409 +633,16 @@
   {
    "at": "15:36",
    "text": "attempt 56 on 18_displacement -> lead"
+  },
+  {
+   "at": "16:46",
+   "text": "attempt 57 on 18_displacement -> lead"
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-convert.py --ensure) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 27 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-convert.py --ensure) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 27 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-convert.py --ensure) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 26 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-convert.py --ensure) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 27 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. PENDING FIRST: 23 item(s) you can close - run pending.py and take them in its order before the class below. 18_displacement: APPLY tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, then START the slot with the 212-document pass (p2w.py --force --budget 250, repeat) - that pass is the whole cost. It is measured: 362_price_list_dense 41/42 -> 42/42 in Google, electricity-bill and 330_cad_drawing_sheet byte-identical. Do NOT re-run the trHeight=max(content,line-15) probe - it is refuted and the guard makes it unnecessary. After the pass: regress.py --check, --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. Then check the 9 documents named in FINDINGS/18_displacement-UNIFORM-PITCH-GUARD-GOOGLE-42of42-0450-fixer.md for a uniform pitch.",
- "agents": [
-  {
-   "id": "18A-01",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact",
-   "expected": "is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact",
-   "deployed": "20:15",
-   "status": "landed",
-   "finding": "FINDINGS/18_displacement-LO-PROXY-VERDICT-2013-agentA.md",
-   "deployed_at": "2026-11-23T20:15",
-   "landed_at": "2026-11-23T14:44"
-  },
-  {
-   "id": "18B-01",
-   "class": "18_displacement",
-   "angle": "B",
-   "question": "is there a construct that gives Google the row pitch without changing what LibreOffice draws",
-   "expected": "is there a construct that gives Google the row pitch without changing what LibreOffice draws",
-   "deployed": "20:44",
-   "status": "landed",
-   "finding": "FINDINGS/18_displacement-TRHEIGHT-CROSS-RENDERER-1506-agentB.md",
-   "deployed_at": "2026-11-23T20:44",
-   "landed_at": "2026-11-23T14:44"
-  },
-  {
-   "id": "04_c-01",
-   "class": "04_chars_missing construct: Google drops wps:txbx text; missing multiset fully explained by anchored boxes on 9 docs",
-   "angle": "",
-   "question": "",
-   "expected": "",
-   "deployed": "23:32",
-   "status": "landed",
-   "finding": "DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.",
-   "deployed_at": "2026-11-23T23:32",
-   "landed_at": "2026-11-24T02:07"
-  },
-  {
-   "id": "44_h-01",
-   "class": "44_header_footer: .txt half clean (0 lost/duplicated across 31); 20 of 28 feet are floating anchors, 8 flow and still fail",
-   "angle": "",
-   "question": "",
-   "expected": "",
-   "deployed": "23:32",
-   "status": "landed",
-   "finding": "DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.",
-   "deployed_at": "2026-11-23T23:32",
-   "landed_at": "2026-11-24T02:07"
-  },
-  {
-   "id": "18_dA-01",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "which single failing Google check, if fixed, makes the most documents CLEAN",
-   "expected": "landed",
-   "deployed": "02:00",
-   "status": "landed",
-   "finding": "DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.",
-   "deployed_at": "2026-11-24T02:00",
-   "landed_at": "2026-11-24T02:07"
-  },
-  {
-   "id": "04_cB-01",
-   "class": "04_chars_missing",
-   "angle": "B",
-   "question": "is the missing-char multiset fully explained by anchored text boxes on 9 docs",
-   "expected": "landed",
-   "deployed": "02:00",
-   "status": "landed",
-   "finding": "DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.",
-   "deployed_at": "2026-11-24T02:00",
-   "landed_at": "2026-11-24T02:07"
-  },
-  {
-   "id": "18_dA-02",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "which single failing Google check, if fixed, makes the most documents CLEAN",
-   "expected": "landed",
-   "deployed": "02:07",
-   "status": "landed",
-   "finding": "FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md",
-   "deployed_at": "2026-11-24T02:07",
-   "landed_at": "2026-11-24T02:07"
-  },
-  {
-   "id": "04_cB-02",
-   "class": "04_chars_missing",
-   "angle": "B",
-   "question": "is the missing-char multiset fully explained by anchored text boxes",
-   "expected": "landed",
-   "deployed": "02:07",
-   "status": "landed",
-   "finding": "FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md",
-   "deployed_at": "2026-11-24T02:07",
-   "landed_at": "2026-11-24T02:07"
-  },
-  {
-   "id": "18_dA-03",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "audit the pending gate: which of the 21 closable items are still true",
-   "expected": "03:05",
-   "deployed": "02:35",
-   "status": "landed",
-   "finding": "PENDING-AUDIT.md",
-   "deployed_at": "2026-11-24T02:35",
-   "landed_at": "2026-11-24T02:37"
-  },
-  {
-   "id": "18_dB-01",
-   "class": "18_displacement",
-   "angle": "B",
-   "question": "table block-top gap and per-row height in DocxWriter",
-   "expected": "03:10",
-   "deployed": "02:35",
-   "status": "landed",
-   "finding": "18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md",
-   "deployed_at": "2026-11-24T02:35",
-   "landed_at": "2026-11-24T02:37"
-  },
-  {
-   "id": "18_dA-04",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "what is settled, refuted and left as a patch on this class",
-   "expected": "10 min",
-   "deployed": "04:38",
-   "status": "landed",
-   "finding": "FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied)",
-   "deployed_at": "2026-11-24T04:38",
-   "landed_at": "2026-11-24T04:38"
-  },
-  {
-   "id": "18_dB-02",
-   "class": "18_displacement",
-   "angle": "B",
-   "question": "if the table-top step were removed, which documents become CLEAN",
-   "expected": "10 min",
-   "deployed": "04:38",
-   "status": "landed",
-   "finding": "step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40",
-   "deployed_at": "2026-11-24T04:38",
-   "landed_at": "2026-11-24T04:38"
-  },
-  {
-   "id": "18_drowheight-prepass-01",
-   "class": "18_displacement",
-   "angle": "rowheight-prepass",
-   "question": "produce a minimal compilable two-pass emit for the atLeast trHeight that applies the cumulative pixel snap only on a uniform pitch",
-   "expected": "a unified diff that applies and compiles, plus the catch that an all-equal test skips the target document",
-   "deployed": "06:34",
-   "status": "landed",
-   "finding": "FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch",
-   "deployed_at": "2026-11-24T06:34",
-   "landed_at": "2026-11-24T06:35"
-  },
-  {
-   "id": "18_drowpitch-census-01",
-   "class": "18_displacement",
-   "angle": "rowpitch-census",
-   "question": "census the table row pitch of every corpus PDF and classify uniform-fractional, uniform-whole-pixel, non-uniform",
-   "expected": "a CSV and a count per class, so the guard's population is measured rather than assumed",
-   "deployed": "06:34",
-   "status": "landed",
-   "finding": "no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B.",
-   "deployed_at": "2026-11-24T06:34",
-   "landed_at": "2026-11-24T06:35"
-  },
-  {
-   "id": "A1",
-   "class": "25_invisible_text",
-   "angle": "check-definition",
-   "question": "what does 25_invisible_text compare, and which construct makes 48 documents fail it in Google and none in LibreOffice",
-   "expected": "the check's operands and a named Java site, so a fix could be attempted",
-   "deployed": "07:03",
-   "status": "landed",
-   "finding": "the check stopped at the FIRST fill under a run's corner. A Google export opens with a page-sized white rect and rasterises our bands into images, so white type on an orange band matched the sheet. This run's fix; 5 documents went 42/42.",
-   "deployed_at": "2026-11-24T07:03",
-   "landed_at": "2026-11-24T07:07"
-  },
-  {
-   "id": "A2",
-   "class": "18_displacement",
-   "angle": "row-height-law",
-   "question": "what law does Google use to lay a table row's height, and what LO-invariant change removes the +0.75 pt/row ramp",
-   "expected": "a law fitted to the committed Google numbers, and one falsifiable change",
-   "deployed": "07:22",
-   "status": "landed",
-   "finding": "row = 0.75*round((max(trHeight,content)+rule)/0.75): trHeight is a quantised floor, not a length. 362 is unruled, so it does not ramp +0.75/row - the carry-over's 21.75 pt is ruled-table arithmetic. The LO-invariant change is DocxWriter:6468 declaring the row one rule short; it must be tested on a ruled document, not 362.",
-   "deployed_at": "2026-11-24T07:22",
-   "landed_at": "2026-11-24T07:26"
-  },
-  {
-   "id": "18_dA-05",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "is the page-height guard why no table-top spacer is ever spent on the 14 documents that fail only 18",
-   "expected": "08:05",
-   "deployed": "08:20",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-24T08:20"
-  },
-  {
-   "id": "60_tB-01",
-   "class": "60_text_column_right_edge",
-   "angle": "B",
-   "question": "is 60 or 18 reading the paper instead of the defect - the 25_invisible_text precedent",
-   "expected": "08:05",
-   "deployed": "08:20",
-   "status": "landed",
-   "finding": "FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md",
-   "deployed_at": "2026-11-24T08:20",
-   "landed_at": "2026-11-24T12:28"
-  },
-  {
-   "id": "60_tB-02",
-   "class": "60_text_column_right_edge",
-   "angle": "B",
-   "question": "is 60 or 18 reading the paper - the 25_invisible_text precedent",
-   "expected": "11:19",
-   "deployed": "12:28",
-   "status": "landed",
-   "finding": "FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md",
-   "deployed_at": "2026-11-24T12:28",
-   "landed_at": "2026-11-24T12:28"
-  },
-  {
-   "id": "04_cA-01",
-   "class": "04_chars_missing",
-   "angle": "A",
-   "question": "real writer defect or instrument, and how much t01/t12 already explains",
-   "expected": "11:21",
-   "deployed": "12:28",
-   "status": "landed",
-   "finding": "FINDINGS/04_chars_missing-REAL-WRITER-DEFECT-1115-fixer.md",
-   "deployed_at": "2026-11-24T12:28",
-   "landed_at": "2026-11-24T12:28"
-  },
-  {
-   "id": "conv-01",
-   "class": "conversion cost",
-   "angle": "",
-   "question": "",
-   "expected": "",
-   "deployed": "14:00",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-24T14:00"
-  },
-  {
-   "id": "txt -01",
-   "class": "txt discrepancy",
-   "angle": "",
-   "question": "",
-   "expected": "",
-   "deployed": "14:00",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-24T14:00"
-  },
-  {
-   "id": "18_dA-06",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "where does the 11 s/doc conversion go, and the smallest change that makes --force incremental",
-   "expected": "13:16",
-   "deployed": "14:00",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-24T14:00"
-  },
-  {
-   "id": "18_dB-03",
-   "class": "18_displacement",
-   "angle": "B",
-   "question": "why do RANKING-TXT.csv and the report disagree by 50 documents",
-   "expected": "13:18",
-   "deployed": "14:00",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-24T14:00"
-  }
- ],
+ "plan": "",
  "run": {
-  "started": "16:00",
   "ended": null,
-  "ended_how": null
- },
- "history": [
-  {
-   "at": "02:33",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "04:11",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "05:13",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "05:30",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "06:18",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "16:38",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "22:43",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "00:32",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "02:09",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "02:37",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "03:58",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "04:39",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "05:51",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "06:40",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "07:23",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "08:21",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "09:19",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "12:31",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "13:09",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "14:07",
-   "how": "forced",
-   "plan": ""
-  }
- ],
- "context": "18_displacement: the residual on the 13 sole-failure documents is TWO constructs whose errors cancel, and that is why 20 attempts moved 4. Four live Google round trips this slot: med_dy -2.8 (362_price_list_dense), -3.0 (bus-timetable), -6.7 (mobile-bill), -13.0 (72_bank_statement); worst_dy 5.4/4.9/10.0/28.2; med_dx -0.2..+0.2 on all four; bad_pages [0] on all four. Run-by-run profiles: at every table's block top the gap is lost (-8.76, -4.19, -4.08 pt on mobile-bill) and inside every table each row is laid 0.75 pt too tall, so dy climbs back to 0 at the footer. 24 rows x 0.75 = 18 pt of ramp against 17.0 pt of step. Each half refuted alone because spending the spacer overflows (the DocxWriter guard at :6074 names mobile-bill and insurance-policy-schedule) and the row declaration change alone leaves the step uncompensated. The untried pair: deliver the gap through the first-row cell w:before (measured 1:1 by Google, 66 probes, error 0.000000) AND reduce w:trHeight by the same per-row amount, so the table total is unchanged. 362_price_list_dense has no step, only a monotone ramp, so it is the document that proves or refutes the pair. All 13 are converted in /scratch/work/p2w/out.",
- "needs_human": [
-  {
-   "at": "10:40",
-   "what": "the widget-AP walk is refused by one document, and the decision is not a fixer's",
-   "tried": "measured all three variants corpus-wide: 601 52.39 -> 0.00 and 42/42 docx checks, Account form 97.62 -> 98.65 (+1.03) in every variant that emits widget text, 0 other documents worse of 205 scored",
-   "change": "a person must either authorise the trade (a 1.03 rise on a document already at 97.62 for 601 going to 0.00), or give share@5px a companion axis that separates 'more ink, some far' from 'the same ink, further' - see FINDINGS/widget-walk-REFUSED-BY-ONE-DOCUMENT-1050-f1x.md"
-  }
- ],
- "next_class": "electricity-bill"
+  "ended_how": null,
+  "started": "16:00"
+ }
 }

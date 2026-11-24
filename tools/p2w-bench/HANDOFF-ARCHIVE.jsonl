@@ -391,3 +391,4 @@
 {"_list": "notes", "_entry": {"at": "23:32", "text": "agent deployed: 04_chars_missing construct: Google drops wps:txbx text; missing multiset fully explained by anchored boxes on 9 docs /  - "}}
 {"_list": "agents", "_entry": {"id": "gverB-01", "class": "gverify", "angle": "B", "question": "why gverify --collect cannot read the download result the Drive tool returns now", "expected": "a fix with a test", "deployed": "16:37", "status": "landed", "finding": "tools/p2w-bench/FINDINGS/gverify-COLLECT-DOWNLOAD-SHAPE-1120-agent.md", "deployed_at": "2026-11-23T16:37", "landed_at": "2026-11-23T16:37"}}
 {"_list": "notes", "_entry": {"at": "23:32", "text": "agent deployed: 44_header_footer: .txt half clean (0 lost/duplicated across 31); 20 of 28 feet are floating anchors, 8 flow and still fail /  - "}}
+{"_list": "notes", "_entry": {"at": "00:09", "text": "attempt 16 on content-present-partly-displaced -> lead (0/13 moved)"}}

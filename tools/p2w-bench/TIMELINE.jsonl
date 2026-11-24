@@ -4463,3 +4463,302 @@
 {"t": 1795518965.1181107, "ist": "16:46:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795518970.669301, "ist": "16:46:10", "ev": "beat", "d": "committing the finding"}
 {"t": 1795518988.8931508, "ist": "16:46:28", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795518992.3900313, "ist": "16:46:32", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795518992.5902145, "ist": "16:46:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795518992.7511148, "ist": "16:46:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795518993.2938607, "ist": "16:46:33", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795519205.1321013, "ist": "16:50:05", "ev": "beat", "d": "writing the report"}
+{"t": 1795519205.324001, "ist": "16:50:05", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519206.3062093, "ist": "16:50:06", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519230.234743, "ist": "16:50:30", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519231.3097374, "ist": "16:50:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519243.5976841, "ist": "16:50:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795519243.7035449, "ist": "16:50:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519261.6963022, "ist": "16:51:01", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795519267.877559, "ist": "16:51:07", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519268.889622, "ist": "16:51:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519296.991488, "ist": "16:51:36", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519297.1188173, "ist": "16:51:37", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519297.9890783, "ist": "16:51:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519298.4936337, "ist": "16:51:38", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519298.6263084, "ist": "16:51:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519298.9158185, "ist": "16:51:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519299.0741742, "ist": "16:51:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519299.9741447, "ist": "16:51:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519300.5892992, "ist": "16:51:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519300.7463143, "ist": "16:51:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519301.9300778, "ist": "16:51:41", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519306.731962, "ist": "16:51:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519310.6503282, "ist": "16:51:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519319.913745, "ist": "16:51:59", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519320.9456108, "ist": "16:52:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519329.51947, "ist": "16:52:09", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519330.7184381, "ist": "16:52:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519349.772782, "ist": "16:52:29", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519349.9704611, "ist": "16:52:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519351.7035494, "ist": "16:52:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519352.5258265, "ist": "16:52:32", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519352.698422, "ist": "16:52:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519353.0675435, "ist": "16:52:33", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519353.2319863, "ist": "16:52:33", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519354.2845533, "ist": "16:52:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519354.8277833, "ist": "16:52:34", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519355.0269682, "ist": "16:52:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519356.283437, "ist": "16:52:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519362.3201852, "ist": "16:52:42", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519363.2955894, "ist": "16:52:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519364.2568696, "ist": "16:52:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519364.4244123, "ist": "16:52:44", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519365.9596426, "ist": "16:52:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519366.6652684, "ist": "16:52:46", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519366.835892, "ist": "16:52:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519367.2193964, "ist": "16:52:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519367.370787, "ist": "16:52:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519368.5477176, "ist": "16:52:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519369.1974387, "ist": "16:52:49", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519369.3836296, "ist": "16:52:49", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519370.553003, "ist": "16:52:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519376.7297492, "ist": "16:52:56", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519376.8905098, "ist": "16:52:56", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519377.8210223, "ist": "16:52:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519378.3980463, "ist": "16:52:58", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519378.561992, "ist": "16:52:58", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519379.0711434, "ist": "16:52:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519379.2937658, "ist": "16:52:59", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519380.749812, "ist": "16:53:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519381.5090187, "ist": "16:53:01", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519381.6588175, "ist": "16:53:01", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519382.7943084, "ist": "16:53:02", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519383.6554723, "ist": "16:53:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519383.840494, "ist": "16:53:03", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519384.7752466, "ist": "16:53:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519385.4852083, "ist": "16:53:05", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519385.6733632, "ist": "16:53:05", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519386.1866875, "ist": "16:53:06", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519386.3748503, "ist": "16:53:06", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519387.60028, "ist": "16:53:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519388.3277552, "ist": "16:53:08", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519388.5675013, "ist": "16:53:08", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519389.9062643, "ist": "16:53:09", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519391.099537, "ist": "16:53:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519391.5522153, "ist": "16:53:11", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519392.894328, "ist": "16:53:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519393.4340234, "ist": "16:53:13", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519393.5694838, "ist": "16:53:13", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519393.8403783, "ist": "16:53:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519393.9891024, "ist": "16:53:13", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519394.7990444, "ist": "16:53:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519395.2694, "ist": "16:53:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519395.4176638, "ist": "16:53:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519396.5310187, "ist": "16:53:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519403.6042464, "ist": "16:53:23", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519403.7259612, "ist": "16:53:23", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519404.7406933, "ist": "16:53:24", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519405.2704716, "ist": "16:53:25", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519405.442102, "ist": "16:53:25", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519405.7312129, "ist": "16:53:25", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519405.9072719, "ist": "16:53:25", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519407.0415905, "ist": "16:53:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519407.7996738, "ist": "16:53:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519407.932257, "ist": "16:53:27", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519408.7776694, "ist": "16:53:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519409.4233925, "ist": "16:53:29", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519409.5386207, "ist": "16:53:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519410.4847639, "ist": "16:53:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519411.0415387, "ist": "16:53:31", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519411.2168434, "ist": "16:53:31", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519411.5328023, "ist": "16:53:31", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519411.677824, "ist": "16:53:31", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519412.5279536, "ist": "16:53:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519412.9986246, "ist": "16:53:32", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519413.120144, "ist": "16:53:33", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519413.936993, "ist": "16:53:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519421.323856, "ist": "16:53:41", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519421.454991, "ist": "16:53:41", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519422.303662, "ist": "16:53:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519422.8138728, "ist": "16:53:42", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519422.9400501, "ist": "16:53:42", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519423.227095, "ist": "16:53:43", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519423.379527, "ist": "16:53:43", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519424.3121042, "ist": "16:53:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519424.8224573, "ist": "16:53:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519424.9810178, "ist": "16:53:44", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519425.8906543, "ist": "16:53:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519426.537055, "ist": "16:53:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519426.6939118, "ist": "16:53:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519427.6215215, "ist": "16:53:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519428.1700375, "ist": "16:53:48", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519428.3284345, "ist": "16:53:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519428.6557102, "ist": "16:53:48", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519428.8126333, "ist": "16:53:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519430.0171602, "ist": "16:53:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519430.866566, "ist": "16:53:50", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519431.0575564, "ist": "16:53:51", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519432.2147431, "ist": "16:53:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519432.9730663, "ist": "16:53:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519433.135881, "ist": "16:53:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519434.1145093, "ist": "16:53:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519434.6274297, "ist": "16:53:54", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519434.7939851, "ist": "16:53:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519435.1458554, "ist": "16:53:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519435.3130188, "ist": "16:53:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519436.555027, "ist": "16:53:56", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519437.0817397, "ist": "16:53:57", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519437.2249548, "ist": "16:53:57", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519438.0943944, "ist": "16:53:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519438.7291496, "ist": "16:53:58", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519438.8568249, "ist": "16:53:58", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519439.8005457, "ist": "16:53:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519440.319302, "ist": "16:54:00", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519440.4671507, "ist": "16:54:00", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519440.7542038, "ist": "16:54:00", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519440.904953, "ist": "16:54:00", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519441.8131824, "ist": "16:54:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519442.279925, "ist": "16:54:02", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519442.4118397, "ist": "16:54:02", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519443.217824, "ist": "16:54:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519443.9310439, "ist": "16:54:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519444.0863338, "ist": "16:54:04", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519444.9372492, "ist": "16:54:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519445.5154533, "ist": "16:54:05", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519445.7048118, "ist": "16:54:05", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519446.0964956, "ist": "16:54:06", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519446.2423978, "ist": "16:54:06", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519447.2063205, "ist": "16:54:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519447.7486413, "ist": "16:54:07", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519447.8918793, "ist": "16:54:07", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519448.8751037, "ist": "16:54:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519449.6263697, "ist": "16:54:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519449.784147, "ist": "16:54:09", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519450.7705812, "ist": "16:54:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519451.4022973, "ist": "16:54:11", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519451.572368, "ist": "16:54:11", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519451.9024777, "ist": "16:54:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519452.029134, "ist": "16:54:12", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519453.007798, "ist": "16:54:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519453.5698414, "ist": "16:54:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519453.7140203, "ist": "16:54:13", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519454.652148, "ist": "16:54:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519455.3467426, "ist": "16:54:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519455.5159426, "ist": "16:54:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519456.372476, "ist": "16:54:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519456.8917663, "ist": "16:54:16", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519457.0129092, "ist": "16:54:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519457.3179402, "ist": "16:54:17", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519457.474611, "ist": "16:54:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519458.2772486, "ist": "16:54:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519458.7412024, "ist": "16:54:18", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519458.8669071, "ist": "16:54:18", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519459.8438087, "ist": "16:54:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519460.6172702, "ist": "16:54:20", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519460.7623713, "ist": "16:54:20", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519461.7073665, "ist": "16:54:21", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519462.3089352, "ist": "16:54:22", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519462.4761882, "ist": "16:54:22", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519462.8258197, "ist": "16:54:22", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519462.9846222, "ist": "16:54:22", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519463.8390305, "ist": "16:54:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519464.336342, "ist": "16:54:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519464.498813, "ist": "16:54:24", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519465.341562, "ist": "16:54:25", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519475.4682083, "ist": "16:54:35", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519475.7073503, "ist": "16:54:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519477.0493374, "ist": "16:54:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519477.986439, "ist": "16:54:37", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519478.2526524, "ist": "16:54:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519478.9464836, "ist": "16:54:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519479.1071184, "ist": "16:54:39", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519479.9764526, "ist": "16:54:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519480.455145, "ist": "16:54:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519480.5941765, "ist": "16:54:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519481.4716177, "ist": "16:54:41", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519482.210222, "ist": "16:54:42", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519482.3489695, "ist": "16:54:42", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519483.1685784, "ist": "16:54:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519483.6880293, "ist": "16:54:43", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519483.8274004, "ist": "16:54:43", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519484.1364465, "ist": "16:54:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519484.273485, "ist": "16:54:44", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519485.103482, "ist": "16:54:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519485.6144514, "ist": "16:54:45", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519485.7772892, "ist": "16:54:45", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519486.8144472, "ist": "16:54:46", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519487.5346174, "ist": "16:54:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519487.6925433, "ist": "16:54:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519488.7232714, "ist": "16:54:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519489.4104304, "ist": "16:54:49", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519489.550717, "ist": "16:54:49", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519489.8680482, "ist": "16:54:49", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519490.0230284, "ist": "16:54:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519491.1151118, "ist": "16:54:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519491.816726, "ist": "16:54:51", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519491.9965272, "ist": "16:54:51", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519493.049402, "ist": "16:54:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519493.8285818, "ist": "16:54:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519494.001254, "ist": "16:54:54", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519494.8821168, "ist": "16:54:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519495.436638, "ist": "16:54:55", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519495.5830822, "ist": "16:54:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519495.9270513, "ist": "16:54:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519496.0763714, "ist": "16:54:56", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519497.0394454, "ist": "16:54:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519497.660269, "ist": "16:54:57", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519497.8512757, "ist": "16:54:57", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519498.7995489, "ist": "16:54:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519512.6212854, "ist": "16:55:12", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519512.8035858, "ist": "16:55:12", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519513.7826695, "ist": "16:55:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519514.419667, "ist": "16:55:14", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519514.5941753, "ist": "16:55:14", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519515.0494676, "ist": "16:55:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519515.269377, "ist": "16:55:15", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519516.8950915, "ist": "16:55:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519517.6734805, "ist": "16:55:17", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519517.8952842, "ist": "16:55:17", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519519.171813, "ist": "16:55:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519524.7942753, "ist": "16:55:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519524.9421048, "ist": "16:55:24", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519526.0344198, "ist": "16:55:26", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519526.6257238, "ist": "16:55:26", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519526.820331, "ist": "16:55:26", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519527.215373, "ist": "16:55:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519527.3760936, "ist": "16:55:27", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519528.578212, "ist": "16:55:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519529.443128, "ist": "16:55:29", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519529.6040785, "ist": "16:55:29", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519531.024613, "ist": "16:55:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519531.8499253, "ist": "16:55:31", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519532.0624237, "ist": "16:55:32", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519533.4556546, "ist": "16:55:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519534.3043947, "ist": "16:55:34", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519534.5377595, "ist": "16:55:34", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519535.2880235, "ist": "16:55:35", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519535.5551124, "ist": "16:55:35", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519537.3416233, "ist": "16:55:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519538.386481, "ist": "16:55:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519538.5467176, "ist": "16:55:38", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519539.780605, "ist": "16:55:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519545.8508568, "ist": "16:55:45", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519546.012477, "ist": "16:55:46", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519547.010801, "ist": "16:55:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519547.662469, "ist": "16:55:47", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519547.8565645, "ist": "16:55:47", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519548.2973163, "ist": "16:55:48", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519548.4966471, "ist": "16:55:48", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519549.704016, "ist": "16:55:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519550.2992454, "ist": "16:55:50", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519550.4647398, "ist": "16:55:50", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519551.6393588, "ist": "16:55:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519552.9063752, "ist": "16:55:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519553.1488903, "ist": "16:55:53", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519554.3648894, "ist": "16:55:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519555.271615, "ist": "16:55:55", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795519555.4717047, "ist": "16:55:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519555.8111856, "ist": "16:55:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519555.9625301, "ist": "16:55:55", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519557.1845253, "ist": "16:55:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519557.8318393, "ist": "16:55:57", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795519558.0313978, "ist": "16:55:58", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519559.4363399, "ist": "16:55:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795519566.0922115, "ist": "16:56:06", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795519567.3922288, "ist": "16:56:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
