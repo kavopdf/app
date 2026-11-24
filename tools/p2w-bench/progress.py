@@ -36,7 +36,7 @@ the corpus on that date; nothing here is typed by hand.
 
 `docx open` is the number of documents whose share@5px is above 1.0 in RANKING.csv. `txt failing` is
 the number whose .txt fails a check. `google` is how many documents have been measured through Google's
-own renderer, and `google clean` how many of those pass all 42 checks.
+own renderer, and `google clean` how many of those pass every check offered checks.
 
 A row that does not move is the signal: it means a day of the pipeline produced no change, and the
 watchdog's job is to find out why.
