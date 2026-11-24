@@ -4805,3 +4805,7 @@
 {"t": 1795525084.2677622, "ist": "18:28:04", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795525179.2559092, "ist": "18:29:39", "ev": "beat", "d": "live Google probe on a refused document"}
 {"t": 1795525238.5813322, "ist": "18:30:38", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795525242.4395735, "ist": "18:30:42", "ev": "attempt", "d": "00_page_count -> lead"}
+{"t": 1795525242.581973, "ist": "18:30:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795525242.6740146, "ist": "18:30:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795525243.1103177, "ist": "18:30:43", "ev": "beat", "d": "classrow.py: refreshing the class file"}
