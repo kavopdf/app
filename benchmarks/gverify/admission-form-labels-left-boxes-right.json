@@ -1,12 +1,10 @@
 {
  "name": "admission-form-labels-left-boxes-right",
  "status": "ok",
- "rc": 1,
- "passed": 41,
+ "rc": 0,
+ "passed": 42,
  "total": 42,
- "failed": [
-  "25_invisible_text"
- ],
+ "failed": [],
  "displacement": {
   "med_dy": -0.1,
   "worst_dy": 1.4,

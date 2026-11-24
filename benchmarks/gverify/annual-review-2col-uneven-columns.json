@@ -1,12 +1,10 @@
 {
  "name": "annual-review-2col-uneven-columns",
  "status": "ok",
- "rc": 1,
- "passed": 41,
+ "rc": 0,
+ "passed": 42,
  "total": 42,
- "failed": [
-  "25_invisible_text"
- ],
+ "failed": [],
  "displacement": {
   "med_dy": -0.2,
   "worst_dy": 2.1,
