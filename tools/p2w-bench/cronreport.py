@@ -437,21 +437,30 @@ def watchdog():
                    else "Nothing is stopped."), "",
          "## Stages", "",
          "| stage | state | progress | age |", "|:--|:--|--:|--:|"]
-    for name in ("measure-google", "matrix", "classify", "fix", "txt"):
-        v = stages.get(name) or {}
-    # TODAY'S ROW IS NOT HISTORY YET. The trend is read from the committed table, which is right - rows()
-    # must not be recomputed. But when today's row disagrees with the live data it is reported, not served
-    # as if current. On 24 Nov it said google_clean 29 against a live 35: six documents adrift.
+    # THE STAGES TABLE WAS EMPTY ON EVERY CLEAN PASS. The row-building lines below used to sit inside
+    # `if _stale:`, so the five rows were written only when today's progress row disagreed with the
+    # live data, and only for the last stage name the loop had reached. Measured 24 Nov: the generated
+    # watchdog report printed "## Stages" and then nothing, on a pass where health.py had five rows to
+    # show. The stale banner is still conditional; the rows are not.
     _stale = progress_stale()
     if _stale:
+        # TODAY'S ROW IS NOT HISTORY YET. The trend is read from the committed table, which is right -
+        # rows() must not be recomputed. But when today's row disagrees with the live data it is
+        # reported, not served as if current. On 24 Nov it said google_clean 29 against a live 35.
         L.append("> **Today's row is stale** - %s. The trend below is the committed row; the data has moved."
                  % "; ".join(_stale))
         L.append("")
+    for name in ("measure-google", "matrix", "classify", "fix", "txt"):
+        v = stages.get(name) or {}
         prog = ""
         if v.get("done") is not None and v.get("of"):
             prog = "%d of %d" % (v["done"], v["of"])
         elif v.get("clean") is not None:
             prog = "%d clean, %d failing" % (v["clean"], v.get("failing") or 0)
+        elif v.get("attempts_3h") is not None:
+            # The fix stage has no done/of and no clean/failing - it has attempts. Without this the
+            # fix row printed an empty progress cell, which is the one number a watchdog reads first.
+            prog = "%d attempt(s) in 3 h" % v["attempts_3h"]
         state = v.get("state") or "-"
         mark = "**%s**" % state if state == "stopped" else state
         # health.py uses a large sentinel for "no evidence at all" and it was printed as a real age:
