@@ -375,12 +375,10 @@
  },
  "324_loan_amortisation_schedule": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t09_page_furniture",
-  "failed": 1,
-  "failed_ids": [
-   "t09_page_furniture"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "325_demat_holdings_statement": {
   "applicable": 8,
@@ -1280,12 +1278,10 @@
  },
  "gst-invoice-multipage-item-table": {
   "applicable": 12,
-  "baseline_failed": 1,
-  "cause": "t09_page_furniture",
-  "failed": 1,
-  "failed_ids": [
-   "t09_page_furniture"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "gst-invoice-with-qr-code": {
   "applicable": 10,

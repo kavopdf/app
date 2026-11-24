@@ -1,6 +1,6 @@
 # .txt defect classes
 
-Documents measured: **213 of 213** - 197 clean, 16 failing at least one check.
+Documents measured: **213 of 213** - 199 clean, 14 failing at least one check.
 
 Grouped from `tools/p2w-bench/txt/RANKING-TXT.csv` only. A document's class is the check
 that fails it; a document failing several is counted under each and its own row names all
@@ -13,10 +13,10 @@ serves every document under it.
 |---|---|---:|---|---:|
 | `t12_word_invention` | the .txt carries no word the source never drew | 8 | OPEN | 4% |
 | `t02_position` | a line's x survives as its leading spaces | 4 | OPEN | 2% |
-| `t09_page_furniture` | one copy of each running head per page it belongs to | 4 | OPEN | 2% |
 | `t01_word_accuracy` | the source's words survive, 99 % of them | 3 | OPEN | 1% |
 | `t06_encoding` | the bytes decode as the UTF-8 the writer declares | 2 | OPEN | 1% |
 | `t08_line_order` | lines arrive in the order the page drew them | 2 | OPEN | 1% |
+| `t09_page_furniture` | one copy of each running head per page it belongs to | 2 | OPEN | 1% |
 
 ## Documents
 
@@ -26,7 +26,6 @@ serves every document under it.
 | `05_round_company_seal_curved_text` | `t12_word_invention` | 1/9 | `t12_word_invention` | was 1 |
 | `305_vaccination_certificate` | `t08_line_order` | 1/7 | `t08_line_order` | was 1 |
 | `311_fir_police_form` | `t12_word_invention` | 1/7 | `t12_word_invention` | was 1 |
-| `324_loan_amortisation_schedule` | `t09_page_furniture` | 1/10 | `t09_page_furniture` | was 1 |
 | `332_bom_on_drawing` | `t02_position` | 1/8 | `t02_position` | was 1 |
 | `334_patent_document` | `t02_position` | 1/7 | `t02_position` | was 1 |
 | `39_small_caps_letter_spacing` | `3 checks` | 3/9 | `t01_word_accuracy`, `t08_line_order`, `t12_word_invention` | was 3 |
@@ -35,6 +34,5 @@ serves every document under it.
 | `74_balance_sheet_indented_subitems` | `t02_position` | 1/10 | `t02_position` | was 1 |
 | `77_arabic_rtl_document` | `t01_word_accuracy + t12_word_invention` | 2/9 | `t01_word_accuracy`, `t12_word_invention` | was 2 |
 | `Account_Opening_Form_Fillable_filled` | `3 checks` | 3/10 | `t06_encoding`, `t09_page_furniture`, `t12_word_invention` | was 3 |
-| `gst-invoice-multipage-item-table` | `t09_page_furniture` | 1/12 | `t09_page_furniture` | was 1 |
 | `journal-2col-with-footnotes` | `t12_word_invention` | 1/9 | `t12_word_invention` | was 1 |
 | `price-list-2col-dense-right-aligned` | `t02_position` | 1/10 | `t02_position` | was 1 |
