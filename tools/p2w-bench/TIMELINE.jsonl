@@ -3928,3 +3928,5 @@
 {"t": 1795506746.5268314, "ist": "13:22:26", "ev": "beat", "d": "relay: p2w --force --budget 240 to measure real per-doc rate"}
 {"t": 1795507662.3162034, "ist": "13:37:42", "ev": "beat", "d": "relay: uniform-pitch patch applied, building engine for the 213-doc pass"}
 {"t": 1795508513.5850227, "ist": "13:51:53", "ev": "beat", "d": "relay: proving the phase-budget split - one chunk must both convert and measure"}
+{"t": 1795508882.173629, "ist": "13:58:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795508942.0543756, "ist": "13:59:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
