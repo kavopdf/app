@@ -5341,3 +5341,8 @@
 {"t": 1795552309.011498, "ist": "02:01:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795552309.0928442, "ist": "02:01:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795552309.3341844, "ist": "02:01:49", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795553700.5568008, "ist": "02:25:00", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795555742.4699624, "ist": "02:59:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795555753.991659, "ist": "02:59:13", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795555754.0772908, "ist": "02:59:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795555756.706489, "ist": "02:59:16", "ev": "beat", "d": "attempt.py: recording an attempt"}
