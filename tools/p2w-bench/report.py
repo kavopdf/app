@@ -695,6 +695,14 @@ def txt():
         path = os.path.join(HERE, "RANKING-TXT.csv")
     if not os.path.exists(path):
         return {"available": False}
+    # THE .TXT NUMBERS ARE ONLY AS CURRENT AS THIS FILE, AND NOTHING RE-MEASURES IT ON A SCHEDULE.
+    # txt_gate.py regenerates RANKING-TXT.csv and no cron calls it - step_txt.py and ratchet.py only PRINT
+    # the command. So the table can be a day old and still be reported as "213 of 213 scored", which is
+    # how a stalled half reads as a healthy one. Measured 24 Nov: written 23 Nov 09:56, reported as current.
+    try:
+        _txt_age_h = (time.time() - os.path.getmtime(path)) / 3600.0
+    except Exception:
+        _txt_age_h = None
     rows = []
     try:
         for r in csv.DictReader(open(path, encoding="utf-8")):
@@ -751,7 +759,8 @@ def txt():
     return {"available": True, "scored": len(rows), "clean": len(clean),
             "failing": len(bad), "top": top,
             "moved": moved, "regressed": regressed,
-            "pct": round(100.0 * len(clean) / len(rows), 1)}
+            "pct": round(100.0 * len(clean) / len(rows), 1),
+            "age_h": _txt_age_h}
 
 
 def subagents():
@@ -1055,6 +1064,16 @@ def main(argv):
         L.append("")
         L.append("| | |")
         L.append("|:--|:--|")
+        # HOW OLD THESE NUMBERS ARE, BEFORE THE NUMBERS. Nothing re-measures RANKING-TXT.csv on a
+        # schedule: txt_gate.py regenerates it and only step_txt.py prints the command. On 24 Nov the
+        # file was 16.7 h old and the table still read "213 of 213 scored", which is a stalled half
+        # reading as a healthy one. The age goes first so a stale table cannot look current.
+        if tx.get("age_h") is not None:
+            _a = tx["age_h"]
+            L.append("| Measured | **%s ago**%s |" % (
+                ("%.1f h" % _a) if _a >= 1 else ("%d min" % int(_a * 60)),
+                "" if _a < 6 else " - nothing re-measures this on a schedule; run "
+                "`txt_gate.py --score 40`" if _a >= 6 else ""))
         L.append("| Scored | **%d** of 213 |" % tx["scored"])
         L.append("| Clean - every applicable check passes | **%d** (%.1f%%) |" % (tx["clean"], tx["pct"]))
         L.append("| Failing at least one check | **%d** |" % tx["failing"])

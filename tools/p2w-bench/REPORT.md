@@ -36,6 +36,7 @@
 
 | | |
 |:--|:--|
+| Measured | **16.8 h ago** - nothing re-measures this on a schedule; run `txt_gate.py --score 40` |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
