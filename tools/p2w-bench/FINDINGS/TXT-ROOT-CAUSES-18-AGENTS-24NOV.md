@@ -208,6 +208,47 @@ pads to); rotation is not the cause (0 non-upright lines on all four pages).
 `t13_amount_columns`, which does **not** reproduce on HEAD - that cell was measured on an older engine
 (`b97d8172ce642eb0`). Worth a full rescore, not a hand edit.
 
+
+## t12, the exact count: 55 invented words, three mechanisms, and the split
+
+Reproduced by converting all 8 documents and scoring them with the shipped check: **55 invented words,
+no more**, from three mechanisms.
+
+| mechanism | words | side |
+|---|---:|---|
+| the .txt writes the same page text twice | 19 | **engine** |
+| the .txt writes text the page never prints (sticky-note body) | 7 | **engine** |
+| a token boundary differs while every character is present | 27 | **check** |
+| one mid-word cell wrap | 2 | **engine** |
+
+So **28 of the 55 are real inventions and 27 are the check charging a whitespace difference as an
+invented word.**
+
+**The two account forms are the same 9-page document** (one carries 352 widget values) and produce the
+identical five words `{'#', 'payable', 'authorised', 'd', 'signatory)y'}` - one cause, not two. Proven
+per word:
+
+- **Page 3, `#` and `payable`** - the footnote marker is drawn at x 131.5-134.1 at size 3.5, and the line
+  it belongs to **ends at exactly x = 131.5**. So the PDF's own declaration carries `payable#` as one
+  token; the .txt writes `payable` and `#` on separate lines. Nothing invented, nothing lost.
+- **Page 4, `d`, `authorised`, `signatory)y`** - the DD/MM/YYYY row is ONE show operation of eight
+  glyphs, and its last `Y` at x 136.8 sits **inside** the label `(Authorised signatory)` at
+  x 133.1-209.2. The engine's model holds both
+  `[TABLE] ROW [D, D, M, M, Y, Y, Y, (Authorised signatory)Y]` **and**
+  `[PARA] L1 x=133.05 (Authorised signatory)`. The page draws that label **once** (text count 1, trace
+  count 1); the .txt writes it twice, at lines 3034 and 3047. A second row is modelled as
+  `ROW [D,D,M,M,Y,Y,Y,Y]` plus a paragraph `'Date: D'`, so one of the eight `D`s is written twice -
+  the page draws 8, the .txt carries 9.
+
+**The "one cause, three symptoms" hypothesis is disproved.** t06 is 127 U+FFFD, one per Effra ligature
+glyph with no Unicode CID (page 1 draws `ģ):` for `ff`; the .txt carries `o�ce`, `a�x`,
+`Identi�cation`). t09's 29-vs-125 comes from one-letter furniture keys. Three independent causes
+that share a page feature, not a mechanism.
+
+**An open format decision, not a bug:** whether a .txt should carry a `/Text` sticky-note body at all.
+Either the writer stops emitting it, or the check is told the format includes it. That decision belongs
+to the format's owner, and it changes whether 600's 7 words are a defect or a feature.
+
 ## t06_encoding — real, but fixing it alone makes t01 and t12 worse
 
 127 U+FFFD in each account form, which are exactly the ligature inventory: ff 13, fi 89, ffi 23, ffl 2.
