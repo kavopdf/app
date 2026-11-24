@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 04:20
+# Fixer report - 2026-11-24 04:52
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 04:20 → running IST · 18 min**
+**24 Nov 2026 · slot 04:52 → running IST · 58 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -22,7 +22,13 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `18_displacement` |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 05:50 | **lead** | 0/None | Google lays a table row out on whole CSS pixels and truncates the fraction: a 168-twip row (11.2 px) renders at 11 px, 0.15 pt a row, 4.35 pt over 29 rows. Carrying the remainder across rows took 362_ |
 
 ## The txt
 
@@ -36,20 +42,17 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-04` | what is settled, refuted and left as a patch on this | 04:38 | - | not recorded |
-| `18_dB-02` | if the table-top step were removed, which documents  | 04:38 | - | not recorded |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 04:20 → running · 18 min |
+| Slot window | 04:52 → running · 58 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
-| Longest silence | **7.1 min** — from 04:30:56, after `relay: full corpus pass (p2w --force)` |
-| Silences over 2 min | 3 |
+| Tool beats | 25 |
+| Longest silence | **5.9 min** — from 05:08:37, after `corpus pass 3 + starting the Google round trip on 362` |
+| Silences over 2 min | 13 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -57,10 +60,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `########` |
-| record - attempt, handoff, class rows | **1 min** | `##` |
-| report - the report and the chain | **3 min** | `#####` |
-| other - not attributed to a tool | **6 min** | `#######` |
+| measure or build - a conversion, screen or compile writes no beacon | **13 min** | `#####` |
+| record - attempt, handoff, class rows | **2 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **41 min** | `################` |
 ## Best results this round
 
 | Document | Before | After | Change |

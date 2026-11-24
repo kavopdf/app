@@ -6,33 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 21 Nov 17:00 | fixer | attempt | t02_position -> partial (1/5 moved) |
-| 21 Nov 17:39 | fixer | attempt | 32_stroke_lines -> reverted (0/145 moved) |
-| 21 Nov 19:00 | fixer | claim | fixer claimed the slot |
-| 21 Nov 19:04 | ? | attempt | 32_stroke_lines -> error |
-| 21 Nov 19:10 | fixer | attempt | 32_stroke_lines -> reverted (0/15 moved) |
-| 21 Nov 19:59 | fixer | build-engine | started |
-| 21 Nov 20:00 | fixer | build-engine | engine unchanged, compile skipped |
-| 21 Nov 20:08 | fixer | attempt | 32_stroke_lines -> reverted (0/213 moved) |
-| 21 Nov 20:17 | fixer | attempt | 32_stroke_lines -> lead (0/210 moved) |
-| 21 Nov 20:57 | fixer | claim | fixer claimed the slot |
-| 21 Nov 20:58 | fixer | build-engine | started |
-| 21 Nov 20:59 | fixer | build-engine | engine built in 59s |
-| 21 Nov 21:29 | fixer | build-engine | started |
-| 21 Nov 21:30 | fixer | build-engine | engine built in 51s |
-| 21 Nov 21:31 | fixer | attempt | 32_stroke_lines -> lead (0/? moved) |
-| 21 Nov 21:53 | fixer | claim | fixer claimed the slot |
-| 21 Nov 22:18 | fixer | build-engine | started |
-| 21 Nov 22:20 | fixer | build-engine | engine built in 70s |
-| 21 Nov 22:38 | fixer | attempt | t08_line_order -> kept (9/10 moved) |
-| 21 Nov 22:49 | fixer | commit-gate | started |
-| 21 Nov 22:51 | fixer | commit-gate | started |
-| 21 Nov 22:56 | fixer | claim | fixer claimed the slot |
-| 21 Nov 22:56 | fixer | stale-claim | fixer slot was stale (18 min) - the previous run ended without releasing it |
-| 21 Nov 23:10 | fixer | build-engine | started |
-| 21 Nov 23:11 | fixer | build-engine | engine built in 36s |
-| 21 Nov 23:13 | fixer | attempt | 32_stroke_lines -> lead (0/192 moved) |
-| 21 Nov 23:26 | fixer | build-engine | started |
 | 21 Nov 23:27 | fixer | build-engine | engine built in 36s |
 | 21 Nov 23:37 | fixer | attempt | 05_chars_extra -> kept (11/192 moved) |
 | 21 Nov 23:57 | fixer | claim | fixer claimed the slot |
@@ -406,3 +379,30 @@
 | 24 Nov 04:30 | fixer | build-engine | started |
 | 24 Nov 04:30 | fixer | build-engine | engine built in 35s |
 | 24 Nov 04:39 | fixer | attempt | 00_page_count -> lead |
+| 24 Nov 04:52 | fixer | claim | fixer claimed the slot |
+| 24 Nov 04:53 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
+| 24 Nov 05:14 | fixer | build-engine | started |
+| 24 Nov 05:15 | fixer | build-engine | engine built in 37s |
+| 24 Nov 05:16 | fixer | build-engine | started |
+| 24 Nov 05:16 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 05:19 | fixer | build-engine | started |
+| 24 Nov 05:19 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 05:23 | fixer | build-engine | started |
+| 24 Nov 05:23 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 05:27 | fixer | build-engine | started |
+| 24 Nov 05:27 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 05:31 | fixer | build-engine | started |
+| 24 Nov 05:31 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 05:35 | fixer | build-engine | started |
+| 24 Nov 05:35 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 05:41 | fixer | build-engine | started |
+| 24 Nov 05:41 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 05:44 | fixer | build-engine | started |
+| 24 Nov 05:44 | fixer | build-engine | engine built in 35s |
+| 24 Nov 05:44 | fixer | build-engine | started |
+| 24 Nov 05:44 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 05:48 | fixer | build-engine | started |
+| 24 Nov 05:48 | fixer | build-engine | engine unchanged, compile skipped |
+| 24 Nov 05:49 | fixer | build-engine | started |
+| 24 Nov 05:49 | fixer | build-engine | engine built in 36s |
+| 24 Nov 05:50 | fixer | attempt | 18_displacement -> lead (0/? moved) |
