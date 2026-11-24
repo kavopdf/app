@@ -193,7 +193,16 @@ def main(argv):
 
     fell, rose, held, new, unmeasured, recut = [], [], [], [], [], []
 
+    # FLUSH THE STORE AS IT GOES, NOT ONLY AT THE END. The single write at 274 sits after the whole
+    # loop, so a run that dies part-way loses every document it measured - and the ledger says most
+    # runs are killed rather than released. The store already accumulates ACROSS runs (it is loaded at
+    # 137), so this is the same mechanism at a finer grain: every 25 documents, write what is done.
+    # Bounded loss, and no per-document I/O.
+    _flush = 0
     for doc in sorted(store):
+        _flush += 1
+        if not a.check and _flush % 25 == 0:
+            write_json(MARKS, marks)
         rec = store[doc]
         if a.doc and a.doc != doc:
             continue
