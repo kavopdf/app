@@ -146,8 +146,12 @@ def collect():
         items.append({"kind": "ratchet", "who": cls,
                       "what": "kept, %s/%s moved, never ratcheted at corpus scale"
                               % (row.get("last_moved", "?"), row.get("last_total", "?")),
-                      "why": "A fix measured on its own class is unproven everywhere else. Run the "
-                             "full corpus ratchet before this class is called done."})
+                      "why": ("A fix measured on its own class is unproven everywhere else. Run the "
+                              "full corpus ratchet, then close it with "
+                              "`python3 tools/p2w-bench/attempt.py --class %s --ratchet <docs-checked>`. "
+                              "That stamp is the ONLY thing that clears this row - ratchet_google.py "
+                              "--doc <name> does one document at a time, so the store builds across "
+                              "slots, but only the stamp ends it." % cls)})
 
     # 4. Walls that were written down and not cleared.
     #
