@@ -53,11 +53,33 @@ Before the change the same probe wrote `name, status, pages, want, at` and no ex
 is written into the record, not left in `/scratch/work`, because the record is committed and the scratch
 directory is not.
 
+## Two of the 23, re-measured in Google with the new recorder
+
+Same slot, after the change, live round trips through the shipped `--collect` (Drive create-as-Google-Doc
+in `KavoPDF-Verify` → export PDF → collect). The point of the probe is that the record now answers the
+question the old record could not.
+
+| document | stored refusal | re-measured on `b7699196` | page 2 of the export |
+|:--|:--|:--|:--|
+| `60_page_border` | 2 pages vs 1, no engine, no `at` | **still 2 vs 1** | 0 words, 1 drawing, **16 images** - the page's own border, rasterised. A real second sheet, so an engine defect, not a counter |
+| `bank-statement-horizontal-rules-only` | 2 pages vs 1, no engine, no `at` | **1 page, 40/42** - `18_displacement` (med_dy 8.5, worst 106.6) and `45_char_accuracy` | not applicable - it is no longer refused |
+
+Two corrections follow, and both cost a run if they are not written down.
+
+1. **The 23 are not 23 engine defects.** At least one of them is not a page-count defect at all on the
+   current engine; its refusal was true of an older build and nothing could see that, because the record
+   carried no engine stamp. The list must be re-measured, not reasoned about.
+2. **`60_page_border`'s second page is real furniture**, 16 rasterised pieces of the page's own border,
+   so the instrument is right to refuse it and the fix is in the engine. That is the first of the 23
+   whose extra page has been read rather than assumed.
+
 ## What it does not claim
 
-No verdict changed. A refusal is still a refusal, `status` is still `page_count_refused`, and nothing in
-`matrix()`, `report.py` or `measure_gate` reads the new fields yet - they are evidence for the next run,
-not a number in this one. The next gverify pass over those 23 documents is what turns the census into a
+The code change alters no verdict by itself: a refusal is still a refusal, `status` is still
+`page_count_refused`, and nothing in `matrix()`, `report.py` or `measure_gate` reads the new fields yet.
+The two verdicts that DID change above changed because those documents were re-measured in Google, not
+because the recorder was edited - `bank-statement-horizontal-rules-only` is no longer a refusal on this
+engine and `60_page_border` still is. The next gverify pass over those 23 documents is what turns the census into a
 measurement; until it runs, the 21 unstamped refusals stay stale, which is the honest state.
 
 ## What would prove this wrong

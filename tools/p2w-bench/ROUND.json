@@ -13,10 +13,10 @@
       }
     ]
   },
-  "fixer_doing": "instrument fix measured; running the gates",
-  "fixer_doing_since": 1795524460.6328862,
+  "fixer_doing": "live Google probe on a refused document",
+  "fixer_doing_since": 1795525179.2564032,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795524460.6328871,
+  "fixer_last_beat": 1795525179.256404,
   "fixer_started": 1795525083.5720527,
   "history": [
     {

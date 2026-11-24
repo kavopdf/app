@@ -4803,3 +4803,4 @@
 {"t": 1795525083.7320588, "ist": "18:28:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795525083.839837, "ist": "18:28:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795525084.2677622, "ist": "18:28:04", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795525179.2559092, "ist": "18:29:39", "ev": "beat", "d": "live Google probe on a refused document"}
