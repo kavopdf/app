@@ -1,17 +1,17 @@
-# Fixer report - 2026-11-24 07:00
+# Fixer report - 2026-11-24 07:12
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 07:00 → running IST · 17 min**
+**24 Nov 2026 · slot 07:12 → running IST · 9 min**
 
-> **7 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> **5 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **7** — 2 attempt(s), 2 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **5** — 3 attempt(s), 2 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -22,7 +22,7 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `25_invisible_text` |
+| Working on | `18_displacement` |
 
 ## What was tried
 
@@ -30,6 +30,7 @@
 |--:|:--|--:|:--|
 | 07:11 | **kept** | 2/5 | check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42 |
 | 07:12 | **kept** | 5/5 | all five single-check documents re-measured 42/42 in Google on this engine after the check fix |
+| 07:21 | **reverted** | 0/2 | A2's row declared one rule short is NOT LO-invariant: mobile-bill 104/112 lines moved up to -10.5 pt, electricity-bill 117/125 up to -10.0 pt; ruleTwHere is 10 tw not 15, and LibreOffice lays the decl |
 
 ## The txt
 
@@ -43,20 +44,17 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `A1` | what does 25_invisible_text compare, and which const | 07:03 | 07:07 | 4 min |
-| `A2` | what law does Google use to lay a table row's height | 07:22 | 07:26 | 4 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 07:00 → running · 17 min |
+| Slot window | 07:12 → running · 9 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 15 |
-| Longest silence | **5.6 min** — from 07:05:54, after `building the engine (build-engine.sh)` |
-| Silences over 2 min | 3 |
+| Tool beats | 11 |
+| Longest silence | **4.1 min** — from 07:13:44, after `report.py: building the report` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -64,10 +62,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **5 min** | `#######` |
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `######` |
-| record - attempt, handoff, class rows | **2 min** | `###` |
-| report - the report and the chain | **4 min** | `######` |
+| fix - diagnose and change the engine | **2 min** | `######` |
+| record - attempt, handoff, class rows | **1 min** | `###` |
+| report - the report and the chain | **5 min** | `#############` |
 ## Best results this round
 
 | Document | Before | After | Change |

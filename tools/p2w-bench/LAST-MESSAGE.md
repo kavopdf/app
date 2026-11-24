@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 07:00 → running IST · 17 min**
+**24 Nov 2026 · slot 07:12 → running IST · 9 min**
 
 > **`25_invisible_text` was a check that read the paper.** A Google PDF export opens with a page-sized
 > white rectangle and rasterises our bands into images, so white type on an orange band counted as
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **7** — 2 attempt(s), 2 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **5** — 3 attempt(s), 2 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -22,7 +22,7 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `25_invisible_text` |
+| Working on | `18_displacement` |
 
 ## What was tried
 
@@ -30,6 +30,7 @@
 |--:|:--|--:|:--|
 | 07:11 | **kept** | 2/5 | check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42 |
 | 07:12 | **kept** | 5/5 | all five single-check documents re-measured 42/42 in Google on this engine after the check fix |
+| 07:21 | **reverted** | 0/2 | A2's row declared one rule short is NOT LO-invariant: mobile-bill 104/112 lines moved up to -10.5 pt, electricity-bill 117/125 up to -10.0 pt; ruleTwHere is 10 tw not 15, and LibreOffice lays the decl |
 
 ## The txt
 
@@ -43,20 +44,17 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `A1` | what does 25_invisible_text compare, and which const | 07:03 | 07:07 | 4 min |
-| `A2` | what law does Google use to lay a table row's height | 07:22 | 07:26 | 4 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 07:00 → running · 17 min |
+| Slot window | 07:12 → running · 9 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 15 |
-| Longest silence | **5.6 min** — from 07:05:54, after `building the engine (build-engine.sh)` |
-| Silences over 2 min | 3 |
+| Tool beats | 11 |
+| Longest silence | **4.1 min** — from 07:13:44, after `report.py: building the report` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -64,10 +62,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **5 min** | `#######` |
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `######` |
-| record - attempt, handoff, class rows | **2 min** | `###` |
-| report - the report and the chain | **4 min** | `######` |
+| fix - diagnose and change the engine | **2 min** | `######` |
+| record - attempt, handoff, class rows | **1 min** | `###` |
+| report - the report and the chain | **5 min** | `#############` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -90,32 +87,31 @@ NEXT RUN: (1) THE PREVIOUS PAIR IS REFUTED - do not spend a slot on it. content+
 ## Next run
 
 **(1) THE CHECK WAS THE DEFECT, ON 5 OF THE 48.** The five documents that failed nothing but
-`25_invisible_text` are now 42/42 in Google. The other 43 still fail it and whether they are the same
-false positive is **not measured** - the stamp case was proven by eye (band present, white on orange),
-the rest were not looked at. One export each is the whole test. A band arriving as an **image** in a
-Google export (15 images and 2 drawings where the source has 1 and 14) is a separate real defect that
-belongs to whoever owns rasterised shapes.
+`25_invisible_text` are 42/42 in Google. The other 43 still fail it and whether they are the same false
+positive is **not measured** — the stamp case was proven by eye (band present, white on orange), the
+rest were not looked at. One export each is the whole test.
 
-**(2) AGENT A2 REFUTED THE CARRY-OVER'S OWN NUMBER.** The row law, fitted to every committed Google
-number: `laid = 0.75 * round((max(trHeight, content) + rule) / 0.75)` - `w:trHeight` is a quantised
-**floor**, not a length. `362_price_list_dense` draws no rules, so `rule = 0` and it does **not** ramp
-+0.75 pt/row; its rows lay at 8.25 against a declared 8.40 and the table's foot drifts *negative*,
-which is the measured `med_dy` -2.8. The "29 x 0.75 = 21.75 pt of pure ramp" in the last handoff is
-ruled-table arithmetic applied to an unruled table. **362 cannot test the row half.** A ruled Half B
-document (`mobile-bill`, `electricity-bill`) can.
+**(2) AGENT A2'S LAW STANDS, ITS FIX DOES NOT — AND THAT IS THE USEFUL PART.** The law, fitted to every
+committed Google number: `laid = 0.75 * round((max(trHeight, content) + rule) / 0.75)`, so `w:trHeight`
+is a quantised **floor**. `362_price_list_dense` draws no rules (`rule = 0`), so it does **not** ramp
++0.75 pt/row and its foot drifts *negative* — the measured `med_dy` -2.8. **The carry-over's
+"29 x 0.75 = 21.75 pt of pure ramp" is ruled-table arithmetic on an unruled table.** 362 cannot test the
+row half; a ruled document can.
 
-**(3) THE ONE CHANGE WORTH THE NEXT SLOT.** `DocxWriter.java:6468` - declare the row one rule short:
-`rowHeightTw = Math.max(rowLineTw, rowTwHere - ruleTwHere)`. LibreOffice lays
-`max(trHeight, content + rule)` and HEAD already writes `content = rowTwHere - ruleTwHere`, so LO lays
-`P` either way: **LO-identical by construction**, and `regress.py` has nothing to refuse. Google drops
-one pixel per row, which is the whole ramp. It is a **no-op on 362** (`rule = 0`), so test it on
-`mobile-bill`. This is close to the `ROW-RULE-1220` patch, which took mobile-bill, 68_journal and
-73_marksheet to 42/42 in Google; that build subtracted two rules because its tree still had the cell's
-line at the pitch, at HEAD one is right and the change is LO-neutral, which that build was not.
+A2's one-line fix — declare the row one rule short at `DocxWriter:6468` — was **built and refuted in
+this slot**: `mobile-bill` moved 104/112 lines up to -10.5 pt and `electricity-bill` 117/125 lines to
+-10.0 pt in LibreOffice. The rule is 10 twips, not the 15 assumed, and LibreOffice lays the
+**declaration** where it exceeds the content, so `max(P-r, P) = P` was wrong. Engine reverted,
+`regress.py --check` PASS. This is the same wall `…WHOLE-PIXELS-0052` hit, reached from the arithmetic
+instead of from a corpus sweep.
 
-**(4) `18_displacement` is still 101 documents and still the class**, and 14 documents fail nothing
-else - the largest single-check group left. `60_text_column_right_edge` (5) is the next largest.
+**(3) WHAT IS LEFT ON THE ROW HALF IS THE CELL'S CONTENT, NOT THE DECLARATION** (`:6403`, `:6786-6803`).
+The row is as tall as the cell asks it to be, and that is the only place a change can move both
+renderers together. Do not spend the next slot on `trHeight` again.
 
-**(5) The gates are clean.** `regress.py --check` PASS before and after, `measure_gate.py` READY,
-`google_safe` could not check (no `.docx` output directory in this pod). The change touches no emitted
-byte, only how a PDF is read; the agent's change is not in this run's tree and is not claimed.
+**(4) `18_displacement` is still 101 documents and still the class**; 14 documents fail nothing else —
+the largest single-check group left. `60_text_column_right_edge` (5) is next.
+
+**(5) The gates are clean.** `regress.py --check` PASS before and after every attempt,
+`measure_gate.py` READY, `google_safe` could not check (no `.docx` output directory in this pod). The
+kept change touches no emitted byte, only how a PDF is read.
