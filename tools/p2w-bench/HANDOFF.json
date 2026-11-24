@@ -2,18 +2,6 @@
  "plan": "",
  "notes": [
   {
-   "at": "16:37",
-   "text": "agent deployed: gverify / B - why gverify --collect cannot read the download result the Drive tool returns now"
-  },
-  {
-   "at": "16:37",
-   "text": "agent landed: 00_pA-02 /  -> tools/p2w-bench/FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md"
-  },
-  {
-   "at": "16:37",
-   "text": "agent landed: gverB-01 /  -> tools/p2w-bench/FINDINGS/gverify-COLLECT-DOWNLOAD-SHAPE-1120-agent.md"
-  },
-  {
    "at": "17:41",
    "text": "attempt 38 on 18_displacement -> lead (0/190 moved)"
   },
@@ -240,34 +228,22 @@
   {
    "at": "08:18",
    "text": "attempt 4 on 60_text_column_right_edge -> lead"
+  },
+  {
+   "at": "08:18",
+   "text": "attempt 50 on 18_displacement -> lead"
+  },
+  {
+   "at": "08:20",
+   "text": "agent deployed: 18_displacement / A - is the page-height guard why no table-top spacer is ever spent on the 14 documen"
+  },
+  {
+   "at": "08:20",
+   "text": "agent deployed: 60_text_column_right_edge / B - is 60 or 18 reading the paper instead of the defect - the 25_invisible_text prec"
   }
  ],
  "next": "NEXT RUN: (1) THE PREVIOUS PAIR IS REFUTED - do not spend a slot on it. content+rule==pitch and hRule=atLeast make a trHeight-only change a no-op, and a cell-level gap escapes fitPage/shaveToFit (FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md). (2) The class is two disjoint halves: a spacer half (the step at each table top = 0.784 x the declared w:line of an unspendable spacer, confirmed on 4 of 4 documents) and a row half (+0.75 pt per row, 21.75 pt over 362_price_list_dense's 29 rows). (3) FIRST MOVE: one Google round trip on 362_price_list_dense with trHeight = max(content, line-15) on rows where line > content only - LO-invariant by construction, and it tells you whether Google lays trHeight+rule or max(trHeight, content+rule). (4) The 4 ratchet rows need one corpus pass (~40 min) - start the slot with it, do not end with it. (5) The 9 REOPEN rows in PENDING-AUDIT.md are decisions with evidence attached.",
  "agents": [
-  {
-   "id": "00_pA-01",
-   "class": "00_page_count",
-   "angle": "A",
-   "question": "from the committed gverify JSONs and CENSUS.csv, how many documents does clearing 18_displacement alone make clean, and is the dy signature a constant or a tail",
-   "expected": "05:00",
-   "deployed": "05:13",
-   "status": "landed",
-   "finding": "FINDINGS/18disp-prize-sizing-agentA.md",
-   "deployed_at": "2026-11-22T23:43",
-   "landed_at": "2026-11-22T23:43"
-  },
-  {
-   "id": "00_pB-01",
-   "class": "00_page_count",
-   "angle": "B",
-   "question": "re-measure every claim of the page-count finding from the exported PDFs and docx alone - pages, image counts, paragraph counts",
-   "expected": "05:40",
-   "deployed": "05:13",
-   "status": "landed",
-   "finding": "FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md",
-   "deployed_at": "2026-11-22T23:43",
-   "landed_at": "2026-11-22T23:43"
-  },
   {
    "id": "18_dresidual-census-01",
    "class": "18_d",
@@ -531,6 +507,28 @@
    "finding": "row = 0.75*round((max(trHeight,content)+rule)/0.75): trHeight is a quantised floor, not a length. 362 is unruled, so it does not ramp +0.75/row - the carry-over's 21.75 pt is ruled-table arithmetic. The LO-invariant change is DocxWriter:6468 declaring the row one rule short; it must be tested on a ruled document, not 362.",
    "deployed_at": "2026-11-24T07:22",
    "landed_at": "2026-11-24T07:26"
+  },
+  {
+   "id": "18_dA-05",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "is the page-height guard why no table-top spacer is ever spent on the 14 documents that fail only 18",
+   "expected": "08:05",
+   "deployed": "08:20",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-24T08:20"
+  },
+  {
+   "id": "60_tB-01",
+   "class": "60_text_column_right_edge",
+   "angle": "B",
+   "question": "is 60 or 18 reading the paper instead of the defect - the 25_invisible_text precedent",
+   "expected": "08:05",
+   "deployed": "08:20",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-24T08:20"
   }
  ],
  "run": {

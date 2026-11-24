@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 07:57
+# Fixer report - 2026-11-24 08:18
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 07:57 → running IST · 0 min**
+**24 Nov 2026 · slot 08:18 → running IST · 2 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -24,11 +24,18 @@
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
 | Working on | `-` |
 
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 08:18 | **lead** | 0/None | two agents, both committed as FINDINGS: (1) a 14-document guard census that refutes 'the guard is why the spacer is unspent' - 5 of the 14 already spend their spacer and still fail 18, and the unruled |
+| 08:18 | **lead** | 0/None | measured all 5 single-check documents: 4 are 42/42 in LibreOffice and fail only in Google, and both probes (font name, embedded face) are refuted - Google has no DejaVu and ignores an embedded face. 7 |
+
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **16.8 h ago** - nothing re-measures this on a schedule; run `txt_gate.py --score 40` |
+| Measured | **23 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -37,18 +44,28 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-05` | is the page-height guard why no table-top spacer is  | 08:20 | - | - |
+| `60_tB-01` | is 60 or 18 reading the paper instead of the defect  | 08:20 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 07:57 → running · 0 min |
+| Slot window | 08:18 → running · 2 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 2 |
+| Tool beats | 8 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| record - attempt, handoff, class rows | **1 min** | `############` |
+| report - the report and the chain | **1 min** | `##########` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -36,8 +36,6 @@ unfinished work, not as a result.
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 00_pA-01 | 00_page_count | A | from the committed gverify JSONs and CENSUS.csv, how many documents do | 05:13 | 05:00 | landed | FINDINGS/18disp-prize-sizing-agentA.md |
-| 00_pB-01 | 00_page_count | B | re-measure every claim of the page-count finding from the exported PDF | 05:13 | 05:40 | landed | FINDINGS/00_page_count-EMPTY-PARAGRAPH-COSTS-THE-PAGE-0530-fixer.md |
 | 18_dresidual-census-01 | 18_d | residual-census | which current-engine documents fail 18_displacement, and what has FIND | 06:17 | a per-document table plus the check arithmetic, from committed files only | landed | FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - 58 of 213 Google results are on the current engine (98be7c3c); 24 fail 18_displacement, only 2 fail it alone (16_right_aligned_amounts_txtpos, 31_times_body_arial_headings); the 16-document solo population is stamped 462353f9, not current. Killed the row-pitch lead before a round trip was spent. |
 | 18_dblast-radius-01 | 18_d | blast-radius | the exact writer rule for w:trHeight/w:hRule, what the row-pitch patch | 06:17 | a blast-radius list and a verdict on whether the 18.5 pt rung is worth a Google round trip | landed | FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md - the laid row-pitch ladder is 0.75*(round(d/0.75)+1) so 18.5 pt is unreachable and the nearest rung to an 18.40 pt source is 18.75; no document is both one check from clean and reachable by a row-height declaration. Refuted the run's opening plan before any build. |
 | A118_displacement-01 | A1 | 18_displacement | writer-construct | 13:21 | Which single .docx writer construct causes the 18_displacement failures that 13+ documents fail alone, and which documents go CLEAN if fixed | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
@@ -60,16 +58,14 @@ unfinished work, not as a result.
 | 18_drowpitch-census-01 | 18_displacement | rowpitch-census | census the table row pitch of every corpus PDF and classify uniform-fr | 06:34 | a CSV and a count per class, so the guard's population is measured rather than assumed | landed | no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B. |
 | A1 | 25_invisible_text | check-definition | what does 25_invisible_text compare, and which construct makes 48 docu | 07:03 | the check's operands and a named Java site, so a fix could be attempted | landed | the check stopped at the FIRST fill under a run's corner. A Google export opens with a page-sized white rect and rasterises our bands into images, so white type on an orange band matched the sheet. This run's fix; 5 documents went 42/42. |
 | A2 | 18_displacement | row-height-law | what law does Google use to lay a table row's height, and what LO-inva | 07:22 | a law fitted to the committed Google numbers, and one falsifiable change | landed | row = 0.75*round((max(trHeight,content)+rule)/0.75): trHeight is a quantised floor, not a length. 362 is unruled, so it does not ramp +0.75/row - the carry-over's 21.75 pt is ruled-table arithmetic. The LO-invariant change is DocxWriter:6468 declaring the row one rule short; it must be tested on a ruled document, not 362. |
+| 18_dA-05 | 18_displacement | A | is the page-height guard why no table-top spacer is ever spent on the  | 08:20 | 08:05 | running |  |
+| 60_tB-01 | 60_text_column_right_edge | B | is 60 or 18 reading the paper instead of the defect - the 25_invisible | 08:20 | 08:05 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `02:07` agent landed: 18_dA-02 /  -> FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md
-- `02:07` agent landed: 04_cB-02 /  -> FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md
-- `02:08` attempt 42 on 18_displacement -> lead (0/13 moved)
-- `02:34` attempt 43 on 18_displacement -> lead (0/13 moved)
 - `02:35` agent deployed: 18_displacement / A - audit the pending gate: which of the 21 closable items are still true
 - `02:35` agent deployed: 18_displacement / B - table block-top gap and per-row height in DocxWriter
 - `02:37` agent landed: 18_dA-03 /  -> PENDING-AUDIT.md
@@ -91,6 +87,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `07:11` attempt 1 on 25_invisible_text -> kept (2/5 moved)
 - `07:12` attempt 2 on 25_invisible_text -> kept (5/5 moved)
 - `07:21` attempt 49 on 18_displacement -> reverted (0/2 moved)
+- `08:18` attempt 4 on 60_text_column_right_edge -> lead
+- `08:18` attempt 50 on 18_displacement -> lead
+- `08:20` agent deployed: 18_displacement / A - is the page-height guard why no table-top spacer is ever spent on the 14 documen
+- `08:20` agent deployed: 60_text_column_right_edge / B - is 60 or 18 reading the paper instead of the defect - the 25_invisible_text prec
 
 ## Where the rest of the state lives
 
