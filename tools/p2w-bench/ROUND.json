@@ -13,11 +13,11 @@
       }
     ]
   },
-  "fixer_doing": "building engine",
-  "fixer_doing_since": 1795541234.8524108,
+  "fixer_doing": "corpus stamped 213/213, running gate",
+  "fixer_doing_since": 1795544051.3523388,
   "fixer_engine_at_claim": "b7699196",
   "fixer_last_beat": 1795539453.665067,
-  "fixer_started": 1795541281.314044,
+  "fixer_started": 1795544082.7746286,
   "history": [
     {
       "at": "2026-11-12 09:46",
