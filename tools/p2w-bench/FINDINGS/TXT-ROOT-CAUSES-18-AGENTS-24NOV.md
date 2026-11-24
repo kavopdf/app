@@ -87,6 +87,53 @@ and both account forms emit `(Authorised signatory)` twice (+14). For 600 the co
 `PdfToWord.pageText()` builds `pageOwn` then calls `readAnnotationAppearances()`, which appends into the
 same `glyphs` list the de-duplication guard was built from — so the guard can never match.
 
+
+## t12, third approach: the one path that ADDS characters, named to the line
+
+The engine-writer investigation converted all 8 documents, dumped the engine's own model (table rows,
+paragraph lines) for the failing pages, and compared characters rather than words:
+
+| document | invented chars | missing chars |
+|---|---|---|
+| 05 seal, 311 fir, 39 small-caps, 77 arabic, journal-2col | **none** | none |
+| 600_reviewed_invoice | **+83** | none |
+| 041122 / Fillable | +13 | 8 / 13 |
+
+Five of the eight carry **not one character the PDF does not draw**. Their invented words are the same
+characters grouped into different tokens - which settles the t12 fix: compare characters, not tokens.
+
+**The only path that adds characters is `PdfToWord.annotationRuns`, line 2456, called at 956.**
+
+It takes `getContents()` from **every** annotation with no subtype filter and appends it as a body
+paragraph at `top = 0`. Its only guard is `flat.contains(...)` against the content stream - but a
+FreeText's words are drawn by its `/AP`, not by the content stream, so the guard can never match.
+
+Proof, on 600_reviewed_invoice_with_annotations: the first line of its .txt is
+`Rate for HSN 8536 confirmed with PO.` - a `/Text` sticky note whose appearance stream draws **no text
+at all** (PyMuPDF returns an empty string for it). Seven words that exist nowhere on the page.
+
+The same loop then duplicates the FreeText's sentence (13 more characters) because it lacks the
+`drawnByAppearance(apDrawn, ...)` guard that the `/V` loop at line 947 already has.
+
+**So 600 has one fix with two halves, both in the same function:** stop hoisting `/Text` sticky notes
+(they draw nothing, so their body is a comment, not page content), and add the same
+`drawnByAppearance` guard the sibling loop already uses.
+
+## t12's other real faults, by mechanism
+
+- **Table-cell welding - 3 of 8** (311, 041122, Fillable). Glyphs are bucketed into columns by x, so a
+  value that overruns its cell lands in the neighbour's cell, and `glyphText` welds it there because it
+  only inserts a space on a *positive* gap. Engine model dump for 311:
+  `row3: [Address] [12/3, ... Bengaluru 5] [60067Mobile] [+91 98450 11223]` - the page draws the address
+  at x 141 to 312.5 and the label `Mobile` at x 291, so `60067` was bucketed into Mobile's cell and
+  welded, orphaning the `5`.
+- **041122's signatory duplication, at output level:** `p4 TABLE row0: [D][D][M][M][Y][Y][Y]
+  [(Authorised signatory)Y]` **plus** `p4 PARA line1: (Authorised signatory)`. The paragraph is absorbed
+  into a cell *and* emitted again, and a stray `Y` glyph 0.5 pt lower is welded on.
+- **Token-boundary rules, no character invented - 4 of 8** (05, 39, 77, journal), four different rules:
+  `ringLines` emits one Line per seal character (05), the 0.18 em space threshold (39), `logicalOrder`
+  RTL reversal (77), superscript baseline clustering (journal).
+
 ## t06_encoding — real, but fixing it alone makes t01 and t12 worse
 
 127 U+FFFD in each account form, which are exactly the ligature inventory: ff 13, fi 89, ffi 23, ffl 2.
