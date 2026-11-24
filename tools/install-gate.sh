@@ -21,6 +21,10 @@ if [ ! -d "$ROOT/.git" ]; then
   exit 1
 fi
 
+# The gate cannot run on a pod with no corpus, no JDK and no compiled engine - three prerequisites,
+# three scripts, one order. pod-prep.sh is that order, and it is idempotent.
+bash "$HERE/p2w-bench/pod-prep.sh"
+
 cat > "$HOOK" <<'EOS'
 #!/usr/bin/env bash
 # THE COMMIT GATE. Installed by tools/install-gate.sh.
