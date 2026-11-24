@@ -261,25 +261,27 @@
   },
   {
    "id": "60ed60_text_column_right_edge-01",
-   "class": "60edge",
-   "angle": "60_text_column_right_edge",
-   "question": "A - is the right edge the engine's or the face's",
-   "expected": "LANDED: FINDINGS/60_text_column_right_edge-EDGE-IS-THE-FACE-4GOOGLE-1INSTRUMENT-24NOV-agentA.md - k x (line width), 4 Google-cannot + 1 instrument, 0 engine",
+   "class": "60_text_column_right_edge",
+   "angle": "A",
+   "question": "is the right edge the engine's or the face's",
+   "expected": "",
    "deployed": "18:27",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-24T18:27"
+   "status": "landed",
+   "finding": "FINDINGS/60_text_column_right_edge-EDGE-IS-THE-FACE-4GOOGLE-1INSTRUMENT-24NOV-agentA.md",
+   "deployed_at": "2026-11-24T18:27",
+   "landed_at": "2026-11-24T18:40"
   },
   {
    "id": "pc2300_page_count-01",
-   "class": "pc23",
-   "angle": "00_page_count",
-   "question": "B - what is on the extra page of the 23 refusals",
-   "expected": "LANDED: FINDINGS/00_page_count-23-REFUSED-ALL-ENGINE-0-CLEAN-24NOV-agentB.md - 23 engine, 0 instrument, 0 clean, and 21 carry no engine stamp",
+   "class": "00_page_count",
+   "angle": "B",
+   "question": "what is on the extra page of the 23 refusals",
+   "expected": "",
    "deployed": "18:27",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-24T18:27"
+   "status": "landed",
+   "finding": "FINDINGS/00_page_count-23-REFUSED-ALL-ENGINE-0-CLEAN-24NOV-agentB.md",
+   "deployed_at": "2026-11-24T18:27",
+   "landed_at": "2026-11-24T18:40"
   }
  ],
  "context": "24 Nov 17:54 slot. Two subagents landed real measurements and both say the leverage table is optimistic: 60_text_column_right_edge is k x (line width) on a substituted face - 4 documents are Google-cannot (they declare DejaVu, which Google lacks) and 1 is the instrument reading the widest extractor line, so 0 of 5 are reachable by an engine change. 00_page_count's 23 refused documents are all engine (the page's own furniture emitted as many page-positioned shapes, Google charges 0.10-0.96 pt per shape, LibreOffice nothing) but ZERO of them would go clean: not one carries a single Google check because a refusal skips all 47, and 21 of the 23 refusals carry no engine stamp at all. This run fixed the recorder: gverify --collect no longer deletes the refused export and now stamps engine/checks/at plus a per-page census (words/drawings/images) into the record, so the next pass can decide engine-vs-instrument for those 23 from the record instead of a Drive round trip.",
