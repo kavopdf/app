@@ -692,3 +692,32 @@ per-check rows, not the shape of the table.
 `gverify.py --plan` to confirm it prints `0 to go`, then `gverify.py --collect` on the four names
 above. Until then, `stage.py`'s `measured` line overstates by exactly the number of stale scored
 results, and any report that quotes it as "213 measured against this engine" is wrong.
+
+---
+
+## 2026-11-24 13:30 IST — gverify: the capability table's row order is not stable, and `classify` cannot be left by any cron
+
+**What I was doing.** `stage.py` said `classify`, so this run regenerated the capability table and
+compared it with the committed copy before committing.
+
+**Finding 1 — the counts are current, the order is not.** `gverify.py --matrix` run twice in a row on
+the same committed results produced two different files: 34 check rows, identical counts, different
+order. The table sorts on the failure count and ties are resolved by dict iteration order, so a
+regenerated table differs textually from the one it replaces on every run while every number in it is
+the same. Verified this run by parsing both files: the check set is identical, `0` rows differ in
+either count column, and both headline lines read `124 of 190` and `35 of 190`. The committed table
+therefore carried the current numbers before this run touched it.
+
+**Finding 2 — no cron can move `stage.py` off `classify`.** `stage.py`'s classify exit condition is
+`benchmarks/DEFECT-CLASSES-GOOGLE.md` committed later than `benchmarks/gverify`. That file's last
+commit is `e788f3c7` at 01:43, gverify's is `d317c3db` at 03:48, so the label reads `classify`. The
+cron that writes that file is the classifier, and its own gate — `round.py --phase` — answers `fix`
+this run, so the classifier brief tells it to stop. The fixer is working (commits at 07:37-07:43 UTC),
+so the pipeline is moving; only `stage.py`'s label is pinned. Every gverify slot will therefore do the
+classify-stage action — regenerate a table whose counts cannot change — until the classifier writes
+that file.
+
+**Decision.** Commit the regenerated table (it is the tool's own output) and this row; do not classify
+and do not touch the engine. What would clear finding 2: one classifier run that rewrites
+`DEFECT-CLASSES-GOOGLE.md`, or a `stage.py` whose classify condition reads the artifact this cron
+actually writes.
