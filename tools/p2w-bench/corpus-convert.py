@@ -61,6 +61,11 @@ WORK = os.path.join(ROOT, "tools", "engine-verify")
 DEFAULT_CP = "out:libs/aar/classes.jar:libs/aar/assets:libs/bcprov.jar:libs/bcpkix.jar:libs/bcutil.jar"
 
 PDF_DIRS = (
+    # corpus-fetch.sh unpacks here, and every other tool in this directory reads it here
+    # (gverify.py, stage.py, benchmarks/census.py). This tool alone still looked in CORP/, so a pod
+    # that had fetched the corpus with the repo's own script reported "corpus PDFs : 0 (none found)"
+    # and refused to build - the cache was full and the tool said COLD. Measured 24 Nov 09:40.
+    "/scratch/work/p2w/corpus",
     "/scratch/work/CORP/pdf-to-word-test-corpus-v3/pdf-to-word-test-corpus-v3/pdfs",
     "/scratch/work/CORP/pdfs",
 )
