@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-24 06:32
+# Fixer report - 2026-11-24 06:38
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 06:32 → running IST · 1 min**
+**24 Nov 2026 · slot 06:38 → running IST · 1 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,7 +11,7 @@
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -22,13 +22,14 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `18_displacement` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 06:32 | **lead** | 0/None | Built the uniform-pitch cumulative-pixel snap the 04:52 finding asked for: compiles, and reproduces the measured Google-winning distribution on 362_price_list_dense (168x28 -> 165/165/180, total prese |
+| 06:38 | **lead** | 0/None | Second pass: measured 11 documents of the 85 the guard fires on, baseline against patched on the LibreOffice proxy. Seven are unchanged at share@5 (16_right_aligned_amounts, 351_omr_answer_sheet, 341_ |
+| 06:40 | **lead** | 0/None | Third pass: the largest table in the corpus, 324_loan_amortisation_schedule (6 tables, 41 rows each, 246 rows, 7 pages) - the document where a per-row redistribution would accumulate the most. LibreOf |
 
 ## The txt
 
@@ -48,9 +49,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 06:32 → running · 1 min |
+| Slot window | 06:38 → running · 1 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 6 |
+| Tool beats | 10 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
@@ -59,8 +60,7 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **1 min** | `##############` |
-| other - not attributed to a tool | **0 min** | `########` |
+| other - not attributed to a tool | **1 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |

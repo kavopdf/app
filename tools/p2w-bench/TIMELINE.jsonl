@@ -3600,3 +3600,17 @@
 {"t": 1795482524.2609577, "ist": "06:38:44", "ev": "beat", "d": "attempt 3: the 41-row x 6-table document, both sides"}
 {"t": 1795482561.9597318, "ist": "06:39:21", "ev": "beat", "d": "attempt 3: the 41-row x 6-table document, patched side"}
 {"t": 1795482601.0577962, "ist": "06:40:01", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795482604.9443789, "ist": "06:40:04", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795482605.0182045, "ist": "06:40:05", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795482605.1085405, "ist": "06:40:05", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795482607.777559, "ist": "06:40:07", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482608.311229, "ist": "06:40:08", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795482608.418115, "ist": "06:40:08", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482608.824532, "ist": "06:40:08", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795482608.9314246, "ist": "06:40:08", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482609.1131454, "ist": "06:40:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795482609.2530558, "ist": "06:40:09", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482609.6690204, "ist": "06:40:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795482609.775457, "ist": "06:40:09", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795482617.2015352, "ist": "06:40:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795482619.21433, "ist": "06:40:19", "ev": "beat", "d": "pending.py: reading the pending gate"}

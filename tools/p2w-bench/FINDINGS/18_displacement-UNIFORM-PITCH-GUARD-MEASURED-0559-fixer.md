@@ -82,13 +82,30 @@ run twice per document to prove determinism:
 | `electricity-bill` | A only | 1.33 | **1.40** | **worse** |
 | `16_right_aligned_amounts_txtpos` | A, B | 0.00 | 0.00 | unchanged |
 | `351_omr_answer_sheet` | A, B | 0.00 | 0.00 | unchanged |
+| `341_shipping_manifest` | A, B | 0.00 | 0.00 | unchanged |
+| `390_wide_data_appendix` | A, B | 0.03 | 0.03 | unchanged |
+| `320_balance_sheet_statutory` | A, B | 0.00 | 0.00 | unchanged |
+| `323_credit_card_statement` | A, B | 0.00 | 0.00 | unchanged |
+| `375_attendance_register` | A, B | 0.01 | 0.01 | unchanged |
+| `324_loan_amortisation_schedule` (6 tables, 246 rows) | A, B | 0.00 | 0.00 | unchanged |
+| `03_stamp_vertical_90deg` | A, B | 16.98 | **17.20** | **worse** |
+| `68_journal_wide_table_spanning` | A, B | 12.09 | **12.34** | **worse** |
+
+**Twelve documents measured, eight unchanged at share@5 and four worse.** The largest table in the
+corpus - 246 rows across six tables - does not move at all, so the cost does not grow with the row
+count, which is exactly what a cumulative snap is for. The four that move are
+the target itself (+0.01) and three documents that are already displaced by 12-17 share points; the
+seven that do not move are the ones that are clean. A 12-document sample is not the corpus, and it
+is not offered as one - it is the reason the next step is a decision about the bar and not another
+guard.
 
 Repeated: `362` reads 0.03 on the baseline engine and 0.04 on the patched one, **both times**. It
 is not noise. `max_pt` goes 3.36 -> 3.84 while `p90_pt` goes 1.92 -> 1.44 and `share@3` goes
 2.03 -> 1.99 - the shape of a redistribution: most rows land closer, the worst one lands further.
 
 **`362_price_list_dense` is the one document this whole class exists for, and it is a proxy
-regression under both guards.** `regress.py` refuses any rise in share@5, so the patch is refused
+regression under both guards.** The largest cost found anywhere is +0.25 share@5, on a document
+whose share@5 is 12.09. `regress.py` refuses any rise in share@5, so the patch is refused
 by the gate on its own target, before any other document is considered.
 
 ## 5. Why no guard can fix this

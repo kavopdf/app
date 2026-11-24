@@ -1,11 +1,15 @@
 {
  "started_ts": 1795482513.6252432,
- "started": "06:38",
+ "started": "05:59",
  "window_for_claim": 1795482513.6252432,
  "ended_ts": null,
  "ended": null,
- "attempts": 0,
+ "attempts": 3,
  "kept": 0,
- "agents": [],
- "docs_improved": 0
+ "agents": [
+  "18_drowheight-prepass-01",
+  "18_drowpitch-census-01"
+ ],
+ "docs_improved": 0,
+ "class": "18_displacement"
 }

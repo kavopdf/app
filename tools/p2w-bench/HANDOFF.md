@@ -36,8 +36,6 @@ unfinished work, not as a result.
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 18_dA-05 | 18_displacement | A | consolidated every FINDINGS file and the two row emitters into one dos | 11:23 | 11:19 | landed | FINDINGS/18_displacement-PARTIAL-SPEND-REGRESSES-GOOGLE-1428-relay.md |
-| 18_dB-04 | 18_displacement | B | recomputed leverage from benchmarks/gverify/*.json without classpick.p | 11:23 | 11:20 | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
 | 18_dA-06 | 18_displacement | A | static map of every writer that emits w:trHeight and cell w:spacing, a | 13:57 | expected by 14:30 | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
 | 18_dB-05 | 18_displacement | B | from the three measured declared->laid points compute the declaration  | 13:57 | expected by 14:30 | landed | ANSWERED: the 18.5 pt rung does not exist. The laid pitch ladder is laid = 0.75*(round(declared/0.75)+1), so laid pitch is always a multiple of 0.75 pt and 18.5 is not on it; the nearest rung to an 18.40 pt source is 18.75. No declaration lands 18.5, so this question is closed rather than answered with a value. See FINDINGS/18_displacement-SEVEN-LO-ONE-CHECK-DOCS-ARE-SEVEN-MECHANISMS-0630-fixer.md. |
 | 00_pA-01 | 00_page_count | A | from the committed gverify JSONs and CENSUS.csv, how many documents do | 05:13 | 05:00 | landed | FINDINGS/18disp-prize-sizing-agentA.md |
@@ -60,18 +58,14 @@ unfinished work, not as a result.
 | 18_dB-01 | 18_displacement | B | table block-top gap and per-row height in DocxWriter | 02:35 | 03:10 | landed | 18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md |
 | 18_dA-04 | 18_displacement | A | what is settled, refuted and left as a patch on this class | 04:38 | 10 min | landed | FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied) |
 | 18_dB-02 | 18_displacement | B | if the table-top step were removed, which documents become CLEAN | 04:38 | 10 min | landed | step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40 |
+| 18_drowheight-prepass-01 | 18_displacement | rowheight-prepass | produce a minimal compilable two-pass emit for the atLeast trHeight th | 06:34 | a unified diff that applies and compiles, plus the catch that an all-equal test skips the target document | landed | FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch |
+| 18_drowpitch-census-01 | 18_displacement | rowpitch-census | census the table row pitch of every corpus PDF and classify uniform-fr | 06:34 | a CSV and a count per class, so the guard's population is measured rather than assumed | landed | no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B. |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `02:07` agent deployed: 04_chars_missing / B - is the missing-char multiset fully explained by anchored text boxes
-- `02:07` agent landed: 18_dB-04 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.
-- `02:07` agent landed: 18_dA-06 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.
-- `02:07` agent landed: A118_displacement-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.
-- `02:07` agent landed: B160_text_column_right_edge-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.
-- `02:07` agent landed: 04_c-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.
 - `02:07` agent landed: 44_h-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.
 - `02:07` agent landed: 18_dA-01 /  -> DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.
 - `02:07` agent landed: 04_cB-01 /  -> DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.
@@ -91,6 +85,12 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `04:39` attempt 7 on 00_page_count -> lead
 - `05:50` attempt 45 on 18_displacement -> lead
 - `06:32` attempt 46 on 18_displacement -> lead
+- `06:34` agent deployed: 18_displacement / rowheight-prepass - produce a minimal compilable two-pass emit for the atLeast trHeight that applies
+- `06:34` agent deployed: 18_displacement / rowpitch-census - census the table row pitch of every corpus PDF and classify uniform-fractional, 
+- `06:35` agent landed: 18_drowheight-prepass-01 /  -> FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch
+- `06:35` agent landed: 18_drowpitch-census-01 /  -> no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B.
+- `06:38` attempt 47 on 18_displacement -> lead
+- `06:40` attempt 48 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 
