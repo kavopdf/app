@@ -174,10 +174,11 @@
    "deployed": "08:20",
    "deployed_at": "2026-11-24T08:20",
    "expected": "08:05",
-   "finding": "",
+   "finding": "18_displacement-FULL-PASS-DOES-NOT-FIT-A-SLOT-0650-fixer.md",
    "id": "18_dA-05",
    "question": "is the page-height guard why no table-top spacer is ever spent on the 14 documents that fail only 18",
-   "status": "running"
+   "status": "landed",
+   "why": "finding landed - read it and act; no longer holds the queue"
   },
   {
    "angle": "B",
@@ -243,10 +244,11 @@
    "deployed": "14:00",
    "deployed_at": "2026-11-24T14:00",
    "expected": "13:16",
-   "finding": "",
+   "finding": "18_displacement-FULL-PASS-DOES-NOT-FIT-A-SLOT-0650-fixer.md",
    "id": "18_dA-06",
    "question": "where does the 11 s/doc conversion go, and the smallest change that makes --force incremental",
-   "status": "running"
+   "status": "landed",
+   "why": "finding landed - read it and act; no longer holds the queue"
   },
   {
    "angle": "B",
