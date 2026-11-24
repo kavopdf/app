@@ -5155,3 +5155,25 @@
 {"t": 1795530300.3853257, "ist": "19:55:00", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795530300.7934482, "ist": "19:55:00", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795530302.211626, "ist": "19:55:02", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795531441.3703182, "ist": "20:14:01", "ev": "beat", "d": "heartbeat before any claim: relay: corpus missing - fetching before the claim can reach origin"}
+{"t": 1795531494.669795, "ist": "20:14:54", "ev": "beat", "d": "heartbeat before any claim: relay: no JVM on the pod - installing one, then the gate can build the corpus"}
+{"t": 1795531541.5268562, "ist": "20:15:41", "ev": "beat", "d": "heartbeat before any claim: relay: building the engine (javac + pdfbox libs)"}
+{"t": 1795531652.4988573, "ist": "20:17:32", "ev": "beat", "d": "heartbeat before any claim: relay: building the converted corpus (resumable), call 1"}
+{"t": 1795532030.0732124, "ist": "20:23:50", "ev": "beat", "d": "heartbeat before any claim: relay: corpus warm (213) - running the gate"}
+{"t": 1795532110.4646914, "ist": "20:25:10", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795532111.0225542, "ist": "20:25:11", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795532111.2581356, "ist": "20:25:11", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795532711.0302458, "ist": "20:35:11", "ev": "beat", "d": "relay: foot-band patch applied (4 sites), rebuilding engine"}
+{"t": 1795532802.5728524, "ist": "20:36:42", "ev": "beat", "d": "relay: restamping 213 docs on the patched engine (p2w, resumable)"}
+{"t": 1795533564.272796, "ist": "20:49:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795533565.8864365, "ist": "20:49:25", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795533566.3786824, "ist": "20:49:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795533567.8947392, "ist": "20:49:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795533591.6202104, "ist": "20:49:51", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795533593.8162858, "ist": "20:49:53", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795533594.2526953, "ist": "20:49:54", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795533595.9526658, "ist": "20:49:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795533600.5334864, "ist": "20:50:00", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795533601.8400767, "ist": "20:50:01", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795533602.2277656, "ist": "20:50:02", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795533603.6478047, "ist": "20:50:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

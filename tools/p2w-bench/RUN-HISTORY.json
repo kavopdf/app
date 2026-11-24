@@ -1,40 +1,5 @@
 [
  {
-  "started_ts": 1795371873.5858057,
-  "started": "23:54",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   {
-    "id": "census-01",
-    "class": "18_displacement",
-    "angle": "census",
-    "question": "what do the 11 non-ruled 18_displacement documents actually hold, and is it one construct",
-    "deployed": "23:56",
-    "expected": "landed",
-    "status": "landed",
-    "finding": "FINDINGS/18_displacement-ELEVEN-NON-RULED-IS-THREE-FAULTS-CENSUS-2354-fixer.md"
-   },
-   {
-    "id": "rowlaw-01",
-    "class": "18_displacement",
-    "angle": "mechanism",
-    "question": "why does Google lay 19.10 where the engine declares 18.0/19.0, and what declaration lands 18.40",
-    "deployed": "23:58",
-    "expected": "landed",
-    "status": "landed",
-    "finding": "FINDINGS/18_displacement-ROW-GROWTH-075-QUANTUM-LAW-2354-fixer.md"
-   }
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795369253.4342782,
   "started": "23:10",
   "ended_ts": null,
@@ -909,5 +874,16 @@
   "started": "19:49",
   "started_ts": 1795529979.4790993,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "20:24",
+  "started_ts": 1795532080.7305615,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]

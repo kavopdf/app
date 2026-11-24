@@ -13,8 +13,10 @@
       }
     ]
   },
+  "fixer_doing": "relay: restamping 213 docs on the patched engine (p2w, resumable)",
+  "fixer_doing_since": 1795532802.5736864,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795530020.369619,
+  "fixer_last_beat": 1795532802.573687,
   "fixer_started": 1795532080.7286685,
   "history": [
     {
