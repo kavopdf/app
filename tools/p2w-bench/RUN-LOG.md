@@ -198,3 +198,4 @@
 | 24 Nov 18:28 | fixer | attempt 00_page_count -> lead (0/23 moved) |
 | 24 Nov 18:30 | fixer | attempt 00_page_count -> lead (0/23 moved) |
 | 24 Nov 18:34 | fixer | attempt 60_text_column_right_edge -> lead (0/5 moved) |
+| 24 Nov 18:34 | fixer | slot FORCED released - see INCIDENTS.md for why |

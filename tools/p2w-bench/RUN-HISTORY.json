@@ -1,22 +1,5 @@
 [
  {
-  "started_ts": 1795321305.9937432,
-  "started": "09:51",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   "18_dtrheight-emitter-01",
-   "18_drow-growth-mechanism-01"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "started_ts": 1795323035.6921647,
   "started": "10:20",
   "ended_ts": null,
@@ -1010,5 +993,21 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "60ed60_text_column_right_edge-01",
+   "pc2300_page_count-01"
+  ],
+  "attempts": 4,
+  "class": "60_text_column_right_edge",
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "started": "18:28",
+  "started_ts": 1795525083.5720527,
+  "window_for_claim": 1795525083.5720527,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
