@@ -1,38 +1,5 @@
 [
  {
-  "started_ts": 1795283340.0,
-  "started": "23:19",
-  "ended_ts": null,
-  "ended": "running",
-  "class": "05_chars_extra",
-  "attempts": 1,
-  "kept": 1,
-  "docs_improved": 11,
-  "agents": [
-   {
-    "id": "rule-emission-census",
-    "at": "23:22",
-    "took_min": 5,
-    "landed": true
-   },
-   {
-    "id": "txt-failures-diagnosis",
-    "at": "23:41",
-    "took_min": 10,
-    "landed": true
-   }
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "counted": [
-   [
-    "05_chars_extra",
-    11
-   ]
-  ],
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795285668.8828137,
   "started": "23:57",
   "ended_ts": null,
@@ -1069,5 +1036,20 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795488523.3960025,
+  "started": "08:18",
+  "window_for_claim": 1795488523.3960025,
+  "ended_ts": null,
+  "ended": "(never)",
+  "attempts": 0,
+  "kept": 0,
+  "agents": [
+   "18_dA-05",
+   "60_tB-01"
+  ],
+  "docs_improved": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
