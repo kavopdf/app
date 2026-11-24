@@ -3839,73 +3839,33 @@
 {"t": 1795492190.766087, "ist": "09:19:50", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795492192.3414636, "ist": "09:19:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795492192.5002441, "ist": "09:19:52", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795494657.3232772, "ist": "10:00:57", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1795494657.4866965, "ist": "10:00:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795494660.1528976, "ist": "10:01:00", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795494676.0324502, "ist": "10:01:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795494689.5888715, "ist": "10:01:29", "ev": "beat", "d": "deploying two agents: guard blast-radius, txt word_invention"}
-{"t": 1795495942.1273541, "ist": "10:22:22", "ev": "beat", "d": "agent A landed: 85 docs touched, 0 page-count changes; now apply+build"}
-{"t": 1795495950.8407953, "ist": "10:22:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795495959.6996312, "ist": "10:22:39", "ev": "beat", "d": "patch applied, building"}
-{"t": 1795496076.558858, "ist": "10:24:36", "ev": "beat", "d": "corpus pass 1/8: fetching corpus, measuring with patched engine"}
-{"t": 1795496389.2070332, "ist": "10:29:49", "ev": "beat", "d": "corpus pass: zips in place, unzip+engine+measure"}
-{"t": 1795496674.959901, "ist": "10:34:34", "ev": "beat", "d": "corpus pass: docx 45/213, continuing"}
-{"t": 1795496970.3434868, "ist": "10:39:30", "ev": "beat", "d": "corpus pass: docx 74/213"}
-{"t": 1795497263.0978858, "ist": "10:44:23", "ev": "beat", "d": "corpus pass: docx 119/213"}
-{"t": 1795497560.6521614, "ist": "10:49:20", "ev": "beat", "d": "corpus pass: docx 166/213"}
-{"t": 1795497853.7176633, "ist": "10:54:13", "ev": "beat", "d": "corpus measure: 2/212"}
-{"t": 1795498148.7672913, "ist": "10:59:08", "ev": "beat", "d": "corpus measure: 54/212"}
-{"t": 1795498443.5875661, "ist": "11:04:03", "ev": "beat", "d": "corpus measure: 99/212"}
-{"t": 1795498741.617328, "ist": "11:09:01", "ev": "beat", "d": "corpus measure: ~125/212"}
-{"t": 1795499036.311607, "ist": "11:13:56", "ev": "beat", "d": "corpus measure: 162/212, final 50"}
-{"t": 1795499320.2531445, "ist": "11:18:40", "ev": "beat", "d": "corpus measure: ~190/212"}
-{"t": 1795499565.3075109, "ist": "11:22:45", "ev": "beat", "d": "200/212 measured; running regress --check"}
-{"t": 1795499616.7150095, "ist": "11:23:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795499621.125955, "ist": "11:23:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795499626.5655773, "ist": "11:23:46", "ev": "attempt", "d": "18_displacement -> lead"}
-{"t": 1795499627.0728898, "ist": "11:23:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795499627.4632869, "ist": "11:23:47", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795499632.439998, "ist": "11:23:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795499633.077097, "ist": "11:23:53", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499640.4087498, "ist": "11:24:00", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499640.9063468, "ist": "11:24:00", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499644.0938096, "ist": "11:24:04", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795499644.4750404, "ist": "11:24:04", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499645.2313037, "ist": "11:24:05", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499645.6306431, "ist": "11:24:05", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499648.4964125, "ist": "11:24:08", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499648.7583187, "ist": "11:24:08", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499656.6262786, "ist": "11:24:16", "ev": "beat", "d": "writing the report"}
-{"t": 1795499657.2206142, "ist": "11:24:17", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499659.6667914, "ist": "11:24:19", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499660.0091155, "ist": "11:24:20", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499662.692687, "ist": "11:24:22", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795499662.9745657, "ist": "11:24:22", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499663.595785, "ist": "11:24:23", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499663.9087915, "ist": "11:24:23", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499666.4004025, "ist": "11:24:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499666.7295785, "ist": "11:24:26", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499678.188247, "ist": "11:24:38", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499684.9221716, "ist": "11:24:44", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499687.9326596, "ist": "11:24:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499688.3010342, "ist": "11:24:48", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499690.9947915, "ist": "11:24:50", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795499691.3808813, "ist": "11:24:51", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499692.2794003, "ist": "11:24:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499692.6335695, "ist": "11:24:52", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499695.228287, "ist": "11:24:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499695.6303754, "ist": "11:24:55", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499707.419146, "ist": "11:25:07", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499710.711558, "ist": "11:25:10", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499711.0802238, "ist": "11:25:11", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499713.703967, "ist": "11:25:13", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795499714.1665058, "ist": "11:25:14", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499715.037094, "ist": "11:25:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499715.359615, "ist": "11:25:15", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499717.628505, "ist": "11:25:17", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795499717.8606865, "ist": "11:25:17", "ev": "beat", "d": "report.py: building the report"}
-{"t": 1795499814.8299944, "ist": "11:26:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795499852.324519, "ist": "11:27:32", "ev": "release", "d": "fixer released (forced)"}
-{"t": 1795499852.5916958, "ist": "11:27:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795499852.755092, "ist": "11:27:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795499853.2508245, "ist": "11:27:33", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795496325.127834, "ist": "10:28:45", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795496326.1356525, "ist": "10:28:46", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795496326.5198605, "ist": "10:28:46", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795496326.8753855, "ist": "10:28:46", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795496327.2860262, "ist": "10:28:47", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795496328.2341979, "ist": "10:28:48", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795496328.6382658, "ist": "10:28:48", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795496329.044786, "ist": "10:28:49", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795499134.7531238, "ist": "11:15:34", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795499135.02242, "ist": "11:15:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795499135.1483586, "ist": "11:15:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795499137.7441812, "ist": "11:15:37", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795499140.1792371, "ist": "11:15:40", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795499147.0018055, "ist": "11:15:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795499150.7547886, "ist": "11:15:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795499567.7128773, "ist": "11:22:47", "ev": "beat", "d": "relay: uniform-pitch patch applied, building"}
+{"t": 1795499653.6951275, "ist": "11:24:13", "ev": "beat", "d": "relay: engine built with uniform-pitch snap, fetching corpus (6 min)"}
+{"t": 1795499677.4731731, "ist": "11:24:37", "ev": "beat", "d": "relay: corpus pass 1/8, p2w --force --budget 250"}
+{"t": 1795500218.9969277, "ist": "11:33:38", "ev": "beat", "d": "relay: patched-tree corpus pass, chunk 1 (P2W_ENGINE_SRC=CS)"}
+{"t": 1795500507.918026, "ist": "11:38:27", "ev": "beat", "d": "relay: corpus pass chunk 2, docx 51/213"}
+{"t": 1795500803.3980508, "ist": "11:43:23", "ev": "beat", "d": "relay: corpus pass chunk 3, docx 71/213"}
+{"t": 1795501092.4774418, "ist": "11:48:12", "ev": "beat", "d": "relay: corpus pass chunk 4, docx 115/213"}
+{"t": 1795501384.4112046, "ist": "11:53:04", "ev": "beat", "d": "relay: corpus pass chunk 5, docx 145/213"}
+{"t": 1795501674.4331138, "ist": "11:57:54", "ev": "beat", "d": "relay: corpus pass chunk 6, docx 179/213"}
+{"t": 1795501966.0786052, "ist": "12:02:46", "ev": "beat", "d": "relay: corpus pass chunk 7, docx 194/213, measurement starting"}
+{"t": 1795502255.450411, "ist": "12:07:35", "ev": "beat", "d": "relay: corpus pass chunk 8, docx 210/213"}
+{"t": 1795502544.7569845, "ist": "12:12:24", "ev": "beat", "d": "relay: measuring, 4/212 done"}
+{"t": 1795502846.3424273, "ist": "12:17:26", "ev": "beat", "d": "relay: measuring 24/212, ~14s/doc - full pass may not fit the slot"}
+{"t": 1795503350.6006417, "ist": "12:25:50", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795503475.184468, "ist": "12:27:55", "ev": "beat", "d": "attempt.py: recording an attempt"}

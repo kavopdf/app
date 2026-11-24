@@ -2,6 +2,10 @@
  "plan": "",
  "notes": [
   {
+   "at": "18:34",
+   "text": "attempt 2 on 44_header_footer -> lead"
+  },
+  {
    "at": "19:31",
    "text": "attempt 39 on 18_displacement -> reverted"
   },
@@ -236,13 +240,9 @@
   {
    "at": "09:17",
    "text": "attempt 51 on 18_displacement -> lead (1/10 moved)"
-  },
-  {
-   "at": "11:23",
-   "text": "attempt 52 on 18_displacement -> lead (0/200 moved)"
   }
  ],
- "next": "PENDING FIRST: 23 item(s) you can close - run pending.py and take them in its order before the class below. 18_displacement: the uniform-pitch guard is measured on 200 of 212 corpus documents with zero worse in docx and txt and no construct spread - it is refused ONLY for an unstamped engine. Re-apply tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, run the remaining 12 documents of the corpus pass (P2W_ENGINE_SRC=/scratch/work/CS python3 benchmarks/p2w.py --budget 275, repeat until measured 212/212), then regress.py --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. The 12 unmeasured are the largest page counts, so order the pass by page count descending. Do NOT re-run the trHeight=max(content,line-15) probe.",
+ "next": "PENDING FIRST: 23 item(s) you can close - run pending.py and take them in its order before the class below. 18_displacement: APPLY tools/p2w-bench/FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch, build, then START the slot with the 212-document pass (p2w.py --force --budget 250, repeat) - that pass is the whole cost. It is measured: 362_price_list_dense 41/42 -> 42/42 in Google, electricity-bill and 330_cad_drawing_sheet byte-identical. Do NOT re-run the trHeight=max(content,line-15) probe - it is refuted and the guard makes it unnecessary. After the pass: regress.py --check, --stamp, commit app/+RANKING.csv, attempt.py --class 18_displacement. Then check the 9 documents named in FINDINGS/18_displacement-UNIFORM-PITCH-GUARD-GOOGLE-42of42-0450-fixer.md for a uniform pitch.",
  "agents": [
   {
    "id": "18_dresidual-census-01",
@@ -532,11 +532,16 @@
   }
  ],
  "run": {
-  "started": "10:00",
-  "ended": "11:27",
-  "ended_how": "forced"
+  "started": "11:15",
+  "ended": null,
+  "ended_how": null
  },
  "history": [
+  {
+   "at": "19:55",
+   "how": "released",
+   "plan": ""
+  },
   {
    "at": "21:24",
    "how": "forced",
@@ -631,11 +636,6 @@
    "at": "09:19",
    "how": "forced",
    "plan": ""
-  },
-  {
-   "at": "11:27",
-   "how": "forced",
-   "plan": ""
   }
  ],
  "context": "18_displacement: the residual on the 13 sole-failure documents is TWO constructs whose errors cancel, and that is why 20 attempts moved 4. Four live Google round trips this slot: med_dy -2.8 (362_price_list_dense), -3.0 (bus-timetable), -6.7 (mobile-bill), -13.0 (72_bank_statement); worst_dy 5.4/4.9/10.0/28.2; med_dx -0.2..+0.2 on all four; bad_pages [0] on all four. Run-by-run profiles: at every table's block top the gap is lost (-8.76, -4.19, -4.08 pt on mobile-bill) and inside every table each row is laid 0.75 pt too tall, so dy climbs back to 0 at the footer. 24 rows x 0.75 = 18 pt of ramp against 17.0 pt of step. Each half refuted alone because spending the spacer overflows (the DocxWriter guard at :6074 names mobile-bill and insurance-policy-schedule) and the row declaration change alone leaves the step uncompensated. The untried pair: deliver the gap through the first-row cell w:before (measured 1:1 by Google, 66 probes, error 0.000000) AND reduce w:trHeight by the same per-row amount, so the table total is unchanged. 362_price_list_dense has no step, only a monotone ramp, so it is the document that proves or refutes the pair. All 13 are converted in /scratch/work/p2w/out.",
@@ -647,5 +647,5 @@
    "change": "a person must either authorise the trade (a 1.03 rise on a document already at 97.62 for 601 going to 0.00), or give share@5px a companion axis that separates 'more ink, some far' from 'the same ink, further' - see FINDINGS/widget-walk-REFUSED-BY-ONE-DOCUMENT-1050-f1x.md"
   }
  ],
- "next_class": ""
+ "next_class": "electricity-bill"
 }
