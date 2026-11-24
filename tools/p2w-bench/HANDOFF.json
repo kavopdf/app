@@ -531,6 +531,30 @@
    "finding": "no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B.",
    "deployed_at": "2026-11-24T06:34",
    "landed_at": "2026-11-24T06:35"
+  },
+  {
+   "id": "A1",
+   "class": "25_invisible_text",
+   "angle": "check-definition",
+   "question": "what does 25_invisible_text compare, and which construct makes 48 documents fail it in Google and none in LibreOffice",
+   "expected": "the check's operands and a named Java site, so a fix could be attempted",
+   "deployed": "07:03",
+   "status": "landed",
+   "finding": "the check stopped at the FIRST fill under a run's corner. A Google export opens with a page-sized white rect and rasterises our bands into images, so white type on an orange band matched the sheet. This run's fix; 5 documents went 42/42.",
+   "deployed_at": "2026-11-24T07:03",
+   "landed_at": "2026-11-24T07:07"
+  },
+  {
+   "id": "A2",
+   "class": "18_displacement",
+   "angle": "row-height-law",
+   "question": "what law does Google use to lay a table row's height, and what LO-invariant change removes the +0.75 pt/row ramp",
+   "expected": "a law fitted to the committed Google numbers, and one falsifiable change",
+   "deployed": "07:22",
+   "status": "landed",
+   "finding": "row = 0.75*round((max(trHeight,content)+rule)/0.75): trHeight is a quantised floor, not a length. 362 is unruled, so it does not ramp +0.75/row - the carry-over's 21.75 pt is ruled-table arithmetic. The LO-invariant change is DocxWriter:6468 declaring the row one rule short; it must be tested on a ruled document, not 362.",
+   "deployed_at": "2026-11-24T07:22",
+   "landed_at": "2026-11-24T07:26"
   }
  ],
  "run": {

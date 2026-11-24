@@ -360,3 +360,5 @@
 {"_list": "notes", "_entry": {"at": "11:28", "text": "attempt 4 on 00_page_count -> lead"}}
 {"_list": "notes", "_entry": {"at": "13:21", "text": "agent deployed: A1 / 18_displacement - writer-construct"}}
 {"_list": "notes", "_entry": {"at": "13:21", "text": "agent deployed: B1 / 60_text_column_right_edge - right-edge+shape_anchor"}}
+{"_list": "notes", "_entry": {"at": "14:03", "text": "attempt 36 on 18_displacement -> reverted"}}
+{"_list": "notes", "_entry": {"at": "14:03", "text": "agent landed: 18_displacement / A -> FINDINGS/18_displacement-PARTIAL-SPEND-REGRESSES-GOOGLE-1428-relay.md"}}

@@ -1,11 +1,11 @@
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 07:00 → running IST · 13 min**
+**24 Nov 2026 · slot 07:00 → running IST · 17 min**
 
 > **`25_invisible_text` was a check that read the paper.** A Google PDF export opens with a page-sized
 > white rectangle and rasterises our bands into images, so white type on an orange band counted as
-> invisible text. 48 documents failed it and LibreOffice passed all 48. Fixed, measured live in Google:
-> **5 of the 5 documents that failed nothing else are now 42/42**, corpus **29 -> 34** clean.
+> invisible text. 48 documents failed it and LibreOffice passed all 48. Fixed and measured live in
+> Google: **all 5 documents that failed nothing else are now 42/42**, corpus **29 -> 34** clean.
 
 ## Progress
 
@@ -43,17 +43,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `A1` | what does 25_invisible_text compare, and which const | 07:03 | 07:07 | 4 min |
+| `A2` | what law does Google use to lay a table row's height | 07:22 | 07:26 | 4 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 07:00 → running · 13 min |
+| Slot window | 07:00 → running · 17 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 14 |
+| Tool beats | 15 |
 | Longest silence | **5.6 min** — from 07:05:54, after `building the engine (build-engine.sh)` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -61,9 +64,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **5 min** | `#########` |
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `#########` |
-| record - attempt, handoff, class rows | **2 min** | `####` |
+| fix - diagnose and change the engine | **5 min** | `#######` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `######` |
+| record - attempt, handoff, class rows | **2 min** | `###` |
+| report - the report and the chain | **4 min** | `######` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -85,24 +89,33 @@ NEXT RUN: (1) THE PREVIOUS PAIR IS REFUTED - do not spend a slot on it. content+
 
 ## Next run
 
-**(1) THE CHECK WAS THE DEFECT, AND ONLY ON 5 OF THE 48.** The five documents that failed nothing but
-`25_invisible_text` are now 42/42 in Google. The other 43 still fail it, and whether they are the same
+**(1) THE CHECK WAS THE DEFECT, ON 5 OF THE 48.** The five documents that failed nothing but
+`25_invisible_text` are now 42/42 in Google. The other 43 still fail it and whether they are the same
 false positive is **not measured** - the stamp case was proven by eye (band present, white on orange),
-the rest were not looked at. One export each is the whole test; the band arriving as an **image** in a
-Google export (15 images, 2 drawings where the source has 1 and 14) is a separate real defect that
+the rest were not looked at. One export each is the whole test. A band arriving as an **image** in a
+Google export (15 images and 2 drawings where the source has 1 and 14) is a separate real defect that
 belongs to whoever owns rasterised shapes.
 
-**(2) `18_displacement` IS STILL 101 DOCUMENTS AND STILL THE CLASS.** Unchanged by this run, and the
-two halves are now separated by measurement, not inference: A = the unspendable spacer
-(`w:before="0"`, whole gap in `w:line`, Google draws `w:line` at 0.216 -> 0.784 of the gap lost at each
-table top, 4 of 4 documents); B = the +0.75 pt/row ramp on documents with no unspendable spacer.
-**A cannot be spent on a page that has no slack, and the slack was eaten by B** - so B is the lever for
-A, and `362_price_list_dense` (29 rows, 21.75 pt, zero spacers) is the cleanest falsifier of B.
+**(2) AGENT A2 REFUTED THE CARRY-OVER'S OWN NUMBER.** The row law, fitted to every committed Google
+number: `laid = 0.75 * round((max(trHeight, content) + rule) / 0.75)` - `w:trHeight` is a quantised
+**floor**, not a length. `362_price_list_dense` draws no rules, so `rule = 0` and it does **not** ramp
++0.75 pt/row; its rows lay at 8.25 against a declared 8.40 and the table's foot drifts *negative*,
+which is the measured `med_dy` -2.8. The "29 x 0.75 = 21.75 pt of pure ramp" in the last handoff is
+ruled-table arithmetic applied to an unruled table. **362 cannot test the row half.** A ruled Half B
+document (`mobile-bill`, `electricity-bill`) can.
 
-**(3) 14 documents fail nothing but `18_displacement`.** They are the largest single-check group in the
-corpus and the next slot's best target. `60_text_column_right_edge` (5) and `25_invisible_text` (43, of
-which 5 were this run) are the others.
+**(3) THE ONE CHANGE WORTH THE NEXT SLOT.** `DocxWriter.java:6468` - declare the row one rule short:
+`rowHeightTw = Math.max(rowLineTw, rowTwHere - ruleTwHere)`. LibreOffice lays
+`max(trHeight, content + rule)` and HEAD already writes `content = rowTwHere - ruleTwHere`, so LO lays
+`P` either way: **LO-identical by construction**, and `regress.py` has nothing to refuse. Google drops
+one pixel per row, which is the whole ramp. It is a **no-op on 362** (`rule = 0`), so test it on
+`mobile-bill`. This is close to the `ROW-RULE-1220` patch, which took mobile-bill, 68_journal and
+73_marksheet to 42/42 in Google; that build subtracted two rules because its tree still had the cell's
+line at the pitch, at HEAD one is right and the change is LO-neutral, which that build was not.
 
-**(4) The gates are clean.** `regress.py --check` PASS before and after, `measure_gate.py` READY,
-`google_safe` could not check (no `.docx` output directory in this pod) - the change touches no
-emitted byte, only how a PDF is read.
+**(4) `18_displacement` is still 101 documents and still the class**, and 14 documents fail nothing
+else - the largest single-check group left. `60_text_column_right_edge` (5) is the next largest.
+
+**(5) The gates are clean.** `regress.py --check` PASS before and after, `measure_gate.py` READY,
+`google_safe` could not check (no `.docx` output directory in this pod). The change touches no emitted
+byte, only how a PDF is read; the agent's change is not in this run's tree and is not claimed.

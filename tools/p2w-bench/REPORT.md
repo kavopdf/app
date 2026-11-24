@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 07:00 → running IST · 13 min**
+**24 Nov 2026 · slot 07:00 → running IST · 17 min**
 
 > **7 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
 
@@ -43,17 +43,20 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `A1` | what does 25_invisible_text compare, and which const | 07:03 | 07:07 | 4 min |
+| `A2` | what law does Google use to lay a table row's height | 07:22 | 07:26 | 4 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 07:00 → running · 13 min |
+| Slot window | 07:00 → running · 17 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 14 |
+| Tool beats | 15 |
 | Longest silence | **5.6 min** — from 07:05:54, after `building the engine (build-engine.sh)` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -61,9 +64,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **5 min** | `#########` |
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `#########` |
-| record - attempt, handoff, class rows | **2 min** | `####` |
+| fix - diagnose and change the engine | **5 min** | `#######` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `######` |
+| record - attempt, handoff, class rows | **2 min** | `###` |
+| report - the report and the chain | **4 min** | `######` |
 ## Best results this round
 
 | Document | Before | After | Change |
