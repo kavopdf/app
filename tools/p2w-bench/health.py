@@ -320,6 +320,10 @@ def compute():
     # A TABLE NEWER THAN EVERYTHING THAT CAN CHANGE IT IS CURRENT, NOT LATE - the same rule the
     # `classify` row uses, applied to the inputs a .txt score actually has.
     _txt_current = bool(txt["measured"]) and txt.get("current", False)
+    # ...BUT A FRESH SCORE IS NOT A FINISHED JOB. The .txt row read "superseded - 199 clean, 14
+    # failing" for days while nothing touched the 14, because every reader of this state treats it as
+    # "no work here". A current measurement of 14 failures is a current measurement OF 14 FAILURES.
+    _txt_current = _txt_current and not txt["failing"]
     out["stages"]["txt"] = {
         "measured": txt["measured"], "clean": txt["clean"], "failing": txt["failing"],
         "age_h": txt["age_h"], "inputs_age_h": txt["inputs_age_h"],
