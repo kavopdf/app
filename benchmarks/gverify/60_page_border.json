@@ -2,5 +2,18 @@
  "name": "60_page_border",
  "status": "page_count_refused",
  "pages": 2,
- "want": 1
+ "want": 1,
+ "at": "2026-11-24T12:59:39",
+ "extra_pages": [
+  {
+   "page": 2,
+   "words": 0,
+   "chars": 0,
+   "drawings": 1,
+   "images": 16
+  }
+ ],
+ "export": "60_page_border.refused.pdf",
+ "engine": "b7699196",
+ "checks": "369550-1795522931"
 }

@@ -1,6 +1,23 @@
 {
  "name": "bank-statement-horizontal-rules-only",
- "status": "page_count_refused",
- "pages": 2,
- "want": 1
+ "status": "ok",
+ "rc": 1,
+ "at": "2026-11-24T13:00:19",
+ "passed": 40,
+ "total": 42,
+ "failed": [
+  "18_displacement",
+  "45_char_accuracy"
+ ],
+ "displacement": {
+  "med_dy": 8.5,
+  "worst_dy": 106.6,
+  "med_dx": -0.3,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 197
+ },
+ "engine": "b7699196",
+ "checks": "369550-1795522931"
 }
