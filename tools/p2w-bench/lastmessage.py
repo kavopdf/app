@@ -141,7 +141,11 @@ def verify(text):
     mine = progress_rows(text)
     theirs = report_py_rows()
     if theirs is None:
-        return None, 0
+        # THE PROSE IS STILL CHECKABLE WITHOUT report.py. Its identities are internal to the report -
+        # measured + unmeasured = total - so they need no other file, and skipping them here is how a
+        # report that contradicts itself in two adjacent sentences gets through on a day report.py
+        # cannot be read.
+        return prose_identities(text) or None, 0
     problems = []
     checked = 0
     seen_any = False
@@ -173,7 +177,50 @@ def verify(text):
         if _numbers(cell):
             problems.append("%-38s carries %s and no tool produces this row"
                             % (label, _numbers(cell)))
+    # THE PROSE IS CHECKED TOO. Rows were verified and prose was not, which is how a report can
+    # say "200 of 212 measured" and "unmeasured on 1" in the same breath and pass.
+    problems.extend(prose_identities(text))
     return problems, checked
+
+
+def prose_identities(text):
+    """Arithmetic the report states about itself, checked for closure. Returns a list of problems.
+
+    verify() compares the report's TABLE ROWS against report.py. Nothing checked the prose, and on 24 Nov
+    the 11:27 fixer report said both of these in the same breath:
+
+        "it reached 200 of 212 measured before the slot ran out. The 12 left are the largest page counts."
+        "it is unmeasured on 1 documents, and an unmeasured change is not a pass."
+
+    200 + 12 = 212 closes. 200 + 1 = 201 does not. Both statements are about the same quantity and they
+    disagree, so the report told a reader that a change was one document short when it was twelve short -
+    and the whole reason nothing landed was those twelve.
+
+    This is not a rule about any class. It is the identity measured + unmeasured = total, which any report
+    claiming all three must satisfy. It is checked only when all three numbers are actually present, so a
+    report that says none of them is not penalised.
+    """
+    problems = []
+    try:
+        import re as _re
+        m = _re.search(r"(\d+)\s+of\s+(\d+)\s+(?:corpus\s+)?(?:documents\s+)?measured", text)
+        u = _re.search(r"unmeasured on\s+(\d+)", text)
+        if m and u:
+            measured, total, unm = int(m.group(1)), int(m.group(2)), int(u.group(1))
+            if measured + unm != total:
+                problems.append("prose: %d measured + %d unmeasured != %d total - "
+                                "two statements about one quantity disagree"
+                                % (measured, unm, total))
+        # The same identity the other way round: "N left" must be total - measured.
+        l = _re.search(r"(?:the\s+)?(\d+)\s+left", text)
+        if m and l and not u:
+            left = int(l.group(1))
+            if int(m.group(1)) + left != int(m.group(2)):
+                problems.append("prose: %d measured + %d left != %d total"
+                                % (int(m.group(1)), left, int(m.group(2))))
+    except Exception:
+        pass
+    return problems
 
 
 def _report_md():
