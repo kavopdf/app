@@ -397,7 +397,11 @@ def gverify():
          "| scored | **%d** |" % scored,
          "| refused on page count | **%d** |" % refused,
          "| clean in Google | **%d** |" % gclean,
-         "| clean in LibreOffice | **%d** |" % lclean,
+         # LIBREOFFICE IS NOT A CLEAN DOCUMENT. It passes 125 of 190 where Google passes 36,
+         # so calling its column "clean" reports a state the user never sees - 89 documents
+         # are called clean here that fail in the renderer they actually open. The number is
+         # useful as a proxy that names a defect; it is not a verdict.
+         "| passes in LibreOffice (proxy, not the renderer the user opens) | **%d** |" % lclean,
          ""]
     if gaps:
         L += ["## Checks Google fails and LibreOffice does not", "",
