@@ -114,14 +114,23 @@ def main(argv):
         print("refused: no .docx output directory - run p2w.py first", file=sys.stderr)
         return 3
     files = sorted(glob.glob(os.path.join(d, "*.docx")))
-    per, totals, carriers = {}, {}, {}
+    per, totals, carriers, errors = {}, {}, {}, []
     for f in files:
         r = scan(f)
         name = os.path.basename(f)[:-5]
         per[name] = r
+        # scan() RETURNS {'error': message} WHEN A .docx CANNOT BE OPENED, AND THIS LOOP USED TO ADD
+        # IT TO AN INT. Measured 24 Nov: one unreadable file raised
+        #   TypeError: unsupported operand type(s) for +: 'int' and 'str'
+        # and took the whole google-safe check with it, so regress.py printed nothing and refused EVERY
+        # commit. A crash in one file must not be a silent veto on all of them.
         for k, v in r.items():
+            if not isinstance(v, int):
+                continue
             totals[k] = totals.get(k, 0) + v
             carriers[k] = carriers.get(k, 0) + 1
+            if r.get('error'):
+                errors.append((name, r['error']))
 
     print("  scanned %d documents in %s" % (len(files), d))
     print()
