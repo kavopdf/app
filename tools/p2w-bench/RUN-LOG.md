@@ -1,4 +1,3 @@
-| 21 Nov 15:17 | fixer | slot claimed - fixer running |
 | 21 Nov 15:48 | fixer | attempt 47_margins -> partial (1/213 moved) |
 | 21 Nov 15:58 | fixer | slot claimed - fixer running |
 | 21 Nov 17:25 | fixer | attempt 47_margins -> reverted (0/5 moved) |
@@ -198,3 +197,4 @@
 | 24 Nov 17:54 | fixer | slot claimed - fixer running |
 | 24 Nov 18:28 | fixer | attempt 00_page_count -> lead (0/23 moved) |
 | 24 Nov 18:30 | fixer | attempt 00_page_count -> lead (0/23 moved) |
+| 24 Nov 18:34 | fixer | attempt 60_text_column_right_edge -> lead (0/5 moved) |

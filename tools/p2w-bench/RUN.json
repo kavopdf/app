@@ -3,8 +3,8 @@
   "60ed60_text_column_right_edge-01",
   "pc2300_page_count-01"
  ],
- "attempts": 3,
- "class": "00_page_count",
+ "attempts": 4,
+ "class": "60_text_column_right_edge",
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
