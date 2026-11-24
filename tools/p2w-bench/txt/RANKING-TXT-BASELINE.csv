@@ -2,9 +2,9 @@ document,applicable,passed,failed,abstained,failed_ids
 01_stamp_rotated_15deg_upright,10,10,0,0,
 02_stamp_rotated_15deg_upleft,9,9,0,0,
 03_stamp_vertical_90deg,10,10,0,0,
-041122-Account_Opening_Form,10,7,3,3,t06_encoding t09_page_furniture t12_word_invention
+041122-Account_Opening_Form,10,7,3,0,t06_encoding t09_page_furniture t12_word_invention
 04_stamp_180deg_upside_down,10,10,0,0,
-05_round_company_seal_curved_text,9,8,1,1,t12_word_invention
+05_round_company_seal_curved_text,9,8,1,0,t12_word_invention
 06_rect_paid_stamp_red_transparent,10,10,0,0,
 07_stamp_over_table,10,10,0,0,
 08_two_overlapping_stamps,10,10,0,0,
@@ -34,11 +34,11 @@ document,applicable,passed,failed,abstained,failed_ids
 302_radiology_report,7,7,0,0,
 303_discharge_summary,7,7,0,0,
 304_package_insert_small_print,9,9,0,0,
-305_vaccination_certificate,7,6,1,1,t08_line_order
+305_vaccination_certificate,7,6,1,0,t08_line_order
 306_clinical_protocol_synopsis,7,7,0,0,
 30_mixed_font_sizes_one_baseline_txtpos,10,10,0,0,
 310_court_judgment,9,9,0,0,
-311_fir_police_form,7,6,1,1,t12_word_invention
+311_fir_police_form,7,6,1,0,t12_word_invention
 312_affidavit_stamp_paper,7,7,0,0,
 313_power_of_attorney,9,9,0,0,
 314_tender_rfp_boq,8,8,0,0,
@@ -57,9 +57,9 @@ document,applicable,passed,failed,abstained,failed_ids
 32_serif_nondefault_body,9,9,0,0,
 330_cad_drawing_sheet,7,7,0,0,
 331_pid_diagram,7,7,0,0,
-332_bom_on_drawing,8,7,1,1,t02_position
+332_bom_on_drawing,8,7,1,0,t02_position
 333_datasheet_spec_tables,7,7,0,0,
-334_patent_document,7,6,1,1,t02_position
+334_patent_document,7,6,1,0,t02_position
 335_msds_safety_data_sheet,7,7,0,0,
 33_sans_nondefault_body,9,9,0,0,
 340_bill_of_lading,7,7,0,0,
@@ -97,7 +97,7 @@ document,applicable,passed,failed,abstained,failed_ids
 392_statistical_console_output,7,7,0,0,
 393_spectrum_peak_table,7,7,0,0,
 394_map_with_legend,7,7,0,0,
-39_small_caps_letter_spacing,9,6,3,3,t01_word_accuracy t08_line_order t12_word_invention
+39_small_caps_letter_spacing,9,6,3,0,t01_word_accuracy t08_line_order t12_word_invention
 400_comic_page_speech_bubbles,7,7,0,0,
 401_trifold_brochure,7,7,0,0,
 402_calendar_month_grid,7,7,0,0,
@@ -134,8 +134,8 @@ document,applicable,passed,failed,abstained,failed_ids
 57_centred_title_page_left_body_pages,10,10,0,0,
 58_header_rule_footer_rule,10,10,0,0,
 59_landscape_mixed_portrait,10,10,0,0,
-600_reviewed_invoice_with_annotations,8,7,1,1,t12_word_invention
-601_fillable_admission_form,7,6,1,1,t01_word_accuracy
+600_reviewed_invoice_with_annotations,8,7,1,0,t12_word_invention
+601_fillable_admission_form,7,6,1,0,t01_word_accuracy
 602_bookmarked_annual_report,9,9,0,0,
 60_page_border,9,9,0,0,
 61_two_col_abstract_spanning,9,9,0,0,
@@ -151,14 +151,14 @@ document,applicable,passed,failed,abstained,failed_ids
 71_invoice_space_aligned_no_rules,10,10,0,0,
 72_bank_statement_no_rules_right_amounts,10,10,0,0,
 73_marksheet_subject_marks_grade,9,9,0,0,
-74_balance_sheet_indented_subitems,10,9,1,1,t02_position
+74_balance_sheet_indented_subitems,10,9,1,0,t02_position
 75_merged_header_cell_three_columns,10,10,0,0,
 76_devanagari_table,10,10,0,0,
-77_arabic_rtl_document,9,7,2,2,t01_word_accuracy t12_word_invention
+77_arabic_rtl_document,9,7,2,0,t01_word_accuracy t12_word_invention
 78_mixed_english_devanagari_line,9,9,0,0,
 79_inr_indian_digit_grouping_table,10,10,0,0,
 80_gstin_pan_cin_ifsc_table,9,9,0,0,
-Account_Opening_Form_Fillable_filled,10,7,3,3,t06_encoding t09_page_furniture t12_word_invention
+Account_Opening_Form_Fillable_filled,10,7,3,0,t06_encoding t09_page_furniture t12_word_invention
 academic-paper-ieee-2col-abstract,10,10,0,0,
 admission-form-labels-left-boxes-right,9,9,0,0,
 admit-card,9,9,0,0,
@@ -182,7 +182,7 @@ gst-invoice-with-qr-code,10,10,0,0,
 insurance-policy-schedule,10,10,0,0,
 invoice-line-items-qty-rate-amount,10,10,0,0,
 itr-computation-with-slab-table,10,10,0,0,
-journal-2col-with-footnotes,9,8,1,1,t12_word_invention
+journal-2col-with-footnotes,9,8,1,0,t12_word_invention
 landscape-page-inside-portrait-document,11,11,0,0,
 magazine-2col-pullquote-spanning,9,9,0,0,
 marksheet-subject-left-marks-right,9,9,0,0,
@@ -194,7 +194,7 @@ newspaper-2col-fullwidth-headline,9,9,0,0,
 one-page-rotated-180-degrees,10,10,0,0,
 payslip-label-left-amount-right,10,10,0,0,
 policy-2col-spanning-section-heading,9,9,0,0,
-price-list-2col-dense-right-aligned,10,9,1,1,t02_position
+price-list-2col-dense-right-aligned,10,9,1,0,t02_position
 price-list-right-aligned-amounts,10,10,0,0,
 product-catalogue-code-left-price-right,9,9,0,0,
 property-tax-receipt,10,10,0,0,
