@@ -7,7 +7,12 @@
  "attempts": 1,
  "kept": 0,
  "docs_improved": 0,
- "agents": [],
+ "agents": [
+  "conv-01",
+  "txt -01",
+  "18_dA-06",
+  "18_dB-03"
+ ],
  "obstacles_cleared": 0,
  "needs_human": 0
 }

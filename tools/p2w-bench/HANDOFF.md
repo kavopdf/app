@@ -36,10 +36,6 @@ unfinished work, not as a result.
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| A118_displacement-01 | A1 | 18_displacement | writer-construct | 13:21 | Which single .docx writer construct causes the 18_displacement failures that 13+ documents fail alone, and which documents go CLEAN if fixed | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
-| B160_text_column_right_edge-01 | B1 | 60_text_column_right_edge | right-edge+shape_anchor | 13:21 | Is 60_text_column_right_edge the same construct as 59_shape_anchor (they travel together) and what minimal writer change clears both | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
-| 00_pA-02 | 00_page_count | A | which construct costs 350_question_paper its second page in Google - i | 16:37 | a charged line in DocxWriter and one general rule | landed | tools/p2w-bench/FINDINGS/00_page_count-350-INLINE-PICTURE-CARRIES-THE-LINE-1120-agent.md |
-| gverB-01 | gverify | B | why gverify --collect cannot read the download result the Drive tool r | 16:37 | a fix with a test | landed | tools/p2w-bench/FINDINGS/gverify-COLLECT-DOWNLOAD-SHAPE-1120-agent.md |
 | 18A-01 | 18_displacement | A | is the LO regression on the spacer+trHeight patch a real layout change | 20:15 | is the LO regression on the spacer+trHeight patch a real layout change or a proxy artefact | landed | FINDINGS/18_displacement-LO-PROXY-VERDICT-2013-agentA.md |
 | 18B-01 | 18_displacement | B | is there a construct that gives Google the row pitch without changing  | 20:44 | is there a construct that gives Google the row pitch without changing what LibreOffice draws | landed | FINDINGS/18_displacement-TRHEIGHT-CROSS-RENDERER-1506-agentB.md |
 | 04_c-01 | 04_chars_missing construct: Google drops wps:txbx text; missing multiset fully explained by anchored boxes on 9 docs |  |  | 23:32 |  | landed | DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed. |
@@ -60,16 +56,16 @@ unfinished work, not as a result.
 | 60_tB-01 | 60_text_column_right_edge | B | is 60 or 18 reading the paper instead of the defect - the 25_invisible | 08:20 | 08:05 | landed | FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md |
 | 60_tB-02 | 60_text_column_right_edge | B | is 60 or 18 reading the paper - the 25_invisible_text precedent | 12:28 | 11:19 | landed | FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md |
 | 04_cA-01 | 04_chars_missing | A | real writer defect or instrument, and how much t01/t12 already explain | 12:28 | 11:21 | landed | FINDINGS/04_chars_missing-REAL-WRITER-DEFECT-1115-fixer.md |
+| conv-01 | conversion cost |  |  | 14:00 |  | running |  |
+| txt -01 | txt discrepancy |  |  | 14:00 |  | running |  |
+| 18_dA-06 | 18_displacement | A | where does the 11 s/doc conversion go, and the smallest change that ma | 14:00 | 13:16 | running |  |
+| 18_dB-03 | 18_displacement | B | why do RANKING-TXT.csv and the report disagree by 50 documents | 14:00 | 13:18 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:39` attempt 7 on 00_page_count -> lead
-- `05:50` attempt 45 on 18_displacement -> lead
-- `06:32` attempt 46 on 18_displacement -> lead
-- `06:34` agent deployed: 18_displacement / rowheight-prepass - produce a minimal compilable two-pass emit for the atLeast trHeight that applies
 - `06:34` agent deployed: 18_displacement / rowpitch-census - census the table row pitch of every corpus PDF and classify uniform-fractional, 
 - `06:35` agent landed: 18_drowheight-prepass-01 /  -> FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch
 - `06:35` agent landed: 18_drowpitch-census-01 /  -> no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B.
@@ -91,6 +87,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `12:28` agent landed: 60_text_column_right_edge / B -> FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md
 - `13:07` attempt 54 on 18_displacement -> lead (0/129 moved)
 - `13:59` attempt 55 on 18_displacement -> lead
+- `14:00` agent deployed: conversion cost /  - 
+- `14:00` agent deployed: txt discrepancy /  - 
+- `14:00` agent deployed: 18_displacement / A - where does the 11 s/doc conversion go, and the smallest change that makes --forc
+- `14:00` agent deployed: 18_displacement / B - why do RANKING-TXT.csv and the report disagree by 50 documents
 
 ## Where the rest of the state lives
 

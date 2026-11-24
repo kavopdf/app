@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 13:12 → running IST · 0 min**
+**24 Nov 2026 · slot 13:12 → running IST · 54 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,8 +11,8 @@
 
 | | |
 |:--|:--|
-| Self-check | **every field agrees with its second source** |
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - subagents: 4 deployed vs no FINDINGS file for conv-01, txt -01 |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -23,13 +23,19 @@
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` |
+| Working on | `18_displacement` - taken from the pending list (26 still open), not a new class |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 13:59 | **lead** | 0/None | started the 213-document pass on the uniform-pitch patch: 52/213 converted, 24/212 measured, slot ran out at 55-60 min of compute on a 1.05-core pod (cpu.max 105000/100000). Kept instead an instrument |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **0 min ago** |
+| Measured | **54 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -38,18 +44,33 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `conv-01` | conversion cost | 14:00 | - | - |
+| `txt -01` | txt discrepancy | 14:00 | - | - |
+| `18_dA-06` | where does the 11 s/doc conversion go, and the small | 14:00 | - | - |
+| `18_dB-03` | why do RANKING-TXT.csv and the report disagree by 50 | 14:00 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 13:12 → running · 0 min |
+| Slot window | 13:12 → running · 54 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 4 |
-| Silences over 2 min | 0 |
+| Tool beats | 150 |
+| Longest silence | **15.3 min** — from 13:22:26, after `relay: p2w --force --budget 240 to measure real per-doc rate` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| fix - diagnose and change the engine | **6 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **39 min** | `################` |
+| record - attempt, handoff, class rows | **5 min** | `##` |
+| report - the report and the chain | **3 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
