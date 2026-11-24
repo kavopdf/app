@@ -1,197 +1,5 @@
 [
  {
-  "started_ts": 1795323035.6921647,
-  "started": "10:20",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   {
-    "id": "2NEAECBFVF9AQV1BQJ542TS0E3",
-    "title": "Cell margin constructs",
-    "sent": "10:26",
-    "landed": "10:28",
-    "took": "2 min",
-    "deployed": true,
-    "landed_ok": true,
-    "found": "DocxWriter.java emits no w:tcMar anywhere and w:vAlign only as top (2164, 6629), so there is no shipped construct that sets a row's height without also setting its baseline"
-   },
-   {
-    "id": "7A659876RV8S1RR8GNAYEJE66Z",
-    "title": "Audit the finding",
-    "sent": "10:30",
-    "landed": "10:34",
-    "took": "4 min",
-    "deployed": true,
-    "landed_ok": true,
-    "found": "Falsified three of this run's five claims: google_safe.py has seven IGNORED entries not one; hRule=exact is honoured at 72 pt and 55.8 pt in two committed findings; the w:before probe is not sensitive to the question it was used to answer"
-   }
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
-  "started_ts": 1795323035.6921647,
-  "started": "10:20",
-  "ended_ts": 1795324672.4316268,
-  "ended": "10:47",
-  "class": "18_displacement",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   {
-    "id": "2NEAECBFVF9AQV1BQJ542TS0E3",
-    "title": "Cell margin constructs",
-    "sent": "10:26",
-    "landed": "10:28",
-    "took": "2 min",
-    "deployed": true,
-    "landed_ok": true,
-    "found": "DocxWriter.java emits no w:tcMar anywhere and w:vAlign only as top (2164, 6629), so there is no shipped construct that sets a row's height without also setting its baseline"
-   },
-   {
-    "id": "7A659876RV8S1RR8GNAYEJE66Z",
-    "title": "Audit the finding",
-    "sent": "10:30",
-    "landed": "10:34",
-    "took": "4 min",
-    "deployed": true,
-    "landed_ok": true,
-    "found": "Falsified three of this run's five claims: google_safe.py has seven IGNORED entries not one; hRule=exact is honoured at 72 pt and 55.8 pt in two committed findings; the w:before probe is not sensitive to the question it was used to answer"
-   }
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
-  "started_ts": 1795326273.494012,
-  "started": "11:14",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   "18_dA-05",
-   "18_dB-04"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
-  "started_ts": 1795328615.0443494,
-  "started": "11:53",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 2,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
-  "started_ts": 1795333712.4812539,
-  "started": "13:18",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
-  "started_ts": 1795336017.8479757,
-  "started": "13:56",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 2,
-  "kept": 1,
-  "docs_improved": 1,
-  "agents": [
-   "18_dA-06",
-   "18_dB-05"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ratchets": 1,
-  "counted": [
-   [
-    "18_displacement",
-    1
-   ]
-  ],
-  "ended_how": "killed - never released the slot"
- },
- {
-  "started_ts": 1795340869.0253325,
-  "started": "15:17",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 2,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
-  "started_ts": 1795343155.425634,
-  "started": "15:55",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   {
-    "id": "59QFMD824H9TCAF8VENANPSWX0",
-    "title": "Independent leverage audit",
-    "returned": "23 of 192 clean, 16 fail 18_displacement only, 38.7 is a percentage not a count"
-   },
-   {
-    "id": "3VGWXF6Z4S9J6VPPTTWSDP3M1P",
-    "title": "Spacer rule spec",
-    "returned": "engine writes the gap in w:line on a 1pt mark; w:before is the only vertical length Google honours; mobile-bill's +12.6 pt is the note's own spacers"
-   }
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
-  "started_ts": 1795347016.2393742,
-  "started": "17:00",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 1,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795361402.5583084,
   "started": "21:00",
   "ended_ts": null,
@@ -1009,5 +817,104 @@
   "started_ts": 1795525083.5720527,
   "window_for_claim": 1795525083.5720527,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "19:48",
+  "started_ts": 1795529911.2739375,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "19:48",
+  "started_ts": 1795529911.2793286,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "19:48",
+  "started_ts": 1795529916.6067407,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "19:48",
+  "started_ts": 1795529916.6114037,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "19:48",
+  "started_ts": 1795529916.6156523,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "19:48",
+  "started_ts": 1795529916.620742,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "19:48",
+  "started_ts": 1795529921.0877774,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "19:48",
+  "started_ts": 1795529921.0936103,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "19:48",
+  "started_ts": 1795529921.0989628,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
