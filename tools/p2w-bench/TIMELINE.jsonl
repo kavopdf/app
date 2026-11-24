@@ -5294,3 +5294,21 @@
 {"t": 1795549171.9154096, "ist": "01:09:31", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795549193.8961008, "ist": "01:09:53", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795549194.13619, "ist": "01:09:54", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795549197.6242766, "ist": "01:09:57", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795549197.7245421, "ist": "01:09:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795549197.8111382, "ist": "01:09:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795549198.187083, "ist": "01:09:58", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795549204.4060643, "ist": "01:10:04", "ev": "beat", "d": "relay: writing the report"}
+{"t": 1795549209.9042568, "ist": "01:10:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795549224.10511, "ist": "01:10:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795549225.4145527, "ist": "01:10:25", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795549225.792827, "ist": "01:10:25", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795549227.1023707, "ist": "01:10:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795549240.1945426, "ist": "01:10:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795549241.4939969, "ist": "01:10:41", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795549241.8868747, "ist": "01:10:41", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795549243.2110968, "ist": "01:10:43", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795549247.9281878, "ist": "01:10:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795549249.2409935, "ist": "01:10:49", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795549249.6169767, "ist": "01:10:49", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795549250.9329712, "ist": "01:10:50", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
