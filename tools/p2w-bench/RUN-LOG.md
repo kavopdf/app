@@ -1,4 +1,3 @@
-| 21 Nov 21:33 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 21 Nov 21:53 | fixer | slot claimed - fixer running |
 | 21 Nov 22:38 | fixer | attempt t08_line_order -> kept (9/10 moved) |
 | 21 Nov 22:56 | fixer | slot claimed - fixer running |

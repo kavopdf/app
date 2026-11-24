@@ -5188,3 +5188,7 @@
 {"t": 1795533689.759064, "ist": "20:51:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795533690.0455382, "ist": "20:51:30", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1795537195.4243093, "ist": "21:49:55", "ev": "claim", "d": "baseline claimed the slot"}
+{"t": 1795537901.4049683, "ist": "22:01:41", "ev": "beat", "d": "corpus fetch"}
+{"t": 1795538526.7452028, "ist": "22:12:06", "ev": "beat", "d": "building engine"}
+{"t": 1795538587.0453215, "ist": "22:13:07", "ev": "beat", "d": "corpus convert pass 1"}
+{"t": 1795538872.964049, "ist": "22:17:52", "ev": "beat", "d": "corpus convert pass 2"}
