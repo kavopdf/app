@@ -337,6 +337,22 @@ def _pending_count():
         return 0
 
 
+def _remote_json():
+    """ROUND.json as origin/main has it, or {} when it cannot be read.
+
+    The claim reads THIS, never its own working file: the two sandboxes share only git, and a
+    working file is what the reading run itself has just written. Reading it made a free slot look
+    busy (measured 24 Nov 18:59).
+    """
+    r = sh("git show origin/main:tools/p2w-bench/ROUND.json 2>/dev/null", timeout=60)
+    if r[0] != 0 or not (r[1] or "").strip():
+        return {}
+    try:
+        return json.loads(r[1])
+    except Exception:
+        return {}
+
+
 def claim_age_min(started):
     """Minutes since a claim, or None when there is no claim.
 
@@ -395,6 +411,31 @@ def claim(name):
     s = load()
     key = "%s_started" % name
     limit = CLAIM_STALE_MIN.get(name, 60)
+
+    # THE CLAIM IS DECIDED FROM ORIGIN, NEVER FROM THIS SANDBOX'S OWN FILE.
+    #
+    # load() is this sandbox's working copy. It is the right source for the engine fingerprint and
+    # for what this run has done, but it is the WRONG source for "does someone else hold the slot":
+    # every tool in this directory writes ROUND.json and RUN.json, so the file is dirty the moment
+    # anything runs, and a `git pull --rebase` to refresh it fails on that dirt. The claim then read
+    # a file it had itself just written, saw a claim seconds old, and stood down from a free slot.
+    #
+    # Measured 24 Nov 18:59 IST: --claim-fixer printed "fixer busy - another run claimed and pushed
+    # first (no detail)" while origin/main said "fixer_started": 0. Two cron runs a day were losing
+    # their slot this way, and a run that stands down reports nothing to look at.
+    sh("git fetch -q origin main", timeout=120)
+    _remote = _remote_json()
+    _local_claim = s.get(key)
+    if _remote:
+        for _k in (key, "%s_last_beat" % name, "%s_doing_since" % name):
+            if _k in _remote:
+                s[_k] = _remote[_k]
+    # IDENTICAL VALUE MEANS IT IS OUR OWN CLAIM, NOT A RIVAL'S. A run that re-enters the claim -
+    # a retry inside the same slot, or a second call after its own push landed - reads its own
+    # stamp back out of origin. time.time() floats do not collide, so an exact match is the same
+    # record. Without this a run stands down from the slot it is itself holding.
+    if _remote and _local_claim and _remote.get(key) == _local_claim:
+        s[key] = 0
     age_min = claim_age_min(s.get(key))
     if age_min is None:
         age_min = 1e9
@@ -506,13 +547,38 @@ def claim(name):
                  "git push -q origin main" % name, timeout=120)
     if _pushed[0] != 0:
         # either the push lost the race, or there was nothing to commit because the claim was already
-        # there. Pull and read what the winner wrote.
-        sh("git pull -q --rebase origin main", timeout=120)
-        s2 = load()
-        other = s2.get(key)
-        if other and claim_age_min(other) is not None and claim_age_min(other) < limit:
+        # there. THE REMOTE IS THE ARBITER, NOT THIS SANDBOX'S OWN FILE.
+        #
+        # This used to read `load()` after a `git pull -q --rebase`, which is wrong twice over:
+        #
+        #   1. THE PULL FAILS WHENEVER THE TREE IS DIRTY, and every tool in this directory writes
+        #      ROUND.json and RUN.json, so on a working run the tree usually IS dirty. The pull then
+        #      fails, `load()` returns THIS sandbox's file, and `other` is the claim this very call
+        #      wrote seconds earlier - age 0 - so the run stands down from a slot nobody holds.
+        #      Measured 24 Nov 18:59: --claim-fixer printed "fixer busy - another run claimed and
+        #      pushed first (no detail)" while `git show origin/main:tools/p2w-bench/ROUND.json`
+        #      said fixer_started: 0. The slot was free and the run nearly threw itself away.
+        #   2. it never checked whether the pull succeeded, so "what I just wrote" and "what the
+        #      other run wrote" were the same variable.
+        #
+        # So: fetch, and read the rival claim out of origin/main, which is the only state both
+        # sandboxes share.
+        mine = s.get(key)
+        sh("git fetch -q origin main", timeout=120)
+        other = _remote_json().get("%s_started" % name)
+        if (other and other != mine and claim_age_min(other) is not None
+                and claim_age_min(other) < limit):
             print("%s busy - another run claimed and pushed first (%s). Standing down."
-                  % (name, s2.get("%s_doing" % name) or "no detail"))
+                  % (name, _remote_json().get("%s_doing" % name) or "no detail"))
+            return 1
+        # NO RIVAL - so the claim has to actually reach origin, or it is not a claim. The old code
+        # printed "claimed at HH:MM" after a rejected push, which told the run it held a slot that
+        # the other fixer could not see. Two runs then edited the engine at once.
+        r = sh("git pull -q --rebase origin main && git push -q origin main", timeout=180)
+        if r[0] != 0:
+            print("%s - the claim never reached origin (%s). Standing down rather than working a "
+                  "slot the other run cannot see." % (name, (r[1] or "").strip().splitlines()[-1][:160]
+                                                      if (r[1] or "").strip() else "push refused"))
             return 1
     print("%s claimed at %s" % (name, ist("%H:%M")))
     note("claim", "%s claimed the slot" % name)
