@@ -18,7 +18,12 @@ document towards 99% is wasted time however tidy it looks.
 
 ## WHAT DONE LOOKS LIKE
 
-A document is done when **all 42 Google checks pass** on it and its `.txt` describes the same document.
+> **THE NUMBER IS NOT 42.** `all_check_ids()` knows 47 checks, and the store is a mix: on 24 Nov, 126
+> documents were measured on 42, 2 on 44 and 62 on 47. A document called "passes all 42" may never have
+> been offered checks 43-47, which is a pass it did not earn. Judge a document by the checks it was
+> actually given, and re-measure the old rows rather than trusting their total.
+
+A document is done when **every Google check that applies to it passes** on it and its `.txt` describes the same document.
 Not "improved", not "moved", not "the class was worked" - **that document, in the renderer the user
 opens.**
 
@@ -946,7 +951,7 @@ What it cannot do is tell you whether the change helped anyone.
         47_grey_body_black_headings
         53_single_space_body_15_headings
 
-**That is a handful, not the corpus.** For each one, put it through Google and compare the 42 checks
+**That is a handful, not the corpus.** For each one, put it through Google and compare every checks
 before and after:
 
     1. copy out/<name>.docx into /scratch/output/ and upload it
@@ -1236,7 +1241,7 @@ So closing `18_displacement` takes the clean count from 30 to 43 in one move. No
 because a class table counts documents touched and the score counts documents finished.
 
 **Work one document all the way to clean, then the next.** `docpick.py --next` names the proof document; the
-attempt is not finished until that document passes all 42 checks, or you can say with evidence which of its
+attempt is not finished until that document passes every check that applies to it, or you can say with evidence which of its
 remaining checks the engine cannot currently emit. "I moved 18_displacement on one document" is the shape of
 the 80% that improved nothing.
 
@@ -1411,7 +1416,7 @@ carries the reason - one line is enough.**
 
 **Fixing 32_stroke_lines alone takes exactly TWO documents to clean**, because those 145 documents each
 fail several checks and losing one failure does not make a document clean. The user's bar is 99% or
-better, which means all 42 checks pass. So before every attempt ask:
+better, which means every check that applies pass. So before every attempt ask:
 
 **"If this works, which documents become CLEAN?"** If the answer is none, the attempt cannot be a fix,
 whatever the class table says.
@@ -1555,7 +1560,7 @@ The same corpus, the same engine, the same day:
 | | documents fixed |
 |---|---:|
 | LibreOffice, `share5 <= 1.0` | **32 of 213** |
-| Google, all 42 checks pass | **7 of 192 measured** |
+| Google, every check that applies pass | **7 of 192 measured** |
 
 LibreOffice draws constructs Google drops. A rule written as a floating `<w:drawing>` is drawn exactly
 where the PDF drew it by LibreOffice and **silently discarded by Google** — so the document is perfect in
@@ -1564,7 +1569,7 @@ Google against 1 in LibreOffice.
 
 ### What this means for you
 
-* **The report now leads with Google's number.** "Fixed - Google, all 42 checks" is the real one;
+* **The report now leads with Google's number.** "Fixed - Google, every check that applies" is the real one;
   "Fixed - LibreOffice proxy" is shown beside it and labelled as a renderer the user does not open.
 * **Never report a LibreOffice improvement as a fix.** A soffice score that falls while Google is
   unchanged is not progress, it is a measurement of the wrong product.
