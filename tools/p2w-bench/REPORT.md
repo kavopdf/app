@@ -1,35 +1,35 @@
-# Fixer report - 2026-11-24 06:38
+# Fixer report - 2026-11-24 07:00
 
 ```
 # P2W Fixer - Run Report
 
-**24 Nov 2026 · slot 05:59 → 06:40 IST · 2 min**
+**24 Nov 2026 · slot 07:00 → running IST · 13 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> **7 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **7** — 2 attempt(s), 2 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **29** of the **186** re-measured on this engine - **4** of the 190 scored are still on an older engine, and **29** were clean there |
+| **Fixed - Google, every applicable check** | **34** of the **186** re-measured on this engine - **4** of the 190 scored are still on an older engine, and **34** were clean there |
 | Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **1** run(s) for the 4 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **23** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `18_displacement` |
+| Working on | `25_invisible_text` |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 06:38 | **lead** | 0/None | Second pass: measured 11 documents of the 85 the guard fires on, baseline against patched on the LibreOffice proxy. Seven are unchanged at share@5 (16_right_aligned_amounts, 351_omr_answer_sheet, 341_ |
-| 06:40 | **lead** | 0/None | Third pass: the largest table in the corpus, 324_loan_amortisation_schedule (6 tables, 41 rows each, 246 rows, 7 pages) - the document where a per-row redistribution would accumulate the most. LibreOf |
+| 07:11 | **kept** | 2/5 | check read the page-white sheet instead of the band behind the run; 2 of the 5 single-check documents re-measured 42/42 in Google, at-risk document unchanged at 40/42 |
+| 07:12 | **kept** | 5/5 | all five single-check documents re-measured 42/42 in Google on this engine after the check fix |
 
 ## The txt
 
@@ -43,19 +43,17 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_drowheight-prepass-01` | produce a minimal compilable two-pass emit for the a | 06:34 | 06:35 | 1 min |
-| `18_drowpitch-census-01` | census the table row pitch of every corpus PDF and c | 06:34 | 06:35 | 1 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 05:59 → 06:40 · 2 min |
+| Slot window | 07:00 → running · 13 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 16 |
-| Silences over 2 min | 0 |
+| Tool beats | 14 |
+| Longest silence | **5.6 min** — from 07:05:54, after `building the engine (build-engine.sh)` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -63,8 +61,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **0 min** | `########` |
-| other - not attributed to a tool | **1 min** | `##############` |
+| fix - diagnose and change the engine | **5 min** | `#########` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `#########` |
+| record - attempt, handoff, class rows | **2 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |

@@ -19,9 +19,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 05:59 |
-| ended | 06:40 |
-| how it ended | forced |
+| started | 07:00 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## The picture, in the words of the run that left it
@@ -66,8 +66,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `02:07` agent landed: 44_h-01 /  -> DEAD - no file in FINDINGS/ names this id; the run that deployed it ended without landing it. Closed 24 Nov, not re-deployed.
-- `02:07` agent landed: 18_dA-01 /  -> DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.
 - `02:07` agent landed: 04_cB-01 /  -> DUPLICATE - this run registered the same two agents twice; the ids held by RUN.json are 18_dA-02 / 04_cB-02, and the finding is on those.
 - `02:07` agent landed: 18_dA-02 /  -> FINDINGS/18_displacement-SOLE-FAILURE-13-DOCS-0120-agentA.md
 - `02:07` agent landed: 04_cB-02 /  -> FINDINGS/04_chars_missing-TXBX-CLAIM-REFUTED-54of65-0120-agentB.md
@@ -91,6 +89,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `06:35` agent landed: 18_drowpitch-census-01 /  -> no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B.
 - `06:38` attempt 47 on 18_displacement -> lead
 - `06:40` attempt 48 on 18_displacement -> lead
+- `07:11` attempt 1 on 25_invisible_text -> kept (2/5 moved)
+- `07:12` attempt 2 on 25_invisible_text -> kept (5/5 moved)
 
 ## Where the rest of the state lives
 
