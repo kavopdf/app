@@ -705,3 +705,41 @@ across two classes, from one threshold in one place.**
 
 **`table-with-rotated-header` has no HEAD .docx because `PdfToWord` throws on that source.** That is a crash
 on a corpus document, not a check fault, and it needs its own investigation.
+
+### 45_char_accuracy, second investigation: the mechanism is proven three ways
+
+A second investigation worked from the documents and reached the same verdict with a sharper proof.
+
+**The smoking gun is a count equality.** In **37 of 37** documents the number of `<w:drawing>` elements in
+the .docx equals the number of raster images in Google's export, exactly. And the .docx contains **zero**
+`word/media` parts and zero `a:blip` - so those bitmaps **cannot be the file's pictures**. Google created
+one image per text box. In **37 of 37** documents the recall of the .docx's *non*-textbox characters in the
+export's text layer is **100.0 %**.
+
+**The text is legible in those bitmaps** - it read `STAFF HANDBOOK - REVISION 6 - APRIL 2026` straight out
+of one 373x14 px image.
+
+**The LibreOffice control:** 18 of 19 documents read **100.00** against the source where Google reads far
+less - `331_pid_diagram` 100.00 against 18.25, `400_comic_page_speech_bubbles` 100.00 against 10.22,
+`policy-2col-spanning-section-heading` 100.00 against 8.52, `69_two_col_legal_numbered_clauses` 100.00
+against 32.46, `academic-paper-ieee-2col-abstract` 100.00 against 53.99. The committed
+`benchmarks/gverify-lo/*.json` agree: **`45` fails on 1 of these 37 on the LibreOffice render (only `600`)
+and on 0 of 37 for `04_chars_missing`.**
+
+**A second render-side artefact:** Google's export inserts **136 U+200B ZERO WIDTH SPACE**, and the check's
+`_glyphs()` does not strip them because `\s` does not match U+200B.
+
+**Coverage: 36 of 37 are the check's comparison.** 1 (`600_reviewed_invoice_with_annotations`) is a genuine
+file-side fault - and it is **extra** text, not wrong characters: the engine writes the PDF's annotation
+`/Contents` into the body (92 characters the page's text layer does not contain), which is
+`05_chars_extra`'s class, not this one.
+
+**The fix both investigations converge on:** a character-accuracy check must read characters from
+`word/document.xml`, not from the exported PDF's text layer. That is a check-side change, it needs no engine
+work, and it would clear 34 to 36 of the 37.
+
+**One honest discrepancy between the two:** the first counted 9,787 characters missing from the render
+across 33 documents and called 34 of 37 explained; the second counted 11,811 across 37 and called 36 of 37
+explained. The mechanisms and the verdict are identical; the difference is the set of Google Docs each
+could locate (the second found all 37 among the 460 pre-existing Docs in Drive, the first found 33). The
+larger sample is the better number.
