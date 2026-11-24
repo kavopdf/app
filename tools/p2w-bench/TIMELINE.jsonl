@@ -5324,3 +5324,15 @@
 {"t": 1795552195.6969535, "ist": "01:59:55", "ev": "beat", "d": "attempt recorded as lead: dither fires, but p2w --force measured stale docx"}
 {"t": 1795552217.974763, "ist": "02:00:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795552219.898515, "ist": "02:00:19", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795552224.1773982, "ist": "02:00:24", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795552224.283312, "ist": "02:00:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795552224.3710916, "ist": "02:00:24", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795552224.732575, "ist": "02:00:24", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795552247.8818212, "ist": "02:00:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795552249.276718, "ist": "02:00:49", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795552249.6423128, "ist": "02:00:49", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795552251.0511577, "ist": "02:00:51", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795552265.0187247, "ist": "02:01:05", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795552266.4236772, "ist": "02:01:06", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795552266.8027372, "ist": "02:01:06", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795552268.1858845, "ist": "02:01:08", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
