@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
  "agents": [
   "gap--01",
   "zero-01",
@@ -13,4 +14,14 @@
  "kept": 0,
  "started": "01:24",
  "started_ts": 1795550070.5188742
+=======
+ "started": "03:00",
+ "started_ts": 1795555823.7848885,
+ "ended": null,
+ "ended_ts": null,
+ "attempts": 0,
+ "kept": 0,
+ "agents": [],
+ "docs_improved": 0
+>>>>>>> Stashed changes
 }

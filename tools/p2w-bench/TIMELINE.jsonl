@@ -5400,3 +5400,4 @@
 {"t": 1795557357.048148, "ist": "03:25:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795557357.1318626, "ist": "03:25:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795557574.831342, "ist": "03:29:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795560792.7823896, "ist": "04:23:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
