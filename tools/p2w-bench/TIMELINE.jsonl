@@ -3663,3 +3663,6 @@
 {"t": 1795484899.3208764, "ist": "07:18:19", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795484899.8486202, "ist": "07:18:19", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795484899.9648707, "ist": "07:18:19", "ev": "beat", "d": "report.py: building the report"}
+{"t": 1795484918.8712547, "ist": "07:18:38", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795484942.9198172, "ist": "07:19:02", "ev": "beat", "d": "attempt 3: row declared one rule short"}
+{"t": 1795485094.1548622, "ist": "07:21:34", "ev": "beat", "d": "attempt.py: recording an attempt"}

@@ -1,36 +1,11 @@
 {
- "started_ts": 1795483830.2647831,
- "started": "07:00",
+ "started_ts": 1795484579.8414795,
+ "started": "07:12",
+ "window_for_claim": 1795484579.8414795,
  "ended_ts": null,
  "ended": null,
- "class": "25_invisible_text",
- "attempts": 2,
- "kept": 2,
- "docs_improved": 7,
- "agents": [
-  {
-   "id": "A1",
-   "name": "25_invisible_text mechanism",
-   "duration_s": 242,
-   "result": "the check reads the FIRST fill under a run's corner; a Google export's page-sized white sheet is that fill, so white type on a rasterised band counted as invisible. Source of this run's fix."
-  },
-  {
-   "id": "A2",
-   "name": "row-height law",
-   "duration_s": 210,
-   "result": "Google lays a row at 0.75*round((max(trHeight,content)+rule)/0.75): trHeight is a quantised floor, not a length. 362 is unruled (r=0) so it does not ramp +0.75/row at all - refutes the carry-over's '21.75 pt of pure ramp'. One LO-invariant probe at DocxWriter:6468 proposed."
-  }
- ],
- "obstacles_cleared": 0,
- "needs_human": 0,
- "counted": [
-  [
-   "25_invisible_text",
-   2
-  ],
-  [
-   "25_invisible_text",
-   5
-  ]
- ]
+ "attempts": 0,
+ "kept": 0,
+ "agents": [],
+ "docs_improved": 0
 }
