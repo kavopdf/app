@@ -180,3 +180,4 @@
 {"at": "2026-11-24 18:34", "attempt": 5, "class": "60_text_column_right_edge", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-24 19:53", "attempt": 3, "class": "04_chars_missing", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-24 20:50", "attempt": 4, "class": "04_chars_missing", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-24 22:39", "attempt": 58, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
