@@ -71,13 +71,21 @@ edited here because it is the user's text, but no run should plan against it aga
   (41 rows differ) for reasons that predate this change, and absorbing that drift should be a
   deliberate pass, not a side effect of an instrument fix. Recorded, not touched.
 
-## Residual, same defect, not patched
+## The third and last site, patched in the same run
 
-`verify_google.py:6394` (`_engine_head()` -> `%h`) stamps NEW verdicts with a commit abbreviation
-while the existing 212 carry the source hash. Until it is aligned, a freshly measured document will
-carry a different kind of stamp from the rest of the store and will not count as current. This is the
-next instrument fix, and it needs one Google round trip to prove, which this pod cannot do (no Drive
-render path from here).
+`verify_google.py:6394` (`_engine_head()`) is what stamps a NEW verdict as it is written, and it
+answered `%h` too - so every document measured from now on would have carried a different kind of
+stamp from the 213 already in the store, and would not have counted as current. Fixed the same way.
+
+| | before | after |
+|:--|:--|:--|
+| `verify_google._engine_head()` | `'85b8735f'` | `'981ff1fa35e2cf67'` |
+| `regress.engine_fingerprint()` (independent) | `981ff1fa35e2cf67` | `981ff1fa35e2cf67` |
+| equal? | **no** | **yes** |
+
+Provenance only: nothing in that change touches a check, a score or a verdict. It is verified by
+value equality against `regress.py`'s fingerprint and against the 213 rows already in the store - not
+by a Google round trip, because a round trip would only re-measure what this change cannot move.
 
 ## What would falsify this
 

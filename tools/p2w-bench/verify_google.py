@@ -4674,13 +4674,40 @@ DETAIL = {}
 
 
 def _engine_head():
-    """The engine commit this measurement is of. Provenance, not a score."""
+    """WHICH ENGINE THIS MEASUREMENT IS OF - the same quantity every stored verdict carries.
+
+    A COMMIT IS NOT THAT QUANTITY. All 213 verdicts in benchmarks/gverify/ are stamped with
+    `sha256(name + bytes of every app/.../engine/*.java)[:16]` (gvbatch.py:26-76, the same quantity as
+    regress.py:engine_fingerprint()), e.g. 981ff1fa35e2cf67. This function answered
+    `git log -1 --format=%h -- engine/`, an 8-char abbreviation (85b8735f on 25 Nov), so every verdict
+    written HERE would carry a different kind of stamp from the store it is written into, and would not
+    be counted as current by report.py or by gverify.py's plan - the two instruments a fixer steers by.
+    Measured 25 Nov: `_engine_head()` returned '85b8735f' while the tree's fingerprint was
+    981ff1fa35e2cf67 and all 213 stored rows carried that value.
+
+    Provenance, not a score: nothing here changes a check. Falls back to the commit so a pod without
+    the engine sources still answers something.
+    """
+    import hashlib as _h
+    _root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    _d = os.path.join(_root, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
+    try:
+        if os.path.isdir(_d):
+            _s = _h.sha256()
+            for _n in sorted(os.listdir(_d)):
+                if not _n.endswith(".java"):
+                    continue
+                _s.update(_n.encode())
+                with open(os.path.join(_d, _n), "rb") as _f:
+                    _s.update(_f.read())
+            return _s.hexdigest()[:16]
+    except Exception:
+        pass
     import subprocess as _sp
     try:
-        r = _sp.run(["git", "-C", os.path.dirname(os.path.dirname(os.path.dirname(
-            os.path.abspath(__file__)))), "log", "-1", "--format=%h", "--",
-            "app/src/main/java/com/kavopdf/app/engine/"],
-            capture_output=True, text=True, timeout=20)
+        r = _sp.run(["git", "-C", _root, "log", "-1", "--format=%h", "--",
+                     "app/src/main/java/com/kavopdf/app/engine/"],
+                    capture_output=True, text=True, timeout=20)
         return (r.stdout or "").strip() or "unknown"
     except Exception:
         return "unknown"
