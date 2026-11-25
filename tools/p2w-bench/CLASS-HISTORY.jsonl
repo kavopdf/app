@@ -204,3 +204,5 @@
 {"at": "2026-11-25 23:37", "attempt": 2, "class": "05_chars_extra", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-25 23:37", "attempt": 3, "class": "05_chars_extra", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-26 00:51", "attempt": 6, "class": "60_text_column_right_edge", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-26 01:45", "attempt": 1, "class": "59_shape_anchor", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-26 01:47", "attempt": 2, "class": "59_shape_anchor", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
