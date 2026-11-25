@@ -258,6 +258,24 @@ def collect():
             return None
 
     _ta = _age_h(os.path.join(HERE, "txt", "RANKING-TXT.csv"))
+    # A FRESH CLONE STAMPS EVERY FILE "NOW", SO THIS CHECK NEVER FIRED. Measured 25 Nov 10:38: the
+    # `.txt` table's mtime was 0.8 h old (it had just been checked out) while its last commit was
+    # 24.3 h old, and `health.py` - which asks git - printed `txt stopped 199 clean, 14 failing 24.2 h`.
+    # Two instruments, two answers, and the pending list was the one that could not see the work.
+    # The commit time is when the table was last WRITTEN; the checkout time is when it was last copied.
+    _tc = None
+    try:
+        import subprocess as _sp
+        _o = _sp.run(["git", "log", "-1", "--format=%ct", "--",
+                      os.path.join("tools", "p2w-bench", "txt", "RANKING-TXT.csv")],
+                     cwd=os.path.dirname(os.path.dirname(HERE)),
+                     capture_output=True, text=True, timeout=20)
+        if _o.returncode == 0 and (_o.stdout or "").strip().isdigit():
+            _tc = (time.time() - int(_o.stdout.strip())) / 3600.0
+    except Exception:
+        _tc = None
+    if _tc is not None and (_ta is None or _tc > _ta):
+        _ta = _tc
     if _ta is None:
         items.append({"kind": "measure", "who": "the .txt table",
                       "what": "RANKING-TXT.csv is missing - the .txt half has no score at all",
