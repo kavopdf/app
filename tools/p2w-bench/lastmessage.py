@@ -22,6 +22,20 @@ OUT = os.path.join(HERE, "LAST-MESSAGE.md")
 MIN = 400
 
 
+
+def _atomic_write(dest, text):
+    """Write beside the target and rename, so a reader never sees half a report.
+
+    Two fixer crons share one slot by design - the :10 relay exists so a dead :50 run does not stop the
+    work. On 25 Nov both wrote LAST-MESSAGE.md within the hour and the 13:00 report was lost; the 12:13
+    one reached the user. os.replace is atomic on POSIX, so at worst the older report survives intact
+    rather than a truncated one.
+    """
+    tmp = dest + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        fh.write(text)
+    os.replace(tmp, dest)
+
 def out_path(cron):
     """Which state file a report for this cron may write.
 
@@ -725,7 +739,7 @@ def main(argv):
             print("dry run - nothing written")
             return 0
         _dest = out_path(_for)
-        open(_dest, "w", encoding="utf-8").write(text)
+        _atomic_write(_dest, text)
         print("wrote %s - %d characters" % (_dest, len(text.strip())))
         return 0
 
@@ -752,7 +766,7 @@ def main(argv):
         print("dry run - nothing written")
         return 0
     _dest = out_path(_for)
-    open(_dest, "w", encoding="utf-8").write(text)
+    _atomic_write(_dest, text)
     print("wrote %s - %d characters" % (_dest, len(text.strip())))
     if _dest != OUT:
         print("LAST-MESSAGE.md is the fixer's and was not touched by this %s report" % (_for or "?"))
