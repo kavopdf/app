@@ -406,3 +406,5 @@
 | 25 Nov 17:16 | fixer | claim | fixer claimed the slot |
 | 25 Nov 18:01 | fixer | attempt | t12_word_invention -> lead (0/? moved) |
 | 25 Nov 20:19 | fixer | attempt | t12_word_invention -> lead (0/? moved) |
+| 25 Nov 19:14 | baseline | claim | baseline claimed the slot |
+| 25 Nov 20:41 | baseline | commit-gate | started |
