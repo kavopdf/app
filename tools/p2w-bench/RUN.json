@@ -6,6 +6,9 @@
  "ended": null,
  "attempts": 0,
  "kept": 0,
- "agents": [],
+ "agents": [
+  "05_ct12 patch spec-01",
+  "18_drow rule charge-01"
+ ],
  "docs_improved": 0
 }

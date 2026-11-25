@@ -13,10 +13,10 @@
       }
     ]
   },
-  "fixer_doing": "gate + commit",
-  "fixer_doing_since": 1795630067.7133975,
+  "fixer_doing": "committing report",
+  "fixer_doing_since": 1795630403.6664608,
   "fixer_engine_at_claim": "85b8735f",
-  "fixer_last_beat": 1795630067.7133985,
+  "fixer_last_beat": 1795630403.6664615,
   "fixer_started": 1795630062.7240088,
   "history": [
     {
