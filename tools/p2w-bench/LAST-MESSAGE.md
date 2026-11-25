@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 02:28 → running IST · 1h 03m**
+**26 Nov 2026 · slot 02:28 → 03:32 IST · 1h 04m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -35,7 +35,7 @@
 
 | | |
 |:--|:--|
-| Measured | **1.2 h ago** |
+| Measured | **1.3 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **204** (95.8%) |
 | Failing at least one check | **9** |
@@ -53,9 +53,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 02:28 → running · 1h 03m |
+| Slot window | 02:28 → 03:32 · 1h 04m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 38 |
+| Tool beats | 43 |
 | Longest silence | **13.7 min** — from 03:15:00, after `lastmessage.py: running a tool for its numbers` |
 | Silences over 2 min | 7 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -66,9 +66,9 @@
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **2 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **43 min** | `#################` |
+| measure or build - a conversion, screen or compile writes no beacon | **43 min** | `################` |
 | record - attempt, handoff, class rows | **3 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 | other - not attributed to a tool | **7 min** | `###` |
 ## Best results this round
 
@@ -85,130 +85,6 @@
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 03:31 | **lead** | 0/25 | pgMar-top patch committed (b6bfcb7b). Full corpus re-measured on the patched engine: RANKING.csv byte-identical, 212 of 212 unchanged, 0 worse - the LibreOffice proxy is blind to this construct by con |
-
-## The txt
-
-| | |
-|:--|:--|
-| Measured | **1.2 h ago** |
-| Scored | **213** of 213 |
-| Clean - every applicable check passes | **204** (95.8%) |
-| Failing at least one check | **9** |
-| Moved since the last commit | **none** - nothing changed |
-| Most common failure | `t12_word_invention` - 3 documents |
-
-## Subagents
-
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `60_tA-02` | which emitted construct makes Google compute a diffe | 02:35 | 03:31 | 56 min |
-| `04_cB-01` | does the check open the .docx at all, and what is th | 02:35 | 03:31 | 56 min |
-
-## Timing
-
-| | |
-|:--|:--|
-| Slot window | 02:28 → running · 1h 03m |
-| Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 38 |
-| Longest silence | **13.7 min** — from 03:15:00, after `lastmessage.py: running a tool for its numbers` |
-| Silences over 2 min | 7 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
-
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| fix - diagnose and change the engine | **2 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **43 min** | `#################` |
-| record - attempt, handoff, class rows | **3 min** | `#` |
-| other - not attributed to a tool | **7 min** | `###` |
-## Best results this round
-
-| Document | Before | After | Change |
-|:--|--:|--:|--:|
-| `415_inline_images` | 89.04 | 0.00 | -89.04 |
-| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
-| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
-| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
-| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
-
-## Next run
-
-
----
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 03:31 | **lead** | 0/25 | pgMar-top patch committed (b6bfcb7b). Full corpus re-measured on the patched engine: RANKING.csv byte-identical, 212 of 212 unchanged, 0 worse - the LibreOffice proxy is blind to this construct by con |
-
-## The txt
-
-| | |
-|:--|:--|
-| Measured | **1.2 h ago** |
-| Scored | **213** of 213 |
-| Clean - every applicable check passes | **204** (95.8%) |
-| Failing at least one check | **9** |
-| Moved since the last commit | **none** - nothing changed |
-| Most common failure | `t12_word_invention` - 3 documents |
-
-## Subagents
-
-*None deployed this run.*
-
-## Timing
-
-| | |
-|:--|:--|
-| Slot window | 02:28 → running · 1h 02m |
-| Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 36 |
-| Longest silence | **13.7 min** — from 03:15:00, after `lastmessage.py: running a tool for its numbers` |
-| Silences over 2 min | 7 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
-
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| fix - diagnose and change the engine | **2 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **43 min** | `#################` |
-| record - attempt, handoff, class rows | **3 min** | `#` |
-| other - not attributed to a tool | **7 min** | `###` |
-## Best results this round
-
-| Document | Before | After | Change |
-|:--|--:|--:|--:|
-| `415_inline_images` | 89.04 | 0.00 | -89.04 |
-| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
-| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
-| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
-| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
-
-## Next run
-
-
----
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 21:15 | **lead** | 0/25 | Full corpus re-measured on the pgMar-top engine (213 converted, 212 scored). `RANKING.csv` byte-identical on all 212 rows, 0 worse, 0 better - the LibreOffice proxy cannot see this construct by construction. |
-| 21:56 | **kept** | - | `18-displacement-PGMAR-TOP-CARRIES-THE-PAGE-GAP.patch` committed as `b6bfcb7b` through the real pre-commit hook (PASS). |
 
 ## The class I chose, and why
 
