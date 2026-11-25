@@ -6233,3 +6233,18 @@
 {"t": 1795610917.4018927, "ist": "18:18:37", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795610917.6461887, "ist": "18:18:37", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795610961.962037, "ist": "18:19:21", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795611487.447696, "ist": "18:28:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795612226.495282, "ist": "18:40:26", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795613347.439754, "ist": "18:59:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795613352.2859738, "ist": "18:59:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795613357.237829, "ist": "18:59:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795613544.3944576, "ist": "19:02:24", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795614037.4692388, "ist": "19:10:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795614042.5640597, "ist": "19:10:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795614074.7647097, "ist": "19:11:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795614075.880464, "ist": "19:11:15", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795614082.3111618, "ist": "19:11:22", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795614083.1936696, "ist": "19:11:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795614099.2225938, "ist": "19:11:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795614100.0833042, "ist": "19:11:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795614108.2303338, "ist": "19:11:48", "ev": "beat", "d": "pending.py: reading the pending gate"}

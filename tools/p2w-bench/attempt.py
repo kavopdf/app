@@ -431,7 +431,13 @@ def add(args):
                      "outcome": "lead", "total": args.total,
                      "reason": "measured on a dirty tree - not credited; commit and re-record"})
                 _r["pending_moved"] = _pending_moved
-                save(_d)
+                # NOT save(): save() also bumps RUN.json attempts, and this path records no
+                # attempt. It bumped the counter and wrote no history row, which is exactly the
+                # disagreement report.py self-check printed: "attempts: RUN.json counter 2 vs
+                # ATTEMPTS.json history 1". A pending row is a note about a measurement, not an
+                # attempt, so it writes the ledger directly.
+                with open(LEDGER, "w", encoding="utf-8") as _f:
+                    json.dump(_d, _f, indent=1, sort_keys=True)
             except Exception as _e:
                 print("could not record the pending measurement: %s" % _e)
             return 2
