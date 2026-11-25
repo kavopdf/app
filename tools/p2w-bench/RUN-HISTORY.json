@@ -1,22 +1,5 @@
 [
  {
-  "started_ts": 1795393711.178966,
-  "started": "05:58",
-  "ended_ts": null,
-  "ended": "(never)",
-  "class": "18_displacement",
-  "attempts": 2,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   "18_dresidual-census-01",
-   "18_dblast-radius-01"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795409247.7846751,
   "started": "10:17",
   "ended_ts": null,
@@ -816,5 +799,32 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795562798.5848136,
+  "started": "04:56",
+  "window_for_claim": 1795562798.5848136,
+  "ended_ts": null,
+  "ended": "(never)",
+  "attempts": 2,
+  "kept": 0,
+  "agents": [
+   {
+    "id": "invisible-text-blind-01",
+    "class": "25_invisible_text",
+    "angle": "instrument",
+    "question": "is 25_invisible_text blind after the 24 Nov sheet filter, and can it be made to fail again",
+    "status": "landed"
+   },
+   {
+    "id": "gapcap-risk-01",
+    "class": "18_displacement",
+    "angle": "engine",
+    "question": "which documents become worse if the gap-cap + zero-gap-anchor pair ships, and can it ship at all",
+    "status": "landed"
+   }
+  ],
+  "docs_improved": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
