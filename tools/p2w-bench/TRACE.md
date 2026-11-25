@@ -406,3 +406,4 @@
 | 26 Nov 01:47 | fixer | attempt | 59_shape_anchor -> lead (0/? moved) |
 | 26 Nov 01:48 | fixer | attempt | 59_shape_anchor -> lead (0/? moved) |
 | 26 Nov 02:15 | ? | attempt | 18_displacement -> lead (9/? moved) |
+| 26 Nov 02:15 | baseline | claim | baseline claimed the slot |
