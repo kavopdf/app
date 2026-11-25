@@ -3,30 +3,31 @@
 ```
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 02:28 → running IST · 1h 03m**
+**26 Nov 2026 · slot 02:28 → 03:32 IST · 1h 04m**
 
 > No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
-| Check-instances passing | **0** of 0 (0.0%) on 0 documents |
-| Check-instances still failing | **0** |
-| Kept attempts vs documents clean | **15** classes with a kept attempt, **42** documents clean - a kept attempt is progress inside a class, not a finished document |
+| Check-instances passing | **6288** of 6698 (93.9%) on 153 documents |
+| Check-instances still failing | **410** |
+| Kept attempts vs documents clean | **15** classes with a kept attempt, **44** documents clean - a kept attempt is progress inside a class, not a finished document |
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
 | **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; subagents: 2 deployed vs no FINDINGS file for 60_tA-02, 04_cB-01 |
 | Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
-| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Corpus improvement vs 15 Nov | **+40.32%** — mean 6.15 → 3.67 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **could not be read** - 0 of 213 scored were read as current, which is a failed read and not a measurement. No count is stated rather than a zero |
-| Who re-measures them | the **:20 gverify** cron, once the read works |
+| **Fixed - Google, every applicable check** | **30** of the **153** re-measured on this engine - **58** of the 211 scored are still on an older engine, and **12** of those were clean on the engine they were measured with |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **1** run(s) for the 58 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Not scored - page count did not match | **2** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (24 still open), not a new class |
+| Working on | `18_displacement` - taken from the pending list (26 still open), not a new class |
 
 ## What was tried
 
@@ -38,7 +39,7 @@
 
 | | |
 |:--|:--|
-| Measured | **1.2 h ago** |
+| Measured | **2.2 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **204** (95.8%) |
 | Failing at least one check | **9** |
@@ -56,9 +57,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 02:28 → running · 1h 03m |
+| Slot window | 02:28 → 03:32 · 1h 04m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 38 |
+| Tool beats | 43 |
 | Longest silence | **13.7 min** — from 03:15:00, after `lastmessage.py: running a tool for its numbers` |
 | Silences over 2 min | 7 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -69,9 +70,9 @@
 | Phase | Time | |
 |:--|--:|:--|
 | fix - diagnose and change the engine | **2 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **43 min** | `#################` |
+| measure or build - a conversion, screen or compile writes no beacon | **43 min** | `################` |
 | record - attempt, handoff, class rows | **3 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 | other - not attributed to a tool | **7 min** | `###` |
 ## Best results this round
 

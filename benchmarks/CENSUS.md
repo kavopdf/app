@@ -13,7 +13,7 @@ that cannot work.
 |---|---|---|---|
 | rules-not-tables | 1 | 0.1% | 391_survey_questionnaire_grid 0.1%@5 p1 |
 | text-missing | 8 | 25.7% | academic-paper-ieee-2col-abstract 5.7%@5 p2 |
-| annotations-present | 1 | 62.5% | 600_reviewed_invoice_with_annotati 62.5%@5 p1 |
+| annotations-present | 1 | 54.3% | 600_reviewed_invoice_with_annotati 54.3%@5 p1 |
 | none-identified | 52 | 672.7% | 041122-Account_Opening_Form 98.7%@5 p9 |
 
 ## Where the ink went, in points
@@ -25,11 +25,11 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 | document | share@5 | dx | dy | explains | still >20pt |
 |---|---|---|---|---|---|
 | 041122-Account_Opening_Form | 98.65 | 38.8 | -36.9 | 1.0 | 70.0% |
-| Account_Opening_Form_Fillable_fill | 97.62 | 3.4 | -6.7 | 2.0 | 66.0% |
+| Account_Opening_Form_Fillable_fill | 97.62 | 3.4 | -17.5 | 2.0 | 66.0% |
 | one-page-rotated-180-degrees | 81.64 | 0.0 | 0.0 | 0.0 | 23.0% |
-| 600_reviewed_invoice_with_annotati | 62.46 | 0.0 | 105.6 | 25.0 | 1.0% |
-| 601_fillable_admission_form | 52.39 | 0.0 | 30.2 | 14.0 | 9.0% |
-| itr-computation-with-slab-table | 42.33 | 0.0 | 0.5 | 4.0 | 1.0% |
+| 600_reviewed_invoice_with_annotati | 54.3 | 0.0 | 36.5 | 26.0 | 1.0% |
+| 601_fillable_admission_form | 52.39 | 0.0 | 26.9 | 15.0 | 8.0% |
+| itr-computation-with-slab-table | 42.33 | 0.0 | -0.5 | 1.0 | 0.0% |
 | table-inside-two-column-page | 35.87 | 0.0 | 0.0 | 0.0 | 0.0% |
 | 360_restaurant_menu | 34.43 | 0.0 | 0.0 | 0.0 | 3.0% |
 | text-held-twice-shadow-text | 30.29 | 0.0 | 0.0 | 0.0 | 28.0% |
@@ -79,7 +79,7 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 
 | document | share@5 | worst page | src img | docx img | src chars | docx chars | src draws | docx cells |
 |---|---|---|---|---|---|---|---|---|
-| 600_reviewed_invoice_with_annotati | 62.46 | 1 | 0 | 0 | 776 | 831 | 23 | 50 |
+| 600_reviewed_invoice_with_annotati | 54.3 | 1 | 0 | 0 | 776 | 730 | 23 | 50 |
 
 ## none-identified (52 documents)
 
