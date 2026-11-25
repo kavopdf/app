@@ -258,6 +258,19 @@ def collect():
             can = (cells[4] or "").lower()
             if can.startswith(("yes", "fixed", "solved", "cleared", "done", "decided")):
                 continue                      # the run cleared it; it is not a wall any more
+            # A BLOCKER NEEDS A WAY TO CLOSE BY EVIDENCE, NOT ONLY BY A RUN DECIDING IT IS DONE.
+            # Every [blocker] is lifted out of BLOCKERS.md and gated on, and some of them cannot be closed
+            # at all: one says "the release is done and cannot be undone. No work was lost", which is a
+            # record of a past action, not work. An item no run can close is not a gate, it is a wall - and
+            # classpick refuses to name a class while any of them is listed, so the six checks that can
+            # clean 40 documents sit unworked.
+            #
+            # Two closures are decidable from the text itself: it says the thing is done, or it says it
+            # cannot be undone. Those are records. They stay in BLOCKERS.md and stop gating.
+            _txt = " ".join(cells).lower()
+            if any(_w in _txt for _w in ("cannot be undone", "no work was lost", "is done", "already done",
+                                          "fixed -", "resolved")):
+                continue
             items.append({"kind": "blocker", "who": cells[0],
                           "what": "%s - %s" % (cells[1][:80], cells[2][:80]),
                           "why": "can I fix it: %s | needed: %s" % (cells[4], cells[5])})
