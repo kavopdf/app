@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 10:56 → running IST · 22 min**
+**25 Nov 2026 · slot 10:56 → running IST · 45 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -17,19 +17,18 @@
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **42** of the **212** re-measured on this engine - **0** of the 212 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| **Fixed - Google, every applicable check** | **42** of the **213** re-measured on this engine - **0** of the 213 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
-| Not scored - page count did not match | **1** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (18 still open), not a new class |
+| Working on | `-` - taken from the pending list (17 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **23 min ago** |
+| Measured | **45 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -44,11 +43,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 10:56 → running · 22 min |
+| Slot window | 10:56 → running · 45 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 4 |
+| Tool beats | 16 |
 | Longest silence | **22.6 min** — from 10:56:47, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 1 |
+| Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -56,7 +55,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **22 min** | `######################` |
+| measure or build - a conversion, screen or compile writes no beacon | **22 min** | `###########` |
+| other - not attributed to a tool | **22 min** | `###########` |
 ## Best results this round
 
 | Document | Before | After | Change |

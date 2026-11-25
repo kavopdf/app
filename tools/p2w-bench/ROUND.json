@@ -13,10 +13,10 @@
       }
     ]
   },
-  "fixer_doing": "committed cf724722, pushing",
-  "fixer_doing_since": 1795587074.320192,
+  "fixer_doing": "classpick for the next run",
+  "fixer_doing_since": 1795587127.0363958,
   "fixer_engine_at_claim": "85b8735f",
-  "fixer_last_beat": 1795587074.3201928,
+  "fixer_last_beat": 1795587127.0363967,
   "fixer_started": 1795584404.3932035,
   "history": [
     {

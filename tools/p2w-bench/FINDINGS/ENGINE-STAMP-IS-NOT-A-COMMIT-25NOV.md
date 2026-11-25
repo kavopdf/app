@@ -15,7 +15,7 @@ Nothing was wrong with the store. `google_fixed()` compares two different quanti
 
 | | |
 |:--|:--|
-| the store's stamp (`benchmarks/gverify/*.json`, 212 rows) | `engine = "981ff1fa35e2cf67"` - 16 hex, `sha256(name + bytes of every app/.../engine/*.java)[:16]`, written by `gvbatch.py:26,76` |
+| the store's stamp (`benchmarks/gverify/*.json`, 213 rows) | `engine = "981ff1fa35e2cf67"` - 16 hex, `sha256(name + bytes of every app/.../engine/*.java)[:16]`, written by `gvbatch.py:26,76` |
 | `report.py:engine_now()` at HEAD | `git log -1 --format=%h -- app/.../engine/` -> `"85b8735f"` - an 8-char git abbreviation |
 | the comparison, `report.py:460` | `if (j.get("engine") or "") == now:` - exact string equality |
 
@@ -38,14 +38,17 @@ Same tree, same store, only the instrument differing.
 
 | | before | after |
 |:--|:--|:--|
-| `report.py` "Fixed - Google" | **could not be read** - 0 of 212 current | **42** of the **212** re-measured on this engine |
+| `report.py` "Fixed - Google" | **could not be read** - 0 of 212 current | **42** of the **212** re-measured on this engine (213 after `b559f2ac` landed) |
 | `report.py --json` | `google_fixed_current=0` | `google_fixed_current=42, google_scored_current=212, google_refused=1` |
 | `classify_google.py --print` header | "0 of the 212 ... measured on it; re-measure" | "Every result above was measured on engine `981ff1fa35e2cf67`, the engine in the tree." |
 
 ## The population, proved three ways that do not share code
 
-1. **The store.** All 213 files in `benchmarks/gverify/`: 212 rows with `engine = 981ff1fa35e2cf67`,
-   `render = google`; 42 of them carry `failed = []`. One row is `status: page_count_refused`.
+1. **The store.** All 213 files in `benchmarks/gverify/`: every row carries `engine =
+   981ff1fa35e2cf67` and `render = google`; 42 of them carry `failed = []`. (At the time of the
+   measurement it was 212 scored plus one `status: page_count_refused`; the 213th verdict - document
+   600, 37 of 44, failing `18_displacement` among others - landed from another run's commit
+   `b559f2ac` at 06:10 UTC, and it is stamped on the same engine.)
 2. **The tree.** `regress.engine_fingerprint()` on this clone returns `981ff1fa35e2cf67` for the txt
    fingerprint (all `.java`) - the same value the store is stamped with. `corpus-slice.py` wrote the
    same value into the corpus stamp after converting all 213 documents.
@@ -53,7 +56,7 @@ Same tree, same store, only the instrument differing.
    engine: 212 (one page-count refusal)", "clean: 42 of 212". The scoreboard contradicted the commit
    that produced its own data.
 
-So **42 of 212 documents pass every applicable Google check on this engine** - not 0, and not the
+So **42 of 213 documents pass every applicable Google check on this engine** - not 0, and not the
 "6 clean of 192 scored" the FIXER-BRIEF charter still carries. The charter line is stale; it is not
 edited here because it is the user's text, but no run should plan against it again.
 

@@ -5843,3 +5843,5 @@
 {"t": 1795586727.101971, "ist": "11:35:27", "ev": "beat", "d": "corpus slice 5, final"}
 {"t": 1795586988.039269, "ist": "11:39:48", "ev": "beat", "d": "regress --check with full corpus"}
 {"t": 1795587074.3194587, "ist": "11:41:14", "ev": "beat", "d": "committed cf724722, pushing"}
+{"t": 1795587127.0353804, "ist": "11:42:07", "ev": "beat", "d": "classpick for the next run"}
+{"t": 1795587127.4520586, "ist": "11:42:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
