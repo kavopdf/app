@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 12:13 → running IST · 1h 09m**
+**25 Nov 2026 · slot 12:13 → running IST · 1h 10m**
 
 > **415_inline_images** fixed — 89.04 → 0.00. Corpus ratchet clean across 213 documents.
 
@@ -51,9 +51,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 12:13 → running · 1h 09m |
+| Slot window | 12:13 → running · 1h 10m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 32 |
+| Tool beats | 34 |
 | Longest silence | **24.3 min** — from 12:23:19, after `gaps.py: reading the timeline` |
 | Silences over 2 min | 10 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
