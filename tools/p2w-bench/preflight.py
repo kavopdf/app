@@ -232,6 +232,7 @@ def main(argv):
         print("  coupled fix : P2W_ACCEPT_WORSE=doc1,doc2 regress.py --check      (named, net-positive)")
         print('  per document: python3 tools/p2w-bench/diagnose.py <name>        (why THIS document fails)')
         print('  before patch: python3 tools/p2w-bench/predict-outcome.py        (which construct buys clean docs)')
+        '  pixel score : python3 tools/p2w-bench/pixbatch.py --slice N --src ...   (88% median SSIM, not 99%)',
         print("")
         print("  READY in %.1f s" % (time.time() - t0))
     return 0
