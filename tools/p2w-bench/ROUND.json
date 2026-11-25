@@ -13,11 +13,11 @@
       }
     ]
   },
-  "fixer_doing": "engine change committed to tree; gate wants a re-measure - building the corpus for regress.py --check",
+  "fixer_doing": "relay: cloned, about to read",
   "fixer_doing_since": 1795595009.343267,
   "fixer_engine_at_claim": "85b8735f",
   "fixer_last_beat": 1795595009.343268,
-  "fixer_started": 1795595495.7999055,
+  "fixer_started": 1795596463.1510503,
   "history": [
     {
       "at": "2026-11-12 09:46",
