@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/325_demat_holdings_statement.pdf",
-  "render": "/tmp/lo-one/325_demat_holdings_statement.pdf",
+  "render": "/tmp/lo-b3/325_demat_holdings_statement.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "b7699196",
+  "engine": "d85db0a9822ddb54",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -50,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 0.3,
+        "worst_dy": 0.7,
+        "med_dx": 0.4,
+        "bad_pages": [],
+        "runs_matched": 84
+      }
     },
     "23_line_pitch": {
       "source": 15.0,
@@ -269,5 +276,5 @@
   },
   "document": "325_demat_holdings_statement",
   "source_file": "/scratch/work/p2w/corpus/325_demat_holdings_statement.pdf",
-  "render_file": "/tmp/lo-one/325_demat_holdings_statement.pdf"
+  "render_file": "/tmp/lo-b3/325_demat_holdings_statement.pdf"
 }
