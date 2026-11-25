@@ -191,3 +191,4 @@
 | 25 Nov 15:06 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
 | 25 Nov 15:30 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
 | 25 Nov 15:30 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
+| 25 Nov 15:32 | fixer | slot FORCED released - see INCIDENTS.md for why |
