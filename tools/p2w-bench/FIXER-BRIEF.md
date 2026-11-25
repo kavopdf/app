@@ -858,6 +858,15 @@ Beyond that, release the claim and let the next run try.
 After three failures on one item: skip it, leave its row empty, write one line in `INCIDENTS.md`,
 and continue.
 
+**`--needs-human` IS FOR A PLATFORM LIMIT, NEVER FOR A QUALITY TRADE.** A workspace budget that will not
+return, a Drive outage, a credential that has expired: those are things you cannot decide, and stopping is
+correct. A trade between two documents' scores is not one of them. Nobody comes for that decision - you take
+it yourself on research, verification, proof and evidence, and you write down what you weighed.
+
+Measured 25 Nov: one such trade sat in `needs_human` from 10:40 onward - a 1.03 rise on a document already
+at 97.62 against 601 going to 0.00. It was a real question and it had a real answer in the corpus; treating
+it as a person's to make left it unowned for the whole day and put a stop in a run's path for nothing.
+
 **If the error says the workspace usage budget is exhausted,** that is not a rate limit: waiting
 inside a run does not restore it. Record it with `--needs-human` and in BLOCKERS.md and stop. The
 watchdog resumes the crons when it returns.
