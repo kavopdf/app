@@ -188,3 +188,4 @@
 | 25 Nov 15:05 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 25 Nov 17:02 | fixer | attempt t12_word_invention -> kept (5/8 moved) |
 | 25 Nov 17:03 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 25 Nov 17:05 | fixer | attempt t12_word_invention -> kept (5/8 moved) |

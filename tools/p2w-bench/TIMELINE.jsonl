@@ -6162,3 +6162,11 @@
 {"t": 1795606507.926226, "ist": "17:05:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795606508.046393, "ist": "17:05:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795606508.7068434, "ist": "17:05:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795606512.169766, "ist": "17:05:12", "ev": "attempt", "d": "t12_word_invention -> kept"}
+{"t": 1795606512.2580183, "ist": "17:05:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795606512.3458495, "ist": "17:05:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795606512.896625, "ist": "17:05:12", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795606535.918343, "ist": "17:05:35", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795606537.4965887, "ist": "17:05:37", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795606537.923488, "ist": "17:05:37", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795606539.594156, "ist": "17:05:39", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

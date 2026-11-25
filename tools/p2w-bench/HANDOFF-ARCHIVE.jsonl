@@ -454,3 +454,10 @@
 {"_list": "agents", "_entry": {"angle": "", "class": "conversion cost", "deployed": "14:00", "deployed_at": "2026-11-24T14:00", "expected": "", "finding": "", "id": "conv-01", "question": "", "status": "running"}}
 {"_list": "notes", "_entry": {"at": "09:17", "text": "attempt 51 on 18_displacement -> lead (1/10 moved)"}}
 {"_list": "notes", "_entry": {"at": "12:28", "text": "attempt 52 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "12:28", "text": "agent deployed: 60_text_column_right_edge / B - is 60 or 18 reading the paper - the 25_invisible_text precedent"}}
+{"_list": "agents", "_entry": {"angle": "", "class": "txt discrepancy", "deployed": "14:00", "deployed_at": "2026-11-24T14:00", "expected": "", "finding": "", "id": "txt -01", "question": "", "status": "running"}}
+{"_list": "notes", "_entry": {"at": "12:28", "text": "agent landed: 60_text_column_right_edge / B -> FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md"}}
+{"_list": "agents", "_entry": {"angle": "A", "class": "18_displacement", "deployed": "14:00", "deployed_at": "2026-11-24T14:00", "expected": "13:16", "finding": "18_displacement-FULL-PASS-DOES-NOT-FIT-A-SLOT-0650-fixer.md", "id": "18_dA-06", "question": "where does the 11 s/doc conversion go, and the smallest change that makes --force incremental", "status": "landed", "why": "finding landed - read it and act; no longer holds the queue"}}
+{"_list": "notes", "_entry": {"at": "12:28", "text": "agent deployed: 04_chars_missing / A - real writer defect or instrument, and how much t01/t12 already explains"}}
+{"_list": "notes", "_entry": {"at": "12:28", "text": "agent landed: 04_chars_missing / A -> FINDINGS/04_chars_missing-REAL-WRITER-DEFECT-1115-fixer.md"}}
+{"_list": "notes", "_entry": {"at": "12:28", "text": "agent landed: 60_text_column_right_edge / B -> FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md"}}

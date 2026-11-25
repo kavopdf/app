@@ -12,272 +12,272 @@
    "status": "running"
   },
   {
-   "id": "60ed60_text_column_right_edge-01",
+   "angle": "A",
    "class": "60_text_column_right_edge",
-   "angle": "A",
-   "question": "is the right edge the engine's or the face's",
-   "expected": "",
    "deployed": "18:27",
-   "status": "landed",
+   "deployed_at": "2026-11-24T18:27",
+   "expected": "",
    "finding": "FINDINGS/60_text_column_right_edge-EDGE-IS-THE-FACE-4GOOGLE-1INSTRUMENT-24NOV-agentA.md",
-   "deployed_at": "2026-11-24T18:27",
-   "landed_at": "2026-11-24T18:40"
+   "id": "60ed60_text_column_right_edge-01",
+   "landed_at": "2026-11-24T18:40",
+   "question": "is the right edge the engine's or the face's",
+   "status": "landed"
   },
   {
-   "id": "pc2300_page_count-01",
-   "class": "00_page_count",
    "angle": "B",
-   "question": "what is on the extra page of the 23 refusals",
-   "expected": "",
+   "class": "00_page_count",
    "deployed": "18:27",
-   "status": "landed",
-   "finding": "FINDINGS/00_page_count-23-REFUSED-ALL-ENGINE-0-CLEAN-24NOV-agentB.md",
    "deployed_at": "2026-11-24T18:27",
-   "landed_at": "2026-11-24T18:40"
+   "expected": "",
+   "finding": "FINDINGS/00_page_count-23-REFUSED-ALL-ENGINE-0-CLEAN-24NOV-agentB.md",
+   "id": "pc2300_page_count-01",
+   "landed_at": "2026-11-24T18:40",
+   "question": "what is on the extra page of the 23 refusals",
+   "status": "landed"
   },
   {
-   "id": "anch-01",
+   "angle": "",
    "class": "anchored-box patch design: six ctx.positioned sites, one emitter, class-free rule, CLEAN set, falsifiers",
-   "angle": "",
-   "question": "",
-   "expected": "",
    "deployed": "22:34",
-   "status": "running",
+   "deployed_at": "2026-11-24T22:34",
+   "expected": "",
    "finding": "",
-   "deployed_at": "2026-11-24T22:34"
+   "id": "anch-01",
+   "question": "",
+   "status": "running"
   },
   {
-   "id": "clea-01",
+   "angle": "",
    "class": "clean-count audit: all 36 clean documents were offered 42 checks and never saw 62-66",
-   "angle": "",
-   "question": "",
-   "expected": "",
    "deployed": "22:34",
-   "status": "running",
+   "deployed_at": "2026-11-24T22:34",
+   "expected": "",
    "finding": "",
-   "deployed_at": "2026-11-24T22:34"
+   "id": "clea-01",
+   "question": "",
+   "status": "running"
   },
   {
-   "id": "gap--01",
+   "angle": "",
    "class": "gap-cap patch: traced DocxWriter, produced spendWideGap() foot-band patch, applied and reverted as a no-op on 69/323/311; census: cap = 1469 chars over 23 of 35 positioned pages",
-   "angle": "",
-   "question": "",
-   "expected": "",
    "deployed": "02:59",
-   "status": "running",
+   "deployed_at": "2026-11-25T02:59",
+   "expected": "",
    "finding": "",
-   "deployed_at": "2026-11-25T02:59"
+   "id": "gap--01",
+   "question": "",
+   "status": "running"
   },
   {
-   "id": "zero-01",
+   "angle": "",
    "class": "zero-gap census: the latch is 655 lines/24920 chars vs the rule's 12 lines/358; pagepos=0 + anchorkeep=0 changes no page count across 213",
-   "angle": "",
-   "question": "",
-   "expected": "",
    "deployed": "02:59",
-   "status": "running",
+   "deployed_at": "2026-11-25T02:59",
+   "expected": "",
    "finding": "",
-   "deployed_at": "2026-11-25T02:59"
+   "id": "zero-01",
+   "question": "",
+   "status": "running"
   },
   {
-   "id": "Goog-01",
+   "angle": "",
    "class": "Google verification: 69_two_col_legal 35/42 -> 39/42 on the spendWideGap build, 26_text_overlap=11 is the price",
-   "angle": "",
-   "question": "",
-   "expected": "",
    "deployed": "03:12",
-   "status": "running",
+   "deployed_at": "2026-11-25T03:12",
+   "expected": "",
    "finding": "",
-   "deployed_at": "2026-11-25T03:12"
+   "id": "Goog-01",
+   "question": "",
+   "status": "running"
   },
   {
-   "id": "band-01",
+   "angle": "",
    "class": "band sweep: footband 0.80 zeroes 69 and spares 330_cad; 26_text_overlap=11 at both 0.80 and 0.0",
-   "angle": "",
-   "question": "",
-   "expected": "",
    "deployed": "03:21",
-   "status": "running",
+   "deployed_at": "2026-11-25T03:21",
+   "expected": "",
    "finding": "",
-   "deployed_at": "2026-11-25T03:21"
+   "id": "band-01",
+   "question": "",
+   "status": "running"
   },
   {
-   "id": "25_iinvisible-text-blind-01",
-   "class": "25_invisible_text",
    "angle": "invisible-text-blind",
-   "question": "is the check blind after the 24 Nov sheet filter, and can it fail again",
-   "expected": "22:05",
-   "deployed": "04:24",
-   "status": "landed",
-   "finding": "FINDINGS/25_iinvisible-text-blind-25NOV.md",
-   "deployed_at": "2026-11-25T04:24",
-   "landed_at": "2026-11-25T04:24"
-  },
-  {
-   "id": "invisible-text-blind-01",
    "class": "25_invisible_text",
+   "deployed": "04:24",
+   "deployed_at": "2026-11-25T04:24",
+   "expected": "22:05",
+   "finding": "FINDINGS/25_iinvisible-text-blind-25NOV.md",
+   "id": "25_iinvisible-text-blind-01",
+   "landed_at": "2026-11-25T04:24",
+   "question": "is the check blind after the 24 Nov sheet filter, and can it fail again",
+   "status": "landed"
+  },
+  {
    "angle": "instrument",
+   "class": "25_invisible_text",
+   "deployed": "05:20",
+   "deployed_at": "2026-11-25T05:20:00+05:30",
+   "id": "invisible-text-blind-01",
+   "landed": "05:45",
+   "landed_at": "2026-11-25T05:45:00+05:30",
    "question": "is 25_invisible_text blind after the 24 Nov sheet filter, and can it be made to fail again",
-   "status": "landed",
-   "deployed_at": "2026-11-25T05:20:00+05:30",
-   "landed_at": "2026-11-25T05:45:00+05:30",
-   "deployed": "05:20",
-   "landed": "05:45"
+   "status": "landed"
   },
   {
+   "angle": "engine",
+   "class": "18_displacement",
+   "deployed": "05:20",
+   "deployed_at": "2026-11-25T05:20:00+05:30",
    "id": "gapcap-risk-01",
-   "class": "18_displacement",
-   "angle": "engine",
-   "question": "which documents become worse if the gap-cap + zero-gap-anchor pair ships, and can it ship at all",
-   "status": "landed",
-   "deployed_at": "2026-11-25T05:20:00+05:30",
+   "landed": "05:45",
    "landed_at": "2026-11-25T05:45:00+05:30",
-   "deployed": "05:20",
-   "landed": "05:45"
+   "question": "which documents become worse if the gap-cap + zero-gap-anchor pair ships, and can it ship at all",
+   "status": "landed"
   },
   {
-   "id": "gapcap-latch-census-01",
+   "angle": "engine",
    "class": "04_chars_missing",
-   "angle": "engine",
-   "question": "what does gapCapTw do to the corpus and which documents become CLEAN if body text stops entering anchored text boxes",
-   "status": "landed",
    "deployed": "06:20",
    "deployed_at": "2026-11-25T06:20",
-   "landed_at": "2026-11-25T06:47",
+   "finding": "FINDINGS/gapcap-latch-census-01-GAPCAP-LATCH-CENSUS-25NOV.md - 28,432 boxed chars over 61 carriers; latch 70%, cap 16%, not additive; ceiling ~8 documents, not 166",
+   "id": "gapcap-latch-census-01",
    "landed": "06:47",
-   "finding": "FINDINGS/gapcap-latch-census-01-GAPCAP-LATCH-CENSUS-25NOV.md - 28,432 boxed chars over 61 carriers; latch 70%, cap 16%, not additive; ceiling ~8 documents, not 166"
+   "landed_at": "2026-11-25T06:47",
+   "question": "what does gapCapTw do to the corpus and which documents become CLEAN if body text stops entering anchored text boxes",
+   "status": "landed"
   },
   {
-   "id": "spendwidegap-lookahead-01",
-   "class": "18_displacement",
    "angle": "engine",
-   "question": "does the spendWideGap look-ahead hold doc 69 at 39/42 with 26_text_overlap back to 0 and 330_cad unchanged",
-   "status": "landed",
+   "class": "18_displacement",
    "deployed": "06:20",
    "deployed_at": "2026-11-25T06:20",
-   "landed_at": "2026-11-25T06:50",
+   "finding": "FINDINGS/spendwidegap-lookahead-01-REJECTED-25NOV.md - REJECTED: it refuses the spend that made 39/42; 209/213 byte-identical, 4 changed all toward more anchoring",
+   "id": "spendwidegap-lookahead-01",
    "landed": "06:50",
-   "finding": "FINDINGS/spendwidegap-lookahead-01-REJECTED-25NOV.md - REJECTED: it refuses the spend that made 39/42; 209/213 byte-identical, 4 changed all toward more anchoring"
+   "landed_at": "2026-11-25T06:50",
+   "question": "does the spendWideGap look-ahead hold doc 69 at 39/42 with 26_text_overlap back to 0 and 330_cad unchanged",
+   "status": "landed"
   },
   {
-   "id": "18-DISPLACEMENT-PROPOSAL-25NOV",
-   "class": "18_displacement",
    "angle": "engine",
-   "question": "where in DocxWriter does w:before / exact line height leave a gap Google drops, and what is the minimal patch",
-   "status": "landed",
-   "deployed": "09:36",
-   "deployed_at": "2026-11-25T09:36",
-   "landed_at": "2026-11-25T09:41",
-   "landed": "09:41",
-   "finding": "FINDINGS/18-DISPLACEMENT-PROPOSAL-25NOV.md - place() at :4149 is DEAD CODE (zero callers), so the mechanism DOCS-ROOT-CAUSES-24NOV names cannot be patched; spacing()'s pageFirst arg is always false; w:beforeLines emitted nowhere. Patch (b) = 3 ints + 1 guard at :6117-6137; patch (a) = w:pgMar w:top per page."
-  },
-  {
-   "id": "PENDING-ANSWERS-25NOV",
-   "class": "-",
-   "angle": "ledger",
-   "question": "for each of the pending items, is it closeable, and with what evidence",
-   "status": "landed",
-   "deployed": "09:36",
-   "deployed_at": "2026-11-25T09:36",
-   "landed_at": "2026-11-25T09:44",
-   "landed": "09:44",
-   "finding": "5 CLOSE / 8 STILL OPEN / 1 REFUSE of the 14; five were closed by the parent run, PENDING 16 -> 10. Also found pending.py:288 counts the MODAL engine, so the '60 documents on an older engine' line is inverted (131 are stale)."
-  },
-  {
-   "id": "18_dA-01",
    "class": "18_displacement",
+   "deployed": "09:36",
+   "deployed_at": "2026-11-25T09:36",
+   "finding": "FINDINGS/18-DISPLACEMENT-PROPOSAL-25NOV.md - place() at :4149 is DEAD CODE (zero callers), so the mechanism DOCS-ROOT-CAUSES-24NOV names cannot be patched; spacing()'s pageFirst arg is always false; w:beforeLines emitted nowhere. Patch (b) = 3 ints + 1 guard at :6117-6137; patch (a) = w:pgMar w:top per page.",
+   "id": "18-DISPLACEMENT-PROPOSAL-25NOV",
+   "landed": "09:41",
+   "landed_at": "2026-11-25T09:41",
+   "question": "where in DocxWriter does w:before / exact line height leave a gap Google drops, and what is the minimal patch",
+   "status": "landed"
+  },
+  {
+   "angle": "ledger",
+   "class": "-",
+   "deployed": "09:36",
+   "deployed_at": "2026-11-25T09:36",
+   "finding": "5 CLOSE / 8 STILL OPEN / 1 REFUSE of the 14; five were closed by the parent run, PENDING 16 -> 10. Also found pending.py:288 counts the MODAL engine, so the '60 documents on an older engine' line is inverted (131 are stale).",
+   "id": "PENDING-ANSWERS-25NOV",
+   "landed": "09:44",
+   "landed_at": "2026-11-25T09:44",
+   "question": "for each of the pending items, is it closeable, and with what evidence",
+   "status": "landed"
+  },
+  {
    "angle": "A",
-   "question": "split the 14 solo documents by construct and name the smallest lever that reaches the largest subset - delivered: three constructs with per-document guard numbers, 11 of 14 pass 42/42 in LibreOffice, a compiled 0.75pt row patch, and the -2.87pt flow constant on 31_times",
-   "expected": "10:45",
+   "class": "18_displacement",
    "deployed": "10:47",
-   "status": "landed",
-   "finding": "FINDINGS/18_dA-01-18_displacement-agent-return-25NOV.md",
    "deployed_at": "2026-11-25T10:47",
-   "landed_at": "2026-11-25T10:48"
+   "expected": "10:45",
+   "finding": "FINDINGS/18_dA-01-18_displacement-agent-return-25NOV.md",
+   "id": "18_dA-01",
+   "landed_at": "2026-11-25T10:48",
+   "question": "split the 14 solo documents by construct and name the smallest lever that reaches the largest subset - delivered: three constructs with per-document guard numbers, 11 of 14 pass 42/42 in LibreOffice, a compiled 0.75pt row patch, and the -2.87pt flow constant on 31_times",
+   "status": "landed"
   },
   {
-   "id": "18-D-01",
+   "angle": "",
    "class": "18-DISPLACEMENT-LIVE-PATH-25NOV",
-   "angle": "",
-   "question": "",
-   "expected": "",
    "deployed": "10:51",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-25T10:51"
-  },
-  {
-   "id": "Expl-01",
-   "class": "Explore: 18_displacement row-pitch dither + three inconsistent w:line exact laws",
-   "angle": "",
-   "question": "",
+   "deployed_at": "2026-11-25T10:51",
    "expected": "",
+   "finding": "",
+   "id": "18-D-01",
+   "question": "",
+   "status": "running"
+  },
+  {
+   "angle": "",
+   "class": "Explore: 18_displacement row-pitch dither + three inconsistent w:line exact laws",
    "deployed": "12:05",
-   "status": "landed",
-   "finding": "FINDINGS/Expl-01-18-DISPLACEMENT-ROW-PITCH-DITHER-25NOV.md",
    "deployed_at": "2026-11-25T12:05",
+   "expected": "",
+   "finding": "FINDINGS/Expl-01-18-DISPLACEMENT-ROW-PITCH-DITHER-25NOV.md",
+   "id": "Expl-01",
+   "landed": "12:05",
    "landed_at": "2026-11-25T12:05",
-   "landed": "12:05"
+   "question": "",
+   "status": "landed"
   },
   {
-   "id": "instA-01",
-   "class": "instrument",
    "angle": "A",
-   "question": "the soffice prerender wedge and the scipy prerequisite - landed 7c7ab124 and 738f78bb, 23 of 23 measured where the old code stalled",
-   "expected": "14:19",
+   "class": "instrument",
    "deployed": "15:12",
-   "status": "landed",
-   "finding": "FINDINGS/RANKING-TXT-TWO-FILES-25NOV.md",
    "deployed_at": "2026-11-25T15:12",
-   "landed_at": "2026-11-25T15:12"
+   "expected": "14:19",
+   "finding": "FINDINGS/RANKING-TXT-TWO-FILES-25NOV.md",
+   "id": "instA-01",
+   "landed_at": "2026-11-25T15:12",
+   "question": "the soffice prerender wedge and the scipy prerequisite - landed 7c7ab124 and 738f78bb, 23 of 23 measured where the old code stalled",
+   "status": "landed"
   },
   {
-   "id": "scresoffice prerender-01",
+   "angle": "soffice prerender",
    "class": "screen-hang",
-   "angle": "soffice prerender",
-   "question": "does soffice block screen.py, and where exactly",
-   "expected": "a screen that finishes inside its budget",
    "deployed": "17:03",
-   "status": "landed",
-   "finding": "tools/p2w-bench/FINDINGS/SCREEN-HANG-IS-SCIPY-NOT-SOFFICE-25NOV.md",
    "deployed_at": "2026-11-25T17:03",
-   "landed_at": "2026-11-25T17:03"
+   "expected": "a screen that finishes inside its budget",
+   "finding": "tools/p2w-bench/FINDINGS/SCREEN-HANG-IS-SCIPY-NOT-SOFFICE-25NOV.md",
+   "id": "SCREEN-HANG-IS-SCIPY-NOT-SOFFICE",
+   "landed_at": "2026-11-25T17:03",
+   "question": "does soffice block screen.py, and where exactly",
+   "status": "landed"
   },
   {
-   "id": "t12_txt instrument-01",
+   "angle": "txt instrument",
    "class": "t12_word_invention",
-   "angle": "txt instrument",
-   "question": "is t12's unit the word or the character",
-   "expected": "which txt documents become clean",
    "deployed": "17:03",
-   "status": "landed",
-   "finding": "tools/p2w-bench/FINDINGS/T12-UNIT-IS-CHARACTER-25NOV.md",
    "deployed_at": "2026-11-25T17:03",
-   "landed_at": "2026-11-25T17:03"
-  },
-  {
-   "id": "SCREsoffice prerender-01",
-   "class": "SCREEN-HANG-IS-SCIPY-NOT-SOFFICE",
-   "angle": "soffice prerender",
-   "question": "does soffice block screen.py, and where exactly",
-   "expected": "a screen that finishes inside its budget",
-   "deployed": "17:05",
-   "status": "landed",
-   "finding": "tools/p2w-bench/FINDINGS/SCREEN-HANG-IS-SCIPY-NOT-SOFFICE-25NOV.md",
-   "deployed_at": "2026-11-25T17:05",
-   "landed_at": "2026-11-25T17:05"
-  },
-  {
-   "id": "T12-txt instrument-01",
-   "class": "T12-UNIT-IS-CHARACTER",
-   "angle": "txt instrument",
-   "question": "is t12's unit the word or the character",
    "expected": "which txt documents become clean",
-   "deployed": "17:05",
-   "status": "landed",
    "finding": "tools/p2w-bench/FINDINGS/T12-UNIT-IS-CHARACTER-25NOV.md",
+   "id": "T12-UNIT-IS-CHARACTER",
+   "landed_at": "2026-11-25T17:03",
+   "question": "is t12's unit the word or the character",
+   "status": "landed"
+  },
+  {
+   "angle": "soffice prerender",
+   "class": "SCREEN-HANG-IS-SCIPY-NOT-SOFFICE",
+   "deployed": "17:05",
    "deployed_at": "2026-11-25T17:05",
-   "landed_at": "2026-11-25T17:05"
+   "expected": "a screen that finishes inside its budget",
+   "finding": "tools/p2w-bench/FINDINGS/SCREEN-HANG-IS-SCIPY-NOT-SOFFICE-25NOV.md",
+   "id": "SCREsoffice prerender-01",
+   "landed_at": "2026-11-25T17:05",
+   "question": "does soffice block screen.py, and where exactly",
+   "status": "landed"
+  },
+  {
+   "angle": "txt instrument",
+   "class": "T12-UNIT-IS-CHARACTER",
+   "deployed": "17:05",
+   "deployed_at": "2026-11-25T17:05",
+   "expected": "which txt documents become clean",
+   "finding": "tools/p2w-bench/FINDINGS/T12-UNIT-IS-CHARACTER-25NOV.md",
+   "id": "T12-txt instrument-01",
+   "landed_at": "2026-11-25T17:05",
+   "question": "is t12's unit the word or the character",
+   "status": "landed"
   }
  ],
  "context": "t12 is fixed: the unit is the character, not the token. txt corpus 199 -> 202 of 213 clean, 5 newly clean, 0 of 213 newly failing, landed as 23d0b1db. The screen.py 'soffice hang' is closed as a finding: it is the scipy fallback in edt(), not soffice - with scipy present a 23-document screen finishes in 190 s. Two instrument defects found and NOT fixed: _ensure_scipy() spends up to 220 s of a 280 s budget and only warns; p2w.py:1112 imports scipy.ndimage inside a try/except so colour_share/tone_share become None and coloured_px 0 on a scipy-less pod, silently blinding every colour or tone judgement.",
@@ -391,13 +391,9 @@
    "what": "the widget-AP walk is refused by one document, and the decision is not a fixer's"
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 14 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 15 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 14 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. FIRST ATTEMPT: add the drawnByAppearance(apDrawn, ...) guard to the annotationRuns loop in PdfToWord.pageText() (~line 956) - its sibling loop at line 947 already has it. Measured on one document: 600_reviewed_invoice_with_annotations goes 20 tokens/83 chars -> 7 tokens/30 chars, paragraphs 14 -> 13. Needs the 213-document docx ratchet before it lands. SECOND: the (Authorised signatory) duplication on 041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled is a table-row/paragraph overlap, a different construct, and clearing it closes the last 2 txt documents that are not the annotation one. THIRD: _ensure_scipy() should refuse rather than warn, and p2w.py:1112 must not swallow the scipy.ndimage import - see FINDINGS/SCREEN-HANG-IS-SCIPY-NOT-SOFFICE-25NOV.md.",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 14 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 15 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 14 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. FIRST ATTEMPT: add the drawnByAppearance(apDrawn, ...) guard to the annotationRuns loop in PdfToWord.pageText() (~line 956) - its sibling loop at line 947 already has it. Measured on one document: 600_reviewed_invoice_with_annotations goes 20 tokens/83 chars -> 7 tokens/30 chars, paragraphs 14 -> 13. Needs the 213-document docx ratchet before it lands. SECOND: the (Authorised signatory) duplication on 041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled is a table-row/paragraph overlap, a different construct, and clearing it closes the last 2 txt documents that are not the annotation one. THIRD: _ensure_scipy() should refuse rather than warn, and p2w.py:1112 must not swallow the scipy.ndimage import - see FINDINGS/SCREEN-HANG-IS-SCIPY-NOT-SOFFICE-25NOV.md.",
  "next_class": "",
  "notes": [
-  {
-   "at": "12:28",
-   "text": "agent landed: 60_text_column_right_edge / B -> FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md"
-  },
   {
    "at": "13:07",
    "text": "attempt 54 on 18_displacement -> lead (0/129 moved)"
@@ -633,12 +629,16 @@
   {
    "at": "17:05",
    "text": "agent landed: T12-UNIT-IS-CHARACTER / txt instrument -> tools/p2w-bench/FINDINGS/T12-UNIT-IS-CHARACTER-25NOV.md"
+  },
+  {
+   "at": "17:05",
+   "text": "attempt 7 on t12_word_invention -> kept (5/8 moved)"
   }
  ],
  "plan": "",
  "run": {
-  "started": "15:05",
   "ended": "17:03",
-  "ended_how": "forced"
+  "ended_how": "forced",
+  "started": "15:05"
  }
 }
