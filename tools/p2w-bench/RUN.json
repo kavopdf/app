@@ -1,11 +1,20 @@
 {
- "agents": [],
- "attempts": 1,
- "docs_improved": 0,
- "ended": "09:27",
- "ended_ts": 1795579044.9283946,
+ "started_ts": 1795580530.55957,
+ "started": "09:52",
+ "window_for_claim": 1795580530.55957,
+ "ended_ts": null,
+ "ended": null,
+ "attempts": 0,
  "kept": 0,
- "started": "09:25",
- "started_ts": 1795578938.0537274,
- "window_for_claim": 1795578938.0537274
+ "agents": [
+  {
+   "id": "18-displacement-proposal-01",
+   "status": "landed"
+  },
+  {
+   "id": "pending-answers-01",
+   "status": "landed"
+  }
+ ],
+ "docs_improved": 0
 }

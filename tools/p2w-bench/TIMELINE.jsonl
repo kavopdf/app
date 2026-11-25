@@ -5627,3 +5627,10 @@
 {"t": 1795580530.6704643, "ist": "09:52:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795580530.7564807, "ist": "09:52:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795580531.1185389, "ist": "09:52:11", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795580556.6990201, "ist": "09:52:36", "ev": "beat", "d": "relay: writing the report"}
+{"t": 1795580575.0957832, "ist": "09:52:55", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795580575.197022, "ist": "09:52:55", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795580587.364592, "ist": "09:53:07", "ev": "beat", "d": "relay: final numbers for the report"}
+{"t": 1795580588.8894677, "ist": "09:53:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795580589.2589018, "ist": "09:53:09", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795580594.410518, "ist": "09:53:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
