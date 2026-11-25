@@ -1345,16 +1345,9 @@
   "status": "OPEN"
  },
  "content-present-partly-displaced": {
-  "attempts": 19,
+  "attempts": 21,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-19 18:40",
-    "moved": 0,
-    "outcome": "reverted",
-    "reason": "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them",
-    "total": 18
-   },
    {
     "at": "2026-11-19 22:30",
     "moved": 13,
@@ -1484,6 +1477,28 @@
     "outcome": "lead",
     "reason": "row-pitch dither (error-diffused w:trHeight, -0.85 pt rule charge) applied alone and A/B measured on the engine's own output: it fires, shifting declared pitch 18.0/19.0 -> 17.15/18.15 pt on mobile-bi",
     "total": 23
+   },
+   {
+    "at": "2026-11-25 13:21",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Instrument, not engine: edt() ran the 48x-slower pure-Python fallback in every tool that imports p2w instead of running main() - screen.py is one. Guard moved beside the requirement. This class: 3x280",
+    "total": 0
+   },
+   {
+    "at": "2026-11-25 13:22",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 0,
+    "outcome": "error",
+    "reason": "Hypothesis refuted: a single document wedges the renderer. Probed all 10 unrendered documents individually with a 45 s cap each and a fresh soffice profile: 4.9, 5.1, 5.4, 5.8, 5.8, 5.8, 5.9, 5.9, 6.0",
+    "total": 0
    }
   ],
   "last": null,
@@ -1509,11 +1524,13 @@
    "lead",
    "lead",
    "lead",
-   "lead"
+   "lead",
+   "lead",
+   "error"
   ],
   "ratchet_at": "20 Nov 03:40",
   "ratchet_docs": 213,
-  "reason": "row-pitch dither (error-diffused w:trHeight, -0.85 pt rule charge) applied alone and A/B measured on the engine's own output: it fires, shifting declared pitch 18.0/19.0 -> 17.15/18.15 pt on mobile-bill, salary-slip-corporate and very-long-single-column-table. Not committed: the rendered share@5 that would judge it could not be obtained because screen.py's soffice prerender hangs (3 x 280 s calls, BLOCKERS 25 Nov), and the engine's own comment records a 0.5 pt variant of this change making 18_displacement worse. FINDINGS/18-DISPLACEMENT-ROW-PITCH-DITHER-25NOV.md",
+  "reason": "Hypothesis refuted: a single document wedges the renderer. Probed all 10 unrendered documents individually with a 45 s cap each and a fresh soffice profile: 4.9, 5.1, 5.4, 5.8, 5.8, 5.8, 5.9, 5.9, 6.0, 6.8 s, all rc=0, all produced a PDF. No document wedges the renderer.",
   "reasons": [
    "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing.",
    "recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down the page (bank-statement 0.4554 pt x 12 rows = +5.85 pt). Whole corpus 13 improved, 0 worse. Also published the table this engine actually produces - ten rows were stale and had blocked every fixer run since 11:55.",
@@ -1533,7 +1550,9 @@
    "instrument now prints med_dy/worst_dy/med_dx (KEPT); unruled row-excess quantum 15->5 twips spends the table-gap spacer on 72_bank_statement and takes Google med_dy -13.0->+1.1, worst 28.2->4.8, still 41/42 from a 0.25pt/row pitch excess; engine reverted, unmeasured at corpus scale",
    "instrument prints med_dy/worst_dy/med_dx (KEPT+committed, cross-checked to 0.1pt against independent PyMuPDF); unruled row-excess quantum 15->5 spends the table-gap spacer, Google med_dy -13.0->+1.1 worst 28.2->4.8; row-height compensation REFUTED (Google +1.1->-4.2, LO 42/42->41/42); corpus pass 43s/doc did not fit, engine reverted",
    "three solo documents measured in Google with the new dy instrument: 72_bank med_dy -13.0/worst 28.2 (spacer step), 71_invoice +1.1/6.7 (no spacer at all), table-no-header -0.5/9.0 (spacer correctly refused) - the spacer is not the class construct and what remains is localised runs, not a page offset",
-   "row-pitch dither (error-diffused w:trHeight, -0.85 pt rule charge) applied alone and A/B measured on the engine's own output: it fires, shifting declared pitch 18.0/19.0 -> 17.15/18.15 pt on mobile-bill, salary-slip-corporate and very-long-single-column-table. Not committed: the rendered share@5 that would judge it could not be obtained because screen.py's soffice prerender hangs (3 x 280 s calls, BLOCKERS 25 Nov), and the engine's own comment records a 0.5 pt variant of this change making 18_displacement worse. FINDINGS/18-DISPLACEMENT-ROW-PITCH-DITHER-25NOV.md"
+   "row-pitch dither (error-diffused w:trHeight, -0.85 pt rule charge) applied alone and A/B measured on the engine's own output: it fires, shifting declared pitch 18.0/19.0 -> 17.15/18.15 pt on mobile-bill, salary-slip-corporate and very-long-single-column-table. Not committed: the rendered share@5 that would judge it could not be obtained because screen.py's soffice prerender hangs (3 x 280 s calls, BLOCKERS 25 Nov), and the engine's own comment records a 0.5 pt variant of this change making 18_displacement worse. FINDINGS/18-DISPLACEMENT-ROW-PITCH-DITHER-25NOV.md",
+   "Instrument, not engine: edt() ran the 48x-slower pure-Python fallback in every tool that imports p2w instead of running main() - screen.py is one. Guard moved beside the requirement. This class: 3x280s, 0 measured, no error -> 23 of 23 measured in 82s, SCREEN FAIL (correct, engine unpatched). No document moved.",
+   "Hypothesis refuted: a single document wedges the renderer. Probed all 10 unrendered documents individually with a 45 s cap each and a fresh soffice profile: 4.9, 5.1, 5.4, 5.8, 5.8, 5.8, 5.9, 5.9, 6.0, 6.8 s, all rc=0, all produced a PDF. No document wedges the renderer."
   ],
   "requeues": 0,
   "status": "OPEN"
