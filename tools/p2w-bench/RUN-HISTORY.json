@@ -11,5 +11,17 @@
   "started_ts": 1795574665.9810188,
   "window_for_claim": 1795574665.9810188,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795578938.0537274,
+  "started": "09:25",
+  "window_for_claim": 1795578938.0537274,
+  "ended_ts": null,
+  "ended": "(never)",
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
