@@ -6498,3 +6498,12 @@
 {"t": 1795630478.1171608, "ist": "23:44:38", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1795631707.759041, "ist": "00:05:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795631710.6268575, "ist": "00:05:10", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795632820.522149, "ist": "00:23:40", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795632820.6875515, "ist": "00:23:40", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795632820.7737496, "ist": "00:23:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795632841.7672799, "ist": "00:24:01", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795632845.0192356, "ist": "00:24:05", "ev": "beat", "d": "relay: pod-prep (corpus/jdk/engine)"}
+{"t": 1795633819.9400873, "ist": "00:40:19", "ev": "beat", "d": "relay: corpus slice 2 + reading DocxWriter"}
+{"t": 1795634062.8637142, "ist": "00:44:22", "ev": "beat", "d": "relay: building engine with right-pin"}
+{"t": 1795634255.1607335, "ist": "00:47:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795634475.7801301, "ist": "00:51:15", "ev": "beat", "d": "attempt.py: recording an attempt"}

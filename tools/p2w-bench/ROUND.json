@@ -13,8 +13,10 @@
       }
     ]
   },
+  "fixer_doing": "relay: building engine with right-pin",
+  "fixer_doing_since": 1795634062.8640215,
   "fixer_engine_at_claim": "85b8735f",
-  "fixer_last_beat": 1795630407.265961,
+  "fixer_last_beat": 1795634062.864022,
   "fixer_started": 1795632817.7302408,
   "history": [
     {
