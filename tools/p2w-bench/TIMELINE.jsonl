@@ -5901,6 +5901,17 @@
 {"t": 1795591332.7613099, "ist": "12:52:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795591332.9564524, "ist": "12:52:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795591333.2332466, "ist": "12:52:13", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795591903.6079667, "ist": "13:01:43", "ev": "beat", "d": "claimed slot, reading charter"}
+{"t": 1795591917.4242437, "ist": "13:01:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795591918.8113575, "ist": "13:01:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795591923.3843868, "ist": "13:02:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795593433.6713777, "ist": "13:27:13", "ev": "beat", "d": "agent returned: row-height patch is one line, 2278 atLeast rows in 143 docs; now measuring it myself"}
+{"t": 1795593461.4858255, "ist": "13:27:41", "ev": "beat", "d": "applying the one-line trHeight exact change, then rebuilding the engine"}
+{"t": 1795593544.4669259, "ist": "13:29:04", "ev": "beat", "d": "engine built with trHeight=exact; converting 40 row-dense documents to test for clipping"}
+{"t": 1795593819.2510335, "ist": "13:33:39", "ev": "beat", "d": "30 row-dense docs converted with exact; rendering to PDF to test for clipping"}
+{"t": 1795595009.3424087, "ist": "13:53:29", "ev": "beat", "d": "engine change committed to tree; gate wants a re-measure - building the corpus for regress.py --check"}
+{"t": 1795595246.930803, "ist": "13:57:26", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795595493.2020545, "ist": "14:01:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795589018.3452907, "ist": "12:13:38", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795589018.5962148, "ist": "12:13:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795589018.7547593, "ist": "12:13:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
