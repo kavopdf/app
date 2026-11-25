@@ -5894,3 +5894,5 @@
 {"t": 1795587428.2807817, "ist": "11:47:08", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795587428.67648, "ist": "11:47:08", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795587430.3437943, "ist": "11:47:10", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795587476.3014052, "ist": "11:47:56", "ev": "beat", "d": "attempt 2: t12 invented words - engine or tokenisation"}
+{"t": 1795587537.074976, "ist": "11:48:57", "ev": "beat", "d": "attempt.py: recording an attempt"}

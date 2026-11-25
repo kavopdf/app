@@ -13,10 +13,10 @@
       }
     ]
   },
-  "fixer_doing": "verify_google stamp aligned, running gates",
-  "fixer_doing_since": 1795587165.9422066,
+  "fixer_doing": "attempt 2: t12 invented words - engine or tokenisation",
+  "fixer_doing_since": 1795587476.3018425,
   "fixer_engine_at_claim": "85b8735f",
-  "fixer_last_beat": 1795587165.9422076,
+  "fixer_last_beat": 1795587476.301843,
   "fixer_started": 1795587335.0428274,
   "history": [
     {
