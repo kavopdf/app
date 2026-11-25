@@ -258,3 +258,29 @@ the median flowed line. Zero displacement would need w:line = 76 twips (3.82 pt)
 | 643.12 | 781.90 | +138.78 | 51 | last drawn basic salary. |
 | 810.71 | 810.70 | -0.01 | 51 | Nirvaan Packaging Industries  ·  Human Resources |
 | 810.71 | 810.70 | -0.01 | 540 | 4 |
+---
+
+## The open question, closed: Google does NOT charge the carrier a full line
+
+This finding left one branch untested - "does Google charge the `w:line="1"` carrier as a FULL line?
+Google is known to rewrite `w:line="1" exact` to an auto line. If so, Google's flowed lines after a box
+land LOW - the opposite sign to LibreOffice."
+
+**The repository already answered it, in a correction that was itself a correction.** From
+`18_displacement-CORRECTION-1045-relay.md`, written 22 Nov after an audit of the finding it corrects:
+
+    The read-back value w:line="14.399999999999999" w:lineRule="auto" is almost certainly NOT 14.4 pt -
+    under lineRule="auto" that attribute is in 240ths of a line, so the export is writing a number this
+    run read as points and should not have.
+
+    So the mechanism this finding proposed - "Google substitutes a ~14.4 pt box for the hairline" - is
+    withdrawn.
+
+14.4/240 is 0.06 of a line, about 0.78 pt at a 13 pt line height - the same tiny advance LibreOffice
+charges (0.05 pt), not a full line. **So the sign does not flip, the two renderers agree on this
+quantity, and the experiment that was going to need three .docx files published at a public URL does
+not need to happen at all.**
+
+The lesson is the one this session kept repeating: "14.4 pt" was a units error read as points, quoted
+onward as a Google behaviour. Anyone pricing a fix against the carrier's `w:line` should price it at
+0.06 line, and anyone quoting "Google rewrites it to a full line" is quoting the withdrawn claim.
