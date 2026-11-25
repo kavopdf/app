@@ -13,11 +13,9 @@
       }
     ]
   },
-  "fixer_doing": "relay: independent engine census before pending.py:288 fix",
-  "fixer_doing_since": 1795580719.1529868,
   "fixer_engine_at_claim": "b7699196",
   "fixer_last_beat": 1795580719.152988,
-  "fixer_started": 1795580966.436359,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
