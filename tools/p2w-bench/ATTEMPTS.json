@@ -902,7 +902,7 @@
   "status": "OPEN"
  },
  "47_margins": {
-  "attempts": 18,
+  "attempts": 19,
   "first_seen": 1794518680.890611,
   "history": [
    {
@@ -1009,12 +1009,23 @@
     "outcome": "lead",
     "reason": "",
     "total": 24
+   },
+   {
+    "at": "2026-11-25 17:35",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "",
+    "total": 3
    }
   ],
   "last": 1794521923.5603442,
-  "last_engine": "462353f9+7abd64a529",
-  "last_moved": 0,
-  "last_total": 24,
+  "last_engine": "85b8735f",
+  "last_moved": 2,
+  "last_total": 3,
   "outcomes": [
    "error",
    "error",
@@ -1033,7 +1044,8 @@
    "partial",
    "reverted",
    "reverted",
-   "lead"
+   "lead",
+   "kept"
   ],
   "reason": "(no reason recorded for this attempt)",
   "reasons": [
@@ -1051,6 +1063,7 @@
    "180deg patch measured on .docx for the first time: 140 of 213 byte-identical (136 full-conversion + the 4 rotation docs), .txt changes only one-page-rotated-180-degrees, t02_position FAIL->PASS. Not landed: regress.py refuses an unstamped engine change and a full .txt corpus re-measure does not fit this slot. Finding committed 09639d0.",
    "The 180deg guard, built and measured on all 213 documents (213/213 .docx word/document.xml byte-identical, 212/213 .txt identical, one-page-rotated-180-degrees t02_position FAIL->PASS, t02_position 5->4). It is recorded as 0 moved because 462353f had already landed the identical change with the identical proof at 17:00 while this run was still converting; this run's commit was reset away rather than duplicated in the tree. The run's own landed work is tooling: scope.py now judges the last engine commit when the tree is clean (462353f had made every subsequent commit unlandable), and the refuted pBdr carry-over is cleared from HANDOFF.json[next] after four runs read it.",
    "cell-border-inset patch measured on all 210 documents, not the nine it was proposed on: 404_sudoku_grid 0.27->0.00 and three others improved, but 24 documents got worse (table-with-no-header-row 0.61->0.86, two-tables-stacked 0.77->1.07) and regress.py refused. The nine-document sample was too small, not wrong. Reverted. Next: subtract the border only where w:sz>=8, one 210-document pass, target 2+ improved / 0 worse. Also landed: two p2w.py bugs that made RANKING.csv unwritable - see FINDINGS/p2w-CORPUS-NEVER-COMPLETED-TWO-TOOL-BUGS-195500-f1x.md",
+   "",
    ""
   ],
   "requeues": 0,
