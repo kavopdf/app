@@ -5480,34 +5480,54 @@
 {"t": 1795567143.4485645, "ist": "06:09:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795567178.6842473, "ist": "06:09:38", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
  704deabc (claim: fixer takes the slot (25 Nov 06:07) + beacon)
-{"t": 1795567476.3954456, "ist": "06:14:36", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1795567476.5577228, "ist": "06:14:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795567476.6441228, "ist": "06:14:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795567768.1199105, "ist": "06:19:28", "ev": "beat", "d": "relay: reading state"}
-{"t": 1795567768.2498255, "ist": "06:19:28", "ev": "beat", "d": "gaps.py: reading the timeline"}
-{"t": 1795567782.5033424, "ist": "06:19:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795569199.4461007, "ist": "06:43:19", "ev": "beat", "d": "relay: pending list"}
-{"t": 1795569199.5632517, "ist": "06:43:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795569218.214039, "ist": "06:43:38", "ev": "beat", "d": "relay: building patched engine"}
-{"t": 1795569264.7508688, "ist": "06:44:24", "ev": "beat", "d": "relay: corpus pass (gate.py) on patched engine"}
-{"t": 1795569557.25193, "ist": "06:49:17", "ev": "beat", "d": "relay: corpus-convert --ensure, 133 to go"}
-{"t": 1795569913.2664661, "ist": "06:55:13", "ev": "beat", "d": "relay: gate.py measure, warm corpus"}
-{"t": 1795570200.6676848, "ist": "07:00:00", "ev": "beat", "d": "relay: gate.py measure 2/3"}
-{"t": 1795570491.777144, "ist": "07:04:51", "ev": "beat", "d": "relay: gate.py measure 3/3"}
-{"t": 1795570779.7769606, "ist": "07:09:39", "ev": "beat", "d": "relay: gate.py measure 4"}
-{"t": 1795571067.397597, "ist": "07:14:27", "ev": "beat", "d": "relay: gate.py measure 5 (last)"}
-{"t": 1795571654.3654218, "ist": "07:24:14", "ev": "beat", "d": "relay: gate.py, last 6 docs"}
-{"t": 1795572158.8509626, "ist": "07:32:38", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795572169.5559685, "ist": "07:32:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795572171.78463, "ist": "07:32:51", "ev": "attempt", "d": "04_chars_missing -> lead"}
-{"t": 1795572171.9079604, "ist": "07:32:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795572172.0002153, "ist": "07:32:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795572172.3636649, "ist": "07:32:52", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795572416.9329793, "ist": "07:36:56", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795572418.5721989, "ist": "07:36:58", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795572419.0049713, "ist": "07:36:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795572420.562064, "ist": "07:37:00", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795572427.7407506, "ist": "07:37:07", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795572429.4573512, "ist": "07:37:09", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795572429.8831658, "ist": "07:37:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795572431.5072463, "ist": "07:37:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795568965.3263907, "ist": "06:39:25", "ev": "beat", "d": "two agents returned; picking the class"}
+{"t": 1795568965.7004278, "ist": "06:39:25", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795568968.561818, "ist": "06:39:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795568991.7241704, "ist": "06:39:51", "ev": "beat", "d": "page-count: fetching corpus + converting witnesses"}
+{"t": 1795569054.107937, "ist": "06:40:54", "ev": "beat", "d": "testing the degenerate-line-height hypothesis on 6 docs"}
+{"t": 1795569088.5276096, "ist": "06:41:28", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795569115.6342766, "ist": "06:41:55", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795569117.8619816, "ist": "06:41:57", "ev": "attempt", "d": "00_page_count -> lead"}
+{"t": 1795569117.967308, "ist": "06:41:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795569118.028704, "ist": "06:41:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795569118.392398, "ist": "06:41:58", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795569172.0317798, "ist": "06:42:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569173.3966653, "ist": "06:42:53", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795569173.7760172, "ist": "06:42:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569175.1185625, "ist": "06:42:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569179.534842, "ist": "06:42:59", "ev": "beat", "d": "committing findings + report"}
+{"t": 1795569227.2750895, "ist": "06:43:47", "ev": "beat", "d": "claim-path fix + report"}
+{"t": 1795569249.1370714, "ist": "06:44:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569251.1513016, "ist": "06:44:11", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795569251.5952024, "ist": "06:44:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569253.1077683, "ist": "06:44:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569258.3820815, "ist": "06:44:18", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569259.7265046, "ist": "06:44:19", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795569260.1235702, "ist": "06:44:20", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569261.564673, "ist": "06:44:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569270.4938843, "ist": "06:44:30", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569272.0772572, "ist": "06:44:32", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795569272.505982, "ist": "06:44:32", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569274.094759, "ist": "06:44:34", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569292.7402546, "ist": "06:44:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569294.296179, "ist": "06:44:54", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795569294.7102118, "ist": "06:44:54", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569296.0869842, "ist": "06:44:56", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569302.1349757, "ist": "06:45:02", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569303.639259, "ist": "06:45:03", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795569304.0807462, "ist": "06:45:04", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569305.6347125, "ist": "06:45:05", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569310.506552, "ist": "06:45:10", "ev": "beat", "d": "final report"}
+{"t": 1795570374.1990561, "ist": "07:02:54", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795570374.3659081, "ist": "07:02:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795570374.4542563, "ist": "07:02:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795570376.4102666, "ist": "07:02:56", "ev": "beat", "d": "reading briefs"}
+{"t": 1795571961.89276, "ist": "07:29:21", "ev": "beat", "d": "agent returned: flow-only NOT VIABLE, mode3 is the lead; measuring"}
+{"t": 1795571976.9092655, "ist": "07:29:36", "ev": "beat", "d": "reading instrument"}
+{"t": 1795571993.6597753, "ist": "07:29:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795572098.8918614, "ist": "07:31:38", "ev": "beat", "d": "compiling patched engine into corpus classpath"}
+{"t": 1795572137.3643677, "ist": "07:32:17", "ev": "beat", "d": "building full corpus with patched engine (213)"}
+{"t": 1795572342.048594, "ist": "07:35:42", "ev": "beat", "d": "corpus slice 2 of 4"}
+{"t": 1795572895.207647, "ist": "07:44:55", "ev": "beat", "d": "measuring patch arm on 27_two_column"}
+{"t": 1795573032.614441, "ist": "07:47:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795573043.006294, "ist": "07:47:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
