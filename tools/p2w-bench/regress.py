@@ -593,6 +593,7 @@ def check(allow_engine_change, only=None):
     # w:before at a page top), so it is read from the bytes of the .docx rather than from anyone's
     # memory. A ratchet, not a ban: the corpus already carries them, and what is refused is a
     # document that GAINS one.
+    _skipped = []
     try:
         # THE CORPUS IS BUILT HERE, NOT LEFT TO WHOEVER REMEMBERS.
         #
@@ -633,7 +634,7 @@ def check(allow_engine_change, only=None):
                 print("  %s" % _l.strip())
             fail = 1
         elif _gs.returncode == 3:
-            print("  google-safe : no .docx output directory - cannot check")
+            print("  google-safe : SKIPPED - no .docx output directory"); _skipped.append("google-safe")
         else:
             print("  google-safe : no construct Google ignores has spread")
     except Exception as _e:
@@ -646,6 +647,8 @@ def check(allow_engine_change, only=None):
         print("  PASS - nothing got worse in %s, and the table matches this engine."
               % ("both formats" if (need_docx and need_txt) else
                  ("the .docx only" if need_docx else "the .txt only")))
+        if _skipped:
+            print("  CHECKS THAT DID NOT RUN: %s - this PASS covers the rest only." % ", ".join(_skipped))
     return fail
 
 
