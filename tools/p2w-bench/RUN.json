@@ -1,10 +1,11 @@
 {
  "agents": [],
- "attempts": 1,
+ "attempts": 2,
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
  "started": "13:00",
- "started_ts": 1795591811.0819776
+ "started_ts": 1795591811.0819776,
+ "class": "18_displacement"
 }
