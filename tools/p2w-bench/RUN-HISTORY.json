@@ -77,5 +77,19 @@
   "started_ts": 1795584406.9799936,
   "window_for_claim": 1795587335.0428274,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "agents": [
+   "Expl-01"
+  ],
+  "attempts": 1,
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "started": "11:24",
+  "started_ts": 1795586076.2526999,
+  "class": "content-present-partly-displaced",
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
