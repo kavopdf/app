@@ -185,9 +185,27 @@ def exhausted():
             if _k not in _ids or _k in hand:
                 continue
             _h = (_v or {}).get("history") or []
-            _mv = sum(int(x.get("moved") or 0) for x in _h)
-            if len(_h) >= 5 and _mv <= 1:
-                hand[_k] = "derived: %d attempt(s), %d moved, from ATTEMPTS.json" % (len(_h), _mv)
+            _mv = sum(int(x.get("moved") or 0) for x in _h if isinstance(x.get("moved"), int))
+            # A LIFETIME SUM CANNOT SEE A WALL. 47_margins held 18 attempts that moved 6 documents between
+            # them and 8 reverts at the end; the sum said 6 > 1, so the class was never exhausted and the
+            # rotation returned to it again and again. What matters is whether the RECENT attempts still move
+            # anything - a class that moved 6 last week and nothing since is one where the current approach
+            # has stopped working.
+            #
+            # So the tail decides as well. A class whose last measured attempts moved nothing is spent,
+            # whatever the lifetime total says; the lifetime rule stays, because five attempts that never
+            # moved anything is the same wall reached faster.
+            _tail = [x.get("moved") for x in _h[-5:]]
+            _tail_m = [m for m in _tail if isinstance(m, int)]
+            # AND THE OUTCOME IS THE SHARPER SIGNAL. 47_margins holds 18 attempts of which 8 are reverted -
+            # the last five carry moved [None, 1, 0, 1, 0], so a moved-sum rule reads progress where the
+            # ledger records eight straight reversions. A reverted attempt is one that was applied and did
+            # not hold; three of them in the recent tail means this approach has been tried and has failed.
+            _tail_oc = [x.get("outcome") for x in _h[-5:]]
+            _tail_rev = sum(1 for o in _tail_oc if o == "reverted")
+            _tail_dead = (len(_tail_m) >= 3 and sum(_tail_m) == 0) or _tail_rev >= 3
+            if len(_h) >= 5 and (_mv <= 1 or _tail_dead):
+                hand[_k] = ("derived: %d attempt(s), %d moved lifetime, last %d measured moved %d - from ATTEMPTS.json" % (len(_h), _mv, len(_tail_m), sum(_tail_m)))
     except Exception:
         pass
     return hand
