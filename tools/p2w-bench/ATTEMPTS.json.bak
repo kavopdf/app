@@ -104,7 +104,7 @@
   "status": "OPEN"
  },
  "04_chars_missing": {
-  "attempts": 8,
+  "attempts": 10,
   "first_seen": null,
   "history": [
    {
@@ -178,13 +178,37 @@
     "outcome": "lead",
     "reason": "2x2 dose over the 133 cached documents: the 120 pt cap alone removes 10% of box characters (8176->7386), the negative-gap anchor alone 71% (->2374), both 86% (->1122, 12 body-text documents zeroed). 1",
     "total": null
+   },
+   {
+    "at": "2026-11-25 07:47",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "00_page_count: land the column-page shape merge - 21 documents, 0 regressions"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "foot-band spend (SPEND_FOOT_GAP) applied and A/B'd: fires on 2 of 12 documents, 57+71 boxed chars -> 0, share5 1.62 -> 1.62 and pages 1 -> 1 on the one doc measured in both arms; not committable - ful",
+    "total": null
+   },
+   {
+    "at": "2026-11-25 08:54",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "inColumn guard at :3591 (the asymmetry against :4474) - built, all 213 converted, word/document.xml changed on 0 of 213; unreachable on this corpus, reverted",
+    "total": 213
    }
   ],
   "last": null,
-  "last_engine": "b7699196",
-  "last_moved": 1,
-  "last_total": 64,
+  "last_engine": "85b8735f",
+  "last_moved": 0,
+  "last_total": 213,
   "outcomes": [
+   "lead",
+   "lead",
    "lead",
    "lead",
    "lead",
@@ -194,7 +218,7 @@
    "lead",
    "lead"
   ],
-  "reason": "2x2 dose over the 133 cached documents: the 120 pt cap alone removes 10% of box characters (8176->7386), the negative-gap anchor alone 71% (->2374), both 86% (->1122, 12 body-text documents zeroed). 15 stamp documents invariant under all three. 0 of 14 page counts moved in LibreOffice. Google: 27_two_column_left_short_txtpos 40/42 (b7699196, failing 04_chars_missing + 44_header_footer) -> 42/42 PASS with both knobs, box characters 43->0. Not shipped: neither knob is shippable without a corpus-wide restamp (~54 min) and 18_displacement's tolerance was not measured in Google.",
+  "reason": "inColumn guard at :3591 (the asymmetry against :4474) - built, all 213 converted, word/document.xml changed on 0 of 213; unreachable on this corpus, reverted",
   "reasons": [
    "txbxContent 4->0 on 4 of 5 (27,61,55,67; 66 stays 16), read from word/document.xml; LO share5 unchanged 27 1.62->1.62 55 0.00->0.00 because LibreOffice renders the anchored box and Google does not - the proxy is blind to this class in both directions; patch saved to patches/foot-band-spend-the-gap.patch, Google render is the next run's measurement",
    "anchored-text-box census: the 120 pt cap is 16% of the box text and the pagepos cascade 17%; spending every gap removes 15.9% but displaces 3 documents worse, and no document has 04/45 as its only failure, so emptying boxes would clean ZERO documents today. Recorded in FINDINGS/ANCHORED-BOX-CENSUS-CAP-IS-16PCT-24NOV.md",
@@ -203,7 +227,9 @@
    "anchor latch census: the page-local ctx.positioned latch multiplies one anchored line into every later line (655 lines/24920 chars) against the 120pt cap's 1469 chars; -Dp2w.pagepos=0 -Dp2w.anchorkeep=0 cuts boxed chars 1358->367 on 69_two_col_legal, 2942->181 on academic-paper, 222->35 on 323_credit_card, 206->30 on 311_fir, and nothing on 47 of 64; no combination reaches 0 boxes so no document flipped; 47 of 64 04-failing docs carry <200 boxed chars and their box is a stamp, not body text",
    "GOOGLE: 69_two_col_legal_numbered_clauses 35/42 -> 39/42 with spendWideGap + FOOT_BAND=0 + pagepos=0/anchorkeep=0/zganchor=false; 04_chars_missing, 45_char_accuracy, 13_text_colours, 44_header_footer, 17_matched_runs, 10_font_sizes and 38_list_markers all pass now (36 boxes/1358 chars -> 0/0); the price is 26_text_overlap render=11 plus new 18_displacement and 60; engine reverted, the missing guard is a look-ahead (spend only when no remaining line targets a lower baseline)",
    "band sweep on the spend-gap build: -Dp2w.footband 0.80 takes 69_two_col_legal to 0 boxes while leaving 330_cad exactly as HEAD (0.85 leaves 7 boxes, 0.70 spends in the drawing sheet); Google at 0.80 is 39/42 with 26_text_overlap still 11, identical to band 0.0 - the overlap is what those gaps do, not a band that is too wide, so the look-ahead is the guard and the constant is not",
-   "2x2 dose over the 133 cached documents: the 120 pt cap alone removes 10% of box characters (8176->7386), the negative-gap anchor alone 71% (->2374), both 86% (->1122, 12 body-text documents zeroed). 15 stamp documents invariant under all three. 0 of 14 page counts moved in LibreOffice. Google: 27_two_column_left_short_txtpos 40/42 (b7699196, failing 04_chars_missing + 44_header_footer) -> 42/42 PASS with both knobs, box characters 43->0. Not shipped: neither knob is shippable without a corpus-wide restamp (~54 min) and 18_displacement's tolerance was not measured in Google."
+   "2x2 dose over the 133 cached documents: the 120 pt cap alone removes 10% of box characters (8176->7386), the negative-gap anchor alone 71% (->2374), both 86% (->1122, 12 body-text documents zeroed). 15 stamp documents invariant under all three. 0 of 14 page counts moved in LibreOffice. Google: 27_two_column_left_short_txtpos 40/42 (b7699196, failing 04_chars_missing + 44_header_footer) -> 42/42 PASS with both knobs, box characters 43->0. Not shipped: neither knob is shippable without a corpus-wide restamp (~54 min) and 18_displacement's tolerance was not measured in Google.",
+   "foot-band spend (SPEND_FOOT_GAP) applied and A/B'd: fires on 2 of 12 documents, 57+71 boxed chars -> 0, share5 1.62 -> 1.62 and pages 1 -> 1 on the one doc measured in both arms; not committable - full-corpus stamp is ~8 measure passes",
+   "inColumn guard at :3591 (the asymmetry against :4474) - built, all 213 converted, word/document.xml changed on 0 of 213; unreachable on this corpus, reverted"
   ],
   "requeues": 0,
   "status": "OPEN"
