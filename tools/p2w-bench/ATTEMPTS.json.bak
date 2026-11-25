@@ -1145,7 +1145,7 @@
   "status": "OPEN"
  },
  "content-missing-partly-replaced": {
-  "attempts": 19,
+  "attempts": 20,
   "first_seen": null,
   "history": [
    {
@@ -1164,6 +1164,17 @@
     "moved": 0,
     "outcome": "lead",
     "reason": "annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an",
+    "total": 14
+   },
+   {
+    "at": "2026-11-25 11:48",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and",
     "total": 14
    }
   ],
@@ -1190,11 +1201,12 @@
    "partial",
    "kept",
    "reverted",
+   "lead",
    "lead"
   ],
   "ratchet_at": "17 Nov 19:35",
   "ratchet_docs": 3,
-  "reason": "annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an engine edit invalidates both tables and regress.py --check refuses an unmeasured engine; this run measured that cost in a live pod: corpus 213 in five slices ~16 min, docx render+score ~56 min. Next run: apply, build, 5 slices, p2w.py, restamp_txt --run --force --report --apply, regress --stamp, regress --check.",
+  "reason": "t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and its fillable twin. Not an instrument artifact: the source has zero U+FFFD. t12 under-reports it (render=5) because _words() drops the token. Fix is in the engine ligature map -> both fingerprints move -> needs the 213-doc pass (~16 min slices + ~56 min docx score), which does not fit a slot 80 minutes in. See FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md",
   "reasons": [
    "no fix measured. Localised the 9->10 page spill on 041122 with two subagent findings and my own measurement (share5 98.65, pages 10/9, worst_page 9, text_recall 99.68 at HEAD): page 7 is one 24-row table, shaveToFit cannot reach it, and four candidate repairs were each measured to leave the page count at 10. B proved the wrap follows width, not anchor, so the width is ours. Three paths closed, no engine change made - a spill repair needs a content-height reduction and a full ratchet that this slot did not have time for.",
    "041122 p7: welded heading (inset 9452 twips in a 10636 cell) wrapped to 27 lines x 10pt in a 59pt slot, row declared 84.1pt laid out 270pt, table 186pt taller than the paper -> 9 pages in, 10 out. Per-line paragraphs: p7 share5 73.99 -> 0.00, pages 10 -> 9, every page's line count now equals the source's.",
@@ -1211,7 +1223,8 @@
    "The carry (ARIAL_W character scale) never bound on a SPANNING table cell: DocxWriter passed colTw[c] - the first grid column under the cell - as the width carryScalePct clamps to, and a clamp of zero or less is skipped, so every merged cell went out at the page's drawn ratio unclamped. 041122's instruction cell is merged over 6 columns (11000 tw), was told 360 tw, emitted w:w 95-97 and the renderer wrapped four of the page's nine lines into two, growing the row past the 158 pt the page had left. One-token change (spanTw - pInset, the cell's real width). Corpus diff: 3 of 213 .docx change, all three form documents with merged cells; 210 byte-identical. Measured on the 3 changed: 373_leave_application_form 5.46 -> 4.64 (improved), 041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled both 11 -> 10 pages with share5 unchanged at 99.02 because the last extra page is a folio written as a TABLE ROW (table 17's last row is the bare '7'), which still shifts every page after it. Kept: the scale is now the cell's own width and 89-92 % is the value the renderer needs.",
    "RATCHET, and here is exactly what was ratcheted so the number can be checked rather than trusted: the change (carryScalePct's ceiling now takes the spanning cell's width, spanTw - pInset, instead of the first grid column's) was converted over all 213 corpus documents and diffed against HEAD entry by entry. 210 of 213 .docx are BYTE-IDENTICAL in every zip entry and therefore cannot render differently, so there is nothing in them to measure. The 3 that differ were all 3 measured, both engines, same JDK, DPI 150: 373_leave_application_form 5.46 -> 4.64 share@5 (improved); 041122-Account_Opening_Form 11 -> 10 pages, share@5 99.02 both; Account_Opening_Form_Fillable_filled 11 -> 10 pages, share@5 99.02 both. 0 of 3 worse. The 3/3 here is 'every document the change can touch', not a quarter of the class - the class metric does not move until the folio row (a table row holding a bare page number, which costs its own sheet and shifts every page after it) is anchored instead of flowed; that is written up as UNTESTED in HYPOTHESES.md and in FINDINGS/carry-ceiling-span-1900.md. The change is kept because it is measured on everything it reaches and regresses nothing.",
    "MEASURED AND REVERTED: the run-size-from-sizePt patch (the one SETTLED called 'the best single change available' after it took 360_restaurant_menu 34.43 -> 1.31) does NOT reproduce on the current engine 7a95b1c. Applied clean, built, screened 4 documents (360_restaurant_menu, 392_statistical_console_output, itr-computation-with-slab-table, 320_balance_sheet_statutory): SCREEN FAIL - 360_restaurant_menu 34.43 -> 34.43 (0.00, the 96% gain does not exist here), 392_statistical_console_output 1.61 -> 13.94 (+12.33, reproduces exactly as recorded), itr and 320 unchanged. So the patch's one real win was a property of the engine state it was measured on, not of the patch: on this engine it is pure loss. Reverted; engine back to 7a95b1c.",
-   "annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an engine edit invalidates both tables and regress.py --check refuses an unmeasured engine; this run measured that cost in a live pod: corpus 213 in five slices ~16 min, docx render+score ~56 min. Next run: apply, build, 5 slices, p2w.py, restamp_txt --run --force --report --apply, regress --stamp, regress --check."
+   "annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an engine edit invalidates both tables and regress.py --check refuses an unmeasured engine; this run measured that cost in a live pod: corpus 213 in five slices ~16 min, docx render+score ~56 min. Next run: apply, build, 5 slices, p2w.py, restamp_txt --run --force --report --apply, regress --stamp, regress --check.",
+   "t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and its fillable twin. Not an instrument artifact: the source has zero U+FFFD. t12 under-reports it (render=5) because _words() drops the token. Fix is in the engine ligature map -> both fingerprints move -> needs the 213-doc pass (~16 min slices + ~56 min docx score), which does not fit a slot 80 minutes in. See FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md"
   ],
   "requeues": 0,
   "status": "OPEN"
