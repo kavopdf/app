@@ -26,11 +26,6 @@
 
 ## What this pass did
 
-* Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
-* **A stage is stopped** - see BLOCKERS.md.
-
-## What this pass did
-
 * Read health.py, health.py --stalled, progress.py, round.py --phase, status.py and pending.py before deciding anything, then the last BLOCKERS rows and the baseline cron's own commits.
 * **One stage is stopped: txt** - 199 clean and 14 failing. The baseline run committed a restamp of all 213 .txt rows before this pass and no row changed, so the table is current and the 14 failures are real, not a stale table.
 * The trend did not move on docx open (59) or txt failing (14). It moved on Google measured (190 to 191) and Google clean (35 to 36). The fixer's attempt count beside the flat pair is 5 attempts in 3 h.
