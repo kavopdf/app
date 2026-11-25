@@ -183,4 +183,5 @@
 | 25 Nov 13:22 | fixer | attempt content-present-partly-displaced -> error (0/? moved) |
 | 25 Nov 13:22 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
 | 25 Nov 14:01 | fixer | attempt 18_displacement -> lead (0/? moved) |
+| 25 Nov 14:08 | baseline | slot claimed - baseline running |
 | 25 Nov 14:17 | fixer | slot claimed - fixer running |
