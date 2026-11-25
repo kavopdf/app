@@ -274,16 +274,9 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 71,
+  "attempts": 72,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-24 09:17",
-    "moved": 1,
-    "outcome": "lead",
-    "reason": "The uniform-pitch guard (0559 patch) takes 362_price_list_dense 41/42 -> 42/42 in Google, measured by gverify --collect; electricity-bill and 330_cad_drawing_sheet byte-identical in LibreOffice (guard",
-    "total": 10
-   },
    {
     "at": "2026-11-24 12:27",
     "moved": 0,
@@ -472,6 +465,17 @@
     "outcome": "lead",
     "reason": "",
     "total": 10
+   },
+   {
+    "at": "2026-11-25 22:10",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "",
+    "total": null
    }
   ],
   "last": null,
@@ -528,6 +532,7 @@
    "lead",
    "lead",
    "reverted",
+   "lead",
    "lead",
    "lead",
    "lead",
@@ -625,6 +630,7 @@
    "trHeight hRule=exact at DocxWriter:6584 measured on the 30 densest-row documents (1328 of 2278 rows): 0 documents lost words against their own baseline or against the source PDF, 0 added a page, 2 dropped a page toward the source (041122-Account_Opening_Form 10->9, Account_Opening_Form_Fillable_filled 11->10). Patch staged in PATCHES/ROW-HEIGHT-EXACT-25NOV.patch; not applied because the pre-commit gate refuses an engine change while the docx table is stamped on an older engine (9e2b3e4d7869ea86 vs tree 791f7cfb779ff648) and a 213-document re-measure does not fit a slot. Google was not run - the displacement gain is still a Google claim.",
    "census of all 25 solo documents at 981ff1fa35e2cf67: A 11 refused-spacer / B 10 spent-still-failing / C 4 no-spacer; a guard patch reaches only A and the w:before delivery ratio is unmeasured (the one measured spend delivered 77%)",
    "census of all 25 solo documents at 981ff1fa35e2cf67: A 11 refused-spacer / B 10 spent-still-failing / C 4 no-spacer; a guard patch reaches only A and the w:before delivery ratio is unmeasured (the one measured spend delivered 77%)",
+   "",
    "",
    ""
   ],

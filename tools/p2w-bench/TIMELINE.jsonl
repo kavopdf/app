@@ -6359,3 +6359,20 @@
 {"t": 1795621263.7887268, "ist": "21:11:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795621264.0961149, "ist": "21:11:04", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795621307.7062137, "ist": "21:11:47", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795622039.891959, "ist": "21:23:59", "ev": "beat", "d": "relay: pod-prep in slices"}
+{"t": 1795622058.83813, "ist": "21:24:18", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795622065.9361796, "ist": "21:24:25", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795622066.1070936, "ist": "21:24:26", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795622066.2000656, "ist": "21:24:26", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795622074.938632, "ist": "21:24:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795622075.965371, "ist": "21:24:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795622080.8987668, "ist": "21:24:40", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795622081.0121844, "ist": "21:24:41", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795622081.640573, "ist": "21:24:41", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795622081.7490778, "ist": "21:24:41", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795623723.3243015, "ist": "21:52:03", "ev": "beat", "d": "relay: agent A landed a local probe; measuring 4 arms in Google myself"}
+{"t": 1795623775.9378474, "ist": "21:52:55", "ev": "beat", "d": "relay: 4 arms exported from Google, scoring with verify_google"}
+{"t": 1795623949.8311524, "ist": "21:55:49", "ev": "beat", "d": "relay: 9 arms measured in Google, building corpus for the gate"}
+{"t": 1795624678.0246286, "ist": "22:07:58", "ev": "beat", "d": "relay: corpus DONE 213, installing gate"}
+{"t": 1795624805.280283, "ist": "22:10:05", "ev": "beat", "d": "relay: corpus DONE 213, installing gate"}
+{"t": 1795624849.9521658, "ist": "22:10:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
