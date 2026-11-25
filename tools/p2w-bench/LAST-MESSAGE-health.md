@@ -1,33 +1,39 @@
-# Pipeline watchdog — 25 Nov 2026
+# Watchdog — 25 Nov 2026, 12:05 IST
 
-Two stages stopped: classify at 7.7 h and txt at 23.4 h. The fix stage is moving with 4 attempt(s) in 3 h. Nothing was measured, classified, fixed or shipped by this pass.
+Two stages are stopped: classify and txt. The fixer is moving, and Google clean rose from 35 to 42 against yesterday's row.
+
+## Stages
 
 | stage | state | progress | age |
-|---|---|---|---|
-| measure-google | done | 213 of 213 | 0.5 h |
-| matrix | done | 213 of 213 | 29.4 h |
-| classify | stopped | — | 7.7 h |
-| fix | moving | 4 attempt(s) in 3 h | 0.3 h |
-| txt | stopped | 199 clean, 14 failing | 23.4 h |
+|:--|:--|--:|--:|
+| measure-google | done | 213 of 213 | 0.1 h |
+| matrix | done | 213 of 213 | 32.3 h |
+| classify | stopped | | 10.6 h |
+| fix | moving | 7 attempt(s) in 3 h | 0.2 h |
+| txt | stopped | 199 clean, 14 failing | 26.3 h |
 
-## What the two stopped rows actually are
+## Trend
 
-**classify** is a real gap this pass found for the first time. stage.py names classify independently — "the table is older than the results" — and fresh Google measurements landed after the class table was last regenerated, so the queue the fixer ranks is built on older results.
+Today's row was stale against the live tables, so progress.py --amend rewrote it from them: docx open 59, txt failing 14, Google 213 measured and 42 clean. Against 24 Nov: docx open 59 to 59, no change on its sixth consecutive row; txt failing 14 to 14; Google 190 to 213 measured, clean 35 to 42.
 
-**txt** is not a stale table. The .txt state file names the current engine, and restamp_txt.py --report prints 213 scored, 213 unchanged. The 14 failures are a measurement of today's engine, so the row is red for the reason health.py intends: a current measurement of 14 failures.
+## Round
 
-## The trend
+The phase is fix, so the fixer runs until no class is OPEN. No cron was paused, resumed, recreated or deleted: this watchdog has no cron tool, so the platform steps of the brief did not run.
 
-Today's row was already written by the earlier pass, so nothing was appended. Against 24 Nov: docx open 59 -> 59 and txt failing 14 -> 14, both flat — the fifth consecutive flat row for docx open and the third for txt — while Google moved 190 -> 191 measured and 35 -> 37 clean. The fixer's count beside the flat pair is 4 attempt(s) in 3 h, none kept.
+## Why those two rows are stopped
 
-## What I did, and what I could not do
+classify: the younger class table was committed yesterday at 19:59 UTC and gverify has committed results since, so the classifier cron has produced no table for ten hourly slots. stage.py names classify on its own - the table is older than the results.
 
-The round phase is fix, so round.py --reopen refuses: the phase is fix, not done. status.py reads the fixer slot IDLE with no claim, so there was nothing to release and --release-fixer --force was not run.
+txt: its table is 26.3 h old against engine inputs 4.5 h old. I re-scored the corpus on this tree with restamp_txt.py --report: 213 scored, none newly clean, none newly failing, 213 unchanged. The 14 are real failures on the current engine, not a stale table.
 
-This watchdog has no cron tool, so STEP 3 and STEP 4 A and B cannot run: a paused, stale or zombie cron cannot be moved by automation here. That is a missing tool, not a decision a person has to make. The calls I would have made are written into BLOCKERS.md with the ids from the health brief's table.
+New this pass: the baseline cron is silent as well. Its LibreOffice output last changed 32.3 h ago, and health.py cannot flag it because matrix reads done at 213 of 213. txt is the baseline's other output, so the red txt row and the silent baseline are one fact, and it is the one no tool here can move.
 
-## Decision on the txt stall (STEP 5)
+## Decision on the txt stall
 
-No class is parked. The earlier pass set its own overturn condition — park t12_word_invention if an attempt on it measures and keeps nothing — and that attempt exists, but its own record contradicts the conclusion: it names the mechanism, says a patch was written, and measured the invented-word count dropping on one document, then recorded no files changed. A class whose last attempt found a working patch and did not land it is not unwinnable, and parking it would discard a measured fix. The defect is the landing, not the class. What would overturn this: an attempt that lands a patch and still moves no document, or further attempts that end with no files and no explanation.
+txt is past 24 hours with nothing moved, so this pass decided rather than deferred: no class parked, no approach replaced, instrument left alone. The restamp is the evidence - the table measures today's engine, and the failures have named mechanisms, the ligature identity in the word-invention check against a corrupt page ToUnicode and the Effra reference face in the word-accuracy check. The fixer is moving, 7 attempts in 3 h, its last three commits landing findings rather than reverting engine patches.
 
-The evidence and the overturn conditions are in tools/p2w-bench/BLOCKERS.md, and the blockers row for this pass is committed with this report.
+What would overturn it: a restamp that reports documents newly failing; two further attempts on the word-invention class ending with an empty file list and no explanation; or a pending queue back above the 26 the 18:12 pass set as its line, which it has since fallen below.
+
+## Written to BLOCKERS.md
+
+One row each: the two stopped stages, the silent baseline cron, the missing cron tool with the exact calls I would have made and the ids from HEALTH-BRIEF's table, and a slot-release write I made by mistake on an already-free slot, which I reverted so the fixer's own release stands.
