@@ -5764,3 +5764,8 @@
 {"t": 1795583864.648037, "ist": "10:47:44", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795583865.050467, "ist": "10:47:45", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795583866.6579528, "ist": "10:47:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795583881.3342755, "ist": "10:48:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795583895.870885, "ist": "10:48:15", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795583895.971133, "ist": "10:48:15", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795583896.0711925, "ist": "10:48:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795583896.6569476, "ist": "10:48:16", "ev": "killed", "d": "dead claim cleared by force release"}
