@@ -92,16 +92,20 @@ verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine
 | over-counted - the word is on the page, the output repeats it | 34 | 6 |
 | tokenisation - characters present, split or joined differently | 18 | 4 |
 
-The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin. The
-page says "Please fill up in BLOCK letters only"; the output says `Please �ll up in BLOCK letters
-only`, and **the .docx carries 86 of them too** - so this is an engine ligature defect in the renderer
-the user opens, not a `.txt` artifact. The source PDF has zero `U+FFFD`. `t12` under-reports it
-(render=5) because its own tokeniser drops the character, so the check that exists to catch an
-invented word cannot see the one that dominates the document; `t06_encoding` is what fails there.
+The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin, and
+**the .docx body carries 86 of them too** - so the damage reaches the renderer the user opens, not just
+the `.txt`. `t12` under-reports it (render=5) because its own tokeniser drops the character; the check
+that exists to catch an invented word cannot see the one that dominates the document, and `t06_encoding`
+is what fails there.
 
-The fix is in the engine's ligature map, so it moves both fingerprints and needs the same 213-document
-pass the annotation patch needs. Recorded as a lead with the measurement
-(`FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md`), not attempted at 80 minutes in.
+Then I tried to prove it wrong, and it partly worked: the page's own text layer is corrupt. PyMuPDF
+reads the same line as `Please \u0124ll up` - the subset font's `/ToUnicode` maps the `fi`-ligature
+glyph to `U+0124`, and PDFBox substitutes `U+FFFD` where PyMuPDF passes the garbage through. So these
+are not 258 words invented from nothing; `t12`'s "no such characters on the page" is technically right.
+The fix is therefore a **glyph-name fallback** when `toUnicode` answers `U+FFFD` (PDFBox exposes the
+glyph name per glyph), not a ligature-to-ASCII table. The finding carries the correction and supersedes
+the wording recorded in the ledger. Engine-side, so it needs the same 213-document pass as the
+annotation patch.
 
 ## Attempt 3: `18_displacement` is one unit, in one direction, on 108 documents
 
