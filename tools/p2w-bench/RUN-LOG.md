@@ -190,3 +190,5 @@
 | 25 Nov 17:03 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 25 Nov 17:05 | fixer | attempt t12_word_invention -> kept (5/8 moved) |
 | 25 Nov 17:07 | fixer | attempt 18_displacement -> lead |
+| 25 Nov 17:16 | fixer | slot claimed - fixer running |
+| 25 Nov 18:01 | fixer | attempt t12_word_invention -> lead (0/? moved) |
