@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 10:56 → running IST · 50 min**
+**25 Nov 2026 · slot 10:56 → running IST · 54 min**
 
 > The Google scoreboard was blind, not the corpus. Three instruments compared a git commit with a
 > source hash and reported "0 of 213 current". Fixed, measured, committed: **42 of 213 documents pass
@@ -80,6 +80,29 @@ for the next run, in order, and it is the only thing between the annotation fix 
 `attempt.py`. Copy `RANKING-TXT.csv` before `restamp_txt.py --apply`: it rewrites the baseline from the
 same rows, which makes the "no .txt document worse" line vacuous.
 
+## Attempt 2: the biggest text defect in the corpus is one unmapped ligature
+
+With the scoreboard readable, the txt side's worst failure was `t12_word_invention` on 8 documents.
+Recomputing the excess-token multiset independently on all 8 (PyMuPDF page text as the source, not the
+verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine":
+
+| class | tokens | documents |
+|:--|--:|:--|
+| **NOVEL** - no such characters on the page | **258** | 2 |
+| over-counted - the word is on the page, the output repeats it | 34 | 6 |
+| tokenisation - characters present, split or joined differently | 18 | 4 |
+
+The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin. The
+page says "Please fill up in BLOCK letters only"; the output says `Please �ll up in BLOCK letters
+only`, and **the .docx carries 86 of them too** - so this is an engine ligature defect in the renderer
+the user opens, not a `.txt` artifact. The source PDF has zero `U+FFFD`. `t12` under-reports it
+(render=5) because its own tokeniser drops the character, so the check that exists to catch an
+invented word cannot see the one that dominates the document; `t06_encoding` is what fails there.
+
+The fix is in the engine's ligature map, so it moves both fingerprints and needs the same 213-document
+pass the annotation patch needs. Recorded as a lead with the measurement
+(`FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md`), not attempted at 80 minutes in.
+
 ## Two agents, in the first ten minutes
 
 | Agent | Sent to find | Took | Result |
@@ -96,7 +119,7 @@ refuse.
 | | |
 |:--|:--|
 | Self-check | **every field agrees with its second source** |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -113,6 +136,597 @@ refuse.
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 11:45 | **lead** | 0/14 | annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an |
+| 11:48 | **lead** | 0/14 | t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and |
+
+## The txt
+
+| | |
+|:--|:--|
+| Measured | **54 min ago** |
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t12_word_invention` - 8 documents |
+
+## Subagents
+
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `googA-01` | why the Google scoreboard reads zero: store, filter  | 11:44 | - | - |
+| `annoB-01` | what regress.py --check demands and the exact timing | 11:44 | - | - |
+
+## Attempt 2: the biggest text defect in the corpus is one unmapped ligature
+
+With the scoreboard readable, the txt side's worst failure was `t12_word_invention` on 8 documents.
+Recomputing the excess-token multiset independently on all 8 (PyMuPDF page text as the source, not the
+verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine":
+
+| class | tokens | documents |
+|:--|--:|:--|
+| **NOVEL** - no such characters on the page | **258** | 2 |
+| over-counted - the word is on the page, the output repeats it | 34 | 6 |
+| tokenisation - characters present, split or joined differently | 18 | 4 |
+
+The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin. The
+page says "Please fill up in BLOCK letters only"; the output says `Please �ll up in BLOCK letters
+only`, and **the .docx carries 86 of them too** - so this is an engine ligature defect in the renderer
+the user opens, not a `.txt` artifact. The source PDF has zero `U+FFFD`. `t12` under-reports it
+(render=5) because its own tokeniser drops the character, so the check that exists to catch an
+invented word cannot see the one that dominates the document; `t06_encoding` is what fails there.
+
+The fix is in the engine's ligature map, so it moves both fingerprints and needs the same 213-document
+pass the annotation patch needs. Recorded as a lead with the measurement
+(`FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md`), not attempted at 80 minutes in.
+
+## Two agents, in the first ten minutes
+
+| Agent | Sent to find | Took | Result |
+|:--|:--|--:|:--|
+| `Google read failure` | why the Google row reads zero - store, filter or error? | 5 min | **filter bug, (a)**: found the `%h` vs source-hash mismatch at `report.py:393-460`, wrote the patch this run landed, and confirmed the store holds 212 rows all stamped on this tree |
+| `Landing path for patch` | what `regress.py --check` actually demands, and the timings | 17 min | **the gate is stamp-gated, not corpus-gated**: `scope_of_change()` answers "both" for `PdfToWord.java`, no scoped re-stamp exists, `--stamp` would pass unmeasured today and must not be used. Timed every step above |
+
+The second agent is why this run did not attempt the annotation landing: 56 minutes of soffice against
+a slot already 40 minutes in is a half-measurement, and a half-measurement is what the gate exists to
+refuse.
+
+## Progress
+
+| | |
+|:--|:--|
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt from the LibreOffice comparison | **0** — none |
+| **Fixed - Google, every applicable check** | **42** of the **213** re-measured on this engine - **0** of the 213 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
+| Working on | `content-missing-partly-replaced` - taken from the pending list (19 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `content-missing-partly-replaced` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 11:45 | **lead** | 0/14 | annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an |
+| 11:48 | **lead** | 0/14 | t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and |
+
+## The txt
+
+| | |
+|:--|:--|
+| Measured | **54 min ago** |
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t12_word_invention` - 8 documents |
+
+## Subagents
+
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `googA-01` | why the Google scoreboard reads zero: store, filter  | 11:44 | - | - |
+| `annoB-01` | what regress.py --check demands and the exact timing | 11:44 | - | - |
+
+## Attempt 2: the biggest text defect in the corpus is one unmapped ligature
+
+With the scoreboard readable, the txt side's worst failure was `t12_word_invention` on 8 documents.
+Recomputing the excess-token multiset independently on all 8 (PyMuPDF page text as the source, not the
+verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine":
+
+| class | tokens | documents |
+|:--|--:|:--|
+| **NOVEL** - no such characters on the page | **258** | 2 |
+| over-counted - the word is on the page, the output repeats it | 34 | 6 |
+| tokenisation - characters present, split or joined differently | 18 | 4 |
+
+The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin. The
+page says "Please fill up in BLOCK letters only"; the output says `Please �ll up in BLOCK letters
+only`, and **the .docx carries 86 of them too** - so this is an engine ligature defect in the renderer
+the user opens, not a `.txt` artifact. The source PDF has zero `U+FFFD`. `t12` under-reports it
+(render=5) because its own tokeniser drops the character, so the check that exists to catch an
+invented word cannot see the one that dominates the document; `t06_encoding` is what fails there.
+
+The fix is in the engine's ligature map, so it moves both fingerprints and needs the same 213-document
+pass the annotation patch needs. Recorded as a lead with the measurement
+(`FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md`), not attempted at 80 minutes in.
+
+## Two agents, in the first ten minutes
+
+| Agent | Sent to find | Took | Result |
+|:--|:--|--:|:--|
+| `Google read failure` | why the Google row reads zero - store, filter or error? | 5 min | **filter bug, (a)**: found the `%h` vs source-hash mismatch at `report.py:393-460`, wrote the patch this run landed, and confirmed the store holds 212 rows all stamped on this tree |
+| `Landing path for patch` | what `regress.py --check` actually demands, and the timings | 17 min | **the gate is stamp-gated, not corpus-gated**: `scope_of_change()` answers "both" for `PdfToWord.java`, no scoped re-stamp exists, `--stamp` would pass unmeasured today and must not be used. Timed every step above |
+
+The second agent is why this run did not attempt the annotation landing: 56 minutes of soffice against
+a slot already 40 minutes in is a half-measurement, and a half-measurement is what the gate exists to
+refuse.
+
+## Progress
+
+| | |
+|:--|:--|
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt from the LibreOffice comparison | **0** — none |
+| **Fixed - Google, every applicable check** | **42** of the **213** re-measured on this engine - **0** of the 213 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
+| Working on | `content-missing-partly-replaced` - taken from the pending list (19 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `content-missing-partly-replaced` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 11:45 | **lead** | 0/14 | annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an |
+| 11:48 | **lead** | 0/14 | t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and |
+
+## The txt
+
+| | |
+|:--|:--|
+| Measured | **53 min ago** |
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t12_word_invention` - 8 documents |
+
+## Subagents
+
+*None deployed this run.*
+
+## Attempt 2: the biggest text defect in the corpus is one unmapped ligature
+
+With the scoreboard readable, the txt side's worst failure was `t12_word_invention` on 8 documents.
+Recomputing the excess-token multiset independently on all 8 (PyMuPDF page text as the source, not the
+verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine":
+
+| class | tokens | documents |
+|:--|--:|:--|
+| **NOVEL** - no such characters on the page | **258** | 2 |
+| over-counted - the word is on the page, the output repeats it | 34 | 6 |
+| tokenisation - characters present, split or joined differently | 18 | 4 |
+
+The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin. The
+page says "Please fill up in BLOCK letters only"; the output says `Please �ll up in BLOCK letters
+only`, and **the .docx carries 86 of them too** - so this is an engine ligature defect in the renderer
+the user opens, not a `.txt` artifact. The source PDF has zero `U+FFFD`. `t12` under-reports it
+(render=5) because its own tokeniser drops the character, so the check that exists to catch an
+invented word cannot see the one that dominates the document; `t06_encoding` is what fails there.
+
+The fix is in the engine's ligature map, so it moves both fingerprints and needs the same 213-document
+pass the annotation patch needs. Recorded as a lead with the measurement
+(`FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md`), not attempted at 80 minutes in.
+
+## Two agents, in the first ten minutes
+
+| Agent | Sent to find | Took | Result |
+|:--|:--|--:|:--|
+| `Google read failure` | why the Google row reads zero - store, filter or error? | 5 min | **filter bug, (a)**: found the `%h` vs source-hash mismatch at `report.py:393-460`, wrote the patch this run landed, and confirmed the store holds 212 rows all stamped on this tree |
+| `Landing path for patch` | what `regress.py --check` actually demands, and the timings | 17 min | **the gate is stamp-gated, not corpus-gated**: `scope_of_change()` answers "both" for `PdfToWord.java`, no scoped re-stamp exists, `--stamp` would pass unmeasured today and must not be used. Timed every step above |
+
+The second agent is why this run did not attempt the annotation landing: 56 minutes of soffice against
+a slot already 40 minutes in is a half-measurement, and a half-measurement is what the gate exists to
+refuse.
+
+## Progress
+
+| | |
+|:--|:--|
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt from the LibreOffice comparison | **0** — none |
+| **Fixed - Google, every applicable check** | **42** of the **213** re-measured on this engine - **0** of the 213 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
+| Working on | `content-missing-partly-replaced` - taken from the pending list (19 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `content-missing-partly-replaced` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 11:45 | **lead** | 0/14 | annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an |
+| 11:48 | **lead** | 0/14 | t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and |
+
+## The txt
+
+| | |
+|:--|:--|
+| Measured | **53 min ago** |
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t12_word_invention` - 8 documents |
+
+## Subagents
+
+*None deployed this run.*
+
+## Attempt 2: the biggest text defect in the corpus is one unmapped ligature
+
+With the scoreboard readable, the txt side's worst failure was `t12_word_invention` on 8 documents.
+Recomputing the excess-token multiset independently on all 8 (PyMuPDF page text as the source, not the
+verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine":
+
+| class | tokens | documents |
+|:--|--:|:--|
+| **NOVEL** - no such characters on the page | **258** | 2 |
+| over-counted - the word is on the page, the output repeats it | 34 | 6 |
+| tokenisation - characters present, split or joined differently | 18 | 4 |
+
+The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin. The
+page says "Please fill up in BLOCK letters only"; the output says `Please �ll up in BLOCK letters
+only`, and **the .docx carries 86 of them too** - so this is an engine ligature defect in the renderer
+the user opens, not a `.txt` artifact. The source PDF has zero `U+FFFD`. `t12` under-reports it
+(render=5) because its own tokeniser drops the character, so the check that exists to catch an
+invented word cannot see the one that dominates the document; `t06_encoding` is what fails there.
+
+The fix is in the engine's ligature map, so it moves both fingerprints and needs the same 213-document
+pass the annotation patch needs. Recorded as a lead with the measurement
+(`FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md`), not attempted at 80 minutes in.
+
+## Two agents, in the first ten minutes
+
+| Agent | Sent to find | Took | Result |
+|:--|:--|--:|:--|
+| `Google read failure` | why the Google row reads zero - store, filter or error? | 5 min | **filter bug, (a)**: found the `%h` vs source-hash mismatch at `report.py:393-460`, wrote the patch this run landed, and confirmed the store holds 212 rows all stamped on this tree |
+| `Landing path for patch` | what `regress.py --check` actually demands, and the timings | 17 min | **the gate is stamp-gated, not corpus-gated**: `scope_of_change()` answers "both" for `PdfToWord.java`, no scoped re-stamp exists, `--stamp` would pass unmeasured today and must not be used. Timed every step above |
+
+The second agent is why this run did not attempt the annotation landing: 56 minutes of soffice against
+a slot already 40 minutes in is a half-measurement, and a half-measurement is what the gate exists to
+refuse.
+
+## Progress
+
+| | |
+|:--|:--|
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt from the LibreOffice comparison | **0** — none |
+| **Fixed - Google, every applicable check** | **42** of the **213** re-measured on this engine - **0** of the 213 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
+| Working on | `content-missing-partly-replaced` - taken from the pending list (19 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `content-missing-partly-replaced` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 11:45 | **lead** | 0/14 | annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an |
+| 11:48 | **lead** | 0/14 | t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and |
+
+## The txt
+
+| | |
+|:--|:--|
+| Measured | **53 min ago** |
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t12_word_invention` - 8 documents |
+
+## Subagents
+
+*None deployed this run.*
+
+## Attempt 2: the biggest text defect in the corpus is one unmapped ligature
+
+With the scoreboard readable, the txt side's worst failure was `t12_word_invention` on 8 documents.
+Recomputing the excess-token multiset independently on all 8 (PyMuPDF page text as the source, not the
+verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine":
+
+| class | tokens | documents |
+|:--|--:|:--|
+| **NOVEL** - no such characters on the page | **258** | 2 |
+| over-counted - the word is on the page, the output repeats it | 34 | 6 |
+| tokenisation - characters present, split or joined differently | 18 | 4 |
+
+The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin. The
+page says "Please fill up in BLOCK letters only"; the output says `Please �ll up in BLOCK letters
+only`, and **the .docx carries 86 of them too** - so this is an engine ligature defect in the renderer
+the user opens, not a `.txt` artifact. The source PDF has zero `U+FFFD`. `t12` under-reports it
+(render=5) because its own tokeniser drops the character, so the check that exists to catch an
+invented word cannot see the one that dominates the document; `t06_encoding` is what fails there.
+
+The fix is in the engine's ligature map, so it moves both fingerprints and needs the same 213-document
+pass the annotation patch needs. Recorded as a lead with the measurement
+(`FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md`), not attempted at 80 minutes in.
+
+## Two agents, in the first ten minutes
+
+| Agent | Sent to find | Took | Result |
+|:--|:--|--:|:--|
+| `Google read failure` | why the Google row reads zero - store, filter or error? | 5 min | **filter bug, (a)**: found the `%h` vs source-hash mismatch at `report.py:393-460`, wrote the patch this run landed, and confirmed the store holds 212 rows all stamped on this tree |
+| `Landing path for patch` | what `regress.py --check` actually demands, and the timings | 17 min | **the gate is stamp-gated, not corpus-gated**: `scope_of_change()` answers "both" for `PdfToWord.java`, no scoped re-stamp exists, `--stamp` would pass unmeasured today and must not be used. Timed every step above |
+
+The second agent is why this run did not attempt the annotation landing: 56 minutes of soffice against
+a slot already 40 minutes in is a half-measurement, and a half-measurement is what the gate exists to
+refuse.
+
+## Progress
+
+| | |
+|:--|:--|
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt from the LibreOffice comparison | **0** — none |
+| **Fixed - Google, every applicable check** | **42** of the **213** re-measured on this engine - **0** of the 213 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
+| Working on | `content-missing-partly-replaced` - taken from the pending list (19 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `content-missing-partly-replaced` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 11:45 | **lead** | 0/14 | annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an |
+| 11:48 | **lead** | 0/14 | t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and |
+
+## The txt
+
+| | |
+|:--|:--|
+| Measured | **52 min ago** |
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t12_word_invention` - 8 documents |
+
+## Subagents
+
+*None deployed this run.*
+
+## Attempt 2: the biggest text defect in the corpus is one unmapped ligature
+
+With the scoreboard readable, the txt side's worst failure was `t12_word_invention` on 8 documents.
+Recomputing the excess-token multiset independently on all 8 (PyMuPDF page text as the source, not the
+verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine":
+
+| class | tokens | documents |
+|:--|--:|:--|
+| **NOVEL** - no such characters on the page | **258** | 2 |
+| over-counted - the word is on the page, the output repeats it | 34 | 6 |
+| tokenisation - characters present, split or joined differently | 18 | 4 |
+
+The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin. The
+page says "Please fill up in BLOCK letters only"; the output says `Please �ll up in BLOCK letters
+only`, and **the .docx carries 86 of them too** - so this is an engine ligature defect in the renderer
+the user opens, not a `.txt` artifact. The source PDF has zero `U+FFFD`. `t12` under-reports it
+(render=5) because its own tokeniser drops the character, so the check that exists to catch an
+invented word cannot see the one that dominates the document; `t06_encoding` is what fails there.
+
+The fix is in the engine's ligature map, so it moves both fingerprints and needs the same 213-document
+pass the annotation patch needs. Recorded as a lead with the measurement
+(`FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md`), not attempted at 80 minutes in.
+
+## Two agents, in the first ten minutes
+
+| Agent | Sent to find | Took | Result |
+|:--|:--|--:|:--|
+| `Google read failure` | why the Google row reads zero - store, filter or error? | 5 min | **filter bug, (a)**: found the `%h` vs source-hash mismatch at `report.py:393-460`, wrote the patch this run landed, and confirmed the store holds 212 rows all stamped on this tree |
+| `Landing path for patch` | what `regress.py --check` actually demands, and the timings | 17 min | **the gate is stamp-gated, not corpus-gated**: `scope_of_change()` answers "both" for `PdfToWord.java`, no scoped re-stamp exists, `--stamp` would pass unmeasured today and must not be used. Timed every step above |
+
+The second agent is why this run did not attempt the annotation landing: 56 minutes of soffice against
+a slot already 40 minutes in is a half-measurement, and a half-measurement is what the gate exists to
+refuse.
+
+## Progress
+
+| | |
+|:--|:--|
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt from the LibreOffice comparison | **0** — none |
+| **Fixed - Google, every applicable check** | **42** of the **213** re-measured on this engine - **0** of the 213 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
+| Working on | `content-missing-partly-replaced` - taken from the pending list (19 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `content-missing-partly-replaced` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 11:45 | **lead** | 0/14 | annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an |
+| 11:48 | **lead** | 0/14 | t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and |
+
+## The txt
+
+| | |
+|:--|:--|
+| Measured | **52 min ago** |
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t12_word_invention` - 8 documents |
+
+## Subagents
+
+*None deployed this run.*
+
+## Attempt 2: the biggest text defect in the corpus is one unmapped ligature
+
+With the scoreboard readable, the txt side's worst failure was `t12_word_invention` on 8 documents.
+Recomputing the excess-token multiset independently on all 8 (PyMuPDF page text as the source, not the
+verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine":
+
+| class | tokens | documents |
+|:--|--:|:--|
+| **NOVEL** - no such characters on the page | **258** | 2 |
+| over-counted - the word is on the page, the output repeats it | 34 | 6 |
+| tokenisation - characters present, split or joined differently | 18 | 4 |
+
+The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin. The
+page says "Please fill up in BLOCK letters only"; the output says `Please �ll up in BLOCK letters
+only`, and **the .docx carries 86 of them too** - so this is an engine ligature defect in the renderer
+the user opens, not a `.txt` artifact. The source PDF has zero `U+FFFD`. `t12` under-reports it
+(render=5) because its own tokeniser drops the character, so the check that exists to catch an
+invented word cannot see the one that dominates the document; `t06_encoding` is what fails there.
+
+The fix is in the engine's ligature map, so it moves both fingerprints and needs the same 213-document
+pass the annotation patch needs. Recorded as a lead with the measurement
+(`FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md`), not attempted at 80 minutes in.
+
+## Two agents, in the first ten minutes
+
+| Agent | Sent to find | Took | Result |
+|:--|:--|--:|:--|
+| `Google read failure` | why the Google row reads zero - store, filter or error? | 5 min | **filter bug, (a)**: found the `%h` vs source-hash mismatch at `report.py:393-460`, wrote the patch this run landed, and confirmed the store holds 212 rows all stamped on this tree |
+| `Landing path for patch` | what `regress.py --check` actually demands, and the timings | 17 min | **the gate is stamp-gated, not corpus-gated**: `scope_of_change()` answers "both" for `PdfToWord.java`, no scoped re-stamp exists, `--stamp` would pass unmeasured today and must not be used. Timed every step above |
+
+The second agent is why this run did not attempt the annotation landing: 56 minutes of soffice against
+a slot already 40 minutes in is a half-measurement, and a half-measurement is what the gate exists to
+refuse.
+
+## Progress
+
+| | |
+|:--|:--|
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt from the LibreOffice comparison | **0** — none |
+| **Fixed - Google, every applicable check** | **42** of the **213** re-measured on this engine - **0** of the 213 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
+| Working on | `content-missing-partly-replaced` - taken from the pending list (19 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `content-missing-partly-replaced` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 11:45 | **lead** | 0/14 | annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an |
+| 11:48 | **lead** | 0/14 | t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and |
+
+## The txt
+
+| | |
+|:--|:--|
+| Measured | **52 min ago** |
+| Scored | **213** of 213 |
+| Clean - every applicable check passes | **199** (93.4%) |
+| Failing at least one check | **14** |
+| Moved since the last commit | **none** - nothing changed |
+| Most common failure | `t12_word_invention` - 8 documents |
+
+## Subagents
+
+*None deployed this run.*
+
+## Attempt 2: the biggest text defect in the corpus is one unmapped ligature
+
+With the scoreboard readable, the txt side's worst failure was `t12_word_invention` on 8 documents.
+Recomputing the excess-token multiset independently on all 8 (PyMuPDF page text as the source, not the
+verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine":
+
+| class | tokens | documents |
+|:--|--:|:--|
+| **NOVEL** - no such characters on the page | **258** | 2 |
+| over-counted - the word is on the page, the output repeats it | 34 | 6 |
+| tokenisation - characters present, split or joined differently | 18 | 4 |
+
+The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin. The
+page says "Please fill up in BLOCK letters only"; the output says `Please �ll up in BLOCK letters
+only`, and **the .docx carries 86 of them too** - so this is an engine ligature defect in the renderer
+the user opens, not a `.txt` artifact. The source PDF has zero `U+FFFD`. `t12` under-reports it
+(render=5) because its own tokeniser drops the character, so the check that exists to catch an
+invented word cannot see the one that dominates the document; `t06_encoding` is what fails there.
+
+The fix is in the engine's ligature map, so it moves both fingerprints and needs the same 213-document
+pass the annotation patch needs. Recorded as a lead with the measurement
+(`FINDINGS/NO-FFFD-THE-LIGATURES-ARE-NOT-MAPPED-25NOV.md`), not attempted at 80 minutes in.
+
+## Two agents, in the first ten minutes
+
+| Agent | Sent to find | Took | Result |
+|:--|:--|--:|:--|
+| `Google read failure` | why the Google row reads zero - store, filter or error? | 5 min | **filter bug, (a)**: found the `%h` vs source-hash mismatch at `report.py:393-460`, wrote the patch this run landed, and confirmed the store holds 212 rows all stamped on this tree |
+| `Landing path for patch` | what `regress.py --check` actually demands, and the timings | 17 min | **the gate is stamp-gated, not corpus-gated**: `scope_of_change()` answers "both" for `PdfToWord.java`, no scoped re-stamp exists, `--stamp` would pass unmeasured today and must not be used. Timed every step above |
+
+The second agent is why this run did not attempt the annotation landing: 56 minutes of soffice against
+a slot already 40 minutes in is a half-measurement, and a half-measurement is what the gate exists to
+refuse.
+
+## Progress
+
+| | |
+|:--|:--|
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt from the LibreOffice comparison | **0** — none |
+| **Fixed - Google, every applicable check** | **42** of the **213** re-measured on this engine - **0** of the 213 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
+| Working on | `content-missing-partly-replaced` - taken from the pending list (19 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `content-missing-partly-replaced` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 11:45 | **lead** | 0/14 | annotation /Contents is not body text: the saved patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) is measured on 600 (verify_txt 7/12 -> 8/12, t12 invented words 20 -> 0). Not landed because an |
+| 11:48 | **lead** | 0/14 | t12 root cause, measured independently on all 8 failing docs: 258 of 310 excess tokens are U+FFFD where the page draws fi/ff ligatures, in 041122-Account_Opening_Form (127 in txt, 86 in the .docx) and |
 
 ## The txt
 
@@ -146,9 +760,9 @@ table refuses to hand it over, correctly: **13 pending items are closeable first
 
 | | |
 |:--|:--|
-| Slot window | 10:56 → running · 50 min |
+| Slot window | 10:56 → running · 54 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 31 |
+| Tool beats | 37 |
 | Longest silence | **22.6 min** — from 10:56:47, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -158,10 +772,10 @@ table refuses to hand it over, correctly: **13 pending items are closeable first
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **22 min** | `##########` |
+| measure or build - a conversion, screen or compile writes no beacon | **22 min** | `#########` |
 | record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **24 min** | `##########` |
+| report - the report and the chain | **4 min** | `##` |
+| other - not attributed to a tool | **25 min** | `##########` |
 
 Both agents ran *inside* this turn: `delegate_task` returns in-turn on a scheduled run, so the
 22.6-minute silence is a sub-agent working, not a stall. The two 'other' minutes are the same thing

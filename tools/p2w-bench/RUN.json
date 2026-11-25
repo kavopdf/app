@@ -1,11 +1,15 @@
 {
- "agents": [],
- "attempts": 1,
+ "agents": [
+  "googA-01",
+  "annoB-01"
+ ],
+ "attempts": 2,
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
- "started": "11:45",
- "started_ts": 1795587335.0428274,
- "window_for_claim": 1795587335.0428274
+ "started": "10:56",
+ "started_ts": 1795584406.9799936,
+ "window_for_claim": 1795587335.0428274,
+ "class": "content-missing-partly-replaced"
 }
