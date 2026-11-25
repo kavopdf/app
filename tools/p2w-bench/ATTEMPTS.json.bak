@@ -274,16 +274,9 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 69,
+  "attempts": 70,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-24 07:21",
-    "moved": 0,
-    "outcome": "reverted",
-    "reason": "A2's row declared one rule short is NOT LO-invariant: mobile-bill 104/112 lines moved up to -10.5 pt, electricity-bill 117/125 up to -10.0 pt; ruleTwHere is 10 tw not 15, and LibreOffice lays the decl",
-    "total": 2
-   },
    {
     "at": "2026-11-24 08:18",
     "moved": 0,
@@ -464,12 +457,23 @@
     "outcome": "lead",
     "reason": "census of all 25 solo documents at 981ff1fa35e2cf67: A 11 refused-spacer / B 10 spent-still-failing / C 4 no-spacer; a guard patch reaches only A and the w:before delivery ratio is unmeasured (the one",
     "total": null
+   },
+   {
+    "at": "2026-11-25 20:36",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "",
+    "total": 10
    }
   ],
   "last": null,
   "last_engine": "85b8735f",
   "last_moved": 0,
-  "last_total": 122,
+  "last_total": 10,
   "outcomes": [
    "reverted",
    "reverted",
@@ -539,13 +543,14 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
   "park_reason": "no progress in the last 12 attempts (lead, lead, lead, lead, reverted, lead, lead, reverted, reverted, lead, lead, lead)",
   "parked_at": "24 Nov 03:30",
   "ratchet_at": "23 Nov 04:09",
   "ratchet_docs": 212,
-  "reason": "census of all 25 solo documents at 981ff1fa35e2cf67: A 11 refused-spacer / B 10 spent-still-failing / C 4 no-spacer; a guard patch reaches only A and the w:before delivery ratio is unmeasured (the one measured spend delivered 77%)",
+  "reason": "(no reason recorded for this attempt)",
   "reasons": [
    "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 pt mark, Google does not implement lineRule=exact and buys a fraction of it. Applied it (w:before=spacerTw, w:line=1) and measured bank-statement-5-pages through Drive: GOOGLE 40/47 -> 36/47, WORSE, and 27_text_off_page went 0 -> 12 as the extra space overflowed the page. LibreOffice unchanged at 47/47. The reason it cannot work: the spacer is NOT where the 57 pt comes from. Counted in the emitted docx, bank-statement-5-pages carries 9 spacers totalling 81.0 pt across 5 pages, max 16.2 pt - at most 16 pt per page against a measured uniform upward shift of 56.9-57.1 pt on pages 1-4. Forcing the full gap in therefore adds space the page never had and pushes rows off it.",
    "ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 pt - the paper's top edge), while LibreOffice places it at 56.80. The engine emits exactly that construct: bank-statement-5-pages carries w:before=1103 twips (55.15 pt) on the first paragraph of each page, and the measured Google dy on its pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Same number. The probe also found the construct Google DOES honour at a page top: a 1x1 table row with w:trHeight hRule=exact, 55.83 pt of 55.15 asked, exact in LibreOffice. Ruled out with numbers: the table-spacer paragraph (at most 16.2 pt per page against a 57 pt shift, and moving its gap into w:before took Google 40/47 -> 36/47, LO unchanged - reverted), w:line exact (LO honours it, so it cannot split the two renderers), auto line boxes (face-dependent in both). Next run: emit the page-first gap as a trHeight-exact table row and set that paragraph's w:before to 0. FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md has the probe table.",
@@ -614,7 +619,8 @@
    "signature measured from all 213 Google verdicts: 122 documents fail 18_displacement and ALL 122 have render-source > 0; 108 of them by exactly +1.0 (median 1.0). One construct, not 108 defects; 416_many_tiny_pages at 299 is separate. Discriminator: raw y difference before quantisation on one document decides between a check boundary (abs(d)<1) and a half-unit rounding in the writer. Not landed: both fixes move a fingerprint and the 213-doc re-measure was already queued behind two engine fixes. See FINDINGS/18-DISPLACEMENT-IS-ONE-UNIT-AND-ALWAYS-POSITIVE-25NOV.md",
    "trHeight hRule=exact at DocxWriter:6584 measured on the 30 densest-row documents (1328 of 2278 rows): 0 documents lost words against their own baseline or against the source PDF, 0 added a page, 2 dropped a page toward the source (041122-Account_Opening_Form 10->9, Account_Opening_Form_Fillable_filled 11->10). Patch staged in PATCHES/ROW-HEIGHT-EXACT-25NOV.patch; not applied because the pre-commit gate refuses an engine change while the docx table is stamped on an older engine (9e2b3e4d7869ea86 vs tree 791f7cfb779ff648) and a 213-document re-measure does not fit a slot. Google was not run - the displacement gain is still a Google claim.",
    "census of all 25 solo documents at 981ff1fa35e2cf67: A 11 refused-spacer / B 10 spent-still-failing / C 4 no-spacer; a guard patch reaches only A and the w:before delivery ratio is unmeasured (the one measured spend delivered 77%)",
-   "census of all 25 solo documents at 981ff1fa35e2cf67: A 11 refused-spacer / B 10 spent-still-failing / C 4 no-spacer; a guard patch reaches only A and the w:before delivery ratio is unmeasured (the one measured spend delivered 77%)"
+   "census of all 25 solo documents at 981ff1fa35e2cf67: A 11 refused-spacer / B 10 spent-still-failing / C 4 no-spacer; a guard patch reaches only A and the w:before delivery ratio is unmeasured (the one measured spend delivered 77%)",
+   ""
   ],
   "requeues": 0,
   "status": "PARKED"
@@ -1928,7 +1934,7 @@
   "status": "OPEN"
  },
  "t12_word_invention": {
-  "attempts": 8,
+  "attempts": 9,
   "first_seen": null,
   "history": [
    {
@@ -2006,10 +2012,21 @@
     "outcome": "lead",
     "reason": "annotation /Contents hoist has a second, unguarded door in PdfToWord.pageText(): the annotationRuns loop lacks the drawnByAppearance(apDrawn, ...) guard its sibling form-value loop has. Measured 600_r",
     "total": null
+   },
+   {
+    "at": "2026-11-25 20:19",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "put the visual match in the report, where it will be read"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "annotation /Contents hoist patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) reproduced on one engine: 600 txt 7/8 -> 8/8 PASS, t12 83 chars -> 0, paragraphs 14 -> 12; corpus-changed --record pr",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "e95af1e",
+  "last_engine": "4c4bbc03",
   "last_moved": 5,
   "last_total": 8,
   "outcomes": [
@@ -2020,9 +2037,10 @@
    "lead",
    "kept",
    "kept",
+   "lead",
    "lead"
   ],
-  "reason": "annotation /Contents hoist has a second, unguarded door in PdfToWord.pageText(): the annotationRuns loop lacks the drawnByAppearance(apDrawn, ...) guard its sibling form-value loop has. Measured 600_reviewed_invoice_with_annotations verify_txt t12 invented chars 83 -> 30, paragraphs 14 -> 13, verdict still FAIL; residual 30 chars are the /FreeText comment's own words, so the guard does not reach a /FreeText appearance. Patch moves the engine fingerprint and zeroes no document, so it is saved in tools/p2w-bench/patches/ with its numbers. Finding: FINDINGS/annotation-contents-hoist-guard-25NOV-relay.md",
+  "reason": "annotation /Contents hoist patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) reproduced on one engine: 600 txt 7/8 -> 8/8 PASS, t12 83 chars -> 0, paragraphs 14 -> 12; corpus-changed --record proves 1 of 213 docx moved. NOT LANDED: docx share5 51.68 -> 38.97 because the two hoisted paragraphs sat at the top and removing them reflows the body. Before column is the 13:47 row on engine 9e2b3e4d, so drift is inside that -12.71. See FINDINGS/ANNOTATION-PATCH-FIXES-TXT-BUT-COSTS-DOCX-25NOV-relay.md",
   "reasons": [
    "claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furniture duplication, hyphenation join, symbol decode, dropped glyph fallback) and attack the largest group. No engine change until the census names one.",
    "NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_invoice_with_annotations are the six review ANNOTATIONS, which page.get_text() does not read and the engine does (measured: 'confirmed' absent from get_text(), present in the annotation stream). 12_stamp_across_page_break is duplication across the break - KUNIGAL is drawn once on page 1 and arrives twice - which is t09's question. 311_fir_police_form is cell welding: 60067 and Mobile are two drawn lines in one cell and arrive as '60067Mobile'. 77_arabic_rtl_document is RTL order, 05_round_company_seal_curved_text is single letters from a curve, 39_small_caps_letter_spacing is letter-spaced caps. And THREE OF THE TWELVE ARE THE INSTRUMENT'S OWN ARTIFACT: the PDF text layer carries U+0000 as a zero-width cell separator, _words splits on \\S+ so NUL is not whitespace and glues to the token beside it ('\\x00\\x00\\x00PHOTOGRAPH', 'DisagreeStrongly\\x00disagree', '0.8412,\\x00Adjusted'), and _strip_punct does not strip NUL - so the clean token the writer emitted is counted as invented. Replacing U+0000 with a space on the source side clears 391_survey_questionnaire_grid, 392_statistical_console_output and 406_passport_mrz_page and BREAKS NO DOCUMENT (0 of the 205 passing). Not edited into verify_txt.py: the verifier is the instrument. FINDINGS/t12-is-five-faults-and-three-are-the-instrument-1925.md.",
@@ -2031,7 +2049,8 @@
    "annotationRuns() reads /Contents from every annotation, not only FreeText+Stamp, and the :956 hoist lacks the drawnByAppearance guard its sibling loop at :947 has. Measured on 600: verify_txt 8/12 7 passed FAIL -> 8 passed PASS, t12 20 invented words -> 0, the .txt diff is exactly the note (7 words) + the duplicated FreeText (13). Population proved by an independent 213-PDF scan: ONE document carries annotations. Patch saved as PATCHES/600-annotation-runs-subtype-25NOV.patch and reverted: regress.py --check refuses an unmeasured engine and corpus-slice.py needs 4 slices (55 docs per 250 s) before the measurement can start.",
    "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failing. txt corpus 199 -> 202 of 213.",
    "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failing. txt corpus 199 -> 202 of 213.",
-   "annotation /Contents hoist has a second, unguarded door in PdfToWord.pageText(): the annotationRuns loop lacks the drawnByAppearance(apDrawn, ...) guard its sibling form-value loop has. Measured 600_reviewed_invoice_with_annotations verify_txt t12 invented chars 83 -> 30, paragraphs 14 -> 13, verdict still FAIL; residual 30 chars are the /FreeText comment's own words, so the guard does not reach a /FreeText appearance. Patch moves the engine fingerprint and zeroes no document, so it is saved in tools/p2w-bench/patches/ with its numbers. Finding: FINDINGS/annotation-contents-hoist-guard-25NOV-relay.md"
+   "annotation /Contents hoist has a second, unguarded door in PdfToWord.pageText(): the annotationRuns loop lacks the drawnByAppearance(apDrawn, ...) guard its sibling form-value loop has. Measured 600_reviewed_invoice_with_annotations verify_txt t12 invented chars 83 -> 30, paragraphs 14 -> 13, verdict still FAIL; residual 30 chars are the /FreeText comment's own words, so the guard does not reach a /FreeText appearance. Patch moves the engine fingerprint and zeroes no document, so it is saved in tools/p2w-bench/patches/ with its numbers. Finding: FINDINGS/annotation-contents-hoist-guard-25NOV-relay.md",
+   "annotation /Contents hoist patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) reproduced on one engine: 600 txt 7/8 -> 8/8 PASS, t12 83 chars -> 0, paragraphs 14 -> 12; corpus-changed --record proves 1 of 213 docx moved. NOT LANDED: docx share5 51.68 -> 38.97 because the two hoisted paragraphs sat at the top and removing them reflows the body. Before column is the 13:47 row on engine 9e2b3e4d, so drift is inside that -12.71. See FINDINGS/ANNOTATION-PATCH-FIXES-TXT-BUT-COSTS-DOCX-25NOV-relay.md"
   ],
   "requeues": 0,
   "status": "OPEN"
