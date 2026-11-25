@@ -1,8 +1,6 @@
-
-  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 06:07 → running IST · 35 min**
+**25 Nov 2026 · slot 06:41 → running IST · 2 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -21,8 +19,8 @@
 | Not scored - page count did not match | **22** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `00_page_count` - taken from the pending list (15 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `00_page_count` by hand instead |
+| Working on | `-` - taken from the pending list (15 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## What was tried
 
@@ -34,7 +32,7 @@
 
 | | |
 |:--|:--|
-| Measured | **49 min ago** |
+| Measured | **51 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -52,11 +50,10 @@
 
 | | |
 |:--|:--|
-| Slot window | 06:07 → running · 35 min |
+| Slot window | 06:41 → running · 2 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 11 |
-| Longest silence | **29.8 min** — from 06:09:38, after `lastmessage.py: running a tool for its numbers` |
-| Silences over 2 min | 1 |
+| Tool beats | 7 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -64,9 +61,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **30 min** | `###################` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| other - not attributed to a tool | **3 min** | `##` |
+| record - attempt, handoff, class rows | **0 min** | `########` |
+| report - the report and the chain | **0 min** | `####` |
+| other - not attributed to a tool | **1 min** | `##########` |
 ## Best results this round
 
 | Document | Before | After | Change |
