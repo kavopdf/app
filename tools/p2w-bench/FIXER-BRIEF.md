@@ -53,6 +53,28 @@ a rule. Write it in `FINDINGS/` as a measurement and leave the method alone.**
 appear in `verify_google.py` and `verify_txt.py` because those files ARE the check catalogue, and in tests
 because a test asserts a specific check catches a specific mutation. Neither is a rule about what to work on.
 
+## TWO HABITS THAT DECIDE HOW MUCH A RUN IS WORTH
+
+COMMIT BEFORE YOU MEASURE, AND MEASURE BEFORE YOU BUILD.
+
+**Commit, then record.** `attempt.py` refuses a moved count measured on a dirty tree, because a
+measurement of code that exists only in this sandbox is not a measurement of the repo. It now keeps
+the number as `pending_moved` rather than erasing it, but it does not credit it: the attempt counter
+does not rise and the rotation does not learn. So the order is: build, convert, measure, **commit the
+engine change**, then `attempt.py --moved N --outcome kept`. A run that measures first and commits
+later has done the work and told the ledger nothing.
+
+**One document before the build.** Seven attempts in the ledger ended as `error` with a refuted
+hypothesis - each was correctly abandoned, and each had already spent a whole run. A hypothesis can be
+tested on one document in minutes: convert that document with the proposed change and compare it
+against the PDF. If one document does not move, the patch is wrong and writing it for the class is
+wasted. If it does move, you have the evidence a kept attempt needs and you know the size of the
+effect before spending a run on it.
+
+Neither habit is about being careful for its own sake. Both are about how much of a run survives into
+the next one: a credited attempt and a tested hypothesis are the two things that carry forward.
+
+
 ## THE ONLY THINGS THAT ARE NOT YOURS TO DECIDE
 
 Six, and they are not preferences - each one is a mistake this project has already paid for.
