@@ -471,3 +471,5 @@
 {"_list": "notes", "_entry": {"at": "15:36", "text": "attempt 56 on 18_displacement -> lead"}}
 {"_list": "agents", "_entry": {"angle": "A", "class": "60_text_column_right_edge", "deployed": "18:27", "deployed_at": "2026-11-24T18:27", "expected": "", "finding": "FINDINGS/60_text_column_right_edge-EDGE-IS-THE-FACE-4GOOGLE-1INSTRUMENT-24NOV-agentA.md", "id": "60ed60_text_column_right_edge-01", "landed_at": "2026-11-24T18:40", "question": "is the right edge the engine's or the face's", "status": "landed"}}
 {"_list": "notes", "_entry": {"at": "16:46", "text": "attempt 57 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "18:27", "text": "agent deployed: 60edge / 60_text_column_right_edge - A - is the right edge the engine's or the face's"}}
+{"_list": "notes", "_entry": {"at": "18:27", "text": "agent deployed: pc23 / 00_page_count - B - what is on the extra page of the 23 refusals"}}
