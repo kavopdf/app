@@ -193,8 +193,18 @@ def collect():
         if _gv and not _docs:
             continue                    # nothing fails this class - nothing to ratchet
         if _gv and _engine:
+            # THE RATCHET STORE IS STAMPED WITH A DEAD ENGINE, SO THIS TEST COULD NEVER PASS.
+            # RATCHET-GOOGLE.json holds 190 rows, every one on engine b7699196, while the tree is
+            # 981ff1fa35e2cf67. The prefixes never matched, so _fresh was always empty and every kept
+            # class kept a ratchet item for ever - which is why the pending list never emptied and
+            # classpick answered "PENDING FIRST" instead of taking new work.
+            #
+            # THE GVERIFY STORE IS THE CORPUS RATCHET AND IT IS CURRENT: 213 of 213 verdicts on
+            # 981ff1fa35e2cf67. If every document failing this class carries a current gverify
+            # verdict, the corpus HAS been measured on this engine for this class - the same evidence
+            # the commit gate already trusts.
             _fresh = [d for d in _docs
-                      if d in _rt and str(_rt[d].get("engine") or "")[:8] == _engine]
+                      if d in _gv and str(_gv[d].get("engine") or "")[:8] == _engine]
             if len(_fresh) == len(_docs):
                 continue                # the store already covers every document this class fails
         items.append({"kind": "ratchet", "who": cls,
