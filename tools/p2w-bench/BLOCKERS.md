@@ -851,3 +851,33 @@ left as it read at the start of the pass, not rewritten.
 
 
 **The pipeline is moving, and the one decision this pass made is a park, not a pause.** `txt failing` fell 14 -> 9 and Google clean rose 35 -> 42, so the half that can still move is moving; `fix` reads moving at 3 attempt(s) in 3 h and no stage reads stopped. No cron was touched - this run has no cron tool to touch one with - nothing was left paused, and no past row of PROGRESS.md was edited: the row rewritten is today's, from the live tables, and it names what it used to say. The park is the only state change: one class, with the ledger that justified it written next to it in ROTATION.json, and the condition that puts it back written in the row above.
+
+---
+
+## 2026-11-26 00:03 IST — watchdog: nothing stopped, the fixer is live, and the flat column is the proxy
+
+**The evidence this pass.** health.py and health.py --stalled both exit 0: nothing is stopped.
+measure-google done, 213 of 213, 12.1 h. matrix done, 213 of 213, 44.3 h. classify superseded, 3.4 h.
+fix moving, 3 attempt(s) in 3 h, 0.5 h. txt moving, 204 clean and 9 failing, 0.4 h.
+
+progress.py: today's row was already committed by the 21:10 pass, so nothing was appended and there is
+no new row to commit. Against 24 Nov it reads docx open 59 to 59, txt failing 14 to 9, google 190 to 213,
+google clean 35 to 42.
+
+round.py --phase: fix. STEP 4 C does not apply - its own guard refuses while the phase is not done.
+
+**STEP 4 D was tested and not applied.** status.py reads the fixer WORKING: fresh claim and beacon,
+2 attempt(s), 4.1 attempts per hour, and the two newest commits on main are fixer claims. A live run
+holds the slot, so round.py --release-fixer --force would have put a second run into the engine beside
+it. What would overturn this: status.py reading SILENT past the stale limit with no beacon.
+
+**The flat column, with the fixer's attempt count beside it.** docx open has read 59 again while the
+fixer made 3 attempt(s) in the last 3 h. That column is the soffice proxy; share@5px is settled as not a
+cross-renderer measure, and google clean rose 35 to 42 over the same rows. STEP 5 does not fire - its own
+overturning test, more rows with google clean also flat, is not met.
+
+**No cron tool in this pass.** STEP 3 and STEP 4 A and B did not run and nothing here claims they did.
+This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. The calls it
+would have made and did not: cron with action list; cron with action runs and the cron id from
+HEALTH-BRIEF's table for any stopped stage; then pause and resume in the same pass for a stale
+next_fire_at, never leaving one paused.

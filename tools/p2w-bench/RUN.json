@@ -2,14 +2,12 @@
  "agents": [
   "18_dA-02"
  ],
- "attempts": 1,
- "class": "18_displacement",
+ "attempts": 3,
  "docs_improved": 0,
- "ended": null,
- "ended_ts": null,
+ "ended": "23:44",
+ "ended_ts": 1795630478.117912,
  "kept": 0,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "23:56",
- "started_ts": 1795631207.921986
+ "started": "23:37",
+ "started_ts": 1795630062.7240088,
+ "window_for_claim": 1795630062.7240088
 }
