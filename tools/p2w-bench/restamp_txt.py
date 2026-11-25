@@ -64,6 +64,25 @@ def verifier():
     return m
 
 
+def verifier_hash():
+    """The identity of the thing that produced a score.
+
+    A ROW SCORED BY AN OLDER verify_txt.py IS NOT A SCORE OF THIS ONE. done() reused every row in
+    RESTAMP-TXT.jsonl, so a verifier fix changed nothing: on 25 Nov the t02 ruler was corrected and
+    two documents went FAIL to PASS, and this tool still reported 202 clean because the 213 rows it
+    reused had been written before the fix.
+
+    Same discipline as .stamp for the engine: the score carries the identity of its producer, and a
+    row whose producer has changed is re-scored rather than trusted.
+    """
+    import hashlib
+    try:
+        with open(os.path.join(HERE, "verify_txt.py"), "rb") as fh:
+            return hashlib.sha256(fh.read()).hexdigest()[:16]
+    except Exception:
+        return ""
+
+
 def done():
     """{document: row} for everything already scored by this run."""
     out = {}
@@ -78,6 +97,8 @@ def done():
         except Exception:
             continue
         out[r["document"]] = r
+        if (r.get("verifier") or "") != verifier_hash():
+            continue    # scored by a different verify_txt.py - re-score it
     return out
 
 
@@ -167,6 +188,7 @@ def run(budget):
             failed = sorted(k for k, (s, g, ok, a) in c.items() if a and not ok)
             _st = os.stat(txt)
             rec = {"document": d,
+                 "verifier": verifier_hash(),
                    "applicable": sum(1 for k, (s, g, ok, a) in c.items() if a),
                    "passed": sum(1 for k, (s, g, ok, a) in c.items() if a and ok),
                    "failed": len(failed),
