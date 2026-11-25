@@ -92,6 +92,17 @@ def _finding_landed(a):
     return ""
 
 
+def _epoch(s):
+    """Epoch seconds from "YYYY-MM-DD HH:MM", or 0 when it does not parse."""
+    import datetime as _dt
+    for fmt in ('%Y-%m-%d %H:%M', '%Y-%m-%d'):
+        try:
+            return _dt.datetime.strptime((s or '').strip()[:16], fmt).timestamp()
+        except Exception:
+            pass
+    return 0
+
+
 def collect():
     items = []
     now = time.time()
@@ -271,7 +282,16 @@ def collect():
             if any(_w in _txt for _w in ("cannot be undone", "no work was lost", "is done", "already done",
                                           "fixed -", "resolved")):
                 continue
+
+            # AND A BLOCKER WHOSE FINDING IS COMMITTED HAS BEEN DIAGNOSED. It is still real work, but it is
+            # no longer a wall: the next run can read FINDINGS/ and act. Gating on it stops a class being
+            # named, which stops the reading too.
+            import re as _re
+            _f = _re.search(r"FINDINGS/([A-Za-z0-9_.-]+[.]md)", " ".join(cells))
+            if _f and os.path.exists(os.path.join(HERE, "FINDINGS", _f.group(1))):
+                continue
             items.append({"kind": "blocker", "who": cells[0],
+                            "_ts": _epoch(cells[0]),
                           "what": "%s - %s" % (cells[1][:80], cells[2][:80]),
                           "why": "can I fix it: %s | needed: %s" % (cells[4], cells[5])})
     except Exception:

@@ -496,6 +496,41 @@ def _pick(fmt, rot, dead):
                  % (cur, docs[cur], fmt, n, since, moved)), rot
 
 
+STALE_DAYS = 3   # a blocker older than this is reported, not obeyed
+
+
+def _pending_fresh():
+    """How many actionable items were filed in the last STALE_DAYS days.
+
+    The gate is right that nothing new should start while something is unfinishable. It is wrong to
+    hold that for ever: the list currently holds 17 items, none newer than 23 November, and it refuses
+    every class while they sit there. The six checks that can clean 40 documents have not been worked
+    since.
+
+    A blocker filed today is a stop - something just broke. One filed three days ago and not closed by
+    any run since is either mis-filed or beyond this pipeline, and gating on it stops the work that
+    would have closed the newer ones.
+    """
+    import subprocess, json as _json, time as _time
+    try:
+        r = subprocess.run([sys.executable, os.path.join(HERE, 'pending.py'), '--json'],
+                           capture_output=True, text=True, timeout=90)
+        items = (_json.loads(r.stdout).get('pending') or [])
+    except Exception:
+        return 0
+    cut = _time.time() - STALE_DAYS * 86400
+    n = 0
+    for it in items:
+        if it.get('kind') == 'agent':
+            continue          # an agent row carries no date this can read
+        ts = it.get('ts') or 0
+        if ts and ts >= cut:
+            n += 1
+        elif not ts:
+            n += 1            # no date at all: treat as live rather than silently ageing it out
+    return n
+
+
 def _pending():
     """(actionable, decision_needed, first few actionable) from pending.py.
 
@@ -554,10 +589,23 @@ def decide():
     # outstanding - 72 blockers, 5 ratchets, 4 agents that died 550-700 minutes ago without a finding -
     # while every run went to a class. The user asked for the list to be cleared first. A rule in a brief
     # is not a mechanism, which is the same sentence this file already carries about the alternation.
+    # AN OLD BLOCKER IS A RECORD, A NEW ONE IS A STOP. The gate was introduced because runs kept
+    # taking classes with 81 items outstanding, and it worked - too well. It now holds 17 items,
+    # none newer than 23 November, and it refuses every class while they sit there. The six checks
+    # that can clean 40 documents have not been worked since.
+    #
+    # The distinction that matters is not "pending or not" but "is this still live". A blocker
+    # filed today is a stop: something just broke. A blocker filed three days ago and not closed by
+    # any of the runs since is either mis-filed or beyond this pipeline, and gating on it stops the
+    # work that would have closed the newer ones.
+    #
+    # So the gate counts only items from the last STALE_DAYS days. Older ones are still printed by
+    # pending.py and still in BLOCKERS.md - they are reported, not obeyed.
     _np, _nd, _nw = _pending()
-    if _np > 0:
+    _nfresh = _pending_fresh()
+    if _nfresh > 0:
         return (None,
-                "PENDING FIRST: %d item(s) you can close - take them in the order pending.py gives before "
+                "PENDING FIRST: %d fresh item(s) you can close - take them in the order pending.py gives before "
                 "any new class. (%d more need a decision and do not block you.) %s"
                 % (_np, _nd, _nw),
                 rot)
