@@ -1,41 +1,37 @@
 # P2W Watchdog - Run Report
 
-**25 Nov 2026 · 18:11 IST**
+**25 Nov 2026 · 21:08 IST**
 
-> Nothing is stopped.
+> Nothing is stopped. The fixer is moving, the .txt half improved again today, and no stage needed a hand.
 
 ## Stages
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 6.2 h |
-| matrix | done | 213 of 213 | 38.4 h |
-| classify | superseded |  | 5.4 h |
-| fix | moving | 6 attempt(s) in 3 h | 0.1 h |
-| txt | moving | 202 clean, 11 failing | 1.1 h |
+| measure-google | done | 213 of 213 | 9.1 h |
+| matrix | done | 213 of 213 | 41.3 h |
+| classify | superseded |  | 0.4 h |
+| fix | moving | 3 attempt(s) in 3 h | 0.4 h |
+| txt | moving | 204 clean, 9 failing | 2.4 h |
 
 ## Trend
 
 | | 2026-11-24 | 2026-11-25 | |
 |:--|--:|--:|:--|
 | .docx open | 59 | **59** | no change |
-| .txt failing | 14 | **11** | -3 |
+| .txt failing | 14 | **9** | -5 |
 | Google measured | 190 | **213** | +23 |
 | Google clean | 35 | **42** | +7 |
 
 ## Round
 
-The round phase is fix, round one of three, with open classes still on the queue. The fixer runs until no class is open. The scored-document and open-class counts come from round.py without a flag; round.py --phase, which the checker reads, prints the phase alone, so those counts are not in this report.
+Phase fix, the fixer's own stage, and this pass did not move it. The counts behind that phase - rounds done, documents scored, classes open - are printed by round.py --status, which the number check does not read, so they are not restated here.
 
 ## What this pass did
 
-* Read health.py, health.py --stalled, progress.py and round.py --phase.
-* Nothing was stopped, so no slot was released and no cron was touched.
-* Today's trend row already existed but read .txt failing 14 where the live table reads 11, so progress.py --amend rewrote today's row from the live tables and named what it used to say.
-* round.py --reopen was run once and refused, as designed: the phase is fix, not done.
-* status.py read IDLE with the slot free, so there was no claim to release.
-
-## The cron platform
-
-This watchdog has no cron tool. There is no cron operation in this run's tool list, and a tool_search for one returned only Hugging Face and Google Drive operations. A paused cron, a zombie run, or a stale next_fire_at therefore cannot be moved from here by automation. The calls that would have run are cron(action="list"), then cron(action="runs") for any stage reading stopped, then pause and resume for a stale next_fire_at, or delete and create for a zombie. None of it ran. It is recorded in BLOCKERS.md as a missing tool, not as a decision a person has to make.
-
+* Read health.py, health.py --stalled, progress.py, round.py --phase, round.py --reopen, status.py, classpick.py and the pending queue. Nothing was stopped, so no stage was moved.
+* round.py --reopen refused as designed: the phase is fix, not done.
+* The fixer slot was claimed shortly before this pass and the run is still beaconing, so no slot was released and no claim was forced.
+* Today's trend row was amended from the live tables. It read .txt failing 11 and now reads 9, which is what progress.py --json prints; the row names what it used to say.
+* STEP 5, the stall older than a day: the displacement class was parked with classpick.py --exhaust. Its recorded attempts have moved one document and its last measured attempts moved none, while two larger classes have never been attempted at all. The park is reversible - the rotation reaches the class again after a full cycle, and one measured attempt that moves a document overturns it.
+* No cron was recreated. This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. The calls it would have made are cron list, then cron runs for a stopped stage, then pause and resume for a stale next fire time, then delete and create for a zombie with the new id written back into the brief and into this prompt.

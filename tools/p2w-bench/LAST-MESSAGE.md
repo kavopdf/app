@@ -1,7 +1,9 @@
+# Fixer report - 2026-11-25 20:56
 
+```
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 20:02 → 20:43 IST · 41 min**
+**25 Nov 2026 · slot 20:56 → running IST · 1h 07m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -13,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3 |
-| Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1 |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -30,84 +32,92 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 20:36 | **lead** | 0/10 | `18_displacement` rank 1 - the census's top mechanism - falsified in Google on the worst document in the class. |
+| 22:01 | **lead** | 0/None | cell carry-on guard clears t12 on 2 txt documents but costs 2-3 real characters on itr-computation-with-slab-table and mutual-fund-statement; reverted, see FINDINGS/25NOV-CELL-CARRY-GUARD-t12-vs-conte |
 
 ## The measurement, and what it killed
 
-`FINDINGS/18-displacement-B-GROUP-CENSUS-25NOV-relay.md` ranks "Google lays a table row's pitch on whole
-0.75 pt pixels while the engine declares twips" first, worth 54.8 clean documents. I tested it on
-`320_balance_sheet_statutory`, the group-B document with the largest recorded ramp.
+`t12_word_invention` fails 3 documents. Two are the same form, and the surplus is one `Y`: the
+carry-on rule at `PdfToWord.java:7904-7908` pulls a glyph into the previous cell within
+`max(9 pt, 1.1 x size)` of the previous glyph **without checking the glyph still belongs to the
+table**. On `041122-Account_Opening_Form` the phrase `(Authorised signatory)` starts at x=153.46 and
+the table's right edge is x=145.0, so it welds onto the last cell as `(Authorised signatory)Y`.
 
-**The change.** `DocxWriter.table()` writes rows `<w:trHeight w:val="H" w:hRule="atLeast"/>` at the
-page's own pitch. I rounded the row's border box (`H` + the drawn rule) up to a whole multiple of 15
-twips and declared `H = snapped - rule`. Ceiling only, behind one constant.
+**The change.** One clause on that condition: the glyph must still start inside the cell it is carried
+into. A second variant narrowed it to the table's right edge instead of the cell's.
 
-**The declaration moved, verified from the .docx and not from the tool.** `w:trHeight` went 280 -> 292
-twips on 16 rows, 260 -> 262 on 5; with the rule charged that is a 300-twip box, **15.00 pt**, which is
-exactly the pitch the census recorded Google laying on this document.
+**Scope, from bytes and not from a guess.** `corpus-changed.py --record` / `--list` after converting
+all 213 with the patched engine: **4 documents' `.docx` bytes moved** — the two forms,
+`itr-computation-with-slab-table` and `mutual-fund-statement`. The other 209 are byte-identical, so
+their scores cannot have moved.
 
-**Google did not move.**
+**txt — it worked.** `txt_rank.py --all`, 213 scored against the committed table: t12 failures
+**3 -> 1**, documents better **2**, documents worse **0**. Both forms went `t06 t09 t12` -> `t06 t09`.
 
-| `320_balance_sheet_statutory` | passed | `18_displacement` | `med_dy` | `worst_dy` |
-|:--|--:|:--|--:|--:|
-| before | 41/42 | FAIL | **+8.2** | **19.4** |
-| after (box on the 0.75 pt grid) | 41/42 | FAIL | **+8.2** | **18.7** |
+**docx — it did not survive.** `measure_doc` on the four changed documents against their committed
+`RANKING.csv` rows:
 
-Both sides are Google's own layout of the same .docx: upload -> copy as a Google Doc -> export PDF ->
-`verify_google.py`. 73 runs matched on both. `med_dy` is unchanged to the tenth of a point; `worst_dy`
-moves by one snap on one row.
+| document | share@5px | chars_missing | order_share |
+|:--|:--|:--|:--|
+| `041122-Account_Opening_Form` | 98.65 -> 98.65 | 127 -> 127 | 79.11 -> 79.11 |
+| `Account_Opening_Form_Fillable_filled` | 97.62 -> 97.62 | 131 -> 131 | 78.94 -> 78.94 |
+| `itr-computation-with-slab-table` | **42.33 -> 43.01** | **0 -> 2** | 95.50 -> 95.50 |
+| `mutual-fund-statement` | 0.21 -> 0.21 | **0 -> 3** | **99.49 -> 99.36** |
 
-**Why it failed, and what is left.** `hRule="atLeast"` is a floor. Google lays
-`max(trHeight, cell content + rule)`, and the cell content already exceeds the declaration, so raising
-it is absorbed. The pitch Google uses comes from the cell's own lines - the census's **rank 2**, which
-it could not separate from rank 1 on ten points. That is now the only live candidate, and the
-discriminating probe is in the finding: a cell whose declared `w:line` is already a whole multiple of
-15 twips. If Google still drifts, `w:lineRule` is not honoured on import and the lever is not a number.
+The two forms are visually untouched - the invented `Y` was never printed by the source, so removing
+it moves no ink. The other two lose 2 and 3 real characters from a baseline of `chars_missing = 0`.
+**That is a document getting worse, so the change does not land.** Reverted; `git diff app/` is empty.
 
-This satisfies the census's own stated falsifier for rank 1, which said a document whose row box is
-already on the grid and which still ramps would mean the pitch is not the lever. That document now
-exists. The patch is reverted, not left in the tree: it moves nothing in Google and adds up to 0.7 pt a
-row in LibreOffice, which is regression risk for no gain.
+**Why the narrowing did not save it.** Restricting the guard to the *table's* right edge instead of the
+cell's measured **identical numbers on the same four documents** - the characters lost on `itr` and
+`mutual-fund` are also carried from beyond the table edge. The carry-out-of-table behaviour is
+load-bearing for those two and is not separable from the t12 fix by geometry alone. The next
+discriminator is the glyph's own line, not its position: print the glyph that changes cell with its
+`(x, y, size, text)` and the text already in the destination cell, for all four documents.
 
-## Next run
+**`600_reviewed_invoice_with_annotations` is not fixed by this and must not be yet.** Its 83 invented
+characters are the annotation `/Contents` hoist at `PdfToWord.java:956-961`; filtering `annotationRuns`
+through the dead `annotationContentsOf` (`:2475`, no call site) clears them, and that was measured.
+It was **rejected here** because the comment at `:2352-2356` records that `50_annotation_text` - a
+Google check - asks for that `/Contents` string exactly, and suppressing the hoist deletes the only
+copy of `Approved`. The txt check and the Google check disagree about the same string. That is a
+conflict to measure in Google, not a patch to land.
 
-Do not re-derive the row snap. Read
-`FINDINGS/18-displacement-ROW-SNAP-FALSIFIED-25NOV-fixer.md`, then probe `w:lineRule="exact"` on a
-single cell before touching the class again. `18_displacement` is still worth 54.8 documents and is
-still the class to take - but rank 1 is spent.
-
-## Subagents
-
-One, on the engine code: it produced the patch specification and corrected the site (group B goes
-through `table()`, not `columnPage()`), which is why the experiment was one compile and one conversion
-rather than an hour of guessing.
-
-## Honest limits
-
-The corpus was mid-build when the slot ended (169 of 213 converted on the old engine, then 213 to go
-again on the patched one), so `regress.py --check` was never run on the patched tree - it was not needed,
-because the patch is reverted and the tree carries no engine change. Nothing is committed to `app/`.
-
-## The txt
+**Nothing was committed to `app/`.** Full detail, both patches verbatim, and the next probe in
+`FINDINGS/25NOV-CELL-CARRY-GUARD-t12-vs-content-2005.md`.## The txt
 
 | | |
 |:--|:--|
-| Measured | **47 min ago** |
+| Measured | **1 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **204** (95.8%) |
 | Failing at least one check | **9** |
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 3 documents |
 
+## Subagents
+
+Two, both on the engine code and both before the first attempt.
+
+- One produced the patch specification for this change: the exact `<w:trHeight>` emitters
+  (`DocxWriter.java:2280-2282`, `:6582-6585`) and the finding that **`w:lineRule` is already `exact`
+  at all 14 sites** - so the 18_displacement row-snap hypothesis from the last run has no `atLeast`
+  to raise on the line axis either, and the only arm that can move a row is a cell `w:line` at 285
+  twips (19 x 15), not the literal 15. That is the next run's probe and it is now a number, not a guess.
+- One root-caused the three `t12` documents: the check is a character multiset difference
+  (`verify_txt.py:1441-1452`), the forms are the carry-on weld above, and the invoice is the
+  annotation hoist. It built and measured both patches on the affected documents, which is why this
+  run measured four documents instead of guessing at 213.
+
+
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 20:02 → 20:43 · 41 min |
+| Slot window | 20:56 → running · 1h 07m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 35 |
-| Longest silence | **14.6 min** — from 20:02:51, after `pod-prep: warm pod, installing hook` |
-| Silences over 2 min | 4 |
+| Tool beats | 28 |
+| Longest silence | **27.3 min** — from 21:01:38, after `warm pod confirmed, installing gate` |
+| Silences over 2 min | 10 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -115,11 +125,12 @@ because the patch is reverted and the tree carries no engine change. Nothing is 
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **2 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **28 min** | `###############` |
-| record - attempt, handoff, class rows | **4 min** | `###` |
-| report - the report and the chain | **4 min** | `##` |
-| other - not attributed to a tool | **2 min** | `#` |
+| build - compiling the engine | **0 min** | `#` |
+| fix - diagnose and change the engine | **3 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **32 min** | `###########` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **28 min** | `#########` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -132,7 +143,13 @@ because the patch is reverted and the tree carries no engine change. Nothing is 
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 9 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 9 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 10 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 10 item(s) you can close - run pending.py and take them in its order before the class below. classpick --leverage picks the class; six checks can make a document clean (18_displacement 25, 60_text_column_right_edge 6, 47_margins 3, 59_shape_anchor 3, 32_stroke_lines 2, 17_matched_runs 1) and they are weighted 3x over the 34 that cannot. Read pending.py first, then take the class it gives.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 10 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 10 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 9 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 10 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 10 item(s) you can close - run pending.py and take them in its order before the class below. classpick --leverage picks the class; six checks can make a document clean (18_displacement 25, 60_text_column_right_edge 6, 47_margins 3, 59_shape_anchor 3, 32_stroke_lines 2, 17_matched_runs 1) and they are weighted 3x over the 34 that cannot. Read pending.py first, then take the class it gives.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+```
+
+Written by report.py from committed files only. Every number above is read from
+ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
+and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
