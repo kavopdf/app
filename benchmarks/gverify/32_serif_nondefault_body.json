@@ -2,8 +2,17 @@
  "name": "32_serif_nondefault_body",
  "status": "ok",
  "rc": 0,
+ "at": "2026-11-25T03:13:16",
  "passed": 42,
  "total": 42,
  "failed": [],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 1.3,
+  "worst_dy": 2.2,
+  "med_dx": -0.1,
+  "bad_pages": [],
+  "runs_matched": 20
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

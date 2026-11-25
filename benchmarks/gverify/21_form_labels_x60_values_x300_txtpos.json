@@ -2,11 +2,20 @@
  "name": "21_form_labels_x60_values_x300_txtpos",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T03:14:58",
  "passed": 40,
  "total": 42,
  "failed": [
   "43_within_10pt_x",
   "47_margins"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 1.8,
+  "worst_dy": 3.2,
+  "med_dx": -0.4,
+  "bad_pages": [],
+  "runs_matched": 66
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

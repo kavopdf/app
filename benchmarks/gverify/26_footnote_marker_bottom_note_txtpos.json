@@ -2,8 +2,17 @@
  "name": "26_footnote_marker_bottom_note_txtpos",
  "status": "ok",
  "rc": 0,
+ "at": "2026-11-25T03:14:08",
  "passed": 42,
  "total": 42,
  "failed": [],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 0.4,
+  "worst_dy": 0.7,
+  "med_dx": -0.1,
+  "bad_pages": [],
+  "runs_matched": 23
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

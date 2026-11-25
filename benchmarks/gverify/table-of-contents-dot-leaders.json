@@ -2,12 +2,10 @@
  "name": "table-of-contents-dot-leaders",
  "status": "ok",
  "rc": 1,
- "passed": 38,
+ "at": "2026-11-25T03:13:26",
+ "passed": 41,
  "total": 42,
  "failed": [
-  "04_chars_missing",
-  "44_header_footer",
-  "45_char_accuracy",
   "47_margins"
  ],
  "displacement": {
@@ -15,7 +13,8 @@
   "worst_dy": 1.9,
   "med_dx": -0.7,
   "bad_pages": [],
-  "runs_matched": 74
+  "runs_matched": 76
  },
- "engine": "b7699196"
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

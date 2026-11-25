@@ -2,6 +2,7 @@
  "name": "09_stamp_font_not_embedded",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T03:14:21",
  "passed": 38,
  "total": 42,
  "failed": [
@@ -10,5 +11,13 @@
   "35_rotation",
   "59_shape_anchor"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 1.1,
+  "worst_dy": 3.4,
+  "med_dx": -0.1,
+  "bad_pages": [],
+  "runs_matched": 21
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

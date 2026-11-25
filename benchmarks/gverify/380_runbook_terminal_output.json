@@ -2,10 +2,10 @@
  "name": "380_runbook_terminal_output",
  "status": "ok",
  "rc": 1,
- "passed": 40,
+ "at": "2026-11-25T03:13:22",
+ "passed": 41,
  "total": 42,
  "failed": [
-  "25_invisible_text",
   "47_margins"
  ],
  "displacement": {
@@ -15,5 +15,6 @@
   "bad_pages": [],
   "runs_matched": 20
  },
- "engine": "b7699196"
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

@@ -2,10 +2,10 @@
  "name": "39_small_caps_letter_spacing",
  "status": "ok",
  "rc": 1,
- "passed": 38,
+ "at": "2026-11-25T03:14:55",
+ "passed": 39,
  "total": 42,
  "failed": [
-  "25_invisible_text",
   "26_text_overlap",
   "43_within_10pt_x",
   "47_margins"
@@ -17,5 +17,6 @@
   "bad_pages": [],
   "runs_matched": 74
  },
- "engine": "b7699196"
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

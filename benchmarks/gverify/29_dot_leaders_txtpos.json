@@ -2,8 +2,17 @@
  "name": "29_dot_leaders_txtpos",
  "status": "ok",
  "rc": 0,
+ "at": "2026-11-25T03:14:01",
  "passed": 42,
  "total": 42,
  "failed": [],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 1.1,
+  "worst_dy": 2.9,
+  "med_dx": -0.3,
+  "bad_pages": [],
+  "runs_matched": 52
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

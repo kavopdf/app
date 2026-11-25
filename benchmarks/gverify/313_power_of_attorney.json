@@ -2,10 +2,19 @@
  "name": "313_power_of_attorney",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T03:12:37",
  "passed": 41,
  "total": 42,
  "failed": [
   "60_text_column_right_edge"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": -0.2,
+  "worst_dy": 1.7,
+  "med_dx": -0.1,
+  "bad_pages": [],
+  "runs_matched": 30
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

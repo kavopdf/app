@@ -2,15 +2,22 @@
  "name": "28_value_overflows_cell_txtpos",
  "status": "ok",
  "rc": 1,
- "passed": 36,
+ "at": "2026-11-25T03:15:04",
+ "passed": 38,
  "total": 42,
  "failed": [
-  "04_chars_missing",
   "43_within_10pt_x",
-  "45_char_accuracy",
   "47_margins",
   "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 1.6,
+  "worst_dy": 2.3,
+  "med_dx": -0.1,
+  "bad_pages": [],
+  "runs_matched": 45
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

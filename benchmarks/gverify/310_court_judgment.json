@@ -2,6 +2,7 @@
  "name": "310_court_judgment",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T03:12:42",
  "passed": 39,
  "total": 42,
  "failed": [
@@ -9,5 +10,13 @@
   "47_margins",
   "60_text_column_right_edge"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": -0.6,
+  "worst_dy": 1.5,
+  "med_dx": -0.1,
+  "bad_pages": [],
+  "runs_matched": 28
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

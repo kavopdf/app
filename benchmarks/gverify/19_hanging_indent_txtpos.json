@@ -2,8 +2,17 @@
  "name": "19_hanging_indent_txtpos",
  "status": "ok",
  "rc": 0,
+ "at": "2026-11-25T03:13:29",
  "passed": 42,
  "total": 42,
  "failed": [],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 0.6,
+  "worst_dy": 1.1,
+  "med_dx": -0.1,
+  "bad_pages": [],
+  "runs_matched": 24
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

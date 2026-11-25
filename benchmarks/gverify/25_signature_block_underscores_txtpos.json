@@ -2,6 +2,7 @@
  "name": "25_signature_block_underscores_txtpos",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T03:14:35",
  "passed": 38,
  "total": 42,
  "failed": [
@@ -10,5 +11,15 @@
   "45_char_accuracy",
   "60_text_column_right_edge"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 0.2,
+  "worst_dy": 47.3,
+  "med_dx": -0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 37
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

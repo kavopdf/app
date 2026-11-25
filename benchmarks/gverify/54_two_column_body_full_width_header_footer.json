@@ -1,22 +1,18 @@
 {
  "name": "54_two_column_body_full_width_header_footer",
  "status": "ok",
- "rc": 1,
- "passed": 37,
+ "rc": 0,
+ "at": "2026-11-25T03:14:38",
+ "passed": 42,
  "total": 42,
- "failed": [
-  "04_chars_missing",
-  "13_text_colours",
-  "25_invisible_text",
-  "44_header_footer",
-  "45_char_accuracy"
- ],
+ "failed": [],
  "displacement": {
   "med_dy": 0.3,
-  "worst_dy": 0.3,
+  "worst_dy": 0.8,
   "med_dx": -0.1,
   "bad_pages": [],
-  "runs_matched": 27
+  "runs_matched": 29
  },
- "engine": "b7699196"
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }

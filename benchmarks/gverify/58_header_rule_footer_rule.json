@@ -2,6 +2,7 @@
  "name": "58_header_rule_footer_rule",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T03:13:06",
  "passed": 38,
  "total": 42,
  "failed": [
@@ -19,5 +20,6 @@
   ],
   "runs_matched": 19
  },
- "engine": "b7699196"
+ "engine": "85b8735f",
+ "checks": "374204-1795575505"
 }
