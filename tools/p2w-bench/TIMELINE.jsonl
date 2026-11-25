@@ -6541,3 +6541,9 @@
 {"t": 1795636543.902585, "ist": "01:25:43", "ev": "beat", "d": "gaps.py: reading the timeline"}
 {"t": 1795637717.4272032, "ist": "01:45:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795637753.5120497, "ist": "01:45:53", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795637757.4248204, "ist": "01:45:57", "ev": "attempt", "d": "59_shape_anchor -> lead"}
+{"t": 1795637757.6824555, "ist": "01:45:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795637757.8240921, "ist": "01:45:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795637758.6434727, "ist": "01:45:58", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795637793.081541, "ist": "01:46:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795637848.1686647, "ist": "01:47:28", "ev": "beat", "d": "attempt.py: recording an attempt"}

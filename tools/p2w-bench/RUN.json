@@ -1,7 +1,7 @@
 {
  "agents": [],
- "attempts": 1,
- "class": "",
+ "attempts": 3,
+ "class": "59_shape_anchor",
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
