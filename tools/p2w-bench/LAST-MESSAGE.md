@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 09:13 → running IST · 44 min**
+**25 Nov 2026 · slot 09:13 → running IST · 47 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -20,9 +20,12 @@ today as the stale ones while the 105 stale results stayed invisible.
 | `health.py` measure-google | `done 213 of 213` | `moving 82 of 213` |
 | `health.py` matrix | `done 213 of 82` | `done 213 of 213` |
 | `pending.py` docx table | `86 document(s) still carry a verdict from an older engine: 09_stamp_font_not_embedded, ...` | `105 document(s) ...: 11_stamp_with_signature_image, ...` |
+| `pending.py` .txt table | no row at all (mtime 0.8 h on a fresh clone) | `RANKING-TXT.csv is 24.2 h old` - the same 24.2 h `health.py` reports |
 
 The `matrix` row was a second bug the first exposed: its denominator was the Google count, so as soon as
 that count became engine-aware the line printed a fraction greater than one. The `pending.py` row was
+The `.txt` row is the third of the same kind: `pending.py` read the table's **mtime**, and a checkout stamps every file with the time it was copied, so on a fresh clone the check could never fire while `health.py` - which asks git - reported the table 24.2 h old. It now takes the later of mtime and the last commit. **The pending count went UP, 12 -> 13, and that is the point**: surfacing real work is not the same as creating it.
+
 checked against an **independent census** - count the engine stamps in `benchmarks/gverify/*.json` with a
 separate script, and against `gverify._engine_now()` - before and after the edit, not through the tool
 being edited.
@@ -83,7 +86,7 @@ before/after measure - the next run's first hour, not this one's last twenty min
 | Not scored - page count did not match | **22** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (12 still open), not a new class |
+| Working on | `-` - taken from the pending list (13 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## What was tried
@@ -97,7 +100,7 @@ before/after measure - the next run's first hour, not this one's last twenty min
 
 | | |
 |:--|:--|
-| Measured | **44 min ago** |
+| Measured | **47 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -128,9 +131,9 @@ recorded one attempt (64, the `18_displacement` lead). Nothing is zeroed and not
 
 | | |
 |:--|:--|
-| Slot window | 09:13 → running · 44 min |
+| Slot window | 09:13 → running · 47 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 44 |
+| Tool beats | 50 |
 | Longest silence | **24.4 min** — from 09:27:24, after `dead claim cleared by force release` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -142,9 +145,9 @@ recorded one attempt (64, the `18_displacement` lead). Nothing is zeroed and not
 |:--|--:|:--|
 | fix - diagnose and change the engine | **24 min** | `############` |
 | measure or build - a conversion, screen or compile writes no beacon | **0 min** | `#` |
-| record - attempt, handoff, class rows | **3 min** | `##` |
-| report - the report and the chain | **2 min** | `#` |
-| other - not attributed to a tool | **11 min** | `######` |
+| record - attempt, handoff, class rows | **6 min** | `###` |
+| report - the report and the chain | **3 min** | `##` |
+| other - not attributed to a tool | **11 min** | `#####` |
 ## Best results this round
 
 | Document | Before | After | Change |

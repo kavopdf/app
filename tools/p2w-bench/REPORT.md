@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 09:13 → running IST · 41 min**
+**25 Nov 2026 · slot 09:13 → running IST · 47 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -23,7 +23,7 @@
 | Not scored - page count did not match | **22** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (12 still open), not a new class |
+| Working on | `-` - taken from the pending list (13 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## What was tried
@@ -37,7 +37,7 @@
 
 | | |
 |:--|:--|
-| Measured | **41 min ago** |
+| Measured | **47 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -55,9 +55,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 09:13 → running · 41 min |
+| Slot window | 09:13 → running · 47 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 39 |
+| Tool beats | 50 |
 | Longest silence | **24.4 min** — from 09:27:24, after `dead claim cleared by force release` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -67,11 +67,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **24 min** | `#############` |
+| fix - diagnose and change the engine | **24 min** | `############` |
 | measure or build - a conversion, screen or compile writes no beacon | **0 min** | `#` |
-| record - attempt, handoff, class rows | **2 min** | `##` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **11 min** | `######` |
+| record - attempt, handoff, class rows | **6 min** | `###` |
+| report - the report and the chain | **3 min** | `##` |
+| other - not attributed to a tool | **11 min** | `#####` |
 ## Best results this round
 
 | Document | Before | After | Change |
