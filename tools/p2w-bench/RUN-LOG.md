@@ -1,13 +1,3 @@
-<<<<<<< Updated upstream
-=======
-| 22 Nov 08:56 | fixer | slot claimed - fixer running |
-| 22 Nov 09:19 | fixer | attempt 18_displacement -> lead (6/16 moved) |
-| 22 Nov 09:13 | watchdog | slot FORCED released on a live run - see BLOCKERS.md 09:16 |
->>>>>>> Stashed changes
-| 22 Nov 09:34 | fixer | slot FORCED released - see INCIDENTS.md for why |
-| 22 Nov 09:51 | fixer | slot claimed - fixer running |
-| 22 Nov 10:06 | fixer | attempt 18_displacement -> lead (0/3 moved) |
-| 22 Nov 10:20 | fixer | slot claimed - fixer running |
 | 22 Nov 10:37 | fixer | attempt 18_displacement -> lead (0/3 moved) |
 | 22 Nov 10:47 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 22 Nov 11:14 | fixer | slot FORCED released - see INCIDENTS.md for why |
@@ -68,18 +58,9 @@
 | 23 Nov 16:05 | fixer | attempt 00_page_count -> lead (0/? moved) |
 | 23 Nov 16:09 | fixer | attempt 00_page_count -> lead (0/? moved) |
 | 23 Nov 16:10 | fixer | slot FORCED released - see INCIDENTS.md for why |
-<<<<<<< HEAD
-=======
 | 20 Nov 08:52 | fixer | slot claimed - fixer running |
->>>>>>> 0be925ff (00_page_count: land the column-page shape merge - 21 documents, 0 regressions)
-<<<<<<< HEAD
-=======
 | 23 Nov 15:02 | fixer | slot claimed - fixer running |
-<<<<<<< HEAD
->>>>>>> 0be925ff (00_page_count: land the column-page shape merge - 21 documents, 0 regressions)
-=======
 | 23 Nov 16:35 | fixer | attempt 00_page_count -> partial (2/23 moved) |
->>>>>>> f3b47658 (run report 23 Nov 15:02: the column-page shape merge landed (partial, 2/23 - the proxy is blind to it))
 | 23 Nov 16:38 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 23 Nov 17:00 | fixer | slot claimed - fixer running |
 | 23 Nov 17:41 | fixer | attempt 18_displacement -> lead (0/190 moved) |
@@ -184,14 +165,11 @@
 | 25 Nov 05:34 | fixer | attempt 25_invisible_text -> lead (0/? moved) |
 | 25 Nov 05:45 | fixer | attempt 18_displacement -> lead (0/? moved) |
 | 25 Nov 05:47 | fixer | slot FORCED released - see INCIDENTS.md for why |
-<<<<<<< HEAD
 | 25 Nov 06:14 | fixer | slot claimed - fixer running |
 | 25 Nov 07:32 | fixer | attempt 04_chars_missing -> lead (0/212 moved) |
-=======
 | 25 Nov 06:41 | fixer | attempt 00_page_count -> lead (0/? moved) |
 | 25 Nov 07:02 | fixer | slot claimed - fixer running |
 | 25 Nov 07:47 | fixer | attempt 04_chars_missing -> lead (0/? moved) |
->>>>>>> eb329cc7 (fixer 25 Nov: foot-band spend measured - fires on 2 of 12, neutral on the pixel instrument; engine deterministic at document.xml, not at the .docx byte)
 | 25 Nov 09:25 | fixer | attempt 18_displacement -> lead (0/? moved) |
 | 25 Nov 09:27 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 25 Nov 09:52 | fixer | attempt 18_displacement -> lead (0/213 moved) |
@@ -200,11 +178,9 @@
 | 25 Nov 10:48 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 25 Nov 12:03 | fixer | attempt content-present-partly-displaced -> lead (0/23 moved) |
 | 25 Nov 12:07 | fixer | slot FORCED released - see INCIDENTS.md for why |
-<<<<<<< Updated upstream
 | 25 Nov 12:13 | fixer | slot claimed - fixer running |
 | 25 Nov 13:21 | fixer | attempt content-present-partly-displaced -> lead (0/? moved) |
 | 25 Nov 13:22 | fixer | attempt content-present-partly-displaced -> error (0/? moved) |
 | 25 Nov 13:22 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
-=======
 | 25 Nov 14:01 | fixer | attempt 18_displacement -> lead (0/? moved) |
->>>>>>> Stashed changes
+| 25 Nov 14:17 | fixer | slot claimed - fixer running |
