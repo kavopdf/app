@@ -1,57 +1,41 @@
-# The slot dies at 45 minutes, the brief asks for hours, and the two reverts are the difference
+# CORRECTED: the slot does not die at 45 minutes while a run is alive
 
-## The contradiction, in two numbers
+This file claimed that `CLAIM_STALE_MIN["fixer"] = 45` kills a live run's slot after forty-five minutes and
+that long runs therefore revert each other. That was wrong, and it was wrong because I read the constant and
+not the code that uses it.
 
-    round.py:204   CLAIM_STALE_MIN = {"fixer": 45, "baseline": 45, "classifier": 20}
-    FIXER-BRIEF    "run until the work is done"; runs of 2h48m are described in its own pages
+## What the code actually does
 
-A run that legitimately works for ninety minutes has its slot declared dead at forty-five. The next cron
-run - the fixer fires hourly at :50 - claims the slot, finds it free, and starts. Two runs are now editing
-`app/src/main/java/.../engine/` at the same time.
+    round.py:456   newest = s.get(key) or 0
+    round.py:457   for other in ("%s_last_beat" % name, "%s_doing_since" % name):
+    round.py:458       newest = max(newest, s.get(other) or 0)
 
-The code says exactly what that costs, in its own comment on line 119:
+The age is taken from the NEWEST of the claim stamp, the heartbeat and the doing-since stamp - not from the
+claim alone. `round.py:452` says so in its own words: "The age that matters is time since the run last did
+anything, not time since it started."
 
-    "a live run of up to forty-five minutes is never doubled - two runs editing the engine at once would
-     each revert the other's fix."
+And the heartbeat is real and live. `origin/main:tools/p2w-bench/ROUND.json` right now holds:
 
-So the pipeline knows the failure mode, guards against it for forty-five minutes, and then allows it. The
-guard is not wrong; the window it guards is too short for the behaviour the brief asks for.
+    fixer_started    0
+    fixer_last_beat  1795609860.7376003
 
-## What the ledger shows
+`attempt.py` writes it, `status.py:61` reads it, `round.py` consults it. The forty-five minute limit governs
+only a run that has stopped beating - which is exactly the run that should lose the slot.
 
-    37 attempts recorded as `reverted`
-    19 of 18_displacement's 20 attempts are `lead`, one `reverted`
-    47_margins: 8 reverted of 16
+The mechanism even carries the incident I was trying to explain: the 17 Nov case where one slot's whole-file
+commit reverted another's 218-line engine fix is written into the code as the reason the reader was fixed.
 
-A revert means the change was applied and did not hold. Some of those are genuine - the construct did not do
-what was thought. But the brief's own instruction is to work until the time is used, and a run that obeys it
-crosses forty-five minutes, and past that point a second run can revert it. The ledger cannot tell the two
-apart, and neither can the run that comes next.
+## Why the mistake is worth recording
 
-## Why this is a pipeline fault and not a discipline fault
+The constant `CLAIM_STALE_MIN["fixer"] = 45` reads like a hard cap on run length. It is not: it is the
+patience for silence. A run that works for three hours and beats is never touched; a run that dies is replaced
+in minutes.
 
-The run is being asked to do two incompatible things: use its full time, and never outlive its claim. It
-cannot do both while the claim lasts less than the work. Telling it to release the slot before measuring
-(the brief's own rule for corpus measurement) covers one case - a measurement - and not the general one,
-which is any long attempt.
+Sixth wrong finding today, and the same shape as the other five: a number read in isolation, and the code that
+consumes it not read. The real defects this session were all found the other way round - read the consumer,
+then measure.
 
-## The options, with what each costs
+## What this leaves
 
-1. RAISE THE LIMIT to cover a real run. 45 -> 150. A dead run then costs 150 minutes of an empty slot
-   instead of 45. That is the trade: fewer doubled runs, slower recovery from a crash.
-
-2. HEARTBEAT INSTEAD OF AGE. A run that is alive rewrites `started_ts` every few minutes; staleness is then
-   "no heartbeat for 15 minutes", not "claimed 45 minutes ago". A dead run is detected in 15 minutes, a live
-   one is never stolen, and the two requirements stop fighting. This is the one that fixes it properly.
-
-3. RELEASE AND RE-CLAIM AROUND EVERY LONG STEP. The brief already does this for corpus measurement. Doing it
-   around every engine build would work and would put the burden on the run to remember, which is what the
-   ledger shows runs do not reliably do.
-
-## Recommendation
-
-Option 2. It is the only one where a live run is never mistaken for a dead one and a dead run is still found
-in minutes, and it removes the need for the brief to teach a workaround.
-
-Not changed here: the slot is what stops two runs corrupting the engine, and a wrong change to it is worse
-than the fault. Recorded with the measurement so the change is made against the evidence.
+The 37 reverted attempts are still unexplained by this file. They are not a slot fault. Something else
+reverted them, and that is now an open question rather than a conclusion.
