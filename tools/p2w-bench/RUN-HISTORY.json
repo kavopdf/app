@@ -91,5 +91,16 @@
   "started_ts": 1795586076.2526999,
   "class": "content-present-partly-displaced",
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "12:13",
+  "started_ts": 1795589015.5087528,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]

@@ -5901,3 +5901,34 @@
 {"t": 1795591332.7613099, "ist": "12:52:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795591332.9564524, "ist": "12:52:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795591333.2332466, "ist": "12:52:13", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795589018.3452907, "ist": "12:13:38", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795589018.5962148, "ist": "12:13:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795589018.7547593, "ist": "12:13:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795589022.1305528, "ist": "12:13:42", "ev": "beat", "d": "relay: claimed, reading charter"}
+{"t": 1795589336.0980198, "ist": "12:18:56", "ev": "beat", "d": "relay: pod-prep artifacts warm, installing hook"}
+{"t": 1795589593.2828844, "ist": "12:23:13", "ev": "beat", "d": "relay: reading last run + gaps"}
+{"t": 1795589599.399223, "ist": "12:23:19", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795591056.4841328, "ist": "12:47:36", "ev": "beat", "d": "relay: p2w.py profile patch applied, testing real class prerender"}
+{"t": 1795591064.4680169, "ist": "12:47:44", "ev": "beat", "d": "relay: running screen on content-present-partly-displaced (real class, patched)"}
+{"t": 1795591374.296949, "ist": "12:52:54", "ev": "beat", "d": "relay: screen call 2 - does the resume progress?"}
+{"t": 1795591668.0709648, "ist": "12:57:48", "ev": "beat", "d": "relay: screen call 3, unbuffered to log"}
+{"t": 1795592056.0220573, "ist": "13:04:16", "ev": "beat", "d": "relay: stack-dumping the stall"}
+{"t": 1795592223.6771865, "ist": "13:07:03", "ev": "beat", "d": "relay: scipy missing is the stall - installing and measuring"}
+{"t": 1795592349.307629, "ist": "13:09:09", "ev": "beat", "d": "relay: verifying scipy guard, then class screen"}
+{"t": 1795592359.1140313, "ist": "13:09:19", "ev": "beat", "d": "relay: class screen with scipy present"}
+{"t": 1795592667.923903, "ist": "13:14:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592669.695198, "ist": "13:14:29", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795592670.3478916, "ist": "13:14:30", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592672.2037213, "ist": "13:14:32", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592682.5261397, "ist": "13:14:42", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592684.1858306, "ist": "13:14:44", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795592684.5367668, "ist": "13:14:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592686.2451534, "ist": "13:14:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592699.9131317, "ist": "13:14:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592701.752293, "ist": "13:15:01", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795592702.201796, "ist": "13:15:02", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592704.4199193, "ist": "13:15:04", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592711.0056996, "ist": "13:15:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592712.585657, "ist": "13:15:12", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795592713.071177, "ist": "13:15:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795592714.7376385, "ist": "13:15:14", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

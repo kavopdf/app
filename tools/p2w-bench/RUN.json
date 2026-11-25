@@ -1,13 +1,13 @@
 {
- "agents": [
-  "Expl-01"
- ],
- "attempts": 1,
- "docs_improved": 0,
- "ended": "12:07",
- "ended_ts": 1795588678.2633777,
+ "started_ts": 1795589019.5242128,
+ "started": "12:13",
+ "ended_ts": null,
+ "ended": null,
+ "class": "",
+ "attempts": 0,
  "kept": 0,
- "started": "11:24",
- "started_ts": 1795586076.2526999,
- "class": "content-present-partly-displaced"
+ "docs_improved": 0,
+ "agents": [],
+ "obstacles_cleared": 0,
+ "needs_human": 0
 }
