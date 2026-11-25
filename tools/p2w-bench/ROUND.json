@@ -13,11 +13,11 @@
       }
     ]
   },
-  "fixer_doing": "relay: rebuilt engine with inColumn symmetry patch",
-  "fixer_doing_since": 1795576102.7735198,
+  "fixer_doing": "reverting probe, gate check",
+  "fixer_doing_since": 1795578877.7771678,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795576102.7735205,
-  "fixer_started": 1795577048.4436631,
+  "fixer_last_beat": 1795578877.7771688,
+  "fixer_started": 1795577564.3770125,
   "history": [
     {
       "at": "2026-11-12 09:46",

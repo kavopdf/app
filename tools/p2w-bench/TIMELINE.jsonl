@@ -5582,3 +5582,21 @@
 {"t": 1795577048.627764, "ist": "08:54:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795577048.9933531, "ist": "08:54:08", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795577049.152931, "ist": "08:54:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795577689.8014634, "ist": "09:04:49", "ev": "beat", "d": "reading state"}
+{"t": 1795577691.8127599, "ist": "09:04:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795577708.5399506, "ist": "09:05:08", "ev": "beat", "d": "pod-prep: corpus fetch"}
+{"t": 1795578001.7110744, "ist": "09:10:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795578002.4293094, "ist": "09:10:02", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795578006.4222043, "ist": "09:10:06", "ev": "beat", "d": "pod-prep jdk/libs"}
+{"t": 1795578321.2280602, "ist": "09:15:21", "ev": "beat", "d": "gate timing"}
+{"t": 1795578610.0485888, "ist": "09:20:10", "ev": "beat", "d": "building docx corpus slice 1"}
+{"t": 1795578665.277755, "ist": "09:21:05", "ev": "beat", "d": "gate check"}
+{"t": 1795578681.185317, "ist": "09:21:21", "ev": "beat", "d": "testing drive stage on one doc"}
+{"t": 1795578754.1559954, "ist": "09:22:34", "ev": "beat", "d": "spacer guard probe: editing"}
+{"t": 1795578794.718782, "ist": "09:23:14", "ev": "beat", "d": "staging forced + control docx"}
+{"t": 1795578806.7482803, "ist": "09:23:26", "ev": "beat", "d": "converting forced probe docx"}
+{"t": 1795578837.1114151, "ist": "09:23:57", "ev": "beat", "d": "verifying probe export in Google"}
+{"t": 1795578860.9558246, "ist": "09:24:20", "ev": "beat", "d": "verifying control export"}
+{"t": 1795578877.776782, "ist": "09:24:37", "ev": "beat", "d": "reverting probe, gate check"}
+{"t": 1795578933.060817, "ist": "09:25:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795578935.683124, "ist": "09:25:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
