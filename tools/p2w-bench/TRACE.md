@@ -404,5 +404,5 @@
 | 25 Nov 19:14 | baseline | claim | baseline claimed the slot |
 | 25 Nov 20:41 | baseline | commit-gate | started |
 | 25 Nov 20:42 | fixer | attempt | 18_displacement -> lead (0/10 moved) |
-| 25 Nov 20:56 | fixer | claim | fixer claimed the slot |
-| 25 Nov 22:01 | fixer | attempt | 18_displacement -> lead (0/? moved) |
+| 25 Nov 21:24 | fixer | claim | fixer claimed the slot |
+| 25 Nov 22:10 | fixer | attempt | 18_displacement -> lead (0/? moved) |
