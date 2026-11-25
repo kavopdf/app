@@ -34,18 +34,39 @@ Commands:
 
 This reproduces the pending note's prediction (20 tokens/83 chars -> 7 tokens/30 chars) exactly.
 
-## What the residual 30 characters are - and why the guard did not reach them
+## What the residual 30 characters are - and who owns them
 
-The 30 remaining invented characters are exactly the free-text comment's own words:
+The page carries seven annotations (raw `/Annots`, read with PyMuPDF):
 
-    Rate for HSN 8536 confirmed with PO.     (4+3+3+4+9+4+2+1 = 30 non-space characters)
+| xref | /Subtype | /Contents | /AP /N |
+|---|---|---|---|
+| 78 | Highlight | - | draws the band |
+| 80 | Underline | - | draws the rule |
+| 82 | StrikeOut | - | draws the rule |
+| **84** | **Text** (sticky note) | **"Rate for HSN 8536 confirmed with PO."** | **an icon** |
+| 85 | Popup | - | none |
+| **87** | **FreeText** | "Checked against PO 4471. Quantity on line 3 raised from 20 t..." | **draws the text** |
+| **89** | **Stamp** | "Approved" | draws "APPROVED" |
 
-That is a `/FreeText` annotation. Its `/Contents` is hoisted as a body line at the top of the `.txt`,
-so its appearance stream did **not** satisfy `drawnByAppearance(apDrawn, text)` - the guard is not
-reaching this annotation's appearance at all. Either `readAnnotationAppearances()` does not read a
-`/FreeText`'s `/AP /N` into `apDrawn`, or the appearance draws the string in a form the whitespace
-normalisation does not match. **That is the next measurement, and it is the one that makes this
-document clean**, not this guard.
+The 30 remaining invented characters are exactly xref 84, the sticky note:
+`RateforHSN8536confirmedwithPO.` = 4+3+3+4+9+4+2+1 = **30**.
+
+That is not an engine defect and no engine guard can reach it. A `/Text` note's appearance is an
+**icon**; the words exist only in `/Contents`. The engine is right to carry them (the .docx side has
+`50_annotation_text` asking for exactly that string), and `verify_txt.py`'s source side is built from
+**glyph truth**, which cannot see a string that was never drawn. So the .txt is charged for words the
+source side refuses to count.
+
+**The fix therefore belongs in the instrument, not the engine:** the txt source side should add each
+annotation's `/Contents` to its source character multiset - the strings the engine is required to
+emit - before `t12_word_invention` compares. That is an instrument edit, it does not move the engine
+fingerprint, and it does not need the 213-document docx ratchet. **It does need its own measurement**
+(a txt re-measure over the corpus, because relaxing a source side can hide a real invention
+elsewhere), and this slot ended before that could be run honestly.
+
+What the guard DID remove (83 -> 30, i.e. 53 characters) is xref 87, the `/FreeText`: its appearance
+draws the same words the hoist was writing at the top of the page. So the guard is correct and
+measured; it is simply not the whole of this document's failure.
 
 ## Why it is a patch file and not a commit
 
