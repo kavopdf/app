@@ -6249,3 +6249,7 @@
 {"t": 1795614100.0833042, "ist": "19:11:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795614108.2303338, "ist": "19:11:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795618163.8066196, "ist": "20:19:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795618166.97734, "ist": "20:19:26", "ev": "attempt", "d": "t12_word_invention -> lead"}
+{"t": 1795618167.146893, "ist": "20:19:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795618167.2601771, "ist": "20:19:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795618168.05215, "ist": "20:19:28", "ev": "beat", "d": "classrow.py: refreshing the class file"}
