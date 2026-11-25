@@ -4,7 +4,7 @@
  "window_for_claim": 1795630062.7240088,
  "ended_ts": null,
  "ended": null,
- "attempts": 0,
+ "attempts": 2,
  "kept": 0,
  "agents": [
   "05_ct12 patch spec-01",
