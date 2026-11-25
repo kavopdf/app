@@ -1,0 +1,36 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index ad56dac1..0feb4663 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -957,6 +957,15 @@ public final class PdfToWord {
+                 if (flat.contains(ar.text.replaceAll("\\s+", " ").toLowerCase(Locale.ROOT))) {
+                     continue;
+                 }
++                // Nor a third time what the annotation's own /AP already drew on this page:
++                // readAnnotationAppearances() above has put that text into the page as glyphs,
++                // so hoisting the /Contents as well writes it twice. The form-value loop nine
++                // lines up carries this same guard for the same reason; 600's free-text box
++                // was transcribed once by its appearance and once from /Contents, 13 words.
++                // Case-sensitive on purpose - see drawnByAppearance(): 600's stamp draws
++                // "APPROVED" and its /Contents is "Approved", and 50_annotation_text asks for
++                // the /Contents string, so this must not swallow it.
++                if (drawnByAppearance(apDrawn, ar.text)) continue;
+                 Para p = new Para();
+                 p.runs.add(ar);
+                 p.top = 0;
+@@ -2460,6 +2469,15 @@ public final class PdfToWord {
+                 if (ann == null || ann.isHidden()) continue;
+                 if (ann instanceof com.tom_roush.pdfbox.pdmodel.interactive.annotation
+                         .PDAnnotationWidget) continue;      // its /V was already read
++                // ONLY THE SUBTYPES THAT PRINT THEIR /Contents. This is the same rule the
++                // sibling annotationContentsOf() below states at length, and the same one the
++                // truth reader applies: a free-text box draws its /Contents, and a stamp's
++                // caption is what the stamp graphic says; a note, a comment and a highlight's
++                // remark are METADATA that a reader shows in a panel and the page never draws.
++                // Reading them here put them into the document as body text - 600 gained
++                // "Rate for HSN 8536 confirmed with PO." (its note), 7 words no page shows.
++                String subtype = ann.getSubtype();
++                if (!"FreeText".equals(subtype) && !"Stamp".equals(subtype)) continue;
+                 String c = ann.getContents();
+                 if (c == null || c.trim().isEmpty()) continue;
+                 float[] style = appearanceStyle(ann);
