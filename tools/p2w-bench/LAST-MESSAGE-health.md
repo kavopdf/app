@@ -1,39 +1,42 @@
-# Watchdog — 25 Nov 2026, 12:05 IST
+# P2W Watchdog - Run Report
 
-Two stages are stopped: classify and txt. The fixer is moving, and Google clean rose from 35 to 42 against yesterday's row.
+**25 Nov 2026 · 15:12 IST**
+
+## Verdict: moving, after I cleared a dead run that was holding the fixer slot
+
+At the start of this pass fix read stopped. The cause was not the work: a run had claimed the fixer slot, written "relay: cloned, about to read" as its activity, and then stopped beaconing past the stale window without releasing. Every later fixer slot stood down behind it. I cleared it with round.py --release-fixer --force, which archives the dead run's record and pushes the release; status.py then read IDLE and health.py read fix moving. That was the only thing stopped, and it is now moving.
 
 ## Stages
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 0.1 h |
-| matrix | done | 213 of 213 | 32.3 h |
-| classify | stopped | | 10.6 h |
-| fix | moving | 7 attempt(s) in 3 h | 0.2 h |
-| txt | stopped | 199 clean, 14 failing | 26.3 h |
+| measure-google | done | 213 of 213 | 3.0 h |
+| matrix | done | 213 of 213 | 3.0 h |
+| classify | superseded |  | 2.3 h |
+| fix | moving | 4 attempt(s) in 3 h | 1.0 h |
+| txt | moving | 199 clean, 14 failing | 3.0 h |
 
 ## Trend
 
-Today's row was stale against the live tables, so progress.py --amend rewrote it from them: docx open 59, txt failing 14, Google 213 measured and 42 clean. Against 24 Nov: docx open 59 to 59, no change on its sixth consecutive row; txt failing 14 to 14; Google 190 to 213 measured, clean 35 to 42.
+| | 2026-11-24 | 2026-11-25 | |
+|:--|--:|--:|:--|
+| .docx open | 59 | **59** | no change |
+| .txt failing | 14 | **14** | no change |
+| Google measured | 190 | **213** | +23 |
+| Google clean | 35 | **42** | +7 |
+
+Both flat columns are recorded in BLOCKERS.md beside the fixer's attempt count: 4 attempt(s) in 3 h, none kept. The Google side of the same corpus did move today, so the pipeline is producing measured change; what has not moved is the ranking column.
 
 ## Round
 
-The phase is fix, so the fixer runs until no class is OPEN. No cron was paused, resumed, recreated or deleted: this watchdog has no cron tool, so the platform steps of the brief did not run.
+round.py --phase reads fix, so the fixer owns the work and the queue is not empty: pending.py lists the items it may close before any new class.
 
-## Why those two rows are stopped
+## What this pass could not do
 
-classify: the younger class table was committed yesterday at 19:59 UTC and gverify has committed results since, so the classifier cron has produced no table for ten hourly slots. stage.py names classify on its own - the table is older than the results.
+This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. The exact call I would have made is cron(action="list") followed by cron(action="runs", cron_id=...) for any stage reading stopped; neither exists in this run's tool list. A stale next_fire_at would need cron(action="pause") then cron(action="resume"). None of that is a decision for a person - it is a missing tool, and it is written into BLOCKERS.md as one.
 
-txt: its table is 26.3 h old against engine inputs 4.5 h old. I re-scored the corpus on this tree with restamp_txt.py --report: 213 scored, none newly clean, none newly failing, 213 unchanged. The 14 are real failures on the current engine, not a stale table.
+## What this pass did
 
-New this pass: the baseline cron is silent as well. Its LibreOffice output last changed 32.3 h ago, and health.py cannot flag it because matrix reads done at 213 of 213. txt is the baseline's other output, so the red txt row and the silent baseline are one fact, and it is the one no tool here can move.
-
-## Decision on the txt stall
-
-txt is past 24 hours with nothing moved, so this pass decided rather than deferred: no class parked, no approach replaced, instrument left alone. The restamp is the evidence - the table measures today's engine, and the failures have named mechanisms, the ligature identity in the word-invention check against a corrupt page ToUnicode and the Effra reference face in the word-accuracy check. The fixer is moving, 7 attempts in 3 h, its last three commits landing findings rather than reverting engine patches.
-
-What would overturn it: a restamp that reports documents newly failing; two further attempts on the word-invention class ending with an empty file list and no explanation; or a pending queue back above the 26 the 18:12 pass set as its line, which it has since fallen below.
-
-## Written to BLOCKERS.md
-
-One row each: the two stopped stages, the silent baseline cron, the missing cron tool with the exact calls I would have made and the ids from HEALTH-BRIEF's table, and a slot-release write I made by mistake on an already-free slot, which I reverted so the fixer's own release stands.
+* Read health.py, health.py --stalled, stage.py, progress.py, round.py --phase and status.py.
+* Released the fixer slot held by the dead run, with the reason written into BLOCKERS.md.
+* Committed today's trend row; progress.py reported it already present, so nothing was appended.
