@@ -332,6 +332,30 @@ def open_leads():
     return out
 
 
+def _solo_counts():
+    """{check: documents that fail ONLY this check} - the ones a fix can finish outright."""
+    import json as _j, glob as _g, os as _o
+    out = {}
+    try:
+        eng = (_j.load(open('/scratch/work/p2w/.stamp', encoding='utf-8')).get('engine') or '')
+    except Exception:
+        eng = ''
+    for f in _g.glob(_o.path.join(HERE, '..', '..', 'benchmarks', 'gverify', '*.json')):
+        try:
+            v = _j.load(open(f, encoding='utf-8'))
+        except Exception:
+            continue
+        if eng and (v.get('engine') or '') != eng:
+            continue
+        fl = v.get('failed') or []
+        if len(fl) == 1:
+            out[fl[0]] = out.get(fl[0], 0) + 1
+    return out
+
+
+SOLO = _solo_counts()
+
+
 def by_expected_fixes(rows):
     """Order classes by how many documents are likely to be FIXED, not by how many are broken.
 
@@ -358,7 +382,12 @@ def by_expected_fixes(rows):
     out = []
     for name, docs, att, moved in rows:
         y = (moved + g * K) / (att + K)
-        out.append((name, docs, att, moved, docs * y, y))
+        # A CHECK THAT CANNOT MAKE ANY DOCUMENT CLEAN IS WORTH ZERO DOCUMENTS, WHATEVER ITS SIZE.
+        # 34 of the 40 failing checks finish nothing - every document they touch fails something
+        # else too. Only six can: 18_displacement 25, 60_text_column_right_edge 6, 47_margins 3,
+        # 59_shape_anchor 3, 32_stroke_lines 2, 17_matched_runs 1. The factor is 3, not infinity,
+        # so the other 34 stay reachable once the six are done.
+        out.append((name, docs, att, moved, docs * y * (3.0 if SOLO.get(name, 0) else 1.0), y))
     return sorted(out, key=lambda x: (-x[4], -x[1]))
 
 
