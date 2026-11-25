@@ -6248,12 +6248,14 @@
 {"t": 1795614099.2225938, "ist": "19:11:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795614100.0833042, "ist": "19:11:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795614108.2303338, "ist": "19:11:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795618163.8066196, "ist": "20:19:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795618166.97734, "ist": "20:19:26", "ev": "attempt", "d": "t12_word_invention -> lead"}
-{"t": 1795618167.146893, "ist": "20:19:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795618167.2601771, "ist": "20:19:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795618168.05215, "ist": "20:19:28", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795618218.7554917, "ist": "20:20:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795618222.4668999, "ist": "20:20:22", "ev": "release", "d": "fixer released (forced)"}
-{"t": 1795618222.6000876, "ist": "20:20:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795618222.7120597, "ist": "20:20:22", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795617161.3713894, "ist": "20:02:41", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795617161.7023828, "ist": "20:02:41", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795617161.9308634, "ist": "20:02:41", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795617171.0199325, "ist": "20:02:51", "ev": "beat", "d": "pod-prep: warm pod, installing hook"}
+{"t": 1795618048.9779992, "ist": "20:17:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795618053.2997427, "ist": "20:17:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795618060.7855825, "ist": "20:17:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795618062.5548966, "ist": "20:17:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795618693.8397822, "ist": "20:28:13", "ev": "beat", "d": "rowsnap patch applied, compiling engine"}
+{"t": 1795619032.6357296, "ist": "20:33:52", "ev": "beat", "d": "google round-trip: 320 before vs after"}
+{"t": 1795619165.0830724, "ist": "20:36:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
