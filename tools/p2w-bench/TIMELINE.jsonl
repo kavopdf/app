@@ -6376,3 +6376,7 @@
 {"t": 1795624678.0246286, "ist": "22:07:58", "ev": "beat", "d": "relay: corpus DONE 213, installing gate"}
 {"t": 1795624805.280283, "ist": "22:10:05", "ev": "beat", "d": "relay: corpus DONE 213, installing gate"}
 {"t": 1795624849.9521658, "ist": "22:10:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795624853.1915061, "ist": "22:10:53", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795624853.3594816, "ist": "22:10:53", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795624853.5236156, "ist": "22:10:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795624854.4454954, "ist": "22:10:54", "ev": "beat", "d": "classrow.py: refreshing the class file"}
