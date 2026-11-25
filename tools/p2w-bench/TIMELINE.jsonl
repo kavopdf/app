@@ -6498,3 +6498,11 @@
 {"t": 1795630478.1171608, "ist": "23:44:38", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1795631707.759041, "ist": "00:05:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795631710.6268575, "ist": "00:05:10", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795633706.3195963, "ist": "00:38:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795633708.429112, "ist": "00:38:28", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795633708.891611, "ist": "00:38:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795633711.3968775, "ist": "00:38:31", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795633720.4835656, "ist": "00:38:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795633723.1241305, "ist": "00:38:43", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795633723.7083569, "ist": "00:38:43", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795633727.1371927, "ist": "00:38:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

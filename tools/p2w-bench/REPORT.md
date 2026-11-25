@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-25 23:56
+# Fixer report - 2026-11-25 23:37
 
 ```
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 23:56 → running IST · 41 min**
+**26 Nov 2026 · slot 23:37 → 23:44 IST · 6 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - subagents: 1 deployed vs no FINDINGS file for 18_dA-02 |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; subagents: 1 deployed vs no FINDINGS file for 18_dA-02 |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -25,20 +25,22 @@
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (20 still open), not a new class |
-| Findings vs landing | **71** finding(s) on this class and **0** documents moved - writing is cheaper than landing, and nothing else says so |
+| Working on | `-` - taken from the pending list (20 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Committed | **14** files in 5 commit(s) from `3e47992` — ATTEMPTS.json.bak, CLASS-HISTORY.jsonl, HANDOFF-ARCHIVE.jsonl, HANDOFF.json, HANDOFF.md, LAST-MESSAGE.md, RANKING-TXT.csv, REPORT.md, ROUND.json, RUN-HISTORY.json, RUN-LOG.md, RUN.json, TIMELINE.jsonl, TRACE.md |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 00:36 | **lead** | None/None | pgMar-top carries the page-top gap: Google render of 4 docs +2/+3/+4/+2, 412 clean 42/42, no check lost. Patch in patches/18-displacement-PGMAR-TOP-CARRIES-THE-PAGE-GAP.patch; not committed because 19 |
+| 23:37 | **lead** | 0/None | carry-on guard keyed on whether the line gets a paragraph copy: changed 1 of 213 docx, moved no score (txt 0 rows changed, docx share5 97.62->97.62); reverted. Welded-Y diagnosis disproved. |
+| 23:37 | **lead** | 0/None | isJunk() treats U+FFFD as readable so decodeThroughFont never runs; adding it to the junk set made .txt surplus 127->141 on both forms; reverted. Real cause is a Type0 Identity-H font with no ToUnicod |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **41 min ago** |
+| Measured | **42 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **204** (95.8%) |
 | Failing at least one check | **9** |
@@ -55,11 +57,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 23:56 → running · 41 min |
+| Slot window | 23:37 → 23:44 · 6 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 18 |
-| Longest silence | **23.8 min** — from 00:01:54, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 4 |
+| Tool beats | 29 |
+| Longest silence | **4.2 min** — from 23:37:47, after `gate + commit` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -67,11 +69,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **2 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **25 min** | `##############` |
-| record - attempt, handoff, class rows | **5 min** | `###` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **6 min** | `###` |
+| record - attempt, handoff, class rows | **0 min** | `##` |
+| report - the report and the chain | **0 min** | `##` |
+| other - not attributed to a tool | **5 min** | `###################` |
 ## Best results this round
 
 | Document | Before | After | Change |
