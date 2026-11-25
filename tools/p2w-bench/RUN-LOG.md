@@ -194,3 +194,4 @@
 | 25 Nov 18:01 | fixer | attempt t12_word_invention -> lead (0/? moved) |
 | 25 Nov 18:05 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 25 Nov 20:19 | fixer | attempt t12_word_invention -> lead (0/? moved) |
+| 25 Nov 20:20 | fixer | slot FORCED released - see INCIDENTS.md for why |

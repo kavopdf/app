@@ -1,13 +1,22 @@
 {
- "agents": [],
- "attempts": 4,
+ "agents": [
+  {
+   "class": "t12_word_invention",
+   "what": "audit the annotation hoist guard site"
+  },
+  {
+   "class": "t12_word_invention",
+   "what": "root-cause the (Authorised signatory) duplication"
+  }
+ ],
+ "attempts": 1,
  "class": "t12_word_invention",
  "docs_improved": 0,
- "ended": "18:05",
- "ended_ts": 1795610104.9564345,
+ "ended": "20:20",
+ "ended_ts": 1795618223.3233955,
  "kept": 0,
  "needs_human": 0,
  "obstacles_cleared": 0,
- "started": "17:16",
- "started_ts": 1795607215.4020357
+ "started": "19:17",
+ "started_ts": 1795612197.7428188
 }
