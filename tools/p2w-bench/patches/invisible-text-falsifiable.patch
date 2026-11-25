@@ -1,0 +1,179 @@
+diff --git a/tools/p2w-bench/verify_google.py b/tools/p2w-bench/verify_google.py
+index 42c13fc7..1816400e 100644
+--- a/tools/p2w-bench/verify_google.py
++++ b/tools/p2w-bench/verify_google.py
+@@ -51,6 +51,40 @@ except ImportError:
+     sys.exit(2)
+ 
+ 
++# ---- pixel background, added for 25_invisible_text -------------------------
++# THE VECTOR PATH CANNOT SEE A GOOGLE EXPORT'S BACKGROUND.
++#
++# Measured 25 Nov 2026 on 34 real Google exports: every page carries exactly ONE filled
++# rect and it is page-sized - the sheet Google paints itself. fill_rects() therefore
++# yields no band, `behind` is None for every run on every page, and the check returns 0.
++# That is why it has not failed a Google export in 392 of them. The bands ARE there;
++# Google rasterises them, so a navy table header that arrives as an image is invisible
++# to get_drawings().
++#
++# So the background is read from the rendered pixels instead. The constants are measured,
++# not guessed - see FINDINGS/INVISIBLE-TEXT-FALSIFIABLE-25NOV.md:
++#
++#   BG_RING_PT  0.5   the sample ring sits this far outside the run's ink box. The radius
++#                     is NOT what separates a real defect from a neighbour: on
++#                     340_bill_of_lading the ring reads 61 % black / 39 % white at 0.5 pt
++#                     AND at 3.5 pt, because that run sits on a barcode. Growing the
++#                     radius only reaches further into the neighbour.
++#   BG_RING_MAX 1.5   never sample further out than this, even for a tiny run.
++#   BG_PURITY   0.90  the background must be at least 90 % one colour. A mixed background
++#                     is not a background, so the check ABSTAINS instead of comparing the
++#                     run against whichever colour wins the vote. This is the rule that
++#                     keeps 340 (barcode, 61 %) out and mutual-fund-statement in (100 %).
++#   BG_TOL      0.08  per channel, unchanged from the vector rule.
++# Same answer for every tolerance 0.04-0.12 and every purity 0.80-0.95, and at 72, 100 and
++# 150 dpi: 2 documents fail, the same 2.
++BG_DPI = 100
++BG_RING_PT = 0.5
++BG_RING_MAX = 1.5
++BG_PURITY = 0.90
++BG_TOL = 0.08
++BG_MIN_PX = 12
++
++
+ # ----------------------------------------------------------------------------
+ # helpers
+ # ----------------------------------------------------------------------------
+@@ -797,6 +831,64 @@ def _clipped_count(doc):
+     return n
+ 
+ 
++def _page_array(page, dpi=BG_DPI):
++    """The page as an (h, w, 3) float array in 0..1, or None when numpy is unavailable."""
++    try:
++        import numpy as np
++    except ImportError:
++        return None
++    pm = page.get_pixmap(dpi=dpi, colorspace=fitz.csRGB, alpha=False)
++    return np.frombuffer(pm.samples, dtype=np.uint8).reshape(
++        pm.h, pm.w, pm.n)[:, :, :3].astype(np.float32) / 255.0
++
++
++def _pixel_background(arr, page, r, dpi=BG_DPI):
++    """The colour behind one run, and how uniform it is: (rgb, purity) or (None, purity).
++
++    The sample is a ring just outside the run's ink box - never inside it, where the
++    glyph's own antialiased edges would be counted as background. The ring grows only
++    until it has BG_MIN_PX pixels, and never past BG_RING_MAX. A background that is not
++    at least BG_PURITY one colour returns None: there is no single colour behind that run
++    to be invisible against, so the run abstains rather than being guessed at.
++    """
++    import numpy as np
++    s = dpi / 72.0
++    W, H = page.rect.width, page.rect.height
++    ax = max(0, min(int(np.floor(r["x"] * s)), int(W * s) - 1))
++    ay = max(0, min(int(np.floor(r["y"] * s)), int(H * s) - 1))
++    bx = max(ax + 1, min(int(np.ceil(r["x1"] * s)), int(W * s)))
++    by = max(ay + 1, min(int(np.ceil(r["y1"] * s)), int(H * s)))
++    rad = BG_RING_PT
++    cols = np.empty((0, 3), dtype=np.float32)
++    A_h, A_w = arr.shape[:2]
++    while True:
++        pad = max(1, int(round(rad * dpi / 72.0)))
++        # Slice the window around the run instead of masking the whole page: a full-page
++        # boolean array per run cost 26x the old check on a 2-page document, and this is
++        # the same measurement without that allocation.
++        y0, y1 = max(0, ay - pad), min(A_h, by + pad)
++        x0, x1 = max(0, ax - pad), min(A_w, bx + pad)
++        sub = arr[y0:y1, x0:x1]
++        inner = np.zeros(sub.shape[:2], dtype=bool)
++        inner[max(0, ay - y0):max(0, by - y0), max(0, ax - x0):max(0, bx - x0)] = True
++        cols = sub[~inner].reshape(-1, 3)
++        if len(cols) >= BG_MIN_PX or rad >= BG_RING_MAX:
++            break
++        rad = min(BG_RING_MAX, rad * 2)
++    if len(cols) < BG_MIN_PX:
++        return None, 0.0
++    q = np.clip(np.rint(cols * 255.0), 0, 255).astype(np.uint8)
++    packed = (q[:, 0].astype(np.uint32) << 16) | (q[:, 1].astype(np.uint32) << 8) | q[:, 2]
++    vals, counts = np.unique(packed, return_counts=True)
++    k = int(vals[int(np.argmax(counts))])
++    bg = (((k >> 16) & 255) / 255.0, ((k >> 8) & 255) / 255.0, (k & 255) / 255.0)
++    near = int(np.all(np.abs(cols - np.array(bg, dtype=np.float32)) <= BG_TOL, axis=1).sum())
++    purity = near / float(len(cols))
++    if purity < BG_PURITY:
++        return None, purity
++    return bg, purity
++
++
+ def _visual_counts(doc):
+     """Invisible text and off-page text, measured the same way for either document.
+ 
+@@ -806,38 +898,42 @@ def _visual_counts(doc):
+     the 208 corpus documents did exactly that. The measurement is now taken from
+     the source too, so only text that BECAME invisible or left the page counts as
+     a defect. Same bug as 26_text_overlap, same fix.
++
++    THE BACKGROUND IS READ FROM PIXELS, NOT FROM get_drawings(). The vector rule that
++    stood here until 25 Nov 2026 could not fail a Google export: every page carries one
++    page-sized fill (the sheet) and nothing else, so `behind` was None on every run of
++    every page and the check returned 0 across 392 exports. Google rasterises the bands
++    it draws, so the only place a band exists in an export is in the pixels. The vector
++    rule is kept as the fallback for the one case it can still serve - numpy missing -
++    so that a pod without numpy degrades to the old behaviour instead of crashing.
+     """
+     invisible = off_page = 0
+     for p in doc:
+         W, H = p.rect.width, p.rect.height
+-        # THE SHEET IS NOT A BAND BEHIND THE TEXT, AND THE FIRST FILL IS NOT THE ONE A READER SEES.
+-        #
+-        # This used to stop at the FIRST fill whose rect held the run's corner. A Google export
+-        # opens with a page-sized white rectangle - Google paints the sheet itself - so on
+-        # 10_stamp_as_image a white heading on an ORANGE band matched that white sheet and counted
+-        # as invisible text, while the export rendered it white-on-orange, exactly as the source
+-        # has it (verified by eye on the exported PDF, 24 Nov: the band arrives as an image, so
+-        # get_drawings() never sees it at all). 48 documents fail this check and LibreOffice passes
+-        # all 48 - a check that reads the paper instead of the band behind the words.
+-        #
+-        # Two corrections, both of which only ever REMOVE a false count: a fill covering the sheet
+-        # is dropped, and among the fills that remain the TOPMOST one wins (get_drawings() is in
+-        # paint order, so the last one containing the corner is the last one painted there).
+-        sheet_area = p.rect.width * p.rect.height
+-        fills = [f for f in fill_rects(p)
+-                 if sheet_area <= 0 or f["rect"].width * f["rect"].height < 0.90 * sheet_area]
++        arr = _page_array(p)
++        # The vector fallback: a fill covering the sheet is dropped, and among the fills
++        # that remain the TOPMOST one wins (get_drawings() is in paint order).
++        fills = []
++        if arr is None:
++            sheet_area = p.rect.width * p.rect.height
++            fills = [f for f in fill_rects(p)
++                     if sheet_area <= 0 or f["rect"].width * f["rect"].height < 0.90 * sheet_area]
+         rs = runs(p)
+         for r in rs:
+-            pt = fitz.Point(r["x"] + 1, r["y"] + 1)
+-            behind = None
+-            for f in fills:
+-                if f["rect"].contains(pt):
+-                    behind = f
+-            if behind is not None:
+-                tr = (((r["colour"] >> 16) & 255) / 255.0,
+-                      ((r["colour"] >> 8) & 255) / 255.0,
+-                      (r["colour"] & 255) / 255.0)
+-                if colour_close(tr, behind["fill"], 0.08):
++            tr = (((r["colour"] >> 16) & 255) / 255.0,
++                  ((r["colour"] >> 8) & 255) / 255.0,
++                  (r["colour"] & 255) / 255.0)
++            if arr is not None:
++                bg, _purity = _pixel_background(arr, p, r)
++                if bg is not None and colour_close(tr, bg, BG_TOL):
++                    invisible += 1
++            else:
++                pt = fitz.Point(r["x"] + 1, r["y"] + 1)
++                behind = None
++                for f in fills:
++                    if f["rect"].contains(pt):
++                        behind = f
++                if behind is not None and colour_close(tr, behind["fill"], 0.08):
+                     invisible += 1
+             if r["x"] < -1 or r["y"] < -1 or r["x1"] > W + 1 or r["y1"] > H + 1:
+                 off_page += 1
