@@ -6455,3 +6455,8 @@
 {"t": 1795630052.9319286, "ist": "23:37:32", "ev": "beat", "d": "writing finding"}
 {"t": 1795630056.6230373, "ist": "23:37:36", "ev": "beat", "d": "recording attempts"}
 {"t": 1795630056.857889, "ist": "23:37:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795630059.2853007, "ist": "23:37:39", "ev": "attempt", "d": "05_chars_extra -> lead"}
+{"t": 1795630059.425441, "ist": "23:37:39", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795630059.5268264, "ist": "23:37:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795630060.1943843, "ist": "23:37:40", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795630060.4088814, "ist": "23:37:40", "ev": "beat", "d": "attempt.py: recording an attempt"}
