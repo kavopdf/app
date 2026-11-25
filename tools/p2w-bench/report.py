@@ -454,6 +454,37 @@ def _same_engine(stamp, now):
     return _e == _n or _n.startswith(_e) or _e.startswith(_n)
 
 
+def check_instances():
+    """(passed, total, documents) over the current engine - the unit of progress that moves first.
+
+    THE REPORT ONLY COUNTED DOCUMENTS CLEAN, AND THAT CANNOT MOVE UNTIL A DOCUMENT LAST CHECK FALLS.
+    A patch taking eighteen documents from -114 pt to -3 pt moves nothing by that count, reads as
+    worthless, and gets reverted - which is what happened on 25 Nov: 70 findings on 18_displacement,
+    0 documents moved, docx open 59 for four days.
+
+    A check-instance is one document against one applicable check. It moves the moment the render
+    improves, whatever else on that document still fails. Current engine only, so stale rows cannot
+    inflate it.
+    """
+    import glob as _g
+    try:
+        now = engine_now()
+    except Exception:
+        now = ""
+    p = f = n = 0
+    for path in _g.glob(os.path.join(ROOT, "benchmarks", "gverify", "*.json")):
+        try:
+            j = json.load(open(path, encoding="utf-8"))
+        except Exception:
+            continue
+        if (j.get("engine") or "") != now:
+            continue
+        n += 1
+        p += int(j.get("passed") or 0)
+        f += len(j.get("failed") or [])
+    return p, p + f, n
+
+
 def google_fixed():
     """What GOOGLE calls fixed, and the denominator that is honest about which engine measured it.
 
@@ -1239,6 +1270,13 @@ def main(argv):
 
     L.append("## Progress")
     L.append("")
+    try:
+        _cp, _ct, _cn = check_instances()
+        _pct = (100.0 * _cp / _ct) if _ct else 0.0
+        L.append("| Check-instances passing | **%d** of %d (%.1f%%) on %d documents |" % (_cp, _ct, _pct, _cn))
+        L.append("| Check-instances still failing | **%d** |" % (_ct - _cp))
+    except Exception:
+        L.append("| Check-instances passing | could not be read |")
     L.append("| | |")
     L.append("|:--|:--|")
     if tr.get("present"):
