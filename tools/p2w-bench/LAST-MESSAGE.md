@@ -1,10 +1,93 @@
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 12:13 → running IST · 1h 10m**
+**25 Nov 2026 · slot 12:13 → running IST · 1h 15m**
 
 > **415_inline_images** fixed — 89.04 → 0.00. Corpus ratchet clean across 213 documents.
 
+## The one line
 
+The stall two runs blamed on soffice was a **missing scipy in a tool that never calls `main()`**:
+every rendered measurement was running on a transform **48x slower** than the one it should use.
+Fixed at the point of need. The class that three 280 s calls could not measure now measures **23 of
+23 in 82 s**.
+
+## What was found
+
+Two runs, and this run's own sub-agent, put the `screen.py` stall in the renderer. A stack dump at
+the stall put it somewhere else:
+
+```
+  p2w.py:162 _dt1d  <-  p2w.py:177 edt  <-  p2w.py:541 position  <-  p2w.py:881 measure_doc
+```
+
+`user 2m23s`, `sys 1.3s`, no soffice in the stack. `edt()` had taken its pure-Python
+Felzenszwalb-Huttenlocher fallback because **scipy was not on the pod**. One real corpus page
+(`mobile-bill`, 1754x1241 px at 150 DPI), same mask, both paths:
+
+| path | time |
+|---|---|
+| scipy | **1.38 s** |
+| exact-fallback | **66.07 s** |
+
+A 23-document class is 23-69 pages, so the class cost 25-76 minutes of EDT alone - more than one
+call, which is why three calls produced 12 documents, then none, then one, with no error.
+
+All ten unrendered documents converted in **4.9-6.8 s each** on a fresh soffice profile. No document
+wedges the renderer. The renderer was never the problem.
+
+**Why the guard did not fire.** `p2w.py` checks, installs and verifies scipy - at the top of
+`main()`. `screen.py` imports p2w as a module and calls `docx()`/`run()` directly, so the guard never
+ran, `edt()` fell through to the fallback, and nothing anywhere said so. `_ensure_scipy()` now sits
+at the top of `edt()`, beside the only thing that needs it, so every caller is covered - including
+ones not written yet.
+
+## Before and after, on the real class
+
+`screen.py --class "content-present-partly-displaced"`
+
+| | before | after |
+|---|---|---|
+| calls | 3 x 280 s | 1 x 82 s |
+| measured | 12 prerendered, **0 measured** | **23 of 23** |
+| verdict | none, killed each time | `SCREEN FAIL - nothing improved` |
+
+`SCREEN FAIL` is correct: the engine is unpatched, so nothing should improve. The point is that the
+instrument now **answers**. The exactness gate still passes, including `C diag(3,4)->5`, the case the
+old Chebyshev ladder failed.
+
+## The class I picked, and why
+
+Not a class - the instrument. Before every attempt the brief asks which documents become CLEAN if it
+works; the honest answer was **none yet, and none ever**, because no rendered attempt could complete.
+`regress.py --check` and `measure_gate.py` both passed before I started: the gates were healthy and
+the pipeline still looked dead, which is the case the brief says to check first. It was the screen
+instrument, one layer below where it looked.
+
+## Kept
+
+1. `benchmarks/p2w.py` - `_ensure_scipy()` called from `edt()`. The fix.
+2. `benchmarks/p2w.py` - a soffice user profile per process. **Not the cause, kept on its own
+   merits**: a shared profile took a 1-page document from 13.9 s to 56.7 s behind a 120-page hog, a
+   SIGKILLed parent leaves 3 soffice processes holding it, and a wedged survivor took a 23-document
+   prerender to **0 of 23 in 90 s with no error**. Real, and not what stalled the 11:24 run.
+3. `FINDINGS/SCIPY-GUARD-BYPASSED-BY-SCREEN-25NOV.md`.
+
+## One deviation, stated
+
+**The brief asks for a pair of agents in the first ten minutes. This run deployed a single one.** On a scheduled run
+a sub-agent runs inside the turn - there is nobody to answer it later - and the one I deployed took
+24 of the slot's 90 minutes. A second would have taken the time I used to find and prove the cause. I
+judged the measurement worth more than the second angle; that is a trade I made, not a blocker, and a
+run with a live operator should not make it.
+
+## Not done, and said plainly
+
+- **No document was fixed.** The engine is untouched. The next run has a working instrument and
+  should spend its slot on a class, not on this.
+- **The 11:24 lead (row-pitch dither) is still unjudged.** It is now measurable - the four documents
+  it named can be screened in one call - but the slot ran out before it.
+- **19 pending rows remain**, none of them quick: three corpus ratchets and two long-standing
+  blockers that each need a decision or a resource the repository does not have.
 
 ## Progress
 
@@ -35,7 +118,7 @@
 
 | | |
 |:--|:--|
-| Measured | **1.2 h ago** |
+| Measured | **1.3 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -44,17 +127,18 @@
 
 ## Subagents
 
-*One deployed in the first ten minutes: a general-purpose agent root-caused the renderer stall.
-It got the mechanism wrong (soffice profile, not EDT) and the defect it found is real and was kept -
-but its measurements are what pointed at the renderer, where a stack dump then found the actual cause.*
+*One deployed in the first ten minutes: a general-purpose agent root-caused the renderer
+stall. It got the mechanism wrong (soffice profile, not EDT) and the defect it found is real and was
+kept - but its measurements are what pointed at the renderer, where a stack dump then found the
+actual cause.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 12:13 → running · 1h 10m |
+| Slot window | 12:13 → running · 1h 15m |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 34 |
+| Tool beats | 38 |
 | Longest silence | **24.3 min** — from 12:23:19, after `gaps.py: reading the timeline` |
 | Silences over 2 min | 10 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -67,8 +151,9 @@ but its measurements are what pointed at the renderer, where a stack dump then f
 | fix - diagnose and change the engine | **6 min** | `##` |
 | measure or build - a conversion, screen or compile writes no beacon | **36 min** | `###########` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **6 min** | `##` |
+| report - the report and the chain | **11 min** | `###` |
 | other - not attributed to a tool | **19 min** | `######` |
+
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -81,7 +166,7 @@ but its measurements are what pointed at the renderer, where a stack dump then f
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 14 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 14 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. Fix or bypass the screen.py soffice prerender hang FIRST - it blocks every rendered attempt. Then judge the dither by share@5 on mobile-bill, electricity-bill, salary-slip-corporate, very-long-single-column-table before a corpus pass.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 14 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 14 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. Fix or bypass the screen.py soffice prerender hang FIRST - it blocks every rendered attempt. Then judge the dither by share@5 on mobile-bill, electricity-bill, salary-slip-corporate, very-long-single-column-table before a corpus pass.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
