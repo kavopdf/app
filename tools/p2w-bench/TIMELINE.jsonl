@@ -6403,3 +6403,55 @@
 {"t": 1795625044.7425194, "ist": "22:14:04", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795625044.8363013, "ist": "22:14:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795625045.4093308, "ist": "22:14:05", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795627704.8001933, "ist": "22:58:24", "ev": "beat", "d": "heartbeat before any claim: install-gate timed out, inspecting"}
+{"t": 1795627709.680715, "ist": "22:58:29", "ev": "beat", "d": "heartbeat before any claim: checking pod prerequisites"}
+{"t": 1795627713.2105622, "ist": "22:58:33", "ev": "beat", "d": "heartbeat before any claim: pod warm, checking gate"}
+{"t": 1795627724.7221224, "ist": "22:58:44", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795627725.1605477, "ist": "22:58:45", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795627725.4697092, "ist": "22:58:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795627730.7264197, "ist": "22:58:50", "ev": "beat", "d": "reading handoff + state"}
+{"t": 1795627734.1120858, "ist": "22:58:54", "ev": "beat", "d": "reading rest of handoff"}
+{"t": 1795627736.3434072, "ist": "22:58:56", "ev": "beat", "d": "classpick + pending"}
+{"t": 1795627740.7609332, "ist": "22:59:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795627747.900359, "ist": "22:59:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795628534.2735803, "ist": "23:12:14", "ev": "beat", "d": "verifying 18_displacement lead"}
+{"t": 1795628538.5566037, "ist": "23:12:18", "ev": "beat", "d": "reading patch + toolbox"}
+{"t": 1795628543.290448, "ist": "23:12:23", "ev": "beat", "d": "reading toolbox"}
+{"t": 1795628546.4270287, "ist": "23:12:26", "ev": "beat", "d": "reading INSTRUMENT.md"}
+{"t": 1795628556.8323622, "ist": "23:12:36", "ev": "beat", "d": "listing measurement tools"}
+{"t": 1795628559.3477478, "ist": "23:12:39", "ev": "beat", "d": "gverify usage"}
+{"t": 1795628564.960549, "ist": "23:12:44", "ev": "beat", "d": "planning google run"}
+{"t": 1795628573.625793, "ist": "23:12:53", "ev": "beat", "d": "reading carry-on code"}
+{"t": 1795628586.3846438, "ist": "23:13:06", "ev": "beat", "d": "checking measure_doc"}
+{"t": 1795628602.6038575, "ist": "23:13:22", "ev": "beat", "d": "applying t12 line-copy guard"}
+{"t": 1795628636.653097, "ist": "23:13:56", "ev": "beat", "d": "converting corpus with patched engine"}
+{"t": 1795628638.5474973, "ist": "23:13:58", "ev": "beat", "d": "corpus convert slice 1"}
+{"t": 1795628923.8171725, "ist": "23:18:43", "ev": "beat", "d": "corpus convert slice 2"}
+{"t": 1795629020.9973202, "ist": "23:20:20", "ev": "beat", "d": "which docx bytes moved"}
+{"t": 1795629026.5965977, "ist": "23:20:26", "ev": "beat", "d": "recording docx hash diff"}
+{"t": 1795629032.550084, "ist": "23:20:32", "ev": "beat", "d": "finding single-doc measure"}
+{"t": 1795629066.8116658, "ist": "23:21:06", "ev": "beat", "d": "txt check on affected docs"}
+{"t": 1795629101.1860662, "ist": "23:21:41", "ev": "beat", "d": "diffing txt ranking"}
+{"t": 1795629115.9722672, "ist": "23:21:55", "ev": "beat", "d": "measuring the one changed docx"}
+{"t": 1795629134.1492763, "ist": "23:22:14", "ev": "beat", "d": "measure_doc on the changed doc"}
+{"t": 1795629292.5658324, "ist": "23:24:52", "ev": "beat", "d": "reverting t12, checking gate"}
+{"t": 1795629577.2653663, "ist": "23:29:37", "ev": "beat", "d": "gate state"}
+{"t": 1795629834.2703512, "ist": "23:33:54", "ev": "beat", "d": "listing txt failures"}
+{"t": 1795629839.516505, "ist": "23:33:59", "ev": "beat", "d": "600 google verdict"}
+{"t": 1795629850.8236482, "ist": "23:34:10", "ev": "beat", "d": "t12 multiset diff on the forms"}
+{"t": 1795629860.0454288, "ist": "23:34:20", "ev": "beat", "d": "computing t12 surplus chars"}
+{"t": 1795629866.886631, "ist": "23:34:26", "ev": "beat", "d": "locating FFFD emission"}
+{"t": 1795629876.947882, "ist": "23:34:36", "ev": "beat", "d": "reading decodeThroughFont"}
+{"t": 1795629889.1457868, "ist": "23:34:49", "ev": "beat", "d": "patching isJunk for U+FFFD"}
+{"t": 1795629923.5887253, "ist": "23:35:23", "ev": "beat", "d": "converting the two forms"}
+{"t": 1795629965.3812733, "ist": "23:36:05", "ev": "beat", "d": "checking U+FFFD gone"}
+{"t": 1795629979.2188163, "ist": "23:36:19", "ev": "beat", "d": "inspecting the form font"}
+{"t": 1795630016.454548, "ist": "23:36:56", "ev": "beat", "d": "rebuilding corpus on the reverted tree"}
+{"t": 1795630020.0610082, "ist": "23:37:00", "ev": "beat", "d": "rebuild corpus clean engine"}
+{"t": 1795630028.455777, "ist": "23:37:08", "ev": "beat", "d": "verifying disk vs committed manifest"}
+{"t": 1795630031.3424737, "ist": "23:37:11", "ev": "beat", "d": "verifying disk vs committed manifest v2"}
+{"t": 1795630039.562025, "ist": "23:37:19", "ev": "beat", "d": "recording attempts"}
+{"t": 1795630039.741996, "ist": "23:37:19", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795630052.9319286, "ist": "23:37:32", "ev": "beat", "d": "writing finding"}
+{"t": 1795630056.6230373, "ist": "23:37:36", "ev": "beat", "d": "recording attempts"}
+{"t": 1795630056.857889, "ist": "23:37:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
