@@ -1,7 +1,4 @@
  704deabc (claim: fixer takes the slot (25 Nov 06:07) + beacon)
-<<<<<<< HEAD
-=======
->>>>>>> 2921ff64 (attempt: t12_word_invention -> lead (1 of 1))
 {"t": 1795167811.0288882, "ist": "15:13:31", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795170303.4692028, "ist": "15:55:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795170303.4816751, "ist": "15:55:03", "ev": "release", "d": "fixer released (forced)"}
@@ -5831,3 +5828,18 @@
 {"t": 1795584171.2104576, "ist": "10:52:51", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795584173.1468203, "ist": "10:52:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795586369.149636, "ist": "11:29:29", "ev": "release", "d": "baseline released"}
+{"t": 1795584406.9799936, "ist": "10:56:46", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795584407.1434329, "ist": "10:56:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795584407.2403588, "ist": "10:56:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795585765.9204292, "ist": "11:19:25", "ev": "beat", "d": "verifying the gverify read defect independently"}
+{"t": 1795585787.5579345, "ist": "11:19:47", "ev": "beat", "d": "gates: regress --check and measure_gate on the instrument patch"}
+{"t": 1795585801.1496985, "ist": "11:20:01", "ev": "beat", "d": "fetching corpus to unblock regress --check"}
+{"t": 1795585817.674335, "ist": "11:20:17", "ev": "beat", "d": "regress --check with corpus present"}
+{"t": 1795585838.3565376, "ist": "11:20:38", "ev": "beat", "d": "jdk-fetch, then corpus slices"}
+{"t": 1795585949.2554772, "ist": "11:22:29", "ev": "beat", "d": "corpus slice, engine built"}
+{"t": 1795586185.0283017, "ist": "11:26:25", "ev": "beat", "d": "corpus slice 2 of 4"}
+{"t": 1795586269.9418938, "ist": "11:27:49", "ev": "beat", "d": "corpus slice 3"}
+{"t": 1795586549.9884474, "ist": "11:32:29", "ev": "beat", "d": "corpus slice 4"}
+{"t": 1795586727.101971, "ist": "11:35:27", "ev": "beat", "d": "corpus slice 5, final"}
+{"t": 1795586988.039269, "ist": "11:39:48", "ev": "beat", "d": "regress --check with full corpus"}
+{"t": 1795587074.3194587, "ist": "11:41:14", "ev": "beat", "d": "committed cf724722, pushing"}
