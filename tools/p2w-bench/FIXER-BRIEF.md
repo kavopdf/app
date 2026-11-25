@@ -53,6 +53,48 @@ a rule. Write it in `FINDINGS/` as a measurement and leave the method alone.**
 appear in `verify_google.py` and `verify_txt.py` because those files ARE the check catalogue, and in tests
 because a test asserts a specific check catches a specific mutation. Neither is a rule about what to work on.
 
+## MEASURE IN PARALLEL, NOT ONE DOCUMENT AT A TIME
+
+Four of the five steps of a Google measurement are Drive API calls - upload, convert, export, download -
+and a plain script cannot make them, so `gverify.py` stages the file and you make the calls. Made one
+document at a time that is four round trips per document: twenty-five documents is a hundred sequential
+calls, and that is where most of a run goes.
+
+They do not depend on each other. Every upload, every convert and every export for a whole batch can be
+in flight at once. Use `run_program` with `asyncio.gather`:
+
+```python
+import asyncio, json
+from sarvam_tools import GOOGLEDRIVE_UPLOAD_FILE, GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE
+
+NAMES = [...]          # the batch gverify.py --plan gave you
+FOLDER = '<the verify folder id>'
+
+async def one(n):
+    up = await GOOGLEDRIVE_UPLOAD_FILE(path='/scratch/work/p2w/stage/%s.docx' % n, folder_id=FOLDER)
+    exp = await GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE(fileId=up['fileId'],
+                                                       mimeType='application/pdf')
+    return n, up['fileId'], exp
+
+async def main():
+    out = await asyncio.gather(*[one(n) for n in NAMES], return_exceptions=True)
+    print(json.dumps([o for o in out if not isinstance(o, Exception)], default=str))
+
+asyncio.run(main())
+```
+
+CHECK THE TWO TOOL NAMES BEFORE YOU TRUST THIS BLOCK. `GOOGLEDRIVE_UPLOAD_FILE` and
+`GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE` were confirmed against the live tool list on 25 Nov; the first
+draft of this section used `GOOGLEDRIVE_CREATE_FILE`, which does not exist. If a name has moved, `tool_search`
+finds the current one in one call - do that rather than guessing, and fix this block when you do.
+
+Then run `gverify.py --collect` once per document against what came back - that step is local and cheap.
+
+Two rules that still hold. The Google Doc is deleted after each document, so the folder does not
+accumulate. And Drive allows about 1000 requests per 100 s per user at three per document, so a batch of
+twenty-five is seventy-five requests - comfortably inside, but do not launch two batches at once.
+
+
 ## TWO HABITS THAT DECIDE HOW MUCH A RUN IS WORTH
 
 COMMIT BEFORE YOU MEASURE, AND MEASURE BEFORE YOU BUILD.
@@ -992,8 +1034,8 @@ What it cannot do is tell you whether the change helped anyone.
 before and after:
 
     1. copy out/<name>.docx into /scratch/output/ and upload it
-         upload(path=..., tool_slug="GOOGLEDRIVE_CREATE_FILE", toolkit="googledrive")
-    2. GOOGLEDRIVE_CREATE_FILE with mimeType="application/vnd.google-apps.document", parents=[
+         upload(path=..., tool_slug="GOOGLEDRIVE_UPLOAD_FILE", toolkit="googledrive")
+    2. GOOGLEDRIVE_UPLOAD_FILE with mimeType="application/vnd.google-apps.document", parents=[
        1OoSHtsv-qEUwk8CnNa9d5hsCKu8PFeij]  - converts on upload
     3. GOOGLEDRIVE_DOWNLOAD_FILE(fileId, mime_type="application/pdf")
     4. python3 tools/p2w-bench/gverify.py --collect <name> <s3url>
@@ -1925,7 +1967,7 @@ the crons. Nobody else is coming. The watchdog finds what has stopped and report
 | a shell | `bash`, 300 s per call, `/scratch/work` |
 | Python 3.12 and every library the tools use | pandas, PyMuPDF, python-docx, openpyxl |
 | the engine toolchain | `bash tools/install-gate.sh`, then the build in `benchmarks/p2w.py` |
-| **Google Drive, yourself** | `upload(path=..., tool_slug="GOOGLEDRIVE_CREATE_FILE", toolkit="googledrive")`, then create the Google Doc from it and export the PDF - the exact three calls are in the "How to verify in Google" section above |
+| **Google Drive, yourself** | `upload(path=..., tool_slug="GOOGLEDRIVE_UPLOAD_FILE", toolkit="googledrive")`, then create the Google Doc from it and export the PDF - the exact three calls are in the "How to verify in Google" section above |
 | sub-agents | two per run, `background=true`, never wait |
 | the corpus and every measurement | `/scratch/work/p2w/corpus`, `out`, `benchmarks/` |
 | the whole history | `git log`, `FINDINGS/`, `LESSONS.md`, `SETTLED.md`, `HYPOTHESES.md`, `BLOCKERS.md` |
