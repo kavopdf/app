@@ -1,6 +1,8 @@
+
+  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 06:41 → running IST · 2 min**
+**25 Nov 2026 · slot 06:41 → running IST · 3 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -50,7 +52,7 @@
 
 | | |
 |:--|:--|
-| Slot window | 06:41 → running · 2 min |
+| Slot window | 06:41 → running · 3 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
 | Tool beats | 7 |
 | Silences over 2 min | 0 |
@@ -61,9 +63,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **0 min** | `########` |
-| report - the report and the chain | **0 min** | `####` |
-| other - not attributed to a tool | **1 min** | `##########` |
+| record - attempt, handoff, class rows | **0 min** | `######` |
+| report - the report and the chain | **1 min** | `#######` |
+| other - not attributed to a tool | **1 min** | `#########` |
 ## Best results this round
 
 | Document | Before | After | Change |
