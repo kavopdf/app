@@ -1,14 +1,14 @@
 {
- "started_ts": 1795630062.7240088,
- "started": "23:37",
- "window_for_claim": 1795630062.7240088,
- "ended_ts": 1795630478.117912,
- "ended": "23:44",
- "attempts": 2,
- "kept": 0,
  "agents": [
   "05_ct12 patch spec-01",
   "18_drow rule charge-01"
  ],
- "docs_improved": 0
+ "attempts": 3,
+ "docs_improved": 0,
+ "ended": "23:44",
+ "ended_ts": 1795630478.117912,
+ "kept": 0,
+ "started": "23:37",
+ "started_ts": 1795630062.7240088,
+ "window_for_claim": 1795630062.7240088
 }
