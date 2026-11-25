@@ -1,39 +1,35 @@
-# gverify --plan's "live" is a fourth answer to which engine
+# CORRECTED: the "live" hash is the check universe, not a fourth engine identity
 
-The 10:56 run fixed the comparison that made the Google scoreboard blind, across three instruments -
-report.py:460, gverify.py:194 and classify_google.py:34. Verified after it landed:
+This file previously claimed that `live : 36b7913c98da (12 checks)` was a fourth derivation of the engine
+and that it disagreed with the tree. That was wrong, and the correction matters more than the original.
 
-    report.py              google_fixed -> (42, 213, 42, 213, 0)
-    classify_google --print  "Every result above was measured on engine 981ff1fa35e2cf67, the engine in
-                              the tree."
-    engine on disk           11 .java files -> sha256(name+bytes)[:16] = 981ff1fa35e2cf67
-    .stamp                   981ff1fa35e2cf67
+## What was actually true
 
-All four agree. What does not is the plan:
+The line is not printed by gverify.py at all. It is txt_rank.py:256:
 
-    gverify.py --plan 60
-    live  : 36b7913c98da (12 checks)
-    Not compared, not carried forward, and not replaced: the marks were left as they were. Re-measure
-    the corpus, or reset with a reason if the universe really moved.
+    print("      live  : %s (%d checks)" % (live_sha or "unknown", len(ids)))
 
-36b7913c98da is not this tree's engine. The tree hashes to 981ff1fa35e2cf67 over 11 files; "12 checks"
-is not a file count and not a check count for any document in the store. So `live` is computed from
-something else again - a fourth derivation of the same question, after the three that were just
-reconciled.
+and live_sha comes from `_universe()`, which hashes the set of check ids verify_txt.py offers. `(12 checks)`
+in the same line was the tell - 12 is a count of checks, not of files or documents, so the value beside it
+is a check-set fingerprint.
 
-## Why it matters
+It is a different question from the engine, and it is a legitimate one: `marks_universe != live_sha` is how
+the tool notices that the checks themselves changed and the old marks no longer describe the same
+instrument. Comparing it to 981ff1fa35e2cf67 was never the right comparison.
 
-The plan is what tells the hourly cron what to re-measure. A `live` that matches nothing means the cron
-is told the universe moved, which is the same perpetual re-measure the run just closed on the other
-three instruments - moved one layer down rather than removed.
+## Why this correction is worth writing down
 
-## The rule
+The finding was produced the way every real defect this session was found - by spotting a hash that did not
+match. This time the hash was answering a different question, so the match was never owed. Two lessons:
 
-One question, one derivation. report.py now reads .stamp and is right. classify_google.py now reads the
-same thing and is right. gverify.py's plan should read it too, and its `live` line should print the
-value it actually compared, not a second hash computed beside it.
+1. A hash with no label is not evidence. `live` says nothing about what was hashed; the `(12 checks)`
+   beside it did, and I read past it.
+2. The correction is the same discipline as the original: verify before claiming. I had the evidence in
+   front of me and mis-assigned it.
 
-## Verified, not changed
+## Verified
 
-The engine was not touched and the store is correct: 213 verdicts on 981ff1fa35e2cf67, 42 clean. Only the
-plan's own `live` label disagrees, and it is the label the cron steers on.
+    _engine_now()  gverify.py:141  reads /scratch/work/p2w/.stamp first  -> 981ff1fa35e2cf67  CORRECT
+    live_sha       txt_rank.py:195 from _universe(), hash of check ids   -> 36b7913c98da        CORRECT
+
+Neither is broken. No change was made.
