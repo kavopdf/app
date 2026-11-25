@@ -13,11 +13,9 @@
       }
     ]
   },
-  "fixer_doing": "relay: A/B the dither against an unpatched build",
-  "fixer_doing_since": 1795588320.240963,
   "fixer_engine_at_claim": "85b8735f",
   "fixer_last_beat": 1795588320.2409642,
-  "fixer_started": 1795588424.3631184,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
