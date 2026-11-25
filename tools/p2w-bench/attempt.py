@@ -373,6 +373,16 @@ def add(args):
             if outcome in ("kept", "partial"):
                 outcome = "lead"
 
+            # A MEASUREMENT OF A DIRTY TREE IS NOT AN ATTEMPT, AND COUNTING IT INFLATES THE LEDGER.
+            # This recorded outcome="lead" with moved=0 and carried on, so 18_displacement reached 69
+            # attempts of which 19 were leads - a run that changed nothing, measured code that existed only
+            # in its sandbox, and still advanced the attempt counter. The ledger then showed effort where
+            # there had been none, and rotation kept returning to a class that had never been worked.
+            #
+            # Refuse instead: no attempt is recorded, so the count stays honest and the fixer has to commit
+            # before it can claim the work. The finding is already printed above.
+            return 2
+
     d = load()
     row = d.setdefault(name, {"attempts": 0, "first_seen": None, "last": None,
                               "outcomes": [], "reason": "", "requeues": 0,
