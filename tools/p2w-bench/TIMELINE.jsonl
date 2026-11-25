@@ -6638,3 +6638,5 @@
 {"t": 1795642201.668906, "ist": "03:00:01", "ev": "beat", "d": "measuring 212 on the pgMar engine"}
 {"t": 1795642763.797554, "ist": "03:09:23", "ev": "beat", "d": "measuring (84/212) on the pgMar engine"}
 {"t": 1795643924.0576782, "ist": "03:28:44", "ev": "beat", "d": "212/212 measured; running the gate"}
+{"t": 1795644060.132333, "ist": "03:31:00", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795644062.3450055, "ist": "03:31:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
