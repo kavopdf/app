@@ -13,8 +13,10 @@
       }
     ]
   },
+  "fixer_doing": "measuring narrowed guard on 4",
+  "fixer_doing_since": 1795624125.9490798,
   "fixer_engine_at_claim": "85b8735f",
-  "fixer_last_beat": 1795619032.6371524,
+  "fixer_last_beat": 1795624125.9490805,
   "fixer_started": 1795620372.9134078,
   "history": [
     {

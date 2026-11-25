@@ -6330,3 +6330,27 @@
 {"t": 1795619579.7486389, "ist": "20:42:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795619579.974787, "ist": "20:42:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795619582.5587642, "ist": "20:43:02", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795620375.7320147, "ist": "20:56:15", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795620375.886506, "ist": "20:56:15", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795620375.9575777, "ist": "20:56:15", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795620682.727339, "ist": "21:01:22", "ev": "beat", "d": "install-gate timed out, inspecting"}
+{"t": 1795620698.4968617, "ist": "21:01:38", "ev": "beat", "d": "warm pod confirmed, installing gate"}
+{"t": 1795622337.8885438, "ist": "21:28:57", "ev": "beat", "d": "agents returned, checking gates"}
+{"t": 1795622570.7498822, "ist": "21:32:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795622571.6375585, "ist": "21:32:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795622572.258659, "ist": "21:32:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795622572.8993204, "ist": "21:32:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795622573.5866587, "ist": "21:32:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795622605.0316854, "ist": "21:33:25", "ev": "beat", "d": "P1 applied, compiling engine"}
+{"t": 1795622641.1913238, "ist": "21:34:01", "ev": "beat", "d": "corpus slice 1/5"}
+{"t": 1795622898.27132, "ist": "21:38:18", "ev": "beat", "d": "corpus slice 2/5"}
+{"t": 1795623177.088236, "ist": "21:42:57", "ev": "beat", "d": "corpus slice 3/5"}
+{"t": 1795623401.439494, "ist": "21:46:41", "ev": "beat", "d": "corpus slice 4/5 final"}
+{"t": 1795623637.6590025, "ist": "21:50:37", "ev": "beat", "d": "corpus done, running gate"}
+{"t": 1795623675.6561956, "ist": "21:51:15", "ev": "beat", "d": "corpus done, scoping changed bytes"}
+{"t": 1795623681.2947714, "ist": "21:51:21", "ev": "beat", "d": "measuring txt on 213"}
+{"t": 1795623868.8572214, "ist": "21:54:28", "ev": "beat", "d": "measuring 4 changed docs"}
+{"t": 1795624038.528613, "ist": "21:57:18", "ev": "beat", "d": "narrowing carry guard to table edge"}
+{"t": 1795624125.948531, "ist": "21:58:45", "ev": "beat", "d": "measuring narrowed guard on 4"}
+{"t": 1795624310.928696, "ist": "22:01:50", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795624313.3993993, "ist": "22:01:53", "ev": "beat", "d": "attempt.py: recording an attempt"}
