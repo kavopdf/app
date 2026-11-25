@@ -1351,16 +1351,9 @@
   "status": "OPEN"
  },
  "content-present-partly-displaced": {
-  "attempts": 22,
+  "attempts": 23,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-19 22:59",
-    "moved": 0,
-    "outcome": "reverted",
-    "reason": "SUPERSEDED, nothing landed. rowTables is gated out on this page by rowGapOk's floor max(size*2.4,16) - every 18.4 pt row pair was rejected, so bank-statement fell back to flow. patches/rowgapok-run-pi",
-    "total": 24
-   },
    {
     "at": "2026-11-19 23:00",
     "moved": 13,
@@ -1509,6 +1502,17 @@
     "outcome": "kept",
     "reason": "Kept, and not the cause of the stall: soffice launched with no -env:UserInstallation, so every launch shared one profile and a soffice orphaned by a killed call held it. Measured: 1-page doc 56.7 s be",
     "total": 0
+   },
+   {
+    "at": "2026-11-25 15:06",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 0,
+    "outcome": "kept",
+    "reason": "instrument: the soffice prerender wedge - orphan holders swept by profile, retry on a fresh profile, a no-render docx skipped by name in PRE/.soffice-fail. 23 of 23 measured in two ~4 min calls where ",
+    "total": null
    }
   ],
   "last": null,
@@ -1537,11 +1541,12 @@
    "lead",
    "lead",
    "error",
+   "kept",
    "kept"
   ],
   "ratchet_at": "20 Nov 03:40",
   "ratchet_docs": 213,
-  "reason": "Kept, and not the cause of the stall: soffice launched with no -env:UserInstallation, so every launch shared one profile and a soffice orphaned by a killed call held it. Measured: 1-page doc 56.7 s behind a 120-page hog on the shared profile vs 13.9 s on its own; a wedged survivor took a 23-doc prerender to 0 of 23 in 90 s with no error. Patch kept on its own merits.",
+  "reason": "instrument: the soffice prerender wedge - orphan holders swept by profile, retry on a fresh profile, a no-render docx skipped by name in PRE/.soffice-fail. 23 of 23 measured in two ~4 min calls where the old code stalled with no output. No document moved: this is the instrument the class needs, not the class fix. engine unchanged (981ff1fa35e2cf67)",
   "reasons": [
    "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing.",
    "recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down the page (bank-statement 0.4554 pt x 12 rows = +5.85 pt). Whole corpus 13 improved, 0 worse. Also published the table this engine actually produces - ten rows were stale and had blocked every fixer run since 11:55.",
@@ -1564,7 +1569,8 @@
    "row-pitch dither (error-diffused w:trHeight, -0.85 pt rule charge) applied alone and A/B measured on the engine's own output: it fires, shifting declared pitch 18.0/19.0 -> 17.15/18.15 pt on mobile-bill, salary-slip-corporate and very-long-single-column-table. Not committed: the rendered share@5 that would judge it could not be obtained because screen.py's soffice prerender hangs (3 x 280 s calls, BLOCKERS 25 Nov), and the engine's own comment records a 0.5 pt variant of this change making 18_displacement worse. FINDINGS/18-DISPLACEMENT-ROW-PITCH-DITHER-25NOV.md",
    "Instrument, not engine: edt() ran the 48x-slower pure-Python fallback in every tool that imports p2w instead of running main() - screen.py is one. Guard moved beside the requirement. This class: 3x280s, 0 measured, no error -> 23 of 23 measured in 82s, SCREEN FAIL (correct, engine unpatched). No document moved.",
    "Hypothesis refuted: a single document wedges the renderer. Probed all 10 unrendered documents individually with a 45 s cap each and a fresh soffice profile: 4.9, 5.1, 5.4, 5.8, 5.8, 5.8, 5.9, 5.9, 6.0, 6.8 s, all rc=0, all produced a PDF. No document wedges the renderer.",
-   "Kept, and not the cause of the stall: soffice launched with no -env:UserInstallation, so every launch shared one profile and a soffice orphaned by a killed call held it. Measured: 1-page doc 56.7 s behind a 120-page hog on the shared profile vs 13.9 s on its own; a wedged survivor took a 23-doc prerender to 0 of 23 in 90 s with no error. Patch kept on its own merits."
+   "Kept, and not the cause of the stall: soffice launched with no -env:UserInstallation, so every launch shared one profile and a soffice orphaned by a killed call held it. Measured: 1-page doc 56.7 s behind a 120-page hog on the shared profile vs 13.9 s on its own; a wedged survivor took a 23-doc prerender to 0 of 23 in 90 s with no error. Patch kept on its own merits.",
+   "instrument: the soffice prerender wedge - orphan holders swept by profile, retry on a fresh profile, a no-render docx skipped by name in PRE/.soffice-fail. 23 of 23 measured in two ~4 min calls where the old code stalled with no output. No document moved: this is the instrument the class needs, not the class fix. engine unchanged (981ff1fa35e2cf67)"
   ],
   "requeues": 0,
   "status": "OPEN"

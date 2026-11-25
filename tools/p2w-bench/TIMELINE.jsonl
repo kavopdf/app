@@ -6094,4 +6094,22 @@
 {"t": 1795593532.9404542, "ist": "13:28:52", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795593533.3739467, "ist": "13:28:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795593535.0185068, "ist": "13:28:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+<<<<<<< Updated upstream
 {"t": 1795595904.0315447, "ist": "14:08:24", "ev": "claim", "d": "baseline claimed the slot"}
+=======
+{"t": 1795596440.3208663, "ist": "14:17:20", "ev": "beat", "d": "relay: cloned, about to read"}
+{"t": 1795596465.909515, "ist": "14:17:45", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795596466.1082044, "ist": "14:17:46", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795596466.1996763, "ist": "14:17:46", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795596477.4431188, "ist": "14:17:57", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795596483.557766, "ist": "14:18:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795596488.6559267, "ist": "14:18:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795598164.8676715, "ist": "14:46:04", "ev": "beat", "d": "relay: applying verified prerender fix, then the gate"}
+{"t": 1795598477.88977, "ist": "14:51:17", "ev": "beat", "d": "relay: verifying the prerender fix on a real document"}
+>>>>>>> Stashed changes
+{"t": 1795599352.9191813, "ist": "15:05:52", "ev": "beat", "d": "relay: fixes landed, recording and writing the report"}
+{"t": 1795599359.3688252, "ist": "15:05:59", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795599359.5094974, "ist": "15:05:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795599359.6004252, "ist": "15:05:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795599360.3188002, "ist": "15:06:00", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795599365.1003437, "ist": "15:06:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
