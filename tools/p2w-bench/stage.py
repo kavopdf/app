@@ -73,19 +73,30 @@ def _corpus_names():
 
 
 def measured():
-    """How many documents have a Google result, and how many were refused rather than scored."""
+    """How many documents have a Google result OF THIS ENGINE, and how many were refused rather than scored.
+
+    A FILE ON DISK IS NOT A MEASUREMENT. This counted every .json in the directory, so once all 213
+    existed it reported "measured: 213 through Google" while only 82 carried the engine on HEAD - the
+    stage read `fix` on a measurement that was two engine commits old, and the pending list could not
+    see the staleness at all because nothing here ever asked which engine a result was taken on.
+
+    `gverify._done()` already answers exactly this question, engine stamp and abbreviation length and
+    page_count_refused all handled, and `--plan` has used it since 21 Nov. Two answers to one question
+    is how the 22 Nov "0 verified" report happened, so this calls the one that exists.
+    """
     if not os.path.isdir(GVERIFY):
         return 0, 0
-    ok = refused = 0
-    for f in os.listdir(GVERIFY):
-        if not f.endswith(".json"):
-            continue
-        d = _json(os.path.join(GVERIFY, f), {})
+    try:
+        import gverify as _g
+        done = _g._done()
+    except Exception:
+        return 0, 0
+    refused = 0
+    for name in done:
+        d = _json(os.path.join(GVERIFY, name + ".json"), {})
         if d.get("status") == "page_count_refused":
             refused += 1
-        else:
-            ok += 1
-    return ok, refused
+    return len(done) - refused, refused
 
 
 def _last_commit(rel):

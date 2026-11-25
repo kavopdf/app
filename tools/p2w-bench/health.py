@@ -260,7 +260,17 @@ def _attempts_recent(hours=3.0):
 
 def compute():
     total = _corpus_total()
-    g = _count(GVERIFY)
+    # A FILE ON DISK IS NOT A MEASUREMENT. This counted every .json in benchmarks/gverify/, so the
+    # stage read `done 213 of 213` while only 82 results carried the engine on HEAD - the watchdog was
+    # told the measurement stage was finished, so a stale table could never be reported as late.
+    # `gverify._done()` is the engine-aware count `--plan` has used since 21 Nov; two answers to one
+    # question is how the 22 Nov "0 verified" report happened. Falls back to the file count if the
+    # import fails, so health.py still runs if gverify.py moves.
+    try:
+        import gverify as _g
+        g = len(_g._done())
+    except Exception:
+        g = _count(GVERIFY)
     lo = _count(LORES)
     txt = _txt_state()
     out = {"corpus": total, "stages": {}}
@@ -270,9 +280,14 @@ def compute():
         "state": "done" if total and g >= total else
                  ("moving" if _newest(GVERIFY) < THRESHOLD["measure-google"] else "stopped")}
 
+    # `of` WAS `g`, THE GOOGLE COUNT. Once the Google count became engine-aware (82 of 213) the matrix
+    # line printed "done 213 of 82" - a fraction greater than one, which is the same class of nonsense
+    # as the "213 of 212" this file already warns about at the top. The matrix is a LibreOffice render
+    # of every document in the corpus; the corpus is what it can have, so the corpus is what it is
+    # measured against.
     out["stages"]["matrix"] = {
-        "done": lo, "of": g, "age_h": round(_newest(LORES), 1),
-        "state": "done" if g and lo >= g else
+        "done": lo, "of": total, "age_h": round(_newest(LORES), 1),
+        "state": "done" if total and lo >= total else
                  ("moving" if _newest(LORES) < THRESHOLD["matrix"] else "stopped")}
 
     # A TABLE NEWER THAN ITS RESULTS IS CURRENT, NOT LATE. The class table is regenerated AFTER new
