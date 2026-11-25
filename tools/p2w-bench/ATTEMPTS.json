@@ -1903,7 +1903,7 @@
   "status": "OPEN"
  },
  "t12_word_invention": {
-  "attempts": 5,
+  "attempts": 6,
   "first_seen": null,
   "history": [
    {
@@ -1948,26 +1948,39 @@
     "outcome": "lead",
     "reason": "annotationRuns() reads /Contents from every annotation, not only FreeText+Stamp, and the :956 hoist lacks the drawnByAppearance guard its sibling loop at :947 has. Measured on 600: verify_txt 8/12 7 p",
     "total": 1
+   },
+   {
+    "at": "2026-11-25 17:02",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 5,
+    "outcome": "kept",
+    "reason": "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failin",
+    "total": 8
    }
   ],
   "last": null,
   "last_engine": "85b8735f",
-  "last_moved": 1,
-  "last_total": 1,
+  "last_moved": 5,
+  "last_total": 8,
   "outcomes": [
    "reverted",
    "reverted",
    "lead",
    "lead",
-   "lead"
+   "lead",
+   "kept"
   ],
-  "reason": "annotationRuns() reads /Contents from every annotation, not only FreeText+Stamp, and the :956 hoist lacks the drawnByAppearance guard its sibling loop at :947 has. Measured on 600: verify_txt 8/12 7 passed FAIL -> 8 passed PASS, t12 20 invented words -> 0, the .txt diff is exactly the note (7 words) + the duplicated FreeText (13). Population proved by an independent 213-PDF scan: ONE document carries annotations. Patch saved as PATCHES/600-annotation-runs-subtype-25NOV.patch and reverted: regress.py --check refuses an unmeasured engine and corpus-slice.py needs 4 slices (55 docs per 250 s) before the measurement can start.",
+  "reason": "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failing. txt corpus 199 -> 202 of 213.",
   "reasons": [
    "claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furniture duplication, hyphenation join, symbol decode, dropped glyph fallback) and attack the largest group. No engine change until the census names one.",
    "NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_invoice_with_annotations are the six review ANNOTATIONS, which page.get_text() does not read and the engine does (measured: 'confirmed' absent from get_text(), present in the annotation stream). 12_stamp_across_page_break is duplication across the break - KUNIGAL is drawn once on page 1 and arrives twice - which is t09's question. 311_fir_police_form is cell welding: 60067 and Mobile are two drawn lines in one cell and arrive as '60067Mobile'. 77_arabic_rtl_document is RTL order, 05_round_company_seal_curved_text is single letters from a curve, 39_small_caps_letter_spacing is letter-spaced caps. And THREE OF THE TWELVE ARE THE INSTRUMENT'S OWN ARTIFACT: the PDF text layer carries U+0000 as a zero-width cell separator, _words splits on \\S+ so NUL is not whitespace and glues to the token beside it ('\\x00\\x00\\x00PHOTOGRAPH', 'DisagreeStrongly\\x00disagree', '0.8412,\\x00Adjusted'), and _strip_punct does not strip NUL - so the clean token the writer emitted is counted as invented. Replacing U+0000 with a space on the source side clears 391_survey_questionnaire_grid, 392_statistical_console_output and 406_passport_mrz_page and BREAKS NO DOCUMENT (0 of the 205 passing). Not edited into verify_txt.py: the verifier is the instrument. FINDINGS/t12-is-five-faults-and-three-are-the-instrument-1925.md.",
    "t12's 21 invented words on 600 split into 3 faults; source reader now sees printing annotations (21->20, blast radius 1 doc, no verdict moved); remaining 20 are the converter duplicating FreeText text and emitting sticky-note bodies",
    "footnote superscript starts its own line: toLines tol=max(0.9,size*0.18)=1.28pt for a 7.12pt marker 4.45pt above an 8.9pt baseline. Patch merges it both directions; measured 6->2 invented words on journal-2col-with-footnotes. Not landed: needs 213-doc reconvert to gate, slot ran out at 108/213.",
-   "annotationRuns() reads /Contents from every annotation, not only FreeText+Stamp, and the :956 hoist lacks the drawnByAppearance guard its sibling loop at :947 has. Measured on 600: verify_txt 8/12 7 passed FAIL -> 8 passed PASS, t12 20 invented words -> 0, the .txt diff is exactly the note (7 words) + the duplicated FreeText (13). Population proved by an independent 213-PDF scan: ONE document carries annotations. Patch saved as PATCHES/600-annotation-runs-subtype-25NOV.patch and reverted: regress.py --check refuses an unmeasured engine and corpus-slice.py needs 4 slices (55 docs per 250 s) before the measurement can start."
+   "annotationRuns() reads /Contents from every annotation, not only FreeText+Stamp, and the :956 hoist lacks the drawnByAppearance guard its sibling loop at :947 has. Measured on 600: verify_txt 8/12 7 passed FAIL -> 8 passed PASS, t12 20 invented words -> 0, the .txt diff is exactly the note (7 words) + the duplicated FreeText (13). Population proved by an independent 213-PDF scan: ONE document carries annotations. Patch saved as PATCHES/600-annotation-runs-subtype-25NOV.patch and reverted: regress.py --check refuses an unmeasured engine and corpus-slice.py needs 4 slices (55 docs per 250 s) before the measurement can start.",
+   "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failing. txt corpus 199 -> 202 of 213."
   ],
   "requeues": 0,
   "status": "OPEN"
