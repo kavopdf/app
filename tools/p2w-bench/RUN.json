@@ -1,6 +1,8 @@
 {
- "agents": [],
- "attempts": 2,
+ "agents": [
+  "18_dA-01"
+ ],
+ "attempts": 1,
  "class": "18_displacement",
  "docs_improved": 0,
  "ended": null,
