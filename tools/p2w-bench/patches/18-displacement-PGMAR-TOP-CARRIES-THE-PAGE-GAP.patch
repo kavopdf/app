@@ -1,5 +1,5 @@
---- app/src/main/java/com/kavopdf/app/engine/DocxWriter.java	2026-11-25 18:26:37.173888668 +0000
-+++ /scratch/input/DocxWriter.java	2026-11-25 18:55:26.642036000 +0000
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
 @@ -817,6 +817,25 @@
          float flowBoxPt = 0f;
          /** Set at a page break so the first line on a page carries no gap. */

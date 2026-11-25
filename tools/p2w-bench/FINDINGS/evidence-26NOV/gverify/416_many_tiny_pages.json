@@ -1,0 +1,18 @@
+{
+ "name": "416_many_tiny_pages",
+ "status": "ok",
+ "rc": 0,
+ "at": "2026-11-25T20:08:39",
+ "passed": 42,
+ "total": 42,
+ "failed": [],
+ "displacement": {
+  "med_dy": 2.2,
+  "worst_dy": 3.0,
+  "med_dx": -0.2,
+  "bad_pages": [],
+  "runs_matched": 900
+ },
+ "engine": "d85db0a9822ddb54",
+ "checks": "375669-1795634967"
+}
