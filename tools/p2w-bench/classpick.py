@@ -132,7 +132,24 @@ def attempts_for(cls, since=None):
 
 
 def moved_of(history):
-    return sum(int(x.get("moved") or 0) for x in history)
+    """Documents this history actually moved, counting only the attempts that were measured.
+
+    `x.get("moved") or 0` summed a None - "not measured" - as a zero, so an attempt that never read a
+    number was indistinguishable from one that read a number and found nothing moved. 47_margins holds
+    moved=[2, 2, 0, None, 1, 0, 1, 0]: five of those eight rows are measurements, three are not, and
+    the old sum called it six moved from eight attempts either way.
+
+    A None is skipped, not zeroed. `measured_of()` says how many rows the sum rests on, so a caller
+    that wants to know whether an empty total means "nothing moved" or "nothing was read" can ask.
+    """
+    return sum(int(x["moved"]) for x in history
+               if isinstance(x.get("moved"), int) and not isinstance(x.get("moved"), bool))
+
+
+def measured_of(history):
+    """How many rows of a history carry a real moved count - the denominator moved_of() rests on."""
+    return sum(1 for x in history
+               if isinstance(x.get("moved"), int) and not isinstance(x.get("moved"), bool))
 
 
 def exhausted():
