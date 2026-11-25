@@ -1,14 +1,15 @@
 {
  "agents": [
-  "60te-A-01",
-  "04ch-B-01"
+  "60_tA-02",
+  "04_cB-01"
  ],
- "attempts": 1,
+ "attempts": 2,
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
  "started": "02:28",
  "started_ts": 1795640328.482224,
- "window_for_claim": 1795640328.482224
+ "window_for_claim": 1795640328.482224,
+ "class": "18_displacement"
 }

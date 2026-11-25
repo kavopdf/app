@@ -492,3 +492,7 @@
 {"_list": "agents", "_entry": {"angle": "", "class": "zero-gap census: the latch is 655 lines/24920 chars vs the rule's 12 lines/358; pagepos=0 + anchorkeep=0 changes no page count across 213", "deployed": "02:59", "deployed_at": "2026-11-25T02:59", "expected": "", "finding": "", "id": "zero-01", "question": "", "status": "running"}}
 {"_list": "notes", "_entry": {"at": "02:59", "text": "agent deployed: zero-gap census: the latch is 655 lines/24920 chars vs the rule's 12 lines/358; pagepos=0 + anchorkeep=0 changes no page count across 213 /  - "}}
 {"_list": "agents", "_entry": {"angle": "", "class": "Google verification: 69_two_col_legal 35/42 -> 39/42 on the spendWideGap build, 26_text_overlap=11 is the price", "deployed": "03:12", "deployed_at": "2026-11-25T03:12", "expected": "", "finding": "", "id": "Goog-01", "question": "", "status": "running"}}
+{"_list": "notes", "_entry": {"at": "03:12", "text": "attempt 6 on 04_chars_missing -> lead (1/64 moved)"}}
+{"_list": "notes", "_entry": {"at": "03:12", "text": "agent deployed: Google verification: 69_two_col_legal 35/42 -> 39/42 on the spendWideGap build, 26_text_overlap=11 is the price /  - "}}
+{"_list": "notes", "_entry": {"at": "03:21", "text": "attempt 7 on 04_chars_missing -> lead (1/64 moved)"}}
+{"_list": "notes", "_entry": {"at": "03:21", "text": "agent deployed: band sweep: footband 0.80 zeroes 69 and spares 330_cad; 26_text_overlap=11 at both 0.80 and 0.0 /  - "}}
