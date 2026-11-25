@@ -1355,6 +1355,10 @@ def main(argv):
                      "scored were read as current, which is a failed read and not a measurement. "
                      "No count is stated rather than a zero |" % _gs)
             L.append("| Who re-measures them | the **:20 gverify** cron, once the read works |")
+            _to_go = 0   # A FAILED READ CANNOT PRODUCE A QUEUE. The 09:59 report stated "about 4 runs
+            # for the 212 outstanding" from the same read that could not say how many were fixed. If the
+            # instrument could not count what was done, it cannot count what is left; a reader takes the
+            # queue as a measurement because it is formatted like one.
         else:
             L.append("| **Fixed - Google, every applicable check** | **%d** of the **%d** re-measured on this "
                      "engine - **%d** of the %d scored are still on an older engine, and **%d** of those "
