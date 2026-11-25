@@ -5551,3 +5551,27 @@
 {"t": 1795573091.3311675, "ist": "07:48:11", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795573091.7212946, "ist": "07:48:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795573093.0728488, "ist": "07:48:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795574971.8989484, "ist": "08:19:31", "ev": "beat", "d": "relay: reading gaps/status/report"}
+{"t": 1795574972.0208151, "ist": "08:19:32", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795574976.3238723, "ist": "08:19:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795574978.126003, "ist": "08:19:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795575319.6822534, "ist": "08:25:19", "ev": "beat", "d": "relay: measure gate READY, running regress --check"}
+{"t": 1795575535.1964328, "ist": "08:28:55", "ev": "beat", "d": "relay: fetching 213-doc corpus (6 min)"}
+{"t": 1795575571.9833345, "ist": "08:29:31", "ev": "beat", "d": "relay: corpus conversion with anchor census (-j4, 213 docs)"}
+{"t": 1795575574.3777332, "ist": "08:29:34", "ev": "beat", "d": "relay: corpus conversion batch 2"}
+{"t": 1795575586.3438628, "ist": "08:29:46", "ev": "beat", "d": "relay: corpus conversion --ensure batch (census on)"}
+{"t": 1795575740.113598, "ist": "08:32:20", "ev": "beat", "d": "relay: full 213-doc census pass"}
+{"t": 1795575935.117979, "ist": "08:35:35", "ev": "beat", "d": "relay: A/B of p2w.pagepos=0 over 213 docs"}
+{"t": 1795576102.7728555, "ist": "08:38:22", "ev": "beat", "d": "relay: rebuilt engine with inColumn symmetry patch"}
+{"t": 1795576799.5454216, "ist": "08:49:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795576800.9471884, "ist": "08:50:00", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795576801.311504, "ist": "08:50:01", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795576802.621066, "ist": "08:50:02", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795576816.629827, "ist": "08:50:16", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795576817.9864526, "ist": "08:50:17", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795576818.402858, "ist": "08:50:18", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795576819.7961516, "ist": "08:50:19", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795576831.539284, "ist": "08:50:31", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795576832.8653574, "ist": "08:50:32", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795576833.3078551, "ist": "08:50:33", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795576834.7271714, "ist": "08:50:34", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

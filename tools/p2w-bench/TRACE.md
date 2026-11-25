@@ -6,20 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-<<<<<<< HEAD
-=======
-| 22 Nov 14:05 | fixer | build-engine | engine built in 53s |
->>>>>>> eb329cc7 (fixer 25 Nov: foot-band spend measured - fires on 2 of 12, neutral on the pixel instrument; engine deterministic at document.xml, not at the .docx byte)
-| 22 Nov 14:07 | fixer | build-engine | started |
-| 22 Nov 14:08 | fixer | build-engine | engine built in 52s |
-| 22 Nov 14:08 | fixer | build-engine | started |
-| 22 Nov 14:09 | fixer | build-engine | engine built in 60s |
-| 22 Nov 14:09 | fixer | build-engine | started |
-| 22 Nov 14:10 | fixer | build-engine | engine built in 63s |
-| 22 Nov 14:12 | fixer | build-engine | started |
-| 22 Nov 14:12 | fixer | build-engine | engine unchanged, compile skipped |
-| 22 Nov 14:12 | fixer | build-engine | started |
-| 22 Nov 14:13 | fixer | build-engine | started |
 | 22 Nov 14:14 | fixer | build-engine | started |
 | 22 Nov 14:15 | fixer | build-engine | engine built in 55s |
 | 22 Nov 14:16 | fixer | build-engine | started |
@@ -416,3 +402,7 @@
 | 25 Nov 07:02 | fixer | claim | fixer claimed the slot |
 | 25 Nov 07:47 | fixer | attempt | 04_chars_missing -> lead (0/? moved) |
 >>>>>>> eb329cc7 (fixer 25 Nov: foot-band spend measured - fires on 2 of 12, neutral on the pixel instrument; engine deterministic at document.xml, not at the .docx byte)
+| 25 Nov 08:29 | fixer | build-engine | started |
+| 25 Nov 08:29 | fixer | build-engine | engine unchanged, compile skipped |
+| 25 Nov 08:38 | fixer | build-engine | started |
+| 25 Nov 08:38 | fixer | build-engine | engine built in 34s |
