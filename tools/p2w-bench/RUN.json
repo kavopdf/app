@@ -2,7 +2,7 @@
  "agents": [
   "instA-01"
  ],
- "attempts": 5,
+ "attempts": 7,
  "class": "content-present-partly-displaced",
  "counted": [
   [
@@ -13,7 +13,7 @@
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
- "kept": 2,
+ "kept": 3,
  "needs_human": 0,
  "obstacles_cleared": 0,
  "started": "15:06",

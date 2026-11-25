@@ -6153,3 +6153,8 @@
 {"t": 1795600632.7181592, "ist": "15:27:12", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795600634.302508, "ist": "15:27:14", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795600839.9922452, "ist": "15:30:39", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795600845.6483998, "ist": "15:30:45", "ev": "attempt", "d": "content-present-partly-displaced -> kept"}
+{"t": 1795600845.74769, "ist": "15:30:45", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795600845.8398352, "ist": "15:30:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795600846.4919631, "ist": "15:30:46", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795600846.697471, "ist": "15:30:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
