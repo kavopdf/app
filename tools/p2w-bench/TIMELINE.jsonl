@@ -6496,3 +6496,15 @@
 {"t": 1795630477.4586334, "ist": "23:44:37", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795630477.5554957, "ist": "23:44:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795630478.1171608, "ist": "23:44:38", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795631201.5952618, "ist": "23:56:41", "ev": "beat", "d": "heartbeat before any claim: cloned, claiming"}
+{"t": 1795631206.8349636, "ist": "23:56:46", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795631207.054317, "ist": "23:56:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795631207.1733348, "ist": "23:56:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795631497.109877, "ist": "00:01:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795631514.9412577, "ist": "00:01:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795632942.8007884, "ist": "00:25:42", "ev": "beat", "d": "applying 18_displacement patch, then build"}
+{"t": 1795632957.6446798, "ist": "00:25:57", "ev": "beat", "d": "regress check 1/2 on patched engine"}
+{"t": 1795633217.2187526, "ist": "00:30:17", "ev": "beat", "d": "building patched engine"}
+{"t": 1795633328.8838162, "ist": "00:32:08", "ev": "beat", "d": "converting 4 target docs on patched engine"}
+{"t": 1795633447.9543767, "ist": "00:34:07", "ev": "beat", "d": "scoring 4 Google renders"}
+{"t": 1795633597.7986586, "ist": "00:36:37", "ev": "beat", "d": "attempt.py: recording an attempt"}
