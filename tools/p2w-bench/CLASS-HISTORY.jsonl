@@ -201,3 +201,5 @@
 {"at": "2026-11-25 20:36", "attempt": 70, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-25 20:42", "attempt": 71, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-25 22:10", "attempt": 72, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
+{"at": "2026-11-25 23:37", "attempt": 2, "class": "05_chars_extra", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-25 23:37", "attempt": 3, "class": "05_chars_extra", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}

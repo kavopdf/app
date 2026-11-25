@@ -6460,3 +6460,8 @@
 {"t": 1795630059.5268264, "ist": "23:37:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795630060.1943843, "ist": "23:37:40", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795630060.4088814, "ist": "23:37:40", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795630062.7235334, "ist": "23:37:42", "ev": "attempt", "d": "05_chars_extra -> lead"}
+{"t": 1795630062.8528752, "ist": "23:37:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795630062.9459577, "ist": "23:37:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795630063.8145404, "ist": "23:37:43", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795630067.71301, "ist": "23:37:47", "ev": "beat", "d": "gate + commit"}
