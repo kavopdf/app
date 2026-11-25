@@ -954,9 +954,23 @@ def _ruler(runs, lines):
     (text, column) pairs, and a column is only comparable between the two sides if both
     are read with the same ruler. Returns None when there is nothing to fit.
     """
+    # A TEXT THAT SITS AT ONE COLUMN IS SAFE TO REUSE AS A KEY; ONE THAT SITS AT SEVERAL IS NOT.
+    # by_text[key].pop(0) pairs a run with whichever identical line came first. A bill of
+    # materials numbers its rows 1, 2, 3, so those keys point at different columns and the
+    # pairing is arbitrary - measured on 332_bom_on_drawing, the same column 81 came back for
+    # x = 77.9, 167.9 and 314.9, and the fitted ruler was 4x the width the .txt was written with.
+    #
+    # A page of identical dashes all at one column is a different thing: every pairing is the same
+    # pairing, so dropping it would only shrink the fit for no reason. A duplicate is therefore
+    # removed only when its occurrences disagree about the column - the case where the key carries
+    # no information at all.
     by_text = {}
     for ln in lines:
-        by_text.setdefault(ln.strip(), []).append(_column(ln))
+        _k = ln.strip()
+        if not _k:
+            continue
+        by_text.setdefault(_k, []).append(_column(ln))
+    by_text = {k: v for k, v in by_text.items() if len(set(v)) == 1}
     pairs = []
     for x, _y, t in runs:
         key = t.strip()
