@@ -24,12 +24,12 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 
 | document | share@5 | dx | dy | explains | still >20pt |
 |---|---|---|---|---|---|
-| 041122-Account_Opening_Form | 98.65 | 38.8 | -36.9 | 1.0 | 70.0% |
-| Account_Opening_Form_Fillable_fill | 97.62 | 3.4 | -6.7 | 2.0 | 66.0% |
+| 041122-Account_Opening_Form | 98.65 | 38.6 | -39.5 | 1.0 | 70.0% |
+| Account_Opening_Form_Fillable_fill | 97.62 | 3.4 | -17.5 | 2.0 | 66.0% |
 | one-page-rotated-180-degrees | 81.64 | 0.0 | 0.0 | 0.0 | 23.0% |
-| 600_reviewed_invoice_with_annotati | 62.46 | 0.0 | 105.6 | 25.0 | 1.0% |
-| 601_fillable_admission_form | 52.39 | 0.0 | 30.2 | 14.0 | 9.0% |
-| itr-computation-with-slab-table | 42.33 | 0.0 | 0.5 | 4.0 | 1.0% |
+| 600_reviewed_invoice_with_annotati | 62.46 | 0.0 | 102.7 | 28.0 | 1.0% |
+| 601_fillable_admission_form | 52.39 | 0.0 | 26.9 | 15.0 | 8.0% |
+| itr-computation-with-slab-table | 42.33 | 0.0 | -0.5 | 1.0 | 0.0% |
 | table-inside-two-column-page | 35.87 | 0.0 | 0.0 | 0.0 | 0.0% |
 | 360_restaurant_menu | 34.43 | 0.0 | 0.0 | 0.0 | 3.0% |
 | text-held-twice-shadow-text | 30.29 | 0.0 | 0.0 | 0.0 | 28.0% |
