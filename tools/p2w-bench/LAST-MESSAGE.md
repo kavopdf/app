@@ -1,23 +1,20 @@
-# Fixer report - 2026-11-25 20:12
 
-```
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 20:12 → running IST · 6 min**
+**25 Nov 2026 · slot 20:02 → running IST · 39 min**
 
-> No change was kept this run. The last run's first attempt was taken, reproduced, and **refuted on
-> the docx side** - the txt gets one document cleaner and the docx loses 12.71 share5 on that same
-> document, because the two paragraphs it deletes sat at the top of the page and the body reflows.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
 | Check-instances passing | **8702** of 9320 (93.4%) on 213 documents |
 | Check-instances still failing | **618** |
 | Kept attempts vs documents clean | **15** classes with a kept attempt, **42** documents clean - a kept attempt is progress inside a class, not a finished document |
+| Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 0 vs ATTEMPTS.json history 1; subagents: 2 deployed vs no FINDINGS file for t12_A-01, t12_B-01 |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,47 +23,76 @@
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (18 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `18_displacement` - taken from the pending list (16 still open), not a new class |
+| Findings vs landing | **71** finding(s) on this class and **0** documents moved - writing is cheaper than landing, and nothing else says so |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 20:12 | **lead** | 0/None | annotation /Contents hoist patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) reproduced on one engine: 600_reviewed_invoice_with_annotations txt 7/8 -> 8/8 PASS, t12 83 chars -> 0, paragraphs 14 |
+| 20:36 | **lead** | 0/10 | `18_displacement` rank 1 - the census's top mechanism - falsified in Google on the worst document in the class. |
 
+## The measurement, and what it killed
 
-### What the numbers are
+`FINDINGS/18-displacement-B-GROUP-CENSUS-25NOV-relay.md` ranks "Google lays a table row's pitch on whole
+0.75 pt pixels while the engine declares twips" first, worth 54.8 clean documents. I tested it on
+`320_balance_sheet_statutory`, the group-B document with the largest recorded ramp.
 
-**The txt half, on one engine, the patch the only difference.** `ConvertOne` twice on
-`600_reviewed_invoice_with_annotations`, same pod, same PDF, only `PdfToWord.java` differing.
-Paragraphs 14 to 12, and `verify_txt.py` goes 7 of 8 applicable FAIL to 8 of 8 applicable PASS,
-`t12_word_invention` 83 invented chars to 0. The whole `.txt` diff is two lines: the note
-("Rate for HSN 8536 confirmed with PO.") that no page draws, and the FreeText written a second time.
+**The change.** `DocxWriter.table()` writes rows `<w:trHeight w:val="H" w:hRule="atLeast"/>` at the
+page's own pitch. I rounded the row's border box (`H` + the drawn rule) up to a whole multiple of 15
+twips and declared `H = snapped - rule`. Ceiling only, behind one constant.
 
-**The population, by bytes.** `corpus-changed.py --record` after rebuilding all 213 on the patched
-engine: 1 changed, 0 never measured - that document and nothing else. 212 outputs are byte-identical,
-so no score of theirs can differ.
+**The declaration moved, verified from the .docx and not from the tool.** `w:trHeight` went 280 -> 292
+twips on 16 rows, 260 -> 262 on 5; with the rule charged that is a 300-twip box, **15.00 pt**, which is
+exactly the pitch the census recorded Google laying on this document.
 
-**The docx cost.** `p2w.py` on the patched tree measured 600 at share5 38.97 where the committed row
-(engine `9e2b3e4d`, 13:47) says 51.68; median 11.04 to 6.72, p90 48.96 to 32.64, max 62.88 to 37.44,
-text_recall 100.0 and chars_missing 0 both unchanged. The ink did not go missing, it moved up. Rule 3
-refuses this. The before column is an older engine, so the 12.71 points include drift and are not yet
-proved to be the patch's cost - the A/B is one document and two conversions, and it was not run
-because the slot ran out.
+**Google did not move.**
 
-**Two agents, in the first ten minutes.** One audited the guard site: the hoist is in `readPage()`
-(there is no `pageText()`), the guard is genuinely missing at `:956`, and `annotationContentsOf()`
-holds the correct subtype rule while being dead code with zero call sites. The other root-caused the
-"(Authorised signatory)" duplication: one page glyph, two model entries, a cell-versus-line granularity
-mismatch where `buildRowTable` marks the cell copy consumed and never the raw line, and the duplicate
-guard keys on exact text equality so it cannot fire on a weld. Neither diff was applied.
+| `320_balance_sheet_statutory` | passed | `18_displacement` | `med_dy` | `worst_dy` |
+|:--|--:|:--|--:|--:|
+| before | 41/42 | FAIL | **+8.2** | **19.4** |
+| after (box on the 0.75 pt grid) | 41/42 | FAIL | **+8.2** | **18.7** |
+
+Both sides are Google's own layout of the same .docx: upload -> copy as a Google Doc -> export PDF ->
+`verify_google.py`. 73 runs matched on both. `med_dy` is unchanged to the tenth of a point; `worst_dy`
+moves by one snap on one row.
+
+**Why it failed, and what is left.** `hRule="atLeast"` is a floor. Google lays
+`max(trHeight, cell content + rule)`, and the cell content already exceeds the declaration, so raising
+it is absorbed. The pitch Google uses comes from the cell's own lines - the census's **rank 2**, which
+it could not separate from rank 1 on ten points. That is now the only live candidate, and the
+discriminating probe is in the finding: a cell whose declared `w:line` is already a whole multiple of
+15 twips. If Google still drifts, `w:lineRule` is not honoured on import and the lever is not a number.
+
+This satisfies the census's own stated falsifier for rank 1, which said a document whose row box is
+already on the grid and which still ramps would mean the pitch is not the lever. That document now
+exists. The patch is reverted, not left in the tree: it moves nothing in Google and adds up to 0.7 pt a
+row in LibreOffice, which is regression risk for no gain.
+
+## Next run
+
+Do not re-derive the row snap. Read
+`FINDINGS/18-displacement-ROW-SNAP-FALSIFIED-25NOV-fixer.md`, then probe `w:lineRule="exact"` on a
+single cell before touching the class again. `18_displacement` is still worth 54.8 documents and is
+still the class to take - but rank 1 is spent.
+
+## Subagents
+
+One, on the engine code: it produced the patch specification and corrected the site (group B goes
+through `table()`, not `columnPage()`), which is why the experiment was one compile and one conversion
+rather than an hour of guessing.
+
+## Honest limits
+
+The corpus was mid-build when the slot ended (169 of 213 converted on the old engine, then 213 to go
+again on the patched one), so `regress.py --check` was never run on the patched tree - it was not needed,
+because the patch is reverted and the tree carries no engine change. Nothing is committed to `app/`.
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.0 h ago** |
+| Measured | **45 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **204** (95.8%) |
 | Failing at least one check | **9** |
@@ -75,20 +101,17 @@ guard keys on exact text equality so it cannot fire on a weld. Neither diff was 
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `t12_A-01` | audit the annotation hoist guard: pageText does not  | 20:15 | - | - |
-| `t12_B-01` | root-cause the (Authorised signatory) duplication: c | 20:15 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 20:12 → running · 6 min |
-| Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 12 |
-| Longest silence | **2.1 min** — from 20:12:19, after `classrow.py: refreshing the class file` |
-| Silences over 2 min | 1 |
+| Slot window | 20:02 → running · 39 min |
+| Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
+| Tool beats | 15 |
+| Longest silence | **14.6 min** — from 20:02:51, after `pod-prep: warm pod, installing hook` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -96,9 +119,10 @@ guard keys on exact text equality so it cannot fire on a weld. Neither diff was 
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **2 min** | `#########` |
-| report - the report and the chain | **2 min** | `##########` |
-| other - not attributed to a tool | **0 min** | `###` |
+| fix - diagnose and change the engine | **2 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **30 min** | `#################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **5 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -111,22 +135,7 @@ guard keys on exact text equality so it cannot fire on a weld. Neither diff was 
 
 ## Next run
 
-**FIRST, and it is one document:** settle whether the annotation patch's docx cost is the patch or
-drift. Revert, convert `600_reviewed_invoice_with_annotations` with HEAD, measure, compare against the
-patched run in `FINDINGS/ANNOTATION-PATCH-FIXES-TXT-BUT-COSTS-DOCX-25NOV-relay.md`. Two conversions,
-one document, minutes - and it decides whether the patch is landable at all.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 10 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 10 item(s) you can close - run pending.py and take them in its order before the class below. classpick --leverage picks the class; six checks can make a document clean (18_displacement 25, 60_text_column_right_edge 6, 47_margins 3, 59_shape_anchor 3, 32_stroke_lines 2, 17_matched_runs 1) and they are weighted 3x over the 34 that cannot. Read pending.py first, then take the class it gives.
 
-**SECOND:** the cost is where the hoist is emitted, not that it is emitted. Appending the `/Contents`
-paragraphs after the page's own blocks instead of at the top would let the note and the duplicate be
-dropped without moving a glyph. That patch is not written.
-
-**THIRD:** the "(Authorised signatory)" duplication is a second, independent one-document fix:
-`buildRowTable` marks the cell copy consumed and never the raw line, and the duplicate guard's exact
-text equality cannot fire on a weld. Clearing it closes the last two txt documents that are not the
-annotation one.
-
-**MEASUREMENT ECONOMY, learned this slot:** a full `p2w.py` pass did 73 of 212 in two 260 s budgets - a
-whole slot. `corpus-changed.py --record` then `P2W_CHANGED_ONLY=1 P2W_ENGINE_SRC=<this clone> p2w.py`
-measures only what moved, and it writes `RANKING.partial.csv` rather than the published table, so the
-stamp path still needs the full pass. Do the A/B on one document with `ConvertOne` + `verify_txt.py`
-before spending the corpus.
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
