@@ -1,4 +1,3 @@
-| 22 Nov 06:10 | fixer | attempt 32_stroke_lines -> kept (3/213 moved) |
 | 22 Nov 06:13 | fixer | attempt 32_stroke_lines -> kept (16/213 moved) |
 | 22 Nov 06:17 | fixer | attempt 18_displacement -> lead |
 | 22 Nov 06:18 | fixer | slot FORCED released - see INCIDENTS.md for why |
@@ -198,3 +197,4 @@
 | 25 Nov 07:02 | fixer | slot claimed - fixer running |
 | 25 Nov 07:47 | fixer | attempt 04_chars_missing -> lead (0/? moved) |
 >>>>>>> eb329cc7 (fixer 25 Nov: foot-band spend measured - fires on 2 of 12, neutral on the pixel instrument; engine deterministic at document.xml, not at the .docx byte)
+| 25 Nov 09:25 | fixer | attempt 18_displacement -> lead (0/? moved) |
