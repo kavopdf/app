@@ -5619,3 +5619,7 @@
 {"t": 1795579044.5736613, "ist": "09:27:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795579044.6565804, "ist": "09:27:24", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795579044.9278421, "ist": "09:27:24", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795580507.5613678, "ist": "09:51:47", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795580510.6638653, "ist": "09:51:50", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795580512.6147034, "ist": "09:51:52", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795580527.5725596, "ist": "09:52:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
