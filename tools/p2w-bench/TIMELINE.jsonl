@@ -6118,3 +6118,11 @@
 {"t": 1795599369.5453808, "ist": "15:06:09", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795599370.547696, "ist": "15:06:10", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795599381.4532037, "ist": "15:06:21", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795606349.2129312, "ist": "17:02:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795606349.353577, "ist": "17:02:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795606350.325724, "ist": "17:02:30", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795606350.4288108, "ist": "17:02:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795606351.2335064, "ist": "17:02:31", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795606351.326717, "ist": "17:02:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795606352.0056279, "ist": "17:02:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795606352.1109295, "ist": "17:02:32", "ev": "beat", "d": "pending.py: reading the pending gate"}

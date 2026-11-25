@@ -19,18 +19,18 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 14:17 |
-| ended | still running |
-| how it ended | - |
+| started | 15:05 |
+| ended | 15:32 |
+| how it ended | forced |
 | plan | - |
 
 ## The picture, in the words of the run that left it
 
-> The row-pitch dither fires: A/B on the engine's own output shows declared w:trHeight moving 18.0/19.0 -> 17.15/18.15 pt on mobile-bill, salary-slip-corporate and very-long-single-column-table (patch subtracts the 0.875 pt rule charge). It is a lead, not a kept fix: the rendered share@5 could not be obtained because screen.py's soffice prerender hangs (BLOCKERS 25 Nov, 3 x 280 s calls). The spacer half of the same proposal (always w:before, drop the budget guard) was never applied and should stay separate. The repo holds three inconsistent laws for w:line exact on an sz=2 empty paragraph - resolve that before leaning on the construct.
+> t12 is fixed: the unit is the character, not the token. txt corpus 199 -> 202 of 213 clean, 5 newly clean, 0 of 213 newly failing. The screen.py 'soffice hang' is closed as a finding: it is the scipy fallback in edt(), not soffice - with scipy present a 23-document screen finishes in 190 s. Two instrument defects found and NOT fixed: _ensure_scipy() spends 220 s of a 280 s budget and only warns; p2w.py:1112 imports scipy.ndimage inside a try/except so colour_share/tone_share become None and coloured_px 0 on a scipy-less pod, silently blinding every colour or tone judgement.
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 16 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 14 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. Fix or bypass the screen.py soffice prerender hang FIRST - it blocks every rendered attempt. Then judge the dither by share@5 on mobile-bill, electricity-bill, salary-slip-corporate, very-long-single-column-table before a corpus pass.
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. FIRST ATTEMPT: add the drawnByAppearance(apDrawn, ...) guard to the annotationRuns loop in PdfToWord.pageText() (~line 956) - its sibling loop at line 947 already has it. Measured on one document: 600_reviewed_invoice_with_annotations goes 20 tokens/83 chars -> 7 tokens/30 chars, paragraphs 14 -> 13. Needs the 213-document docx ratchet before it lands. SECOND: the (Authorised signatory) duplication on 041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled is a table-row/paragraph overlap, a different construct, and clearing it closes 2 more txt documents. THIRD: _ensure_scipy() should refuse rather than warn, and p2w.py:1112 must not swallow the scipy.ndimage import - see FINDINGS/SCREEN-HANG-IS-SCIPY-NOT-SOFFICE-25NOV.md.
 
 ## Agents deployed and not yet accounted for
 
@@ -59,18 +59,13 @@ unfinished work, not as a result.
 | 18_dA-01 | 18_displacement | A | split the 14 solo documents by construct and name the smallest lever t | 10:47 | 10:45 | landed | FINDINGS/18_dA-01-18_displacement-agent-return-25NOV.md |
 | 18-D-01 | 18-DISPLACEMENT-LIVE-PATH-25NOV |  |  | 10:51 |  | running |  |
 | Expl-01 | Explore: 18_displacement row-pitch dither + three inconsistent w:line exact laws |  |  | 12:05 |  | landed | FINDINGS/Expl-01-18-DISPLACEMENT-ROW-PITCH-DITHER-25NOV.md |
+| instA-01 | instrument | A | the soffice prerender wedge and the scipy prerequisite - landed 7c7ab1 | 15:12 | 14:19 | landed | FINDINGS/RANKING-TXT-TWO-FILES-25NOV.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `02:00` attempt 61 on 18_displacement -> lead
-- `02:59` attempt 5 on 04_chars_missing -> lead (0/64 moved)
-- `02:59` agent deployed: gap-cap patch: traced DocxWriter, produced spendWideGap() foot-band patch, applied and reverted as a no-op on 69/323/311; census: cap = 1469 chars over 23 of 35 positioned pages /  - 
-- `02:59` agent deployed: zero-gap census: the latch is 655 lines/24920 chars vs the rule's 12 lines/358; pagepos=0 + anchorkeep=0 changes no page count across 213 /  - 
-- `03:12` attempt 6 on 04_chars_missing -> lead (1/64 moved)
-- `03:12` agent deployed: Google verification: 69_two_col_legal 35/42 -> 39/42 on the spendWideGap build, 26_text_overlap=11 is the price /  - 
 - `03:21` attempt 7 on 04_chars_missing -> lead (1/64 moved)
 - `03:21` agent deployed: band sweep: footband 0.80 zeroes 69 and spares 330_cad; 26_text_overlap=11 at both 0.80 and 0.0 /  - 
 - `04:23` attempt 8 on 04_chars_missing -> lead
@@ -90,6 +85,12 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `12:05` agent deployed: Explore: 18_displacement row-pitch dither + three inconsistent w:line exact laws /  - 
 - `12:05` agent deployed: A2: none - one agent deployed this run /  - 
 - `14:01` attempt 67 on 18_displacement -> lead
+- `15:06` attempt 23 on content-present-partly-displaced -> kept
+- `15:06` attempt 24 on content-present-partly-displaced -> kept
+- `15:12` agent deployed: instrument / A - the soffice prerender wedge and the scipy prerequisite - landed 7c7ab124 and 738
+- `15:12` agent landed: instrument / A -> FINDINGS/RANKING-TXT-TWO-FILES-25NOV.md
+- `15:30` attempt 25 on content-present-partly-displaced -> kept
+- `15:30` attempt 26 on content-present-partly-displaced -> kept
 
 ## Where the rest of the state lives
 

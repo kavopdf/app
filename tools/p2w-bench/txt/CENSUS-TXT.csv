@@ -4,7 +4,7 @@ document,applicable,passed,failed,abstained,failed_ids,cause,baseline_failed
 03_stamp_vertical_90deg,10,10,0,0,,clean,0
 041122-Account_Opening_Form,10,7,3,0,t06_encoding t09_page_furniture t12_word_invention,3 checks,3
 04_stamp_180deg_upside_down,10,10,0,0,,clean,0
-05_round_company_seal_curved_text,9,8,1,0,t12_word_invention,t12_word_invention,1
+05_round_company_seal_curved_text,9,9,0,0,,clean,0
 06_rect_paid_stamp_red_transparent,10,10,0,0,,clean,0
 07_stamp_over_table,10,10,0,0,,clean,0
 08_two_overlapping_stamps,10,10,0,0,,clean,0
@@ -38,7 +38,7 @@ document,applicable,passed,failed,abstained,failed_ids,cause,baseline_failed
 306_clinical_protocol_synopsis,7,7,0,0,,clean,0
 30_mixed_font_sizes_one_baseline_txtpos,10,10,0,0,,clean,0
 310_court_judgment,9,9,0,0,,clean,0
-311_fir_police_form,7,6,1,0,t12_word_invention,t12_word_invention,1
+311_fir_police_form,7,7,0,0,,clean,0
 312_affidavit_stamp_paper,7,7,0,0,,clean,0
 313_power_of_attorney,9,9,0,0,,clean,0
 314_tender_rfp_boq,8,8,0,0,,clean,0
@@ -97,7 +97,7 @@ document,applicable,passed,failed,abstained,failed_ids,cause,baseline_failed
 392_statistical_console_output,7,7,0,0,,clean,0
 393_spectrum_peak_table,7,7,0,0,,clean,0
 394_map_with_legend,7,7,0,0,,clean,0
-39_small_caps_letter_spacing,9,6,3,0,t01_word_accuracy t08_line_order t12_word_invention,3 checks,3
+39_small_caps_letter_spacing,9,7,2,0,t01_word_accuracy t08_line_order,t01_word_accuracy + t08_line_order,2
 400_comic_page_speech_bubbles,7,7,0,0,,clean,0
 401_trifold_brochure,7,7,0,0,,clean,0
 402_calendar_month_grid,7,7,0,0,,clean,0
@@ -154,7 +154,7 @@ document,applicable,passed,failed,abstained,failed_ids,cause,baseline_failed
 74_balance_sheet_indented_subitems,10,9,1,0,t02_position,t02_position,1
 75_merged_header_cell_three_columns,10,10,0,0,,clean,0
 76_devanagari_table,10,10,0,0,,clean,0
-77_arabic_rtl_document,9,7,2,0,t01_word_accuracy t12_word_invention,t01_word_accuracy + t12_word_invention,2
+77_arabic_rtl_document,9,8,1,0,t01_word_accuracy,t01_word_accuracy,1
 78_mixed_english_devanagari_line,9,9,0,0,,clean,0
 79_inr_indian_digit_grouping_table,10,10,0,0,,clean,0
 80_gstin_pan_cin_ifsc_table,9,9,0,0,,clean,0
@@ -182,7 +182,7 @@ gst-invoice-with-qr-code,10,10,0,0,,clean,0
 insurance-policy-schedule,10,10,0,0,,clean,0
 invoice-line-items-qty-rate-amount,10,10,0,0,,clean,0
 itr-computation-with-slab-table,10,10,0,0,,clean,0
-journal-2col-with-footnotes,9,8,1,0,t12_word_invention,t12_word_invention,1
+journal-2col-with-footnotes,9,9,0,0,,clean,0
 landscape-page-inside-portrait-document,11,11,0,0,,clean,0
 magazine-2col-pullquote-spanning,9,9,0,0,,clean,0
 marksheet-subject-left-marks-right,9,9,0,0,,clean,0

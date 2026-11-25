@@ -40,12 +40,10 @@
  },
  "05_round_company_seal_curved_text": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t12_word_invention",
-  "failed": 1,
-  "failed_ids": [
-   "t12_word_invention"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "06_rect_paid_stamp_red_transparent": {
   "applicable": 10,
@@ -282,12 +280,10 @@
  },
  "311_fir_police_form": {
   "applicable": 7,
-  "baseline_failed": 1,
-  "cause": "t12_word_invention",
-  "failed": 1,
-  "failed_ids": [
-   "t12_word_invention"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "312_affidavit_stamp_paper": {
   "applicable": 7,
@@ -701,13 +697,12 @@
  },
  "39_small_caps_letter_spacing": {
   "applicable": 9,
-  "baseline_failed": 3,
-  "cause": "3 checks",
-  "failed": 3,
+  "baseline_failed": 2,
+  "cause": "t01_word_accuracy + t08_line_order",
+  "failed": 2,
   "failed_ids": [
    "t01_word_accuracy",
-   "t08_line_order",
-   "t12_word_invention"
+   "t08_line_order"
   ]
  },
  "400_comic_page_speech_bubbles": {
@@ -1110,12 +1105,11 @@
  },
  "77_arabic_rtl_document": {
   "applicable": 9,
-  "baseline_failed": 2,
-  "cause": "t01_word_accuracy + t12_word_invention",
-  "failed": 2,
+  "baseline_failed": 1,
+  "cause": "t01_word_accuracy",
+  "failed": 1,
   "failed_ids": [
-   "t01_word_accuracy",
-   "t12_word_invention"
+   "t01_word_accuracy"
   ]
  },
  "78_mixed_english_devanagari_line": {
@@ -1313,12 +1307,10 @@
  },
  "journal-2col-with-footnotes": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t12_word_invention",
-  "failed": 1,
-  "failed_ids": [
-   "t12_word_invention"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "landscape-page-inside-portrait-document": {
   "applicable": 11,

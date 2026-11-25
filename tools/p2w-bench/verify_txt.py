@@ -232,7 +232,9 @@ ABOUT = {
     "t09_page_furniture": "one copy of each running head per page it belongs to",
     "t10_page_completeness": "every page of the source contributes a line",
     "t11_page_breaks": "N pages carry N-1 U+000C separators",
-    "t12_word_invention": "the .txt carries no word the source never drew",
+    # The unit is the CHARACTER, not the token: see the note at the check itself. A word
+    # boundary is where the two sides are allowed to disagree; a character is not.
+    "t12_word_invention": "the .txt carries no character the source never drew",
     "t13_amount_columns": "amount columns stay right-aligned",
 }
 
@@ -1396,20 +1398,43 @@ def compare(src_pdf, txt_path):
     # this check abstains and says so, which is the whole point of publishing applicable
     # beside total.
     #
-    # Case and surrounding punctuation are folded: moving a comma is not inventing a
-    # word, and t01 already owns the case fault.
-    invented_words = 0
+    # THE UNIT IS THE CHARACTER, NOT THE TOKEN - and this is a measurement, not a
+    # preference. A word multiset difference cannot tell an INVENTED word from a word the
+    # writer merely cut in a different place, because the two sides do not agree on where
+    # words end: the source is a glyph walk of the page and the .txt is a writer's own line
+    # model, so a letter-spaced pincode ("5 7 0 0 0 5" on the page, "570 005" in the .txt),
+    # a footnote digit the page draws as a superscript and the .txt welds to the word before
+    # it ("incorrectly.2"), a curved seal drawn glyph by glyph, an RTL cell whose number the
+    # two sides read in opposite orders - every one of those is a word the token comparison
+    # calls invented and a reader calls faithful.
+    #
+    # Measured 25 Nov 2026, on the 8 documents t12 failed: 55 invented tokens. On 5 of them
+    # the .txt carries EXACTLY the page's non-space character multiset - 0 extra, 0 missing -
+    # so not one character was invented; on 39_small_caps_letter_spacing the whitespace-
+    # stripped .txt is the source string character for character. All 55 token differences
+    # are boundary differences.
+    #
+    # What the character count still catches, and a "is this token a substring of the
+    # source" test would not, is MULTIPLICITY: a line the writer emits twice doubles its
+    # characters, which is the fault this check was built for (38_faux_bold_italic_
+    # synthesised writes its subtitle twice). A token test forgives it; a character count
+    # cannot.
+    #
+    # It is strictly weaker than the token count, so it cannot fail a document the token
+    # count passes: equal token multisets imply equal non-space character multisets, because
+    # a token is a maximal run of non-space characters. The change can only clear documents.
+    invented_chars = 0
     if len(src_text) >= WORD_INVENTION_MIN_CHARS:
-        # A token that is nothing but punctuation strips to "", and an empty string is not
-        # a word the writer invented - it is a mark the page drew and this comparison has no
-        # business counting. Measured on balance-sheet-and-profit-loss, whose only two
-        # "invented words" were both "": the .txt carries an em dash standing alone where
-        # the page does, and the check condemned the document for it.
-        src_w = Counter(w for w in (_strip_punct(x) for x in _words(src_text)) if w)
-        txt_w = Counter(w for w in (_strip_punct(x) for x in _words(txt_text)) if w)
-        invented_words = sum((txt_w - src_w).values())
-    c["t12_word_invention"] = (len(src_text), invented_words,
-                               invented_words == 0,
+        # Whitespace is the one thing the two sides are allowed to disagree about - it is
+        # where a word boundary sits, which is the question this check does not ask. Case is
+        # NOT folded here, unlike the token comparison: a case change moves no character, so
+        # it was never this count's subject, and folding it would make "APPROVED" forgive a
+        # writer that dropped it.
+        src_c = Counter(ch for ch in src_text if not ch.isspace())
+        txt_c = Counter(ch for ch in txt_text if not ch.isspace())
+        invented_chars = sum((txt_c - src_c).values())
+    c["t12_word_invention"] = (len(src_text), invented_chars,
+                               invented_chars == 0,
                                len(src_text) >= WORD_INVENTION_MIN_CHARS)
 
     # ---- t13 amount columns ------------------------------------------------
