@@ -50,3 +50,22 @@ not replaced**, on every claim. `LAST-MESSAGE.md` and `pending.py` item 1 now ca
 ~25 times, which is why item 1 of the pending queue is unreadable and why every run re-reads the same
 instructions instead of the one line of actual handover at the end of the blob. The real handover this run
 used was the last sentence of that blob.
+
+## The fix that landed in round.py this run
+
+Two changes to the claim path, both in `--claim-fixer`:
+
+1. The commit+push timeout goes from **120 s to 250 s**. The pre-commit gate alone is 81 s on this pod.
+2. **A rejected push is no longer read as a rival claim.** The old code fell straight through to
+   `git fetch` and "another run claimed and pushed first". Measured 25 Nov 06:07: the rejection was one
+   unrelated watchdog commit on `origin/main` while `origin/main:ROUND.json` said `fixer_started: 0`.
+   The new branch rebases with the hook off (the gate has already run on this commit) and pushes once
+   more; only if *that* push is rejected does the remote-claim fallback decide, exactly as before.
+   A conflicting rebase aborts and leaves the old behaviour intact.
+
+**How it was verified:** the sequence itself is what this run performed by hand, twice, to land its own
+claim and its own findings — `rebase origin/main` with `core.hooksPath=/dev/null`, then `push`. Both
+landed. The patched file compiles (`python -m py_compile`) and `round.py --phase` still returns `fix`.
+
+**Not verified:** a fresh `--claim-fixer` on a free slot, because this run holds the slot and a second
+claim would read its own beat as busy. The next run's claim is the real test.

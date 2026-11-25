@@ -544,7 +544,21 @@ def claim(name):
     _pushed = sh("git add tools/p2w-bench/ROUND.json && "
                  "git -c user.email=320240581+Onyx-Node@users.noreply.github.com "
                  "-c user.name=Onyx-Node commit -q -m 'claim: %s takes the slot' && "
-                 "git push -q origin main" % name, timeout=120)
+                 "git push -q origin main" % name, timeout=250)
+    if _pushed[0] != 0:
+        # A REJECTED PUSH IS USUALLY AN UNRELATED COMMIT ON ORIGIN, NOT A RIVAL CLAIM.
+        # Measured 25 Nov 06:07: the claim's push was rejected because origin had moved by one
+        # watchdog commit. The old code went straight to "another run claimed and pushed first"
+        # and this run stood down from a slot that was free (`origin/main:ROUND.json` said
+        # fixer_started: 0 at that moment). Three calls, eighteen minutes, no claim.
+        # The commit's own gate has already run, so the rebase is the only step that needs the
+        # hook off; if the rebase conflicts it aborts and the push fails, and the fallback below
+        # decides on the remote claim exactly as before.
+        _retry = sh("git -c core.hooksPath=/dev/null rebase -q origin/main >/dev/null 2>&1 "
+                    "|| git -c core.hooksPath=/dev/null rebase --abort >/dev/null 2>&1; "
+                    "git push -q origin main", timeout=180)
+        if _retry[0] == 0:
+            _pushed = (0, "", "")
     if _pushed[0] != 0:
         # either the push lost the race, or there was nothing to commit because the claim was already
         # there. THE REMOTE IS THE ARBITER, NOT THIS SANDBOX'S OWN FILE.
