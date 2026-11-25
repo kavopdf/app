@@ -2,15 +2,24 @@
  "name": "newspaper-2col-fullwidth-headline",
  "status": "ok",
  "rc": 1,
- "passed": 36,
+ "at": "2026-11-25T00:08:47",
+ "passed": 38,
  "total": 42,
  "failed": [
   "04_chars_missing",
-  "05_chars_extra",
   "18_displacement",
   "26_text_overlap",
-  "32_stroke_lines",
   "45_char_accuracy"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": 3.5,
+  "worst_dy": 4.2,
+  "med_dx": -0.3,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 61
+ },
+ "engine": "b7699196",
+ "checks": "369550-1795564788"
 }

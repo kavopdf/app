@@ -2,19 +2,27 @@
  "name": "magazine-2col-pullquote-spanning",
  "status": "ok",
  "rc": 1,
- "passed": 32,
+ "at": "2026-11-25T00:08:56",
+ "passed": 33,
  "total": 42,
  "failed": [
   "04_chars_missing",
   "10_font_sizes",
   "13_text_colours",
   "17_matched_runs",
-  "32_stroke_lines",
   "43_within_10pt_x",
   "44_header_footer",
   "45_char_accuracy",
   "47_margins",
   "60_text_column_right_edge"
  ],
- "engine": "462353f"
+ "displacement": {
+  "med_dy": 0.3,
+  "worst_dy": 2.1,
+  "med_dx": -0.7,
+  "bad_pages": [],
+  "runs_matched": 17
+ },
+ "engine": "b7699196",
+ "checks": "369550-1795564788"
 }

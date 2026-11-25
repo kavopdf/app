@@ -2,6 +2,7 @@
  "name": "15_stamp_on_scanned_page",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T00:06:58",
  "passed": 33,
  "total": 42,
  "failed": [
@@ -15,5 +16,13 @@
   "45_char_accuracy",
   "59_shape_anchor"
  ],
- "engine": "5beb8b9d"
+ "displacement": {
+  "med_dy": 0.0,
+  "worst_dy": 0,
+  "med_dx": 0.0,
+  "bad_pages": [],
+  "runs_matched": 0
+ },
+ "engine": "b7699196",
+ "checks": "369550-1795564788"
 }
