@@ -1,8 +1,12 @@
+# Fixer report - 2026-11-25 23:37
+
+```
 # P2W Fixer - Run Report
 
 **26 Nov 2026 · slot 00:23 → running IST · 28 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> One attempt, measured in Google, not committed. The mechanism is proven on four documents; the corpus was
+> not re-measured inside the slot, so the gate refused the engine change — correctly.
 
 ## Progress
 
