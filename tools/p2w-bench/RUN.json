@@ -1,18 +1,18 @@
 {
- "started_ts": 1795580530.55957,
- "started": "09:52",
- "window_for_claim": 1795580530.55957,
+ "started_ts": 1795578201.0,
+ "started": "09:13",
+ "window_for_claim": 1795578201.0,
  "ended_ts": null,
  "ended": null,
- "attempts": 0,
+ "attempts": 1,
  "kept": 0,
  "agents": [
   {
-   "id": "18-displacement-proposal-01",
+   "id": "18-DISPLACEMENT-PROPOSAL-25NOV",
    "status": "landed"
   },
   {
-   "id": "pending-answers-01",
+   "id": "PENDING-ANSWERS-25NOV",
    "status": "landed"
   }
  ],

@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-25 09:52
+# Fixer report - 2026-11-25 09:13
 
 ```
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 09:52 → running IST · 0 min**
+**25 Nov 2026 · slot 09:13 → running IST · 41 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -11,8 +11,8 @@
 
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 0 vs ATTEMPTS.json history 1; subagents: 2 deployed vs no FINDINGS file for pending-answers- |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 1 vs ATTEMPTS.json history 2 |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -30,13 +30,14 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
+| 09:25 | **lead** | 0/None | Google round-trip on 68_journal: guard relaxed (env-gated) moves med_dy -114.3 -> -3.1 pt, 111.2 pt of movement, so the guard is the blocker; but 18 still fails at 3.9 pt and 59_shape_anchor appears ( |
 | 09:52 | **lead** | 0/213 | read-only subagent proposal landed as FINDINGS/18-DISPLACEMENT-PROPOSAL-25NOV.md: place() at :4149 is dead code (zero callers) so the mechanism DOCS-ROOT-CAUSES-24NOV.md names cannot be patched; spaci |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **39 min ago** |
+| Measured | **41 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -47,17 +48,18 @@
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `18-displacement-proposal-01` | where in DocxWriter does w:before / exact line heigh | 09:36 | 09:41 | 5 min |
-| `pending-answers-01` | for each of the pending items, is it closeable, and  | 09:36 | 09:44 | 8 min |
+| `18-DISPLACEMENT-PROPOSAL-25NOV` | where in DocxWriter does w:before / exact line heigh | 09:36 | 09:41 | 5 min |
+| `PENDING-ANSWERS-25NOV` | for each of the pending items, is it closeable, and  | 09:36 | 09:44 | 8 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 09:52 → running · 0 min |
+| Slot window | 09:13 → running · 41 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 9 |
-| Silences over 2 min | 0 |
+| Tool beats | 39 |
+| Longest silence | **24.4 min** — from 09:27:24, after `dead claim cleared by force release` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -65,7 +67,11 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **0 min** | `######################` |
+| fix - diagnose and change the engine | **24 min** | `#############` |
+| measure or build - a conversion, screen or compile writes no beacon | **0 min** | `#` |
+| record - attempt, handoff, class rows | **2 min** | `##` |
+| report - the report and the chain | **0 min** | `#` |
+| other - not attributed to a tool | **11 min** | `######` |
 ## Best results this round
 
 | Document | Before | After | Change |

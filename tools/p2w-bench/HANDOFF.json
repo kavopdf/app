@@ -278,7 +278,7 @@
    "finding": "FINDINGS/spendwidegap-lookahead-01-REJECTED-25NOV.md - REJECTED: it refuses the spend that made 39/42; 209/213 byte-identical, 4 changed all toward more anchoring"
   },
   {
-   "id": "18-displacement-proposal-01",
+   "id": "18-DISPLACEMENT-PROPOSAL-25NOV",
    "class": "18_displacement",
    "angle": "engine",
    "question": "where in DocxWriter does w:before / exact line height leave a gap Google drops, and what is the minimal patch",
@@ -290,7 +290,7 @@
    "finding": "FINDINGS/18-DISPLACEMENT-PROPOSAL-25NOV.md - place() at :4149 is DEAD CODE (zero callers), so the mechanism DOCS-ROOT-CAUSES-24NOV names cannot be patched; spacing()'s pageFirst arg is always false; w:beforeLines emitted nowhere. Patch (b) = 3 ints + 1 guard at :6117-6137; patch (a) = w:pgMar w:top per page."
   },
   {
-   "id": "pending-answers-01",
+   "id": "PENDING-ANSWERS-25NOV",
    "class": "-",
    "angle": "ledger",
    "question": "for each of the pending items, is it closeable, and with what evidence",

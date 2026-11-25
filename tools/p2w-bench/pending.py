@@ -282,12 +282,26 @@ def collect():
     except Exception:
         _gv = {}
     if _gv:
-        _c = {}
-        for _j in _gv.values():
-            _e = str(_j.get("engine") or "")[:8]
-            if _e:
-                _c[_e] = _c.get(_e, 0) + 1
-        _eng = max(_c, key=_c.get) if _c else ""
+        # THE MODAL ENGINE IS NOT THE CURRENT ENGINE, AND WHEN IT IS NOT, THIS LINE NAMES THE FRESH
+        # RESULTS AS THE STALE ONES. Measured 25 Nov 10:05 on engine 85b8735f (HEAD): 191 scored results,
+        # 105 stamped b7699196 (23 Nov) and 86 stamped 85b8735f. The modal engine is therefore b7699196,
+        # so `_old` was the 86 documents measured TODAY and the 105 actually-stale ones were invisible -
+        # an inverted count in the tool that decides what a run works on. `classpick.py` uses the modal
+        # engine for a different question (which engine do the RESULTS describe) and is left alone;
+        # "stale" can only mean "not the engine on HEAD", and gverify._engine_now() is the one place that
+        # answers it. Same defect as stage.py's file-count, one layer further in.
+        try:
+            import gverify as _gvmod
+            _eng = _gvmod._engine_now()
+        except Exception:
+            _eng = ""
+        if not _eng:
+            _c = {}
+            for _j in _gv.values():
+                _e = str(_j.get("engine") or "")[:8]
+                if _e:
+                    _c[_e] = _c.get(_e, 0) + 1
+            _eng = max(_c, key=_c.get) if _c else ""
         _old = [d for d, _j in _gv.items() if str(_j.get("engine") or "")[:8] != _eng]
         if _old:
             items.append({"kind": "measure", "who": "the docx table",

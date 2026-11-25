@@ -5634,3 +5634,13 @@
 {"t": 1795580588.8894677, "ist": "09:53:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795580589.2589018, "ist": "09:53:09", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795580594.410518, "ist": "09:53:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795580678.0576913, "ist": "09:54:38", "ev": "beat", "d": "relay: writing the report"}
+{"t": 1795580680.8965738, "ist": "09:54:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795580682.2788231, "ist": "09:54:42", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795580682.6703331, "ist": "09:54:42", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795580684.1744754, "ist": "09:54:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795580719.1518855, "ist": "09:55:19", "ev": "beat", "d": "relay: independent engine census before pending.py:288 fix"}
+{"t": 1795580723.7341866, "ist": "09:55:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795580734.7800262, "ist": "09:55:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795580735.4544034, "ist": "09:55:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795580736.281493, "ist": "09:55:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
