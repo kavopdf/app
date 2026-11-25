@@ -194,6 +194,4 @@
 {"at": "2026-11-25 09:25", "attempt": 63, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-25 09:52", "attempt": 64, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-25 10:45", "attempt": 65, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
-{"at": "2026-11-25 11:45", "attempt": 19, "class": "content-missing-partly-replaced", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
-{"at": "2026-11-25 11:48", "attempt": 20, "class": "content-missing-partly-replaced", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
-{"at": "2026-11-25 11:51", "attempt": 66, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
+{"at": "2026-11-25 12:03", "attempt": 19, "class": "content-present-partly-displaced", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}

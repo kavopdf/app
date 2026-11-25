@@ -1,161 +1,93 @@
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 10:56 -> 11:52 IST · 56 min**
+**25 Nov 2026 · slot 11:24 → running IST · 41 min**
 
-> The Google scoreboard was blind, not the corpus. Three instruments compared a git commit with a
-> source hash and reported "0 of 213 current". Fixed, measured, committed: **42 of 213 documents pass
-> every applicable Google check on this engine** - the truth the store has carried since 05:14.
+> No change was kept this run. The numbers below say what was tried.
 
-## What this run did
 
-**It made the truth readable, and found that the pipeline has been steering on a number that was
-never a zero.**
+## The one line
 
-`report.py` printed this on every run for at least two slots:
+One attempt, recorded as a **lead**: a proposed row-pitch dither was applied alone and measured on
+the engine's own output, it **fires** - and it was **not committed**, because the instrument that
+judges a rendered change hangs.
 
-> **Fixed - Google, every applicable check** | could not be read - 0 of 212 scored were read as
-> current, which is a failed read and not a measurement.
+## What the run actually did
 
-Nothing was wrong with the store. `google_fixed()` compared two different quantities with `==`:
+The slot was **stale, not taken**: origin's claim was 51 minutes since its last beat, stale after
+45, so this run took it and pushed the claim (3cf7c4da).
 
-| | |
-|:--|:--|
-| every verdict in `benchmarks/gverify/` (213 rows) | `engine = "981ff1fa35e2cf67"` - 16 hex, `sha256(name + bytes of every app/.../engine/*.java)[:16]`, written by `gvbatch.py:26,76` |
-| `report.py:engine_now()` | `git log -1 --format=%h -- app/.../engine/` -> `"85b8735f"` - an 8-char git abbreviation |
-| the comparison, `report.py:460` | `if (j.get("engine") or "") == now:` - exact equality |
+1. **The pod was cold and the gate could not run.** `install-gate.sh` timed out at 300 s because
+   `regress.py --check` builds the corpus itself, in 240 s slices. Two `corpus-slice.py` calls took
+   the corpus from 148 to **213 of 213 converted** and wrote the stamp for engine `981ff1fa35e2cf67`;
+   `regress.py --check` then passed in seconds. The gate was never broken - it had nothing to read.
+2. **One sub-agent** (Explore) read `DOCS-ROOT-CAUSES-24NOV.md`, the 18_displacement findings and
+   `DocxWriter.java`, and returned a two-part patch plus two corrections: the `0.961 x gap - 0.58 pt`
+   law is the **page-top** law, not the spacer law, and the repo holds **three mutually
+   inconsistent laws** for `w:line ... exact` on an `sz=2` empty paragraph (21.5 % of the ask on
+   22 Nov, a flat 5-10 pt on 24 Nov, 91-95 % on 23 Nov). They cannot all be true.
+3. **The spacer half was never applied.** It removes the `spendable` budget guard and bets the page
+   budget on a construct whose behaviour is not stably known. That is a trade, not a fix.
+4. **The row-pitch half was applied alone and measured.** Guard:
+   `exactRows && rowCapTw < 0 && !t.recut && ctx.squeeze == 1f && ruleTwHere > 0`. A/B on the
+   engine's own output, same three documents, two builds differing only by the patch:
 
-Two quantities, two lengths, so it matched nothing. `gverify.py:194` had already been fixed for this
-class of bug, but its own `_engine_now()` still answered `%h`, so `_done()` returned 1 (the single
-page-count refusal) and `plan()` said "1 of 213 documents have a Google result; 212 to go" - an
-hourly cron re-measuring the entire corpus for ever, which is why the store never looked fresh.
-`classify_google.py:34` carried it too, and printed it into the class table every run: *"HEAD is
-`85b8735f` and 0 of the 212 Google results were measured on it; re-measure before treating any row as
-the current behaviour"* - the one line that told every fixer to distrust the only Google measurement
-it had.
+   | document | unpatched `w:trHeight` (tw) | patched (tw) | in pt |
+   |---|---|---|---|
+   | `mobile-bill` | 360, 360, 380, 360, 380 | 343, 343, 363, 343, 363 | 18.0/19.0 to 17.15/18.15 |
+   | `salary-slip-corporate` | 380, 360, 380, 360, 360, 380 | 363, 343, 363, 343, 343, 363 | -0.85 pt per ruled row |
+   | `very-long-single-column-table` | 360, 380, 360, 380 | 343, 363, 343, 363 | 18.0/19.0 to 17.15/18.15 |
 
-### The measurement, before and after, on the same tree and the same store
+   The dither spreads its rounding as designed - the alternation survives - but the whole ladder
+   drops by the asserted 0.875 pt rule charge. That is correct **only** if the renderer charges the
+   row's border on top of the declared height. The engine's own comment records a 0.5 pt variant of
+   this change making `18_displacement` **worse**; this one subtracts 0.85 pt on the same documents.
+   The sign depends on a renderer charge known for Google and unmeasured for the proxy.
 
-| | before | after |
-|:--|:--|:--|
-| `report.py` "Fixed - Google" | **could not be read** - 0 of 212 current | **42** of the **213** re-measured on this engine |
-| `report.py --json` | `google_fixed_current=0` | `google_fixed_current=42, google_scored_current=213, google_refused=0` |
-| `classify_google.py --print` | "0 of the 212 ... measured on it; re-measure" | "Every result above was measured on engine `981ff1fa35e2cf67`, the engine in the tree." |
-| `verify_google._engine_head()` | `'85b8735f'` | `'981ff1fa35e2cf67'` = `regress.engine_fingerprint()` |
+## Why it is a lead and not a kept fix
 
-### The population, proved three ways that do not share code
+`screen.py --class "content-present-partly-displaced"` converts all 23 documents and then **hangs in
+the soffice prerender**: 12 in the first call, nothing in the second, `prerender 1 docx` and no
+finish in the third - three 280 s calls, no result, no error. No render means no share@5 before and
+after, so the change cannot be measured, `regress.py --check` cannot be satisfied for a rendered
+table change, and committing it would break non-negotiable 2. Logged in `BLOCKERS.md`.
 
-1. **The store.** 213 files in `benchmarks/gverify/`, every row `engine = 981ff1fa35e2cf67`,
-   `render = google`; **42** carry `failed = []`.
-2. **The tree.** `regress.engine_fingerprint()` on this clone returns `981ff1fa35e2cf67`; the corpus
-   stamp `corpus-slice.py` wrote after converting all 213 documents in this run carries the same
-   value (`{'engine': '981ff1fa35e2cf67', 'documents': 213}`, 0 failed).
-3. **The commit that wrote the store.** `9165bf25` states its own numbers: "on current engine: 212
-   (one page-count refusal)", "clean: 42 of 212". The scoreboard contradicted the commit that
-   produced its own data.
+`regress.py --check` and `measure_gate.py` were both run: **the gates are not what refused this
+run.** The screen instrument is.
 
-**The FIXER-BRIEF charter's Google line is stale against this - it still carries a two-digit clean
-count over a smaller denominator - and no run should plan against it again.** The real figure is 42 of 213; `google-needed.py` agrees (213 scored
-in Google, 141 still need Google, 72 settled by LibreOffice).
+## Written down
 
-## Why no document moved, and what the next run lands
+- `FINDINGS/18-DISPLACEMENT-ROW-PITCH-DITHER-25NOV.md` - the A/B, the three inconsistent laws, the
+  four documents the next run should judge it on.
+- `BLOCKERS.md` - the soffice prerender hang, with what was tried.
+- `HANDOFF.md` - the picture in prose.
 
-The document-moving fix is already in the repo from the 10:10 run: `PATCHES/600-annotation-runs-
-subtype-25NOV.patch`, measured there at `verify_txt.py` 7/12 -> 8/12 on document 600. It did not land
-because an engine edit invalidates **both** tables and `regress.py --check` refuses an unmeasured
-engine. This run measured what that costs, with the JDK and corpus built in this pod:
 
-| step | measured here |
-|:--|:--|
-| `jdk-fetch.sh` + `corpus-fetch.sh` | 24 s + 15 s |
-| `build-engine.sh` | ~45 s |
-| `corpus-slice.py --budget 250 -j 6` | 55 documents per 230 s -> **213 in five slices, ~16 min** |
-| docx render + score (`benchmarks/p2w.py`) | ~15.8 s/document on one-page docs -> **~56 min for 213** |
 
-So the corpus is cheap and the **docx measurement is the whole slot**. The construct is recorded as
-a **lead** on `content-missing-partly-replaced` (attempt 19, 0 of 14 moved) so the rotation does not
-abandon it: the patch is measured, only unlanded. That is the landing sequence
-for the next run, in order, and it is the only thing between the annotation fix and the repo:
-`git apply` -> `build-engine.sh` -> five `corpus-slice.py` slices -> `p2w.py` until complete ->
-`restamp_txt.py --run --force --report --apply` -> `regress.py --stamp` -> `regress.py --check` ->
-`attempt.py`. Copy `RANKING-TXT.csv` before `restamp_txt.py --apply`: it rewrites the baseline from the
-same rows, which makes the "no .txt document worse" line vacuous.
-
-## Attempt 2: the biggest text defect in the corpus is one unmapped ligature
-
-With the scoreboard readable, the txt side's worst failure was `t12_word_invention` on 8 documents.
-Recomputing the excess-token multiset independently on all 8 (PyMuPDF page text as the source, not the
-verifier) gives a different answer from the 10:10 run's "5 instrument / 3 engine":
-
-| class | tokens | documents |
-|:--|--:|:--|
-| **NOVEL** - no such characters on the page | **258** | 2 |
-| over-counted - the word is on the page, the output repeats it | 34 | 6 |
-| tokenisation - characters present, split or joined differently | 18 | 4 |
-
-The 258 are `U+FFFD` in `041122-Account_Opening_Form` (127 in the `.txt`) and its fillable twin, and
-**the .docx body carries 86 of them too** - so the damage reaches the renderer the user opens, not just
-the `.txt`. `t12` under-reports it (render=5) because its own tokeniser drops the character; the check
-that exists to catch an invented word cannot see the one that dominates the document, and `t06_encoding`
-is what fails there.
-
-Then I tried to prove it wrong, and it partly worked: the page's own text layer is corrupt. PyMuPDF
-reads the same line as `Please \u0124ll up` - the subset font's `/ToUnicode` maps the `fi`-ligature
-glyph to `U+0124`, and PDFBox substitutes `U+FFFD` where PyMuPDF passes the garbage through. So these
-are not 258 words invented from nothing; `t12`'s "no such characters on the page" is technically right.
-The fix is therefore a **glyph-name fallback** when `toUnicode` answers `U+FFFD` (PDFBox exposes the
-glyph name per glyph), not a ligature-to-ASCII table. The finding carries the correction and supersedes
-the wording recorded in the ledger. Engine-side, so it needs the same 213-document pass as the
-annotation patch.
-
-## Attempt 3: `18_displacement` is one unit, in one direction, on 108 documents
-
-`classpick.py --leverage` puts `18_displacement` at **54.8 clean documents**, so the cheap question
-first: do its failures share a signature? Read straight out of the 213 stored Google verdicts:
-
-| | |
-|:--|--:|
-| documents with the check measured | 213 |
-| failing | **122** |
-| failing with `render - source > 0` | **122** |
-| failing with `render - source < 0` | **0** |
-| failing by exactly **+1.0** | **108** |
-| median absolute error | 1.0 |
-
-A hundred and eight documents miss the same check by one unit in the same direction. That is one
-construct with a constant, not 108 placement defects. The two hypotheses are a check boundary
-(`abs(d) < 1` over quantised values) and a half-unit rounding in the writer, and one document decides
-between them: compare the engine's y for a line against the page's y in raw PDF points, before
-quantisation. `416_many_tiny_pages` at +299 is a separate defect and should be parked on its own.
-Recorded as a lead (`FINDINGS/18-DISPLACEMENT-IS-ONE-UNIT-AND-ALWAYS-POSITIVE-25NOV.md`); the fix
-moves a fingerprint, and this slot already had two engine fixes queued behind the same re-measure.
-
-## Two agents, in the first ten minutes
-
-| Agent | Sent to find | Took | Result |
-|:--|:--|--:|:--|
-| `Google read failure` | why the Google row reads zero - store, filter or error? | 5 min | **filter bug, (a)**: found the `%h` vs source-hash mismatch at `report.py:393-460`, wrote the patch this run landed, and confirmed the store holds 212 rows all stamped on this tree |
-| `Landing path for patch` | what `regress.py --check` actually demands, and the timings | 17 min | **the gate is stamp-gated, not corpus-gated**: `scope_of_change()` answers "both" for `PdfToWord.java`, no scoped re-stamp exists, `--stamp` would pass unmeasured today and must not be used. Timed every step above |
-
-The second agent is why this run did not attempt the annotation landing: 56 minutes of soffice against
-a slot already 40 minutes in is a half-measurement, and a half-measurement is what the gate exists to
-refuse.
 
 ## Progress
 
 | | |
 |:--|:--|
-| Self-check | **every field agrees with its second source** |
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - subagents: 1 deployed vs no FINDINGS file for Expl-01 |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **42** of the **213** re-measured on this engine - **0** of the 213 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| **Fixed - Google, every applicable check** | **could not be read** - 0 of 213 scored were read as current, which is a failed read and not a measurement. No count is stated rather than a zero |
+| Who re-measures them | the **:20 gverify** cron, once the read works |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 213 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (19 still open), not a new class |
-| Findings vs landing | **70** finding(s) on this class and **0** documents moved - writing is cheaper than landing, and nothing else says so |
+| Working on | `content-present-partly-displaced` - taken from the pending list (17 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `content-present-partly-displaced` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 12:03 | **lead** | 0/23 | row-pitch dither (error-diffused w:trHeight, -0.85 pt rule charge) applied alone and A/B measured on the engine's own output: it fires, shifting declared pitch 18.0/19.0 -> 17.15/18.15 pt on mobile-bi |
 
 ## What was tried
 
@@ -169,7 +101,7 @@ refuse.
 
 | | |
 |:--|:--|
-| Measured | **57 min ago** |
+| Measured | **52 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -180,27 +112,16 @@ refuse.
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `googA-01` | why the Google scoreboard reads zero: store, filter  | 11:44 | - | - |
-| `annoB-01` | what regress.py --check demands and the exact timing | 11:44 | - | - |
-
-## What the next run should take, and why
-
-`classpick.py --leverage` says `18_displacement` is worth **54.8 clean documents** - more than the next
-three checks combined - and document 600's brand-new Google verdict fails it among seven. The leverage
-table refuses to hand it over, correctly: **13 pending items are closeable first** (agent 18-D-01,
-`ratchet 05_chars_extra`, `ratchet 25_invisible_text`), and 4 more need a decision. Take those in
-`pending.py` order before any new class, then `18_displacement` with a Google round trip in hand -
-`refresh-google.py` (commit `b14bc496`) is now one command with no human step, which is what the
-`18_displacement` lead from the 10:10 run needed and did not have.
+| `Expl-01` | Explore: 18_displacement row-pitch dither + three in | 12:05 | - | not recorded |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 10:56 → 11:52 · 56 min |
+| Slot window | 11:24 → running · 41 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 51 |
-| Longest silence | **22.6 min** — from 10:56:47, after `pending.py: reading the pending gate` |
+| Tool beats | 25 |
+| Longest silence | **8.5 min** — from 11:37:14, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
@@ -209,16 +130,26 @@ table refuses to hand it over, correctly: **13 pending items are closeable first
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **22 min** | `#########` |
-| record - attempt, handoff, class rows | **3 min** | `#` |
-| report - the report and the chain | **5 min** | `##` |
-| other - not attributed to a tool | **25 min** | `##########` |
+| build - compiling the engine | **1 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **21 min** | `#############` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **11 min** | `#######` |
+## Best results this round
 
-## The claim held, and the rebase collided anyway
+| Document | Before | After | Change |
+|:--|--:|--:|--:|
+| `415_inline_images` | 89.04 | 0.00 | -89.04 |
+| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
+| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
+| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
 
-The claim at 10:56 succeeded and every heartbeat refreshed it. `git push` still had to rebase over
-`b14bc496` and `3cf7c4da` ("relay: fixer claim - previous claim stale (51 min)"), and the rebase
-collided on `TIMELINE.jsonl` (5,845 lines), `ROUND.json` and `RUN.json`. Resolved as the 10:10 run
-did: state files to this run's copy, `TIMELINE.jsonl` unioned by timestamp so neither run's beats were
-dropped. **Two runs are writing to this repo on a shared slot again** - the claim lock is not what is
-keeping them apart.
+## Next run
+
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 14 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 13 item(s) you can close - run pending.py and take them in its order before the class below. Fix or bypass the screen.py soffice prerender hang FIRST - it blocks every rendered attempt. Then judge the dither by share@5 on mobile-bill, electricity-bill, salary-slip-corporate, very-long-single-column-table before a corpus pass.
+
+> **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
+
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
