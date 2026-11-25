@@ -139,7 +139,38 @@ def _unshallow_if_needed():
 
 
 def _engine_now():
-    """The engine commit the corpus is built from right now."""
+    """The engine the corpus is built from right now - THE SAME QUANTITY THE STORE IS STAMPED WITH.
+
+    A COMMIT IS NOT THAT QUANTITY. gvbatch.py - the instrument that actually writes the verdicts -
+    stamps each row with the engine id from /scratch/work/p2w/.stamp, which is
+    `sha256(name+bytes of every app/.../engine/*.java)[:16]` (corpus-convert.py:engine_sources(),
+    the same quantity as regress.py:engine_fingerprint()). This function answered
+    `git log -1 --format=%h -- engine/`, an 8-char git abbreviation, so `_done()` below matched
+    nothing: measured 25 Nov, the store held 212 rows all stamped 981ff1fa35e2cf67 - this tree's
+    engine hash - and `_done()` returned 1 (the page-count refusal). `plan()` then said
+    "1 of 213 documents have a Google result; 212 to go" and the cron re-measured all 212 every
+    hour for ever, which is the starvation the other way round.
+
+    Falls back to the corpus stamp file, then to the commit abbreviation.
+    """
+    import hashlib as _h
+    d = os.path.join(ROOT, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
+    try:
+        if os.path.isdir(d):
+            _s = _h.sha256()
+            for _n in sorted(os.listdir(d)):
+                if not _n.endswith(".java"):
+                    continue
+                _s.update(_n.encode())
+                with open(os.path.join(d, _n), "rb") as _f:
+                    _s.update(_f.read())
+            return _s.hexdigest()[:16]
+    except Exception:
+        pass
+    try:
+        return (json.load(open("/scratch/work/p2w/.stamp", encoding="utf-8")).get("engine") or "")[:16]
+    except Exception:
+        pass
     import subprocess as _sp
     _unshallow_if_needed()
     try:

@@ -391,22 +391,45 @@ def this_run():
 
 
 def engine_now():
-    """The engine commit the corpus is built from right now - the same fingerprint gverify stamps.
+    """The engine the corpus is built from right now - THE SAME QUANTITY THE STORE IS STAMPED WITH.
 
-    ON A DEPTH-1 CLONE `git log -1 -- <path>` RETURNS THE TIP FOR EVERY PATH, so this answered
-    9f00dc0 (a claim commit) where the engine commit is b7699196, and google_fixed() compared 191
-    current rows against it and reported "could not be read - 0 of 191 scored were read as
-    current". Same tree, full history: 187 of 191. A shallow checkout is fetched once here rather
-    than reported as a dead instrument.
+    THE STAMP IS NOT A COMMIT. Since 25 Nov the verdict store, RANKING.csv and the corpus stamp are
+    keyed on `sha256(name+bytes of every app/.../engine/*.java)[:16]` - the same quantity as
+    regress.py:engine_fingerprint() and corpus-convert.py:engine_sources(), and the id gvbatch.py
+    writes into every verdict. This function still answered `git log -1 --format=%h -- engine/`, a
+    git ABBREVIATION (8 chars, e.g. 85b8735f), and google_fixed() compared it with `==` against the
+    16-char source hash in the store (981ff1fa35e2cf67). Two different quantities, two different
+    lengths, so the comparison matched NOTHING and the report printed
+    "could not be read - 0 of 212 scored were read as current" over 212 rows that were all current.
+    Measured 25 Nov: the store held 212 scored rows, every one stamped 981ff1fa35e2cf67, which IS
+    this tree's engine hash, and 42 of them clean.
+
+    A COMMIT CANNOT BE THE KEY ANYWAY. It moves for a FINDINGS file or a claim, which cannot change a
+    converted byte, and it cannot see an uncommitted engine edit. The source hash moves only when the
+    engine changes.
+
+    Falls back to the corpus stamp file, then to the commit abbreviation, so a pod without the engine
+    sources still answers something instead of "".
     """
-    import subprocess as _sp
+    import hashlib as _h
+    d = os.path.join(ROOT, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
     try:
-        if _sp.run(["git", "-C", ROOT, "rev-parse", "--is-shallow-repository"],
-                   capture_output=True, text=True, timeout=20).stdout.strip() == "true":
-            _sp.run(["git", "-C", ROOT, "fetch", "-q", "--unshallow"],
-                    capture_output=True, text=True, timeout=240)
+        if os.path.isdir(d):
+            _s = _h.sha256()
+            for _n in sorted(os.listdir(d)):
+                if not _n.endswith(".java"):
+                    continue
+                _s.update(_n.encode())
+                with open(os.path.join(d, _n), "rb") as _f:
+                    _s.update(_f.read())
+            return _s.hexdigest()[:16]
     except Exception:
         pass
+    try:
+        return (json.load(open("/scratch/work/p2w/.stamp", encoding="utf-8")).get("engine") or "")[:16]
+    except Exception:
+        pass
+    import subprocess as _sp
     try:
         r = _sp.run(["git", "-C", ROOT, "log", "-1", "--format=%h", "--",
                      "app/src/main/java/com/kavopdf/app/engine/"],
@@ -414,6 +437,21 @@ def engine_now():
         return (r.stdout or "").strip()
     except Exception:
         return ""
+
+
+def _same_engine(stamp, now):
+    """Is this row's engine stamp the engine in the tree?
+
+    PREFIX-TOLERANT, because a git abbreviation's length is not stable - `--format=%h` prints 7 chars
+    in a repository that has never needed 8, and gverify.py already compares this way for exactly
+    that reason (its 22 Nov note: "an instrument that reports zero is not a quiet instrument, it is a
+    wrong one, and it was one character away from being believed"). report.py compared with `==`,
+    which is the same bug the store had already been fixed for.
+    """
+    _e, _n = (stamp or "").strip(), (now or "").strip()
+    if not _e or not _n:
+        return False
+    return _e == _n or _n.startswith(_e) or _e.startswith(_n)
 
 
 def google_fixed():
@@ -457,7 +495,7 @@ def google_fixed():
         ok = not (j.get("failed") or [])
         if ok:
             fixed += 1
-        if (j.get("engine") or "") == now:
+        if _same_engine(j.get("engine"), now):
             scored_cur += 1
             if ok:
                 fixed_cur += 1

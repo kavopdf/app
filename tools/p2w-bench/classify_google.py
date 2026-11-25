@@ -32,7 +32,34 @@ IST = timezone(timedelta(hours=5, minutes=30))
 
 
 def _engine_now():
-    """The engine commit the corpus is built from right now."""
+    """The engine the corpus is built from right now - THE SAME QUANTITY THE STORE IS STAMPED WITH.
+
+    THE STAMP IS NOT A COMMIT. Every verdict in benchmarks/gverify/ is keyed on
+    `sha256(name+bytes of every app/.../engine/*.java)[:16]` (gvbatch.py:26-76, the same quantity as
+    regress.py:engine_fingerprint()). This function answered `git log -1 --format=%h -- engine/`, an
+    8-char abbreviation, so the coverage paragraph below compared it with a 16-char source hash and
+    printed "HEAD is 85b8735f and 0 of the 212 Google results were measured on it" over 212 rows that
+    were all measured on this tree's engine (981ff1fa35e2cf67). Measured 25 Nov; report.py carried the
+    identical defect in engine_now(), and it is fixed the same way there.
+    """
+    import hashlib as _h
+    _d = os.path.join(ROOT, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
+    try:
+        if os.path.isdir(_d):
+            _s = _h.sha256()
+            for _n in sorted(os.listdir(_d)):
+                if not _n.endswith(".java"):
+                    continue
+                _s.update(_n.encode())
+                with open(os.path.join(_d, _n), "rb") as _f:
+                    _s.update(_f.read())
+            return _s.hexdigest()[:16]
+    except Exception:
+        pass
+    try:
+        return (json.load(open("/scratch/work/p2w/.stamp", encoding="utf-8")).get("engine") or "")[:16]
+    except Exception:
+        pass
     import subprocess as _sp
     try:
         r = _sp.run(["git", "-C", ROOT, "log", "-1", "--format=%h", "--",
@@ -162,7 +189,8 @@ def render():
     _gall = load(G)
     _cov = _c.Counter((j.get("engine") or "unstamped") for j in _gall.values())
     _now = _engine_now()
-    _on_now = _cov.get(_now, 0)
+    _on_now = sum(v for k, v in _cov.items()
+                  if k and _now and (k == _now or _now.startswith(k) or k.startswith(_now)))
     L_.append("")
     if _on_now == len(_gall):
         L_.append("Every result above was measured on engine `%s`, the engine in the tree." % _now)
