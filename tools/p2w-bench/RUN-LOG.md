@@ -189,3 +189,5 @@
 | 25 Nov 15:06 | fixer | slot claimed - fixer running |
 | 25 Nov 15:06 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
 | 25 Nov 15:06 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
+| 25 Nov 15:30 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
+| 25 Nov 15:30 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
