@@ -90,7 +90,10 @@ IGNORED = [
      "ANY paragraph or cell before-gap - not a defect on its own (Google honours it 1:1 except at a page top)."),
     ("w:before-after-pagebreak", "page-top-gap",
      re.compile(r'<w:br\s+w:type="page"\s*/>(?:(?!<w:p[ >]).)*?<w:p\b(?:(?!<w:p[ >]).)*?w:before="([1-9]\d*)"', re.S),
-     "Google drops w:before at a page top after a hard break: 55.15 pt asked, 0.33 rendered. This is the real construct."),
+     "Google drops w:before at a page top after a hard break: 55.15 pt asked, 0.33 rendered."),
+    ("w:before-first-para", "page1-top-gap",
+     re.compile(r'<w:body>\s*(?:(?!<w:p[ >]).)*?<w:p\b(?:(?!<w:p[ >]).)*?w:before="([1-9]\d*)"', re.S),
+     "Page one has no preceding break, so the page-top defect there is a w:before on the first body paragraph (72_bank_statement: one page, 99 before-gaps, fails 18_displacement)."),
 ]
 
 EMBEDDED_FONT = ("embedded-font", "FINDINGS/GOOGLE-IGNORES-CHARACTER-WIDTH-2424.md: an embedded face is "
