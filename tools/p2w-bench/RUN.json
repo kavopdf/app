@@ -1,13 +1,16 @@
 {
- "started_ts": 1795584407.8215442,
- "started": "10:56",
- "ended_ts": null,
- "ended": null,
+ "agents": [
+  "googA-01",
+  "annoB-01"
+ ],
+ "attempts": 1,
  "class": "",
- "attempts": 0,
- "kept": 0,
  "docs_improved": 0,
- "agents": [],
+ "ended": null,
+ "ended_ts": null,
+ "kept": 0,
+ "needs_human": 0,
  "obstacles_cleared": 0,
- "needs_human": 0
+ "started": "10:56",
+ "started_ts": 1795584407.8215442
 }
