@@ -5470,3 +5470,8 @@
 {"t": 1795565829.3963087, "ist": "05:47:09", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795565829.4836648, "ist": "05:47:09", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795565829.7580347, "ist": "05:47:09", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795566826.6784863, "ist": "06:03:46", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795567029.2159333, "ist": "06:07:09", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795567063.241735, "ist": "06:07:43", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795567063.4036965, "ist": "06:07:43", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795567097.6883028, "ist": "06:08:17", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}

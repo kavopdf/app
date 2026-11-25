@@ -1,74 +1,49 @@
 # P2W Watchdog - Run Report
 
-**25 Nov 2026 · 00:22 IST**
+**25 Nov 2026 · 06:06 IST**
 
 > **1 stage(s) stopped: txt**
 
 ## Stages
 
-> **Today's row is stale** - google: committed row says 190, the data says 191; google_clean: committed row says 35, the data says 36. The trend below is the committed row; the data has moved.
-
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 3.6 h |
-| matrix | done | 213 of 213 | 20.6 h |
-| classify | moving |  | 4.9 h |
-| fix | moving | 2 attempt(s) in 3 h | 0.2 h |
-| txt | **stopped** | 199 clean, 14 failing | 14.6 h |
+| measure-google | done | 213 of 213 | 0.4 h |
+| matrix | done | 213 of 213 | 26.3 h |
+| classify | moving |  | 4.6 h |
+| fix | moving | 5 attempt(s) in 3 h | 0.3 h |
+| txt | **stopped** | 199 clean, 14 failing | 20.3 h |
 
 ## Trend
 
-| | 2026-11-23 | 2026-11-24 | |
+| | 2026-11-24 | 2026-11-25 | |
 |:--|--:|--:|:--|
 | .docx open | 59 | **59** | no change |
 | .txt failing | 14 | **14** | no change |
-| Google measured | 190 | **190** | no change |
-| Google clean | 30 | **35** | +5 |
+| Google measured | 190 | **191** | +1 |
+| Google clean | 35 | **36** | +1 |
 
 ## What this pass did
 
 * Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
 * **A stage is stopped** - see BLOCKERS.md.
 
+## What this pass did
 
-## The state moved while this pass was reading it
+* Read health.py, health.py --stalled, progress.py, round.py --phase, status.py and pending.py before deciding anything, then the last BLOCKERS rows and the baseline cron's own commits.
+* **One stage is stopped: txt** - 199 clean and 14 failing. The baseline run committed a restamp of all 213 .txt rows before this pass and no row changed, so the table is current and the 14 failures are real, not a stale table.
+* The trend did not move on docx open (59) or txt failing (14). It moved on Google measured (190 to 191) and Google clean (35 to 36). The fixer's attempt count beside the flat pair is 5 attempts in 3 h.
+* The fixer slot is free and the phase is fix, so round.py had nothing to release and nothing to reopen.
 
-When this pass started, the fix row read stopped: a run had claimed the slot, beaconed once, and gone
-silent inside one long step. The claim was still inside round.py's release window, so a forced release
-would have put a second run into the engine while the first may still be alive. The slot was left
-alone. It then cleared itself the way the design says it should: a relay claimed the slot, recorded an
-attempt, and health.py now reads fix moving with 2 attempt(s) in 3 h. That is the pair of fixer crons
-doing their job, and it is why this pass released nothing.
+## What I decided about the txt stall
 
-## txt: 14 failing that the baseline cannot move
+The txt column has read 14 for 3 consecutive rows and no attempt has closed one of them. Those 14 sit in the word-invention, position, word-accuracy and line-order checks, and every one of them has had a turn. I did not park a class: classpick.py --exhaust asks for what was proved, and this pass proved nothing new. What is already proved is narrower - the two bank forms in the word-accuracy check cannot be recovered without a reference face or an English word list. The approach is not wrong either: the fixer is moving, and its rotation has reached the txt side. What would overturn this: an attempt on the word-invention check, which carries the largest share of the 14, that measures and keeps nothing.
 
-The .txt table is newer than the engine and both scripts that can change a .txt score, so re-scoring
-reproduces it byte for byte. Those 14 failures are engine work and belong to the fixer, not to the
-baseline cron. What would overturn that: a .txt table older than its own inputs.
+## What did not run
 
-## The trend, and the overturn the previous pass left
+**This watchdog has no cron tool.** STEP 3 and both cron fixes - the zombie and the stale schedule - cannot run, so the cron half of the brief did not happen this pass. The calls I would have made are written out in full in BLOCKERS.md: list the crons and read next_fire_at and status for the baseline and both fixers, runs for any stage reading stopped, then delete and recreate only a run still marked running past an hour on a free slot, and pause then resume only for a stale schedule, in the same run.
 
-The .docx open and .txt failing columns did not move again. Google clean did - the committed row says
-35 and the live data says 36 - so the row is reported stale rather than served as current, and the
-next row carries the newer figure.
+## Recorded, not acted on
 
-The previous pass left one checkable overturn on the pending queue: if it still held at the same count
-at this pass, the queue itself was the stall. It did not hold. classpick.py still refuses a new class
-on pending items, but the count has fallen well below what the earlier row recorded, so the queue is
-draining and is not the stall. No class was parked, and no phase was re-opened - round.py --reopen
-refuses, because the phase is fix and not done.
-
-## The platform, and what this pass could not do
-
-This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. The exact
-calls it would have made, with the ids from HEALTH-BRIEF's table, are written in BLOCKERS.md. That is
-a missing tool, not a decision waiting for a person.
-
-## Instruments repaired
-
-* health.py's fix row asserted "the slot is free" whenever a run stopped beaconing. It was not free:
-  the claim was held, and every other run would have stood down. The line now prints the beacon age
-  and the age at which round.py frees the claim, read from round.py itself. No threshold moved.
-* cronreport.py's stages table was split in two by its own stale-row banner, which printed between the
-  header row and the first data row. The banner now sits above the table.
+CLASS-HISTORY.jsonl carries committed merge-conflict markers, so a tool that parses it crashes on them. Both writers only append, so nothing is broken at this hour; choosing which side to keep would edit a past record, so it is recorded in BLOCKERS.md for the run that owns that file.
