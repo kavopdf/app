@@ -337,6 +337,18 @@ def add(args):
 
     outcome = args.outcome or compute(args.moved, args.total, ratchet=args.ratchet is not None,
                          best_drop=getattr(args, "best_drop", None))
+
+    # A KEPT FIX THAT MOVED NOTHING IS A COMMIT, NOT A FIX. compute() already refuses this -
+    # `moved <= 0` returns "reverted" before the ratchet branch is reached - so a "kept" with
+    # moved 0 can only arrive as an explicit --outcome, and content-present-partly-displaced
+    # carries six of them: six commits recorded as kept fixes that moved no document at all.
+    # They are harmless to the corpus and they make the ledger look like progress.
+    #
+    # Refused rather than silently downgraded, because a run that says kept when it moved nothing
+    # has a reason in mind and should write that reason as a lead or a finding instead.
+    if outcome == "kept" and not (args.moved or 0):
+        print("REFUSED: outcome=kept with moved=0. A kept fix must have moved a document; record it as a lead or a finding if the work is real but nothing moved.")
+        return 2
     if outcome not in OUTCOMES:
         print("refused: outcome must be one of %s, or give --moved/--total so it is "
               "computed." % ", ".join(OUTCOMES))
