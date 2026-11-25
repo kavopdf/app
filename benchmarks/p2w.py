@@ -136,14 +136,25 @@ def _ensure_scipy():
     except ImportError:
         pass
     log("scipy missing - installing (the fallback transform is ~48x slower per page)")
+    # THE FAILURE WAS SILENT, AND THAT COST A RUN. On 25 Nov this printed "scipy missing -
+    # installing" and then "STILL missing" 16 s later with no reason at all: sh() returns the
+    # CompletedProcess and nothing read its returncode or its stderr, so a pip that failed in 16 s
+    # looked exactly like a pip that worked and an import that did not. The next run went looking
+    # in the renderer, which is where the stall appeared to be. A prerequisite that cannot say why
+    # it failed is not a prerequisite, it is a discovery - so the reason is logged.
+    r = sh("python3 -m pip install -q scipy", 220)
+    rc = None if r is None else r.returncode
+    err = "" if r is None else ((r.stderr or "") + (r.stdout or "")).strip()
     try:
-        sh("pip install -q scipy", 220)
         import scipy  # noqa: F401
         _SCIPY_OK = True
         log("scipy installed - exact EDT, fast path")
     except Exception:
         _SCIPY_OK = False
         log("WARNING: scipy STILL missing - measuring on the exact-fallback transform.")
+        log("WARNING: pip exit %s - %s"
+            % ("timeout" if rc is None else rc,
+               err.splitlines()[-1][:200] if err else "(pip captured no output)"))
         log("WARNING: ~48x slower per page; a 23-document class will not finish in one call.")
     return _SCIPY_OK
 

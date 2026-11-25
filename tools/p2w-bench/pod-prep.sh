@@ -189,6 +189,24 @@ else
   say engine "$(find ../../app/src/main/java -name '*.java' | wc -l) engine sources + ConvertAll + ConvertOne compiled into out/"
 fi
 
+# ---- THE MEASUREMENT TRANSFORM IS A PREREQUISITE TOO --------------------------
+# scipy was not on this list, and the 25 Nov stall was blamed on soffice for three calls before a
+# stack dump landed in edt(). The cost is measured on one real corpus page (mobile-bill, 1754x1241
+# px at 150 DPI): scipy path 1.38 s, pure-Python fallback 66.07 s - 48x, same answer. A 23-document
+# class is 23-69 pages, so the fallback alone is 25-76 minutes, which is exactly the shape of a
+# call that renders 12 documents, then none, then one, with no error.
+#
+# _ensure_scipy() now lives beside the only thing that needs it, but a pod that has never installed
+# scipy still pays the fallback on its first call. Here it is a stat, which is what a prerequisite
+# should be.
+if python3 -c 'import scipy' 2>/dev/null; then
+  say python "scipy $(python3 -c 'import scipy;print(scipy.__version__)') present - skipped (warm)"
+else
+  say python "installing scipy (the exact EDT - without it every rendered measurement is 48x slower)"
+  python3 -m pip install -q scipy || say python "pip could not install scipy - rendered measurement will run on the fallback and say so"
+  python3 -c 'import scipy' 2>/dev/null || say python "scipy still not importable - rendered measurement will be slow, not wrong"
+fi
+
 # ---- CONVERT THE CORPUS, OR THE GATE BUILDS IT AND TIMES OUT ------------------
 # Measured twice on 25 Nov, independently: install-gate.sh runs the hook, the hook runs regress.py
 # --check, and that builds all 213 .docx itself in 240 s slices. The commit then exceeds the 300 s
