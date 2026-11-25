@@ -277,6 +277,9 @@ def engine_id():
         return "unknown"
 
 
+KEPT_BAR_CAP = 6   # documents one attempt can realistically move, whatever the class size
+
+
 def compute(moved, total, ratchet=False, best_drop=None):
     """kept / partial / reverted from the numbers. None when there are no numbers to read.
 
@@ -307,7 +310,19 @@ def compute(moved, total, ratchet=False, best_drop=None):
     # pipeline can get short of a corpus ratchet.
     if total < 2:
         return "kept" if moved >= 1 else "reverted"
-    if moved >= max(2, 0.25 * total):
+    # A QUARTER OF A HUGE CLASS IS UNREACHABLE IN ONE ATTEMPT, SO NOTHING IS EVER KEPT.
+    # The rule exists so a 1-of-30 does not read as a landed fix, and that intent holds - one
+    # document is still below the floor of two. But 18_displacement holds 122 instances across
+    # 100+ documents, so its bar was 31 documents in one attempt; measured, it took 20 attempts
+    # and moved one. A class that can never be kept reads to the rotation as one that never
+    # produces, and the fixer returns to it because its leverage is still the largest.
+    #
+    # The cap is the size of a realistic attempt, not a concession: a patch that moves six
+    # documents has done real work whatever the class size, and the 5.0 share-point rule below
+    # already credits a single large movement. Big classes are meant to be split, and this makes
+    # splitting them a way to earn a kept rather than the only way to avoid a partial forever.
+    _bar = min(max(2, 0.25 * total), KEPT_BAR_CAP)
+    if moved >= _bar:
         return "kept"
     # ONE DOCUMENT THAT MOVED A LONG WAY IS PROGRESS, EVEN IN A BIG CLASS.
     #
