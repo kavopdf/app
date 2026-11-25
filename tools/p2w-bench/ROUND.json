@@ -1,5 +1,5 @@
 {
-  "baseline_started": 1795567123.7101562,
+  "baseline_started": 0,
   "classifier_started": 0,
   "fixer": {
     "agents": [
@@ -13,11 +13,11 @@
       }
     ]
   },
-  "fixer_doing": "claim commit",
-  "fixer_doing_since": 1795567272.5368536,
+  "fixer_doing": "testing the degenerate-line-height hypothesis on 6 docs",
+  "fixer_doing_since": 1795569054.1087995,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795567272.536854,
-  "fixer_started": 1795567473.302569,
+  "fixer_last_beat": 1795569054.1088004,
+  "fixer_started": 1795567033.7651365,
   "history": [
     {
       "at": "2026-11-12 09:46",

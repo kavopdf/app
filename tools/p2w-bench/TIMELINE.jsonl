@@ -5480,3 +5480,10 @@
 {"t": 1795567143.4485645, "ist": "06:09:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795567178.6842473, "ist": "06:09:38", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
  704deabc (claim: fixer takes the slot (25 Nov 06:07) + beacon)
+{"t": 1795568965.3263907, "ist": "06:39:25", "ev": "beat", "d": "two agents returned; picking the class"}
+{"t": 1795568965.7004278, "ist": "06:39:25", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795568968.561818, "ist": "06:39:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795568991.7241704, "ist": "06:39:51", "ev": "beat", "d": "page-count: fetching corpus + converting witnesses"}
+{"t": 1795569054.107937, "ist": "06:40:54", "ev": "beat", "d": "testing the degenerate-line-height hypothesis on 6 docs"}
+{"t": 1795569088.5276096, "ist": "06:41:28", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795569115.6342766, "ist": "06:41:55", "ev": "beat", "d": "attempt.py: recording an attempt"}

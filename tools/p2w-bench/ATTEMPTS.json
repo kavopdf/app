@@ -1,6 +1,6 @@
 {
  "00_page_count": {
-  "attempts": 9,
+  "attempts": 10,
   "first_seen": null,
   "history": [
    {
@@ -58,6 +58,17 @@
     "outcome": "lead",
     "reason": "Second measurement this slot, live in Google through the fixed recorder: 60_page_border still 2 vs 1 on b7699196 with page 2 holding 0 words / 1 drawing / 16 images (the page's own border, rasterised ",
     "total": 23
+   },
+   {
+    "at": "2026-11-25 06:41",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "00_page_count: land the column-page shape merge - 21 documents, 0 regressions"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "22 page_count_refused documents are a Google-only extra page: LibreOffice renders 60_page_border and 350_question_paper at 1 page where Google draws 2. Built a cumulative-flow model over document.xml ",
+    "total": null
    }
   ],
   "last": null,
@@ -73,9 +84,10 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "Second measurement this slot, live in Google through the fixed recorder: 60_page_border still 2 vs 1 on b7699196 with page 2 holding 0 words / 1 drawing / 16 images (the page's own border, rasterised - a real sheet, so an engine defect); bank-statement-horizontal-rules-only is no longer a refusal at all - 1 page, 40/42, failing 18_displacement (med_dy 8.5, worst 106.6) and 45_char_accuracy. Zero of 23 became clean; one of two re-measured stopped being unscored. The remaining 21 must be re-measured, not reasoned about.",
+  "reason": "22 page_count_refused documents are a Google-only extra page: LibreOffice renders 60_page_border and 350_question_paper at 1 page where Google draws 2. Built a cumulative-flow model over document.xml to test a minimum-line-height mechanism; it does not discriminate (300_prescription_rx is scored ok and sums to 1058.8pt vs an 842pt page). No engine change made. Lead: mint the s3key with upload(path=...) and measure the Google render directly.",
   "reasons": [
    "namespace test",
    "Mechanism measured, fix not landed: Google converts each page-positioned floating shape into an inline image in the flow, ~0.79 pt each; 22 of 23 refused documents emit their shapes AFTER the last text paragraph, so a full page overflows. Six docx-level variants measured through Google (drop last, merge into one paragraph, attach to text paragraphs, prstGeom, wrapSquare, framePr) - all still 2 pages; deleting all shapes is 1 page, which proves the cause. Fix needs the table writer (w:tcBorders). FINDINGS/00_page_count-GOOGLE-INLINES-EVERY-SHAPE-0530-fixer.md",
@@ -85,7 +97,8 @@
    "23 page_count_refused docs: 21 render the RIGHT page count in LibreOffice and one too many in Google (proxy is blind); the 350 inline-picture construct is REFUTED - 0 wp:inline across all 23, the engine already anchors every picture; the two bank forms anchor a picture taller than the sheet (842.1pt on an 841.9pt page) and are a genuine pagination fault",
    "No engine change. classpick refused a class because 5 pending ratchet items cannot close: ratchet.py reads the RETIRED BASELINE.md (rows u59, live instrument 47 checks, no RATCHET.json) so it compares 0 of 211 documents. Wrote ratchet_google.py over benchmarks/gverify: 190 compared against marks, 0 fell, 23 page_count_refused uncomparable - those 23 are this class and are why a fifth of the corpus is outside every gate. Falsified 3 ways incl. a clean 42/42 doc made to fail 47_margins -> exit 1 naming it. See FINDINGS/RATCHET-WAS-GATING-A-RETIRED-PIPELINE-0420-fixer.md",
    "Recorded as a lead, not a fix: the class's 23 refusals are all engine (the page's furniture as N page-positioned shapes, Google charges 0.10-0.96 pt per shape) but zero of them can go clean - a refusal skips all 47 checks. This run fixed the instrument that records them: --collect deleted the refused export and wrote a record with no engine stamp (21 of 23), so what the extra page holds was never kept. Now the export is kept and the record carries engine/checks/at plus a per-page census. Re-measure the 23 in Google to turn that census into a verdict.",
-   "Second measurement this slot, live in Google through the fixed recorder: 60_page_border still 2 vs 1 on b7699196 with page 2 holding 0 words / 1 drawing / 16 images (the page's own border, rasterised - a real sheet, so an engine defect); bank-statement-horizontal-rules-only is no longer a refusal at all - 1 page, 40/42, failing 18_displacement (med_dy 8.5, worst 106.6) and 45_char_accuracy. Zero of 23 became clean; one of two re-measured stopped being unscored. The remaining 21 must be re-measured, not reasoned about."
+   "Second measurement this slot, live in Google through the fixed recorder: 60_page_border still 2 vs 1 on b7699196 with page 2 holding 0 words / 1 drawing / 16 images (the page's own border, rasterised - a real sheet, so an engine defect); bank-statement-horizontal-rules-only is no longer a refusal at all - 1 page, 40/42, failing 18_displacement (med_dy 8.5, worst 106.6) and 45_char_accuracy. Zero of 23 became clean; one of two re-measured stopped being unscored. The remaining 21 must be re-measured, not reasoned about.",
+   "22 page_count_refused documents are a Google-only extra page: LibreOffice renders 60_page_border and 350_question_paper at 1 page where Google draws 2. Built a cumulative-flow model over document.xml to test a minimum-line-height mechanism; it does not discriminate (300_prescription_rx is scored ok and sums to 1058.8pt vs an 842pt page). No engine change made. Lead: mint the s3key with upload(path=...) and measure the Google render directly."
   ],
   "requeues": 0,
   "status": "OPEN"
