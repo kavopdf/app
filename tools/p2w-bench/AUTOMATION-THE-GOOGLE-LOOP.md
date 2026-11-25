@@ -1,5 +1,30 @@
 # The Google loop, and the one thing a sandbox cannot do
 
+> **CORRECTED 25 Nov 2026, fixer slot 16:26 IST — there is no missing step. Read this box before the rest of
+> the file, which is kept because its measurements of steps 2-4 still hold.**
+>
+> Two measurements, both taken this run:
+>
+> 1. **The `.docx` are already in Drive.** `GOOGLEDRIVE_FIND_FILE` over the corpus folder
+>    `1qAl4xzzU-FOl6E2nAv8PuZ6GaBpjsXCA` returns **213 distinct `.docx` names, 213 files**, created
+>    04:46 IST today. Step 1 of `refresh-google.py` is satisfied. Nothing has to be uploaded for the loop
+>    to run; `python3 refresh-google.py --folder 1qAl4xzzU-FOl6E2nAv8PuZ6GaBpjsXCA` is the whole loop.
+> 2. **The platform `upload` tool does return an `s3key` from a sandbox path**, which is what the section
+>    below says no sandbox can get. Measured end to end on `303_discharge_summary.docx`:
+>    `upload(toolkit="googledrive", tool_slug="GOOGLEDRIVE_UPLOAD_FILE", path=<a file in /scratch/output>)`
+>    -> `s3key: project_scope/ok_MI5WEzhyITR7/pr_qSx6sTyshHxf/files/gtabbu3786i1.docx` ->
+>    `GOOGLEDRIVE_UPLOAD_FILE(file_to_upload={name, mimetype, s3key}, folder_to_upload_to=<corpus folder>)`
+>    -> a real Drive file id. Two constraints: the path must be a **saved** file (`/scratch/output`; a path in
+>    `/scratch/work` is rejected), and `folder_to_upload_to` must be given or the file lands in the Drive root,
+>    which the rules forbid.
+>
+> That upload created a **duplicate** of a name that already existed, because the file was already there. The
+> duplicate was trashed again (recoverable) and the folder is back to 213. **Do not upload a document that is
+> already in the folder** — check `GOOGLEDRIVE_FIND_FILE` first, or you will hand `refresh-google.py` two files
+> with one name.
+>
+> See `FINDINGS/18_displacement-25-SOLO-A-B-C-CENSUS-25NOV-1626-fixer.md` for the raw numbers.
+
 ## One command now does the whole thing
 
     python3 tools/p2w-bench/refresh-google.py --folder 1qAl4xzzU-FOl6E2nAv8PuZ6GaBpjsXCA
