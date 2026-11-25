@@ -56,7 +56,7 @@ block. Every run begins here.
     p2w.py --status
     p2w.py --diagnose 20
 """
-import sys, os, json, subprocess, time, argparse, glob, csv, re, shutil
+import sys, os, json, subprocess, time, argparse, glob, csv, re, shutil, uuid
 import numpy as np
 try:
     import fitz
@@ -80,7 +80,7 @@ DIST=ROOT+"/dist2"; CACHE="/scratch/output/_cache"; REPO=ROOT+"/repo"
 # P2W_ENGINE_SRC names the clone to measure instead. Unset - the baseline cron, the apk cron, every
 # run that has nothing local to measure - it is REPO, and the behaviour is exactly what it was.
 ENGINE_SRC=os.environ.get("P2W_ENGINE_SRC") or REPO
-IMG=ROOT+"/diag"; PRE=ROOT+"/pre"; CHUNK=12; ZIPS=["p2w-all-groups","p2w-batch-1","pdf-to-word-test-corpus-v3","p2w-round2-additions"]
+IMG=ROOT+"/diag"; PRE=ROOT+"/pre"; CHUNK=12; PER_DOC=90; ZIPS=["p2w-all-groups","p2w-batch-1","pdf-to-word-test-corpus-v3","p2w-round2-additions"]
 JH="/scratch/work/.p2w-jdk/jdk"; INK=68; DPI=150; PT=72.0/DPI
 SWEEP=[1,2,3,5,10]
 # How far one channel may differ and still be the page's colour. 24 of 255 is about 9 % - enough
@@ -105,6 +105,52 @@ def sh(c,t=280):
 def log(m): print(f"[{time.strftime('%H:%M:%S')}] {m}",flush=True)
 
 # ---------------- geometry helpers ----------------
+def _ensure_scipy():
+    """Make scipy importable, ONCE, at the point that needs it.
+
+    THE GUARD WAS IN main() AND THE TOOL THAT STALLED NEVER CALLS main().
+
+    main() checked for scipy, pip-installed it, and verified - and wrote INSTRUMENT.txt saying
+    which mode the numbers came from. screen.py does not run main(): it imports this file as a
+    module and calls docx()/run() directly, so it never reached that block, edt() silently took
+    the fallback, and every rendered measurement ran on the pure-Python transform.
+
+    Measured 25 Nov on one real corpus page (mobile-bill, 1754x1241 px at 150 DPI):
+
+        scipy path        1.38 s
+        fallback path    66.07 s      48x slower, for the same answer
+
+    A 23-document class is 23-69 pages, so the class costs 25-76 MINUTES of EDT alone - which is
+    why three consecutive 280 s calls rendered 12 documents, then none, then one, with no error
+    and no log line. It was never soffice; a stack dump at the stall landed in edt(), not in the
+    renderer. A prerequisite that is not called by the thing that needs it is not a prerequisite,
+    it is a discovery - so the check lives here, beside the only thing that needs it.
+    """
+    global _SCIPY_OK
+    if _SCIPY_OK is not None:
+        return _SCIPY_OK
+    try:
+        import scipy  # noqa: F401
+        _SCIPY_OK = True
+        return True
+    except ImportError:
+        pass
+    log("scipy missing - installing (the fallback transform is ~48x slower per page)")
+    try:
+        sh("pip install -q scipy", 220)
+        import scipy  # noqa: F401
+        _SCIPY_OK = True
+        log("scipy installed - exact EDT, fast path")
+    except Exception:
+        _SCIPY_OK = False
+        log("WARNING: scipy STILL missing - measuring on the exact-fallback transform.")
+        log("WARNING: ~48x slower per page; a 23-document class will not finish in one call.")
+    return _SCIPY_OK
+
+
+_SCIPY_OK = None
+
+
 def _dil(m,r):
     h,w=m.shape; t=m.copy()
     for dx in range(-r,r+1): t[:,max(0,-dx):w+min(0,-dx)]|=m[:,max(0,dx):w+min(0,dx)]
@@ -133,6 +179,7 @@ def edt(mask,shape,maxr=400):
     now exact: the Felzenszwalb-Huttenlocher squared-distance transform, one pass per axis, integer
     and O(n) - the same algorithm scipy uses, so both paths agree to the pixel.
     """
+    _ensure_scipy()
     try:
         from scipy.ndimage import distance_transform_edt
         return distance_transform_edt(~mask).astype(np.int32),"scipy"
@@ -226,6 +273,52 @@ def text_of(p):
 SOFFICE_BIN = ("/usr/bin/soffice" if os.path.exists("/usr/bin/soffice")
                else "/usr/lib/libreoffice/program/soffice.bin")
 
+# EVERY INVOCATION GETS A PROFILE OF ITS OWN, AND THE REASON IS MEASURED.
+#
+# soffice was launched with no -env:UserInstallation, so every launch on the pod shared
+# $XDG_CONFIG_HOME/libreoffice/4. Two launches on one profile do not run in parallel: the second
+# waits for the first. Measured 25 Nov on this image, one 120-page .docx hog converting on the
+# shared profile while a one-page bill was converted:
+#
+#     shared profile, hog running     56.7 s to convert one 1-page document (queued behind it)
+#     own profile, hog running        13.9 s, and independent of what the hog is doing
+#
+# That queue is harmless while every launch ends. It is fatal because it does not always end:
+# soffice_pdf launches soffice with start_new_session=True and kills it by process GROUP in its
+# own finally - but when the sandbox kills PYTHON at the 280 s ceiling, that finally never runs and
+# the process group is the sandbox's, not ours, so soffice survives (measured: 3 soffice processes
+# still alive after SIGKILLing the parent mid-conversion). The survivor holds the shared profile,
+# so every later call queues behind it, produces nothing inside its budget, caches nothing, and the
+# next call queues behind the same survivor. That is the three-call stall in BLOCKERS 25 Nov:
+# prerender 12, then nothing, then 1 with no finish - not a slow document, a queue that never
+# drains. A profile per invocation cannot be queued on: the survivor's profile is nobody else's.
+#
+# A per-call profile was tried before and recorded here as WORSE (rc=81, no PDF). That does not
+# reproduce on this image today: a fresh profile converts in 7.4 s with stdout on DEVNULL, and a
+# profile warmed by its own --terminate_after_init launch converts in 5.7 s. Both are measured
+# above; the note it replaces was not.
+# THE PROFILE IS PER PROCESS, NOT PER LAUNCH, AND THAT IS ALSO MEASURED.
+#
+# A profile per LAUNCH was built first and thrown away: creating a profile is not free, and the
+# per-document retry in prerender() pays it per document instead of per chunk - measured 25 Nov,
+# the same one-page bill that converts in 1.5 s inside a chunk of twelve took 13-15 s alone on a
+# fresh profile. Per PROCESS keeps every property that matters (a survivor of a dead process owns a
+# profile nobody else can queue on) at one profile per run instead of one per launch. p2w is
+# serial - soffice_pdf waits for or kills its own launch before it returns - so no two launches of
+# this process are ever live at once, and one profile is enough for all of them.
+LO_PROFILE_ROOT = "/tmp/p2w-lo"
+_LO_PROFILE = None
+
+
+def _soffice_profile():
+    """A user-profile argument this process alone owns."""
+    global _LO_PROFILE
+    if _LO_PROFILE is None:
+        d = os.path.join(LO_PROFILE_ROOT, "p%d-%s" % (os.getpid(), uuid.uuid4().hex[:8]))
+        os.makedirs(d, exist_ok=True)
+        _LO_PROFILE = "-env:UserInstallation=file://" + d
+    return _LO_PROFILE
+
 # SOFFICE NEEDS A PROFILE OF ITS OWN, AND WITHOUT ONE THE FIRST LAUNCH ON A FRESH POD
 # CONVERTS NOTHING AND SAYS NOTHING.
 #
@@ -255,20 +348,27 @@ SOFFICE_BIN = ("/usr/bin/soffice" if os.path.exists("/usr/bin/soffice")
 # time is the one that goes wrong - silently, exit code 0, no file, no diagnostic. Every
 # later launch works, which is why this read as an intermittent fault for four runs.
 #
-# A per-call -env:UserInstallation profile was tried as the fix and is WORSE: on this image
-# every launch pointed at a fresh profile exits rc=81 having written 260 KB of a profile
-# and no PDF, so the retry below recursed instead of recovering. Reverted; the warm-up is
-# the fix. One `--version` per process costs ~3 s and pays the profile cost once.
-_LO_WARMED = False
+# A per-call -env:UserInstallation profile was recorded here on 21 Nov as WORSE: on this image
+# every launch pointed at a fresh profile exited rc=81 having written 260 KB of a profile
+# and no PDF, so the retry below recursed instead of recovering. RE-MEASURED 25 NOV AND IT DOES
+# NOT REPRODUCE: a fresh profile converts in 7.4 s with stdout on DEVNULL and rc=0, and one warmed
+# by its own --terminate_after_init launch in 5.7 s. The warm-up is still the first launch's job -
+# _soffice_warm is keyed by profile now, so every profile is created by a launch carrying no
+# document, which is what this note asks for. One warm launch per profile costs ~2 s.
+_LO_WARMED = set()
 
 
-def _soffice_warm():
-    global _LO_WARMED
-    if _LO_WARMED:
+def _soffice_warm(profile=None):
+    # KEYED BY PROFILE, NOT BY PROCESS. Each invocation now has its own profile (see
+    # _soffice_profile), so "warm once per process" would warm a profile no conversion uses and
+    # leave every real launch paying the creation cost the note above is about.
+    key = profile or ""
+    if key in _LO_WARMED:
         return
-    _LO_WARMED = True
+    _LO_WARMED.add(key)
     try:
-        subprocess.run([_soffice_exe(), "--headless", "--norestore", "--terminate_after_init"],
+        subprocess.run([_soffice_exe(), "--headless", "--norestore"]
+                       + ([profile] if profile else []) + ["--terminate_after_init"],
                        timeout=90,
                        stdin=subprocess.DEVNULL,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -301,8 +401,9 @@ def soffice_pdf(files, outdir, deadline=None, extra=None):
     """
     os.makedirs(outdir, exist_ok=True)
     want = [os.path.join(outdir, os.path.splitext(os.path.basename(f))[0] + ".pdf") for f in files]
-    _soffice_warm()
-    cmd = [_soffice_exe(), "--headless", "--norestore"] + list(extra or []) + \
+    prof = _soffice_profile()
+    _soffice_warm(prof)
+    cmd = [_soffice_exe(), "--headless", "--norestore", prof] + list(extra or []) + \
           ["--convert-to", "pdf", "--outdir", outdir] + list(files)
     end = deadline if deadline else time.time() + 280
     # A PRE-EXISTING FILE AT THE OUTPUT PATH IS NOT THIS CONVERSION'S OUTPUT.
@@ -433,7 +534,36 @@ def prerender(names,end):
              if not _cached_render(DOCX+"/"+b+".docx")]
         fs=[DOCX+"/"+b+".docx" for b in grp if os.path.exists(DOCX+"/"+b+".docx")]
         if not fs: continue
-        soffice_pdf(fs, PRE, deadline=min(end, time.time()+280))
+        # ONE DOCUMENT MUST NOT HOLD THE BATCH, AND THE BATCH MUST NOT HOLD THE CALL.
+        #
+        # A chunk is one soffice launch, and soffice converts its arguments in order: one document
+        # that never finishes takes the other eleven with it, writes nothing, and caches nothing -
+        # so the next call rebuilds the same chunk, starts at the same document, and stalls in the
+        # same place. Measured 25 Nov: three 280 s calls, 12 prerendered then none then 1, no error.
+        # The batch is now capped one document short of the call's own deadline, so the documents
+        # it lost are retried ONE AT A TIME with PER_DOC seconds each, and a document that gives no
+        # render in that time is NAMED in the log and skipped instead of blocking the class for ever.
+        # RESERVE AT MOST HALF OF WHAT IS LEFT, not a flat PER_DOC: a flat 90 s turned a 100 s
+        # budget into a 10 s batch, which produced nothing and then retried every document alone -
+        # measured 25 Nov, 6 of 23 rendered where the batch alone does all 23. Half the remaining
+        # budget always leaves room to isolate what the batch lost, and never starves the batch.
+        batch_end = end - min(PER_DOC, max(0.0, (end - time.time()) * 0.5))
+        soffice_pdf(fs, PRE, deadline=min(batch_end, time.time()+280))
+        miss=[f for f in fs
+              if not os.path.exists(PRE+"/"+os.path.splitext(os.path.basename(f))[0]+".pdf")]
+        if miss and time.time()<end:
+            log("prerender: %d of %d produced nothing in the batch - retrying one at a time"
+                % (len(miss), len(fs)))
+            for f in miss:
+                if time.time()>=end: break
+                t_one=time.time()
+                soffice_pdf([f], PRE, deadline=min(end, t_one+PER_DOC))
+                b=os.path.splitext(os.path.basename(f))[0]
+                if os.path.exists(PRE+"/"+b+".pdf"):
+                    log("prerender: %s rendered alone in %.0fs" % (b, time.time()-t_one))
+                else:
+                    log("prerender: %s gave no render in %.0fs - SKIPPED (named, not blocking)"
+                        % (b, time.time()-t_one))
         for f in fs:
             p = PRE + "/" + os.path.splitext(os.path.basename(f))[0] + ".pdf"
             if os.path.exists(p): _stamp_render(f, p)
