@@ -6506,3 +6506,7 @@
 {"t": 1795633723.1241305, "ist": "00:38:43", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795633723.7083569, "ist": "00:38:43", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795633727.1371927, "ist": "00:38:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795633742.9257019, "ist": "00:39:02", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795633746.282667, "ist": "00:39:06", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795633746.43313, "ist": "00:39:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795633746.543423, "ist": "00:39:06", "ev": "beat", "d": "pending.py: reading the pending gate"}
