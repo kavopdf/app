@@ -6148,3 +6148,4 @@
 {"t": 1795606426.629172, "ist": "17:03:46", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795606426.733263, "ist": "17:03:46", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795606427.2520351, "ist": "17:03:47", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795606450.5679586, "ist": "17:04:10", "ev": "beat", "d": "attempt.py: recording an attempt"}
