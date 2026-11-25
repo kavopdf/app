@@ -5503,3 +5503,11 @@
 {"t": 1795572171.9079604, "ist": "07:32:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795572172.0002153, "ist": "07:32:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795572172.3636649, "ist": "07:32:52", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795572416.9329793, "ist": "07:36:56", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795572418.5721989, "ist": "07:36:58", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795572419.0049713, "ist": "07:36:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795572420.562064, "ist": "07:37:00", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795572427.7407506, "ist": "07:37:07", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795572429.4573512, "ist": "07:37:09", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795572429.8831658, "ist": "07:37:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795572431.5072463, "ist": "07:37:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
