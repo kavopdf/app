@@ -381,6 +381,15 @@ def add(args):
                 print("    %s" % _x.strip())
             print("Commit what you measured, then record the attempt. Until then it is a FINDING, and")
             print("the honest outcome is `lead`, not a moved count.")
+            # KEEP THE NUMBER. Zeroing it destroyed the only record of what was measured: 69 leads
+            # accumulated, 9 of them carrying real movement, 28 documents between them - 14 on
+            # 32_stroke_lines and 11 on 04_chars_missing - and every one was recorded as having moved
+            # nothing. The rotation then read a producing class as a dead one.
+            #
+            # The count is not credited (a measurement of sandbox-only code is not a measurement of the
+            # repo) but it is not erased either: it goes to pending_moved with its reason, so the history
+            # shows what was measured and the next run knows to commit and re-record rather than re-derive.
+            _pending_moved = args.moved
             args.moved = 0
             if outcome in ("kept", "partial"):
                 outcome = "lead"
@@ -393,6 +402,23 @@ def add(args):
             #
             # Refuse instead: no attempt is recorded, so the count stays honest and the fixer has to commit
             # before it can claim the work. The finding is already printed above.
+            # RECORD WHAT WAS MEASURED, WITHOUT COUNTING AN ATTEMPT. The attempt counter must not rise
+            # for work that changed nothing in the repo, but the number must not vanish either - that
+            # is what lost 28 documents across 69 leads. A pending_moved row says "this was measured,
+            # it is not credited, commit and re-record it".
+            try:
+                _d = load()
+                _r = _d.setdefault(name, {"attempts": 0, "first_seen": None, "last": None,
+                                          "outcomes": [], "reason": "", "requeues": 0,
+                                          "status": "OPEN"})
+                _r.setdefault("history", []).append(
+                    {"at": ist("%d %b %H:%M"), "moved": None, "pending_moved": _pending_moved,
+                     "outcome": "lead", "total": args.total,
+                     "reason": "measured on a dirty tree - not credited; commit and re-record"})
+                _r["pending_moved"] = _pending_moved
+                save(_d)
+            except Exception as _e:
+                print("could not record the pending measurement: %s" % _e)
             return 2
 
     d = load()
