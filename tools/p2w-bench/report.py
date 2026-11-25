@@ -1277,6 +1277,21 @@ def main(argv):
         L.append("| Check-instances still failing | **%d** |" % (_ct - _cp))
     except Exception:
         L.append("| Check-instances passing | could not be read |")
+    # A KEPT ATTEMPT IS NOT A CLEAN DOCUMENT. 15 classes carry a kept attempt and 42 documents
+    # are clean, while 171 still fail a check - the kept bar is max(2, 25% of the class), which is
+    # progress WITHIN a class, and a document is clean only when all its checks pass. Printed
+    # alone, either number misleads about how far the corpus has actually moved.
+    try:
+        _att = json.load(open(os.path.join(ROOT, "tools", "p2w-bench", "ATTEMPTS.json"), encoding="utf-8"))
+        _ka = sum(1 for _v in (_att or {}).values() if "kept" in ((_v or {}).get("outcomes") or []))
+        _gd = os.path.join(ROOT, "benchmarks", "gverify")
+        _cl = 0
+        for _n in os.listdir(_gd):
+            if _n.endswith(".json") and not (json.load(open(os.path.join(_gd, _n), encoding="utf-8")).get("failed") or []):
+                _cl += 1
+        L.append("| Kept attempts vs documents clean | **%d** classes with a kept attempt, **%d** documents clean - a kept attempt is progress inside a class, not a finished document |" % (_ka, _cl))
+    except Exception as _e:
+        L.append("| Kept attempts vs documents clean | could not be read (%s) |" % type(_e).__name__)
     L.append("| | |")
     L.append("|:--|:--|")
     if tr.get("present"):
