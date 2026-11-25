@@ -1334,7 +1334,19 @@ def docx(end):
     # engine", which is a full corpus scored on an engine the run had not built. Same shape as the
     # render-cache-by-name bug below: a cache outliving the thing it caches.
     _eng = ENGINE_SRC + "/tools/engine-verify/out/com/kavopdf/app/engine/PdfToWord.class"
-    _eng_mtime = os.path.getmtime(_eng) if os.path.exists(_eng) else 0.0
+    # NO BINARY IS NOT "OLDER THAN EVERYTHING" - IT IS "UNKNOWN". This read
+    # `getmtime(_eng) if exists else 0.0`, so an absent compiled engine set the clock to
+    # zero and every `min(mtime(dx), mtime(tx)) < _eng_mtime` became false: nothing was
+    # rebuilt, and a --force run reported a full corpus scored on output from a build that
+    # was not there. Same shape as the two stale-engine bugs above - a comparison that
+    # answers confidently when it has nothing to compare.
+    #
+    # Absent means every document is stale, so the rebuild runs and fails loudly on the
+    # missing class file instead of quietly measuring yesterday.
+    _eng_missing = not os.path.exists(_eng)
+    _eng_mtime = os.path.getmtime(_eng) if not _eng_missing else float("inf")
+    if _eng_missing:
+        log("WARNING: no compiled engine at %s - every document counts as stale" % _eng)
     def _need(p):
         b = os.path.basename(p)[:-4]
         dx = DOCX + "/" + b + ".docx"
