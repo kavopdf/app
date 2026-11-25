@@ -62,3 +62,25 @@ content cannot be flow text. That is the one case where the shape has to stay, a
     /scratch/work/flowtest/flow-test.docx  -> Google Doc -> PDF
 
 Both were built by hand in this session; the engine was not modified and was not involved.
+
+## How many textboxes there actually are
+
+Measured on the 213 corpus documents, `word/document.xml` read directly:
+
+    47 documents carry <w:txbxContent>     1007 text boxes in total
+
+      1-2   (stamp-like)   18 documents      20 boxes
+      3-10                 11 documents      51 boxes
+      11-50                13 documents     382 boxes
+      51+   (form-like)     5 documents     554 boxes
+
+    behindDoc="1" present in: 47 of 47 documents
+
+The distribution is what decides the fix, not the construct alone. Twenty boxes across eighteen
+documents are stamps — one shape each, and flow text plus `a:xfrm rot` can plausibly replace them.
+Nine hundred and eighty-seven boxes across twenty-nine documents are form fields and column layouts,
+scattered across the page; flow text cannot express those, because it cannot overlap and cannot be
+placed at an arbitrary point without pushing everything after it down.
+
+So the honest split is: eighteen documents are fixable by removing the shape, twenty-nine are not, and
+for those the fix has to be the angle (proven) and the resolution (untested), not the removal.
