@@ -1,0 +1,16 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index ad56dac..38105a9 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -957,6 +957,11 @@ public final class PdfToWord {
+                 if (flat.contains(ar.text.replaceAll("\\s+", " ").toLowerCase(Locale.ROOT))) {
+                     continue;
+                 }
++                // Nor what the annotation's own appearance already draws - the same guard the
++                // form-value loop above carries. A stamp's /Contents and the string its /AP /N
++                // draws are the same words; the appearance puts them where the reader saw them,
++                // so hoisting the /Contents again put the stamp's words on the page twice.
++                if (drawnByAppearance(apDrawn, ar.text)) continue;
+                 Para p = new Para();
+                 p.runs.add(ar);
+                 p.top = 0;
