@@ -2,11 +2,21 @@
  "name": "303_discharge_summary",
  "status": "ok",
  "rc": 1,
- "passed": 45,
+ "at": "2026-11-25T04:13:43",
+ "passed": 46,
  "total": 47,
  "failed": [
-  "18_displacement",
-  "25_invisible_text"
+  "18_displacement"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": -0.2,
+  "worst_dy": 4.1,
+  "med_dx": -0.4,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 45
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }

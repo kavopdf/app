@@ -2,11 +2,22 @@
  "name": "30_mixed_font_sizes_one_baseline_txtpos",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T04:13:58",
  "passed": 40,
  "total": 42,
  "failed": [
   "18_displacement",
   "59_shape_anchor"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 4.2,
+  "worst_dy": 6.8,
+  "med_dx": -0.2,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 38
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }

@@ -2,6 +2,7 @@
  "name": "13_stamp_non_english",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T04:12:33",
  "passed": 35,
  "total": 42,
  "failed": [
@@ -13,5 +14,15 @@
   "45_char_accuracy",
   "59_shape_anchor"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": -42.4,
+  "worst_dy": 43.5,
+  "med_dx": -0.4,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 25
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }

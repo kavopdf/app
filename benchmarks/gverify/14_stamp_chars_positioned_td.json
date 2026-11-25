@@ -2,14 +2,22 @@
  "name": "14_stamp_chars_positioned_td",
  "status": "ok",
  "rc": 1,
- "passed": 37,
+ "at": "2026-11-25T04:12:35",
+ "passed": 38,
  "total": 42,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
-  "25_invisible_text",
   "45_char_accuracy",
   "60_text_column_right_edge"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 0.8,
+  "worst_dy": 1.8,
+  "med_dx": -0.9,
+  "bad_pages": [],
+  "runs_matched": 49
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }

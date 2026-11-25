@@ -2,6 +2,7 @@
  "name": "318_court_summons_form",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T04:14:10",
  "passed": 39,
  "total": 47,
  "failed": [
@@ -14,5 +15,13 @@
   "59_shape_anchor",
   "60_text_column_right_edge"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 0.8,
+  "worst_dy": 2.5,
+  "med_dx": -0.1,
+  "bad_pages": [],
+  "runs_matched": 26
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }

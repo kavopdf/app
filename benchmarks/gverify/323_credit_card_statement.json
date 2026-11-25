@@ -2,17 +2,27 @@
  "name": "323_credit_card_statement",
  "status": "ok",
  "rc": 1,
- "passed": 39,
+ "at": "2026-11-25T04:14:23",
+ "passed": 40,
  "total": 47,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
   "17_matched_runs",
   "18_displacement",
-  "25_invisible_text",
   "45_char_accuracy",
   "60_text_column_right_edge",
   "66_table_cell_width"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 5.7,
+  "worst_dy": 18.8,
+  "med_dx": 0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 72
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }

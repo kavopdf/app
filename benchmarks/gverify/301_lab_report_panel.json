@@ -2,12 +2,22 @@
  "name": "301_lab_report_panel",
  "status": "ok",
  "rc": 1,
- "passed": 44,
+ "at": "2026-11-25T04:13:44",
+ "passed": 45,
  "total": 47,
  "failed": [
   "18_displacement",
-  "25_invisible_text",
   "60_text_column_right_edge"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 3.9,
+  "worst_dy": 23.4,
+  "med_dx": -0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 88
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }

@@ -2,16 +2,24 @@
  "name": "07_stamp_over_table",
  "status": "ok",
  "rc": 1,
- "passed": 35,
+ "at": "2026-11-25T04:12:18",
+ "passed": 36,
  "total": 42,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
-  "25_invisible_text",
   "26_text_overlap",
   "35_rotation",
   "43_within_10pt_x",
   "47_margins"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": -0.3,
+  "worst_dy": 4.3,
+  "med_dx": -0.6,
+  "bad_pages": [],
+  "runs_matched": 77
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }

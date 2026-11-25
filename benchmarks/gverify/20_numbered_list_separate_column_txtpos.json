@@ -2,6 +2,7 @@
  "name": "20_numbered_list_separate_column_txtpos",
  "status": "ok",
  "rc": 1,
+ "at": "2026-11-25T04:12:53",
  "passed": 38,
  "total": 42,
  "failed": [
@@ -10,5 +11,13 @@
   "44_header_footer",
   "45_char_accuracy"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 0.4,
+  "worst_dy": 0.8,
+  "med_dx": 0.1,
+  "bad_pages": [],
+  "runs_matched": 28
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }

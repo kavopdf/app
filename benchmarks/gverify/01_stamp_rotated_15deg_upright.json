@@ -2,15 +2,25 @@
  "name": "01_stamp_rotated_15deg_upright",
  "status": "ok",
  "rc": 1,
- "passed": 36,
+ "at": "2026-11-25T04:11:38",
+ "passed": 37,
  "total": 42,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
   "18_displacement",
-  "25_invisible_text",
   "35_rotation",
   "59_shape_anchor"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": 2.7,
+  "worst_dy": 6.6,
+  "med_dx": -0.6,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 81
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }

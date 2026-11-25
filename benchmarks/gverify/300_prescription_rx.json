@@ -2,12 +2,22 @@
  "name": "300_prescription_rx",
  "status": "ok",
  "rc": 1,
- "passed": 44,
+ "at": "2026-11-25T04:13:28",
+ "passed": 45,
  "total": 47,
  "failed": [
   "18_displacement",
-  "25_invisible_text",
   "59_shape_anchor"
  ],
- "engine": "b7699196"
+ "displacement": {
+  "med_dy": -9.2,
+  "worst_dy": 13.2,
+  "med_dx": -0.1,
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 49
+ },
+ "engine": "85b8735f",
+ "checks": "374204-1795579198"
 }
