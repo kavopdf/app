@@ -198,3 +198,4 @@
 | 25 Nov 22:58 | fixer | slot claimed - fixer running |
 | 25 Nov 23:37 | fixer | attempt 05_chars_extra -> lead (0/? moved) |
 | 25 Nov 23:37 | fixer | attempt 05_chars_extra -> lead (0/? moved) |
+| 25 Nov 23:44 | fixer | slot FORCED released - see INCIDENTS.md for why |
