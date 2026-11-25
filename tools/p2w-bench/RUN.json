@@ -1,16 +1,10 @@
 {
- "agents": [
-  "60_tA-01",
-  "instB-01"
- ],
- "attempts": 2,
- "class": "60_text_column_right_edge",
- "docs_improved": 0,
+ "started": "01:08",
+ "started_ts": 1795635496.9746382,
  "ended": null,
  "ended_ts": null,
+ "attempts": 0,
  "kept": 0,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "00:23",
- "started_ts": 1795632821.2504218
+ "agents": [],
+ "docs_improved": 0
 }
