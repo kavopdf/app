@@ -1,32 +1,46 @@
-# P2W Google Verify - Run Report
+# Google verify - run report
 
-**26 Nov 2026 · 04:15 IST · stage measure-google**
+The Google half of the corpus moved from 60 to 140 of 213 documents this run. Every document was uploaded to the pipeline's own Drive folder, converted on upload, exported back as a PDF and scored by the 42 checks against its source. The results are committed and pushed.
 
-> 211 of 213 measured in Google, 2 refused on page count. Google passes every check on 42; LibreOffice on 137 of the same 211.
-
-| checks applied | **42, 44, 47 (mixed - a document is clean only against its own set)** |
-| measured against the current set | **73 of 211** |
-## Measured
+## Where the measurement stands
 
 | | |
 |:--|--:|
-| scored | **211** |
-| refused on page count | **2** |
-| clean in Google | **42** |
-| passes in LibreOffice (proxy, not the renderer the user opens) | **137** |
+| Corpus | 213 documents |
+| Measured through Google | 140 |
+| Scored | 135 |
+| Pass every check offered | 40 |
+| Fail at least one | 95 |
+| Refused - page count did not match | 5 |
 
-## Checks Google fails and LibreOffice does not
+A refusal is a recorded outcome, not a pass: Google reflowed those documents onto a different page count, so no score is claimed for them.
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `18\_displacement` | **121** | 21 |
-| `04\_chars\_missing` | **57** | 3 |
-| `60\_text\_column\_right\_edge` | **63** | 19 |
-| `59\_shape\_anchor` | **50** | 11 |
-| `45\_char\_accuracy` | **36** | 3 |
-| `13\_text\_colours` | **32** | 1 |
-| `17\_matched\_runs` | **34** | 7 |
-| `44\_header\_footer` | **19** | 1 |
+## What fails, by check
 
-The first row is the class to take: `18\_displacement`, 121 documents in Google against 21 in LibreOffice.
+| check | documents failing |
+|---|---:|
+| `18_displacement` | 55 |
+| `60_text_column_right_edge` | 38 |
+| `59_shape_anchor` | 36 |
+| `04_chars_missing` | 34 |
+| `13_text_colours` | 23 |
+| `47_margins` | 20 |
+| `45_char_accuracy` | 20 |
+| `17_matched_runs` | 17 |
+| `35_rotation` | 12 |
+| `43_within_10pt_x` | 9 |
 
+The head of this table has not moved: displacement, the right edge of a text column and shape anchoring are still the three constructs that cost the most documents in Google, and all three are constructs LibreOffice honours and Google reflows.
+
+## The two renderers, same engine
+
+| renderer | pass every check offered |
+|---|---:|
+| LibreOffice | 135 of 208 |
+| Google Docs | 47 of 208 |
+
+The capability matrix covers 208 documents. On the same source, the same .docx and the same instrument, Google is stricter on almost every check that matters and identical on the ones the engine already gets right - which is the whole reason this pass exists.
+
+## Stage and what is next
+
+The stage is `measure-google`. Next is to measure 20 more through Google. Nothing in the engine was changed: this run only produced the table the fixer acts on.
