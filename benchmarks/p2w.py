@@ -145,12 +145,17 @@ def _ensure_scipy():
     r = sh("python3 -m pip install -q scipy", 220)
     rc = None if r is None else r.returncode
     err = "" if r is None else ((r.stderr or "") + (r.stdout or "")).strip()
-    try:
-        import scipy  # noqa: F401
-        _SCIPY_OK = True
+    # VERIFY OUT OF PROCESS. pip installs into a user-site directory that this interpreter
+    # computed sys.path for at startup, so `import scipy` here fails even when the install
+    # worked - measured 25 Nov: pip exit 0, pip show reports 1.18.1, a fresh process imports
+    # 1.18.1, and this block printed "~48x slower per page". A run reads that warning and
+    # stops, blaming the renderer, which is exactly the wrong diagnosis two runs already made.
+    chk = sh("python3 -c \"import scipy\"", 60)
+    ok = chk is not None and chk.returncode == 0
+    _SCIPY_OK = ok
+    if ok:
         log("scipy installed - exact EDT, fast path")
-    except Exception:
-        _SCIPY_OK = False
+    else:
         log("WARNING: scipy STILL missing - measuring on the exact-fallback transform.")
         log("WARNING: pip exit %s - %s"
             % ("timeout" if rc is None else rc,
