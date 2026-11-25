@@ -1,0 +1,8 @@
+STALE. Do not read this file for the txt state.
+
+The live store is tools/p2w-bench/txt/RANKING-TXT.csv - 14 documents failing on engine
+981ff1fa35e2cf67, and every reader (cronreport.py, health.py, pending.py, classify_txt.py) points
+at it. This copy was frozen by 13601fb4 at the first whole-corpus txt pass (64 failing) and nothing
+writes to it. The 50-document difference is the age of this file, not a measurement.
+
+Measured 25 Nov 2026: FINDINGS/RANKING-TXT-TWO-FILES-25NOV.md
