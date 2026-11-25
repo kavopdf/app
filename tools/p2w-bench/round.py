@@ -201,6 +201,17 @@ def _handoff(*args):
 # 45 is what baseline uses, and it is the window the fixer had before the heartbeat existed. The risk it
 # reintroduces - a dead run holding the slot - is what the :10 relay cron exists to cover, and the relay
 # only has to find the slot free once an hour.
+# MEASURED 25 NOV: THIS WINDOW NEVER FIRES. Do not lower it and do not raise it on the reasoning
+# that runs are being reaped, because they are not - the 66 "killed" events in the timeline all
+# landed within 0.1 minutes of a heartbeat (median 0.0), and a staleness kill is 45 minutes after
+# one. The kills were a label: the force-release path stamped "killed" on any previous RUN.json
+# that had a started field, including runs that had closed their own record. That is fixed above,
+# in the `if _prev.get("started") and not _prev.get("ended_ts")` test.
+#
+# The comment above says 45 predates the heartbeat and implies it can come down. It can, and it
+# should not be moved on that reasoning alone: a lower window only helps if the window is what
+# reaps runs, and the measurement says it is not. Change it when a run is reaped BY AGE - a kill
+# whose gap since the last beat is close to the limit - and not before.
 CLAIM_STALE_MIN = {"fixer": 45, "baseline": 45, "classifier": 20}
 
 
