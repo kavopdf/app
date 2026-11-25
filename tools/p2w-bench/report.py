@@ -1574,7 +1574,7 @@ def main(argv):
             L.append("| Slot window | %s → %s · %s |"
                      % (tr.get("started") or "?", tr.get("ended") or "running",
                         hhmm(tr.get("minutes") or 0)))
-            L.append("| Before the claim | not recorded - nothing writes a beat until step.py runs |")
+            L.append("| Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |")
     si = silences()
     if si.get("available"):
         L.append("| Tool beats | %d |" % si["beats"])
