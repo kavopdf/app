@@ -165,5 +165,16 @@
   "started": "17:16",
   "started_ts": 1795607215.4020357,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "20:02",
+  "started_ts": 1795617157.3388517,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
