@@ -398,6 +398,12 @@ def _pick(fmt, rot, dead):
         return None, "no class table for the .%s half" % fmt, rot
     # ORDER BY EXPECTED FIXES, NOT BY SIZE. See by_expected_fixes() for the measurement.
     _rows = []
+    # SKIP THE CLASSES A FRESH BLOCKER NAMES, NOT EVERY CLASS. _blocked is empty when nothing is
+    # live, so this costs nothing in the normal case.
+    _blocked_now = _pending_classes()
+    for _n, _d in rank:
+        if _n in _blocked_now:
+            continue
     for _n, _d in rank:
         _h = attempts_for(_n)
         _rows.append((_n, _d, len(_h), moved_of(_h)))
@@ -497,6 +503,40 @@ def _pick(fmt, rot, dead):
 
 
 STALE_DAYS = 3   # a blocker older than this is reported, not obeyed
+
+
+def _pending_classes():
+    """Class names named by a FRESH pending item. Those classes are skipped, the rest are not.
+
+    The gate blocked every class while any item was open, so a blocker on t01_word_accuracy stopped
+    work on 18_displacement. Measured 25 Nov: 6 kept attempts landed in a day - three times the
+    previous best - and the clean count did not move, because the attempts were spread across
+    classes that cannot finish a document while the six that can sat behind the gate.
+
+    A blocker names its class in its own text; a ratchet carries it in `who`. Both are read here.
+    """
+    import subprocess, json as _json, time as _time, re as _re
+    try:
+        r = subprocess.run([sys.executable, os.path.join(HERE, 'pending.py'), '--json'],
+                           capture_output=True, text=True, timeout=90)
+        items = (_json.loads(r.stdout).get('pending') or [])
+    except Exception:
+        return set()
+    cut = _time.time() - STALE_DAYS * 86400
+    out = set()
+    for it in items:
+        if it.get('kind') == 'agent':
+            continue
+        ts = it.get('ts') or 0
+        if ts and ts < cut:
+            continue          # aged out: reported by pending.py, not obeyed
+        who = (it.get('who') or '')
+        blob = ' '.join([who, it.get('what') or '', it.get('why') or ''])
+        for m in _re.findall(r'\b(\d\d_[a-z_]+|t\d\d_[a-z_]+)\b', blob):
+            out.add(m)
+        if _re.match(r'^(\d\d|t\d\d)_', who):
+            out.add(who)
+    return out
 
 
 def _pending_fresh():
@@ -602,13 +642,15 @@ def decide():
     # So the gate counts only items from the last STALE_DAYS days. Older ones are still printed by
     # pending.py and still in BLOCKERS.md - they are reported, not obeyed.
     _np, _nd, _nw = _pending()
-    _nfresh = _pending_fresh()
-    if _nfresh > 0:
-        return (None,
-                "PENDING FIRST: %d fresh item(s) you can close - take them in the order pending.py gives before "
-                "any new class. (%d more need a decision and do not block you.) %s"
-                % (_np, _nd, _nw),
-                rot)
+    # A BLOCKER ON ONE CLASS DOES NOT STOP ANOTHER. Measured 25 Nov: 6 kept attempts landed in a
+    # day, three times the previous best, and the clean count did not move - the attempts were
+    # spread across classes that cannot finish a document while the six that can sat behind a gate
+    # held by blockers on five classes they had nothing to do with.
+    #
+    # So the gate now removes the blocked CLASSES from the ranking and picks among the rest. If every
+    # class is blocked, the refusal below still fires and says so.
+    _np, _nd, _nw = _pending()
+    _blocked = _pending_classes()
     fmt = rot.get("next") or "docx"
     if fmt not in ("docx", "txt"):
         fmt = "docx"
