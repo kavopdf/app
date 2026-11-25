@@ -13,8 +13,10 @@
       }
     ]
   },
+  "fixer_doing": "regress check after patch",
+  "fixer_doing_since": 1795565038.1728604,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795560798.4337692,
+  "fixer_last_beat": 1795565038.1728609,
   "fixer_started": 1795563538.3314154,
   "history": [
     {

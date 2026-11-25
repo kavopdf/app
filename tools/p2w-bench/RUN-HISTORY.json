@@ -1,22 +1,5 @@
 [
  {
-  "started_ts": 1795389993.8230705,
-  "started": "04:56",
-  "ended_ts": 1795391005.516085,
-  "ended": "05:13",
-  "class": "18_displacement",
-  "attempts": 2,
-  "kept": 0,
-  "docs_improved": 0,
-  "agents": [
-   "00_pA-01",
-   "00_pB-01"
-  ],
-  "obstacles_cleared": 0,
-  "needs_human": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795393711.178966,
   "started": "05:58",
   "ended_ts": null,
@@ -822,5 +805,16 @@
   ],
   "docs_improved": 0,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "05:08",
+  "started_ts": 1795563538.3331983,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]

@@ -5434,3 +5434,10 @@
 {"t": 1795561197.5393946, "ist": "04:29:57", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795561197.9357634, "ist": "04:29:57", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795561199.2902303, "ist": "04:29:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795563551.784638, "ist": "05:09:11", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795563551.9536364, "ist": "05:09:11", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795563552.0396137, "ist": "05:09:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795564985.9784214, "ist": "05:33:05", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795565022.347762, "ist": "05:33:42", "ev": "beat", "d": "applying invisible-text patch, testing gate"}
+{"t": 1795565038.1725376, "ist": "05:33:58", "ev": "beat", "d": "regress check after patch"}
+{"t": 1795565073.046237, "ist": "05:34:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
