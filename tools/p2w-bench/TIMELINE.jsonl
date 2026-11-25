@@ -5830,3 +5830,4 @@
 {"t": 1795584170.614323, "ist": "10:52:50", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795584171.2104576, "ist": "10:52:51", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795584173.1468203, "ist": "10:52:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795586369.149636, "ist": "11:29:29", "ev": "release", "d": "baseline released"}
