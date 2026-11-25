@@ -28,6 +28,35 @@ NEW = os.path.join(HERE, "txt", "RESTAMP-TXT.jsonl")
 BASELINE = os.path.join(HERE, "txt", "RANKING-TXT-BASELINE.csv")
 
 
+def _stamp_engine():
+    """sha256(name+bytes of every engine/*.java)[:16] - the id the store is keyed on.
+
+    NOT a commit. `git log -1 --format=%h` answers an 8-char abbreviation that matches nothing,
+    so this tool stamped STATE-TXT.json with "engine 85b8735f" while the tree was 981ff1fa35e2cf67.
+    report.py, gverify.py and classify_google.py were each fixed for this on 25 Nov; this was the
+    fourth copy of the same wrong question.
+    """
+    try:
+        import json as _json
+        with open(os.path.join(REPO, "..", ".stamp"), encoding="utf-8") as fh:
+            v = (_json.load(fh).get("engine") or "").strip()
+        if v:
+            return v
+    except Exception:
+        pass
+    try:
+        import hashlib as _hl
+        d = os.path.join(REPO, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
+        h = _hl.sha256()
+        for n in sorted(os.listdir(d)):
+            if n.endswith(".java"):
+                h.update(n.encode())
+                h.update(open(os.path.join(d, n), "rb").read())
+        return h.hexdigest()[:16]
+    except Exception:
+        return ""
+
+
 def verifier():
     spec = importlib.util.spec_from_file_location("v", os.path.join(HERE, "verify_txt.py"))
     m = importlib.util.module_from_spec(spec)
@@ -242,10 +271,7 @@ def apply():
     # its numbers belong to the tree, and round.py's release guard could never see a .txt change as
     # measured - the .docx state names its engine, so the fallback to the ledger was never reached.
     try:
-        import subprocess as _sp
-        eng = _sp.run(["git", "-C", REPO, "log", "-1", "--format=%h", "--",
-                       "app/src/main/java/com/kavopdf/app/engine/"],
-                      capture_output=True, text=True).stdout.strip()
+        eng = _stamp_engine()
         st_path = os.path.join(HERE, "txt", "STATE-TXT.json")
         st = {}
         if os.path.exists(st_path):
