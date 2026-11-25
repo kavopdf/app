@@ -1,31 +1,31 @@
 # P2W Watchdog - Run Report
 
-**25 Nov 2026 · 15:12 IST**
+**25 Nov 2026 · 15:19 IST**
 
-## Verdict: moving, after I cleared a dead run that was holding the fixer slot
+## Verdict: nothing is stopped, after I cleared a dead run that was holding the fixer slot
 
-At the start of this pass fix read stopped. The cause was not the work: a run had claimed the fixer slot, written "relay: cloned, about to read" as its activity, and then stopped beaconing past the stale window without releasing. Every later fixer slot stood down behind it. I cleared it with round.py --release-fixer --force, which archives the dead run's record and pushes the release; status.py then read IDLE and health.py read fix moving. That was the only thing stopped, and it is now moving.
+At the start of this pass fix read stopped. The cause was not the work: a run had claimed the fixer slot, written "relay: cloned, about to read" as its activity, and then stopped beaconing past the stale window without releasing it, so every later fixer slot stood down behind it. I cleared it with round.py --release-fixer --force, which archives the dead run's record and pushes the release. A relay then took the free slot and is working now: status.py reads a claim started at 15:06 IST, and health.py reads fix moving at 0.2 h with 6 attempt(s) in 3 h.
 
 ## Stages
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 3.0 h |
-| matrix | done | 213 of 213 | 3.0 h |
-| classify | superseded |  | 2.3 h |
-| fix | moving | 4 attempt(s) in 3 h | 1.0 h |
-| txt | moving | 199 clean, 14 failing | 3.0 h |
+| measure-google | done | 213 of 213 | 3.2 h |
+| matrix | done | 213 of 213 | 3.2 h |
+| classify | superseded |  | 2.5 h |
+| fix | moving | 6 attempt(s) in 3 h | 0.2 h |
+| txt | moving | 199 clean, 14 failing | 3.2 h |
 
 ## Trend
 
 | | 2026-11-24 | 2026-11-25 | |
-|:--|--:|--:|:--|
+|:--|:--|--:|--:|
 | .docx open | 59 | **59** | no change |
 | .txt failing | 14 | **14** | no change |
 | Google measured | 190 | **213** | +23 |
 | Google clean | 35 | **42** | +7 |
 
-Both flat columns are recorded in BLOCKERS.md beside the fixer's attempt count: 4 attempt(s) in 3 h, none kept. The Google side of the same corpus did move today, so the pipeline is producing measured change; what has not moved is the ranking column.
+Both flat columns are recorded in BLOCKERS.md beside the fixer's attempt count. The Google side of the same corpus did move today, so the pipeline is producing measured change; what has not moved is the ranking column, which the settled decision already says is not the measure.
 
 ## Round
 
