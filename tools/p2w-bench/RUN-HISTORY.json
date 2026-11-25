@@ -252,5 +252,19 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [],
+  "attempts": 6,
+  "class": "59_shape_anchor",
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "needs_human": 0,
+  "obstacles_cleared": 0,
+  "started": "01:25",
+  "started_ts": 1795636534.8732572,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
