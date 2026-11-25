@@ -9,6 +9,7 @@ not fit one sandbox call, so this walks a slice and appends, and the caller repe
 Already-scored documents are skipped, so re-running is safe and a killed call loses nothing.
 """
 import argparse
+import json
 import csv
 import os
 import sys
@@ -30,6 +31,37 @@ def main(argv):
     ap.add_argument("--dpi", type=int, default=150)
     a = ap.parse_args(argv)
 
+    # A RENDER CARRIES NO RECORD OF THE ENGINE THAT MADE IT, SO A STALE ONE LOOKS EXACTLY
+    # LIKE A FRESH ONE. Measured 25 Nov: deciding whether the corpus renders were still valid
+    # took three measurements - render mtime, docx mtime, engine commit date - and the first two
+    # said "all 213 stale" while the truth was "the engine has not changed since 02:06, the
+    # renders were made at 04:58, and the docx at 07:20 are the same engine regenerated".
+    #
+    # mtime is not identity. So the renders directory carries a stamp of the engine that produced
+    # it, written on first use, and this refuses to score against a render whose stamp is not the
+    # engine on the tree. A missing stamp is recorded, not assumed current.
+    _rend_stamp = os.path.join(a.renders, ".engine")
+    _want = ""
+    try:
+        _want = (json.load(open("/scratch/work/p2w/.stamp", encoding="utf-8")).get("engine") or "")
+    except Exception:
+        _want = ""
+    if not os.path.exists(_rend_stamp):
+        try:
+            with open(_rend_stamp, "w", encoding="utf-8") as _f:
+                _f.write(_want or "unknown")
+            print("  stamped %s as engine %s - it had no record" % (a.renders, (_want or "unknown")[:16]))
+        except Exception as _e:
+            print("  could not stamp the renders: %s" % _e)
+    else:
+        try:
+            _have = open(_rend_stamp, encoding="utf-8").read().strip()
+        except Exception:
+            _have = ""
+        if _want and _have and _have != _want:
+            print("REFUSED: %s was rendered by engine %s, the tree is %s. Re-render before scoring."
+                  % (a.renders, _have[:16], _want[:16]))
+            return 2
     done = set()
     if os.path.exists(a.out):
         with open(a.out, newline="") as f:
