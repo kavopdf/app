@@ -6330,3 +6330,32 @@
 {"t": 1795619579.7486389, "ist": "20:42:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795619579.974787, "ist": "20:42:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795619582.5587642, "ist": "20:43:02", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795620928.6474202, "ist": "21:05:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795620929.4350786, "ist": "21:05:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795620930.3917527, "ist": "21:05:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795620931.2845173, "ist": "21:05:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795620956.8698885, "ist": "21:05:56", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795620994.913981, "ist": "21:06:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795620995.5680282, "ist": "21:06:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795620996.1813228, "ist": "21:06:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795620996.836607, "ist": "21:06:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621001.785539, "ist": "21:06:41", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621003.1404762, "ist": "21:06:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621004.1352336, "ist": "21:06:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621005.3003335, "ist": "21:06:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621020.831658, "ist": "21:07:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621021.7049408, "ist": "21:07:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621022.3881574, "ist": "21:07:02", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621023.377303, "ist": "21:07:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621034.5527718, "ist": "21:07:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621035.2800937, "ist": "21:07:15", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621035.959305, "ist": "21:07:15", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621036.6112921, "ist": "21:07:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795621100.6004958, "ist": "21:08:20", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795621142.2380075, "ist": "21:09:02", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795621142.440469, "ist": "21:09:02", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795621194.4323254, "ist": "21:09:54", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795621215.229475, "ist": "21:10:15", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795621263.7887268, "ist": "21:11:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795621264.0961149, "ist": "21:11:04", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795621307.7062137, "ist": "21:11:47", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
