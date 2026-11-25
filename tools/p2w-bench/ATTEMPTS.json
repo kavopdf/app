@@ -1130,6 +1130,34 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "59_shape_anchor": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-26 01:45",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Live Google round trip on the 3 solo-59 documents + 2 passing controls. Shipped instrument reproduced 41/42 and identical source/render counts. All convictions are same-box, dy +3.2 to +3.65 pt; per-r",
+    "total": 0
+   }
+  ],
+  "last": null,
+  "last_engine": "85b8735f",
+  "outcomes": [
+   "lead"
+  ],
+  "reason": "Live Google round trip on the 3 solo-59 documents + 2 passing controls. Shipped instrument reproduced 41/42 and identical source/render counts. All convictions are same-box, dy +3.2 to +3.65 pt; per-run dy distributions separate cleanly (failing p90 +2.95..+3.27 vs passing max +0.74). The check is right and _same_object would not change one conviction - the defect is a real 3.2-3.9 pt downward displacement that 18_displacement's page-wide budget absorbs. Next: instrument rowHeightTw on 52_one_cm_margin_wide_body to test the 0.75 pt quantum law. See FINDINGS/59-IS-RIGHT-THE-THREE-SOLO-DOCS-ARE-3PT-LOW-0150-relay.md",
+  "reasons": [
+   "Live Google round trip on the 3 solo-59 documents + 2 passing controls. Shipped instrument reproduced 41/42 and identical source/render counts. All convictions are same-box, dy +3.2 to +3.65 pt; per-run dy distributions separate cleanly (failing p90 +2.95..+3.27 vs passing max +0.74). The check is right and _same_object would not change one conviction - the defect is a real 3.2-3.9 pt downward displacement that 18_displacement's page-wide budget absorbs. Next: instrument rowHeightTw on 52_one_cm_margin_wide_body to test the 0.75 pt quantum law. See FINDINGS/59-IS-RIGHT-THE-THREE-SOLO-DOCS-ARE-3PT-LOW-0150-relay.md"
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "60_text_column_right_edge": {
   "attempts": 6,
   "first_seen": null,
