@@ -198,3 +198,4 @@
 | 25 Nov 11:45 | fixer | attempt content-missing-partly-replaced -> lead (0/14 moved) |
 | 25 Nov 11:49 | fixer | attempt content-missing-partly-replaced -> lead (0/14 moved) |
 | 25 Nov 11:51 | fixer | attempt 18_displacement -> lead (0/122 moved) |
+| 25 Nov 11:52 | fixer | slot FORCED released - see INCIDENTS.md for why |
