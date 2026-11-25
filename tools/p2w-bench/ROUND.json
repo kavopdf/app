@@ -13,11 +13,9 @@
       }
     ]
   },
-  "fixer_doing": "scoring 4 Google renders",
-  "fixer_doing_since": 1795633447.9549756,
   "fixer_engine_at_claim": "85b8735f",
   "fixer_last_beat": 1795630407.265961,
-  "fixer_started": 1795632817.7302408,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
