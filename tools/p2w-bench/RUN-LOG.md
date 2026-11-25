@@ -1,3 +1,9 @@
+<<<<<<< Updated upstream
+=======
+| 22 Nov 08:56 | fixer | slot claimed - fixer running |
+| 22 Nov 09:19 | fixer | attempt 18_displacement -> lead (6/16 moved) |
+| 22 Nov 09:13 | watchdog | slot FORCED released on a live run - see BLOCKERS.md 09:16 |
+>>>>>>> Stashed changes
 | 22 Nov 09:34 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 22 Nov 09:51 | fixer | slot claimed - fixer running |
 | 22 Nov 10:06 | fixer | attempt 18_displacement -> lead (0/3 moved) |
@@ -194,7 +200,11 @@
 | 25 Nov 10:48 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 25 Nov 12:03 | fixer | attempt content-present-partly-displaced -> lead (0/23 moved) |
 | 25 Nov 12:07 | fixer | slot FORCED released - see INCIDENTS.md for why |
+<<<<<<< Updated upstream
 | 25 Nov 12:13 | fixer | slot claimed - fixer running |
 | 25 Nov 13:21 | fixer | attempt content-present-partly-displaced -> lead (0/? moved) |
 | 25 Nov 13:22 | fixer | attempt content-present-partly-displaced -> error (0/? moved) |
 | 25 Nov 13:22 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
+=======
+| 25 Nov 14:01 | fixer | attempt 18_displacement -> lead (0/? moved) |
+>>>>>>> Stashed changes

@@ -53,6 +53,22 @@ The two that moved both moved **toward** the source:
 Both carried more words than the source on *both* sides; the 130-word drop is the repeated table header
 that no longer lands on the extra page. Neither is a word loss against the page.
 
+## The structural check that makes clipping impossible, not merely unobserved
+
+A render test can only say "no text was lost on the 30 I looked at". The stronger question is whether a
+row can *ever* declare less height than its own content under this change. Answered by reading the 30
+patched `.docx` files directly - every `<w:tr w:trHeight w:hRule="exact">`, against the sum of its cells'
+paragraph heights (`w:line` + `w:before`, the same numbers the engine writes):
+
+    exact rows: 1371   rows whose declared height is LESS than their cell content: 0
+
+Zero, across 1,371 rows. That is not a sample result - it is the engine's own arithmetic
+(`rowHeightTw = max(rowTwHere, rowLineTw)`, and on the re-cut path floored at `paraContentTw + ruleTwHere`),
+so the declared height is a floor of the content by construction. `atLeast` was never buying the content
+room the page did not have; it was buying the renderer's own opinion of the content, which is the drift.
+
+This is the second, independent instrument on the same claim, and it agrees with the render test.
+
 ## What this does not settle
 
 - **Google was not run.** This measurement is LibreOffice, which is the proxy the charter says is not the
