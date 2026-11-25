@@ -5738,3 +5738,7 @@
 {"t": 1795583699.1009893, "ist": "10:44:59", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795583721.044391, "ist": "10:45:21", "ev": "beat", "d": "recording the census attempt"}
 {"t": 1795583721.2924216, "ist": "10:45:21", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795583723.65944, "ist": "10:45:23", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795583723.770776, "ist": "10:45:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795583723.868309, "ist": "10:45:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795583724.3621016, "ist": "10:45:24", "ev": "beat", "d": "classrow.py: refreshing the class file"}
