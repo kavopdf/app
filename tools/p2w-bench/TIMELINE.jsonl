@@ -5577,3 +5577,8 @@
 {"t": 1795576834.7271714, "ist": "08:50:34", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795577042.3773289, "ist": "08:54:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795577045.5503097, "ist": "08:54:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795577048.4432209, "ist": "08:54:08", "ev": "attempt", "d": "04_chars_missing -> lead"}
+{"t": 1795577048.5376697, "ist": "08:54:08", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795577048.627764, "ist": "08:54:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795577048.9933531, "ist": "08:54:08", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795577049.152931, "ist": "08:54:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
