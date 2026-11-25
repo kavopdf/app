@@ -1,8 +1,8 @@
 rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p90_pt,max_pt,text_recall,chars_missing,worst_page,pages,colour_share,coloured_px,tone_share,order_share,font_share
-1,041122-Account_Opening_Form,content-loss,content-missing-partly-replaced,98.72,98.65,98.65,98.65,98.65,477.6,687.84,937.92,99.68,127,9,9,0.00,520621,47.78,79.11,100.00
+1,041122-Account_Opening_Form,content-loss,content-missing-partly-replaced,98.72,98.65,98.65,98.65,98.65,477.6,687.84,937.92,99.68,127,9,9,0.00,520621,45.46,79.11,100.00
 2,Account_Opening_Form_Fillable_filled,content-loss,content-missing-partly-replaced,97.9,97.72,97.66,97.62,97.55,138.72,312.0,358.08,99.67,131,7,9,0.00,520618,40.16,78.94,99.77
 3,one-page-rotated-180-degrees,content-loss,content-missing-partly-replaced,81.64,81.64,81.64,81.64,81.64,27.84,156.0,177.6,100.0,0,2,2,,0,42.66,91.78,100.00
-4,600_reviewed_invoice_with_annotations,content-loss,content-missing-partly-replaced,73.32,69.97,67.94,62.46,51.68,11.04,48.96,62.88,100.0,0,1,1,68.65,15927,63.01,93.04,100.00
+4,600_reviewed_invoice_with_annotations,mixed,content-partly-lost-and-displaced,65.47,61.3,58.72,54.3,38.97,6.72,32.64,37.44,100.0,0,1,1,71.71,15927,57.09,93.04,100.00
 5,601_fillable_admission_form,content-loss,content-missing-partly-replaced,61.58,57.93,55.92,52.39,44.76,12.0,24.96,27.84,99.58,2,1,1,,0,61.13,96.47,97.65
 6,itr-computation-with-slab-table,mixed,content-partly-lost-and-displaced,64.93,56.21,52.2,42.33,27.4,4.32,11.04,15.36,100.0,0,1,1,,0,76.55,95.50,100.00
 7,table-inside-two-column-page,displacement,content-present-wholly-displaced,63.96,55.19,50.14,35.87,9.7,2.88,6.24,21.6,100.0,0,1,1,,0,78.20,98.15,100.00
@@ -49,7 +49,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 48,price-list-right-aligned-amounts,displacement,content-present-partly-displaced,31.53,11.58,5.49,1.79,0.03,0.96,1.92,5.76,100.0,0,1,1,99.08,2276,93.54,99.28,10.29
 49,65_two_col_full_width_figure_caption,displacement,content-present-partly-displaced,22.54,9.02,5.01,1.75,0.98,0.96,2.4,8.64,100.0,0,1,1,95.74,10340,88.60,33.53,91.92
 50,78_mixed_english_devanagari_line,displacement,content-present-partly-displaced,9.52,4.49,3.06,1.73,0.93,0.96,4.61,18.24,100.0,0,1,1,88.48,851,93.32,97.58,100.00
-51,27_two_column_left_short_txtpos,displacement,content-present-partly-displaced,19.61,7.78,4.27,1.62,0.89,0.96,2.4,7.68,100.0,0,1,1,90.79,4386,89.03,96.92,100.00
+51,27_two_column_left_short_txtpos,displacement,content-present-partly-displaced,19.61,7.78,4.27,1.62,0.89,0.96,2.4,7.68,100.0,0,1,1,90.79,4386,89.03,100.00,100.00
 52,392_statistical_console_output,displacement,content-missing-nothing-in-its-place,28.12,12.81,6.26,1.61,0.0,0.96,2.4,4.32,99.87,1,1,1,,0,87.48,100.00,100.00
 53,mobile-bill,displacement,content-present-partly-displaced,43.87,23.0,6.99,1.55,0.32,1.44,1.92,16.8,100.0,0,1,1,,0,86.80,99.32,100.00
 54,electricity-bill,displacement,content-present-partly-displaced,46.85,22.07,7.32,1.33,0.31,0.96,1.92,14.4,100.0,0,1,1,97.76,57787,95.29,99.42,100.00
