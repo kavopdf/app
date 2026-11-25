@@ -113,5 +113,32 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "scresoffice prerender-01",
+   "t12_txt instrument-01"
+  ],
+  "attempts": 5,
+  "class": "t12_word_invention",
+  "counted": [
+   [
+    "content-present-partly-displaced",
+    0
+   ],
+   [
+    "t12_word_invention",
+    5
+   ]
+  ],
+  "docs_improved": 5,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 2,
+  "needs_human": 0,
+  "obstacles_cleared": 0,
+  "started": "15:06",
+  "started_ts": 1795599360.1153748,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

@@ -1,5 +1,8 @@
 {
- "agents": [],
+ "agents": [
+  "scresoffice prerender-01",
+  "t12_txt instrument-01"
+ ],
  "attempts": 5,
  "class": "t12_word_invention",
  "counted": [
@@ -13,8 +16,8 @@
   ]
  ],
  "docs_improved": 5,
- "ended": null,
- "ended_ts": null,
+ "ended": "17:03",
+ "ended_ts": 1795606427.252962,
  "kept": 2,
  "needs_human": 0,
  "obstacles_cleared": 0,
