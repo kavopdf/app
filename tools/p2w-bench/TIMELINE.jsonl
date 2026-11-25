@@ -5451,3 +5451,16 @@
 {"t": 1795565399.1677623, "ist": "05:39:59", "ev": "beat", "d": "cap-only probe build"}
 {"t": 1795565707.927736, "ist": "05:45:07", "ev": "beat", "d": "committing decomposition findings"}
 {"t": 1795565720.6579473, "ist": "05:45:20", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795565722.8260467, "ist": "05:45:22", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795565722.938739, "ist": "05:45:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795565723.0300584, "ist": "05:45:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795565723.3866472, "ist": "05:45:23", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795565725.0250494, "ist": "05:45:25", "ev": "beat", "d": "writing the report"}
+{"t": 1795565771.1347632, "ist": "05:46:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795565772.5598755, "ist": "05:46:12", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795565772.9476836, "ist": "05:46:12", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795565774.3280685, "ist": "05:46:14", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795565789.1174574, "ist": "05:46:29", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795565790.4713342, "ist": "05:46:30", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795565790.859305, "ist": "05:46:30", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795565792.2599916, "ist": "05:46:32", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

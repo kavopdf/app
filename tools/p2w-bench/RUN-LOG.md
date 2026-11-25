@@ -1,7 +1,3 @@
-| 22 Nov 01:16 | fixer | slot claimed - fixer running |
-| 22 Nov 01:43 | fixer | attempt 32_stroke_lines -> lead (0/? moved) |
-| 22 Nov 01:53 | fixer | slot claimed - fixer running |
-| 22 Nov 02:09 | fixer | attempt 32_stroke_lines -> lead (13/213 moved) |
 | 22 Nov 03:35 | fixer | attempt 32_stroke_lines -> lead (0/213 moved) |
 | 22 Nov 04:01 | fixer | attempt 32_stroke_lines -> reverted (0/16 moved) |
 | 22 Nov 04:08 | fixer | attempt 32_stroke_lines -> lead (1/? moved) |
@@ -200,3 +196,5 @@
 | 25 Nov 04:23 | fixer | attempt 04_chars_missing -> lead (1/? moved) |
 | 25 Nov 04:29 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 25 Nov 05:09 | fixer | slot claimed - fixer running |
+| 25 Nov 05:34 | fixer | attempt 25_invisible_text -> lead (0/? moved) |
+| 25 Nov 05:45 | fixer | attempt 18_displacement -> lead (0/? moved) |

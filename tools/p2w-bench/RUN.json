@@ -1,11 +1,26 @@
 {
- "agents": [],
- "attempts": 1,
- "docs_improved": 0,
- "ended": null,
+ "started_ts": 1795562798.5848136,
+ "started": "04:56",
+ "window_for_claim": 1795562798.5848136,
  "ended_ts": null,
+ "ended": null,
+ "attempts": 2,
  "kept": 0,
- "started": "05:34",
- "started_ts": 1795565097.6319098,
- "window_for_claim": 1795565097.6319098
+ "agents": [
+  {
+   "id": "invisible-text-blind-01",
+   "class": "25_invisible_text",
+   "angle": "instrument",
+   "question": "is 25_invisible_text blind after the 24 Nov sheet filter, and can it be made to fail again",
+   "status": "landed"
+  },
+  {
+   "id": "gapcap-risk-01",
+   "class": "18_displacement",
+   "angle": "engine",
+   "question": "which documents become worse if the gap-cap + zero-gap-anchor pair ships, and can it ship at all",
+   "status": "landed"
+  }
+ ],
+ "docs_improved": 0
 }

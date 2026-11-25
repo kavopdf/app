@@ -187,3 +187,5 @@
 {"at": "2026-11-25 03:12", "attempt": 6, "class": "04_chars_missing", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-25 03:21", "attempt": 7, "class": "04_chars_missing", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-25 04:23", "attempt": 8, "class": "04_chars_missing", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-25 05:34", "attempt": 3, "class": "25_invisible_text", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-25 05:45", "attempt": 62, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
