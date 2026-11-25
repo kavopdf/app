@@ -189,5 +189,24 @@ else
   say engine "$(find ../../app/src/main/java -name '*.java' | wc -l) engine sources + ConvertAll + ConvertOne compiled into out/"
 fi
 
+# ---- CONVERT THE CORPUS, OR THE GATE BUILDS IT AND TIMES OUT ------------------
+# Measured twice on 25 Nov, independently: install-gate.sh runs the hook, the hook runs regress.py
+# --check, and that builds all 213 .docx itself in 240 s slices. The commit then exceeds the 300 s
+# call limit and reads from outside as "REFUSED. This commit would land a regression or an unmeasured
+# engine" on a tree nobody touched.
+#
+# corpus-slice.py finishes the same work in slices that fit, and the numbers are not close: the
+# 09:02 run took the check from over 4m40s to 11 s, and the 11:24 run took the corpus from 148 to
+# 213 of 213 in two calls and the gate then passed in seconds. Both runs found it, neither had a
+# place to put it.
+#
+# `|| true` is deliberate. A slice that cannot run must not stop pod-prep: pod-prep's job is to leave
+# the pod usable, and a partial corpus is still better than none - the gate then has something to
+# read or says so honestly.
+if [ -f "$HERE/corpus-slice.py" ]; then
+  say corpus "converting the corpus so the commit gate has something to compare"
+  python3 "$HERE/corpus-slice.py" || say corpus "slice did not finish - the gate will report what it can"
+fi
+
 echo "pod-prep: ready - corpus $HAVE PDFs, java $("$JDK/bin/java" -version 2>&1 | head -1 | awk '{print $3}' | tr -d '"'), classpath $CP"
 exit 0
