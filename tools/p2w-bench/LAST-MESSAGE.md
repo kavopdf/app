@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 09:13 → running IST · 47 min**
+**25 Nov 2026 · slot 09:13 → 10:01 IST · 48 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -23,10 +23,10 @@ today as the stale ones while the 105 stale results stayed invisible.
 | `pending.py` .txt table | no row at all (mtime 0.8 h on a fresh clone) | `RANKING-TXT.csv is 24.2 h old` - the same 24.2 h `health.py` reports |
 
 The `matrix` row was a second bug the first exposed: its denominator was the Google count, so as soon as
-that count became engine-aware the line printed a fraction greater than one. The `pending.py` row was
+that count became engine-aware the line printed a fraction greater than one.
 The `.txt` row is the third of the same kind: `pending.py` read the table's **mtime**, and a checkout stamps every file with the time it was copied, so on a fresh clone the check could never fire while `health.py` - which asks git - reported the table 24.2 h old. It now takes the later of mtime and the last commit. **The pending count went UP, 12 -> 13, and that is the point**: surfacing real work is not the same as creating it.
 
-checked against an **independent census** - count the engine stamps in `benchmarks/gverify/*.json` with a
+The docx-table row was checked against an **independent census** - count the engine stamps in `benchmarks/gverify/*.json` with a
 separate script, and against `gverify._engine_now()` - before and after the edit, not through the tool
 being edited.
 
@@ -100,7 +100,7 @@ before/after measure - the next run's first hour, not this one's last twenty min
 
 | | |
 |:--|:--|
-| Measured | **47 min ago** |
+| Measured | **48 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -131,9 +131,9 @@ recorded one attempt (64, the `18_displacement` lead). Nothing is zeroed and not
 
 | | |
 |:--|:--|
-| Slot window | 09:13 → running · 47 min |
+| Slot window | 09:13 → 10:01 · 48 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
-| Tool beats | 50 |
+| Tool beats | 56 |
 | Longest silence | **24.4 min** — from 09:27:24, after `dead claim cleared by force release` |
 | Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
