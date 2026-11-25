@@ -1,37 +1,28 @@
-# P2W Watchdog - Run Report
+## Watchdog, 26 Nov 00:03 IST — nothing stopped, the fixer is live and working
 
-**25 Nov 2026 · 21:08 IST**
+Nothing is stopped. health.py and health.py --stalled both exit 0 with no stage reading stopped, so this
+pass made no decision and moved no cron.
 
-> Nothing is stopped. The fixer is moving, the .txt half improved again today, and no stage needed a hand.
+**The five stages.** measure-google done, 213 of 213, 12.1 h. matrix done, 213 of 213, 44.3 h. classify
+superseded, 3.4 h. fix moving, 3 attempt(s) in 3 h, 0.5 h. txt moving, 204 clean and 9 failing, 0.4 h.
 
-## Stages
+**The trend.** progress.py found today's row already committed, so it appended nothing and there is no
+new row to commit. Against 24 Nov it reads docx open 59 to 59, txt failing 14 to 9, google 190 to 213,
+google clean 35 to 42.
 
-| stage | state | progress | age |
-|:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 9.1 h |
-| matrix | done | 213 of 213 | 41.3 h |
-| classify | superseded |  | 0.4 h |
-| fix | moving | 3 attempt(s) in 3 h | 0.4 h |
-| txt | moving | 204 clean, 9 failing | 2.4 h |
+**The round.** round.py --phase prints fix.
 
-## Trend
+**The fixer is live, not a zombie.** status.py reads WORKING, with a fresh claim and beacon, 2 attempt(s)
+and 4.1 attempts per hour. STEP 4 D was not run: releasing the slot would have put a second run
+into the engine beside a live one.
 
-| | 2026-11-24 | 2026-11-25 | |
-|:--|--:|--:|:--|
-| .docx open | 59 | **59** | no change |
-| .txt failing | 14 | **9** | -5 |
-| Google measured | 190 | **213** | +23 |
-| Google clean | 35 | **42** | +7 |
+**The flat column, with the fixer's attempt count beside it.** docx open has read 59 again while the
+fixer made 3 attempt(s) in the last 3 h. That column is the soffice proxy, and the settled notes record
+share@5px as not a cross-renderer measure. google clean, the measure that counts, rose 35 to 42 over the
+same two rows. STEP 5's own overturning test — more rows with google clean also flat — is not met, so no
+class is parked and no approach is replaced.
 
-## Round
-
-Phase fix, the fixer's own stage, and this pass did not move it. The counts behind that phase - rounds done, documents scored, classes open - are printed by round.py --status, which the number check does not read, so they are not restated here.
-
-## What this pass did
-
-* Read health.py, health.py --stalled, progress.py, round.py --phase, round.py --reopen, status.py, classpick.py and the pending queue. Nothing was stopped, so no stage was moved.
-* round.py --reopen refused as designed: the phase is fix, not done.
-* The fixer slot was claimed shortly before this pass and the run is still beaconing, so no slot was released and no claim was forced.
-* Today's trend row was amended from the live tables. It read .txt failing 11 and now reads 9, which is what progress.py --json prints; the row names what it used to say.
-* STEP 5, the stall older than a day: the displacement class was parked with classpick.py --exhaust. Its recorded attempts have moved one document and its last measured attempts moved none, while two larger classes have never been attempted at all. The park is reversible - the rotation reaches the class again after a full cycle, and one measured attempt that moves a document overturns it.
-* No cron was recreated. This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. The calls it would have made are cron list, then cron runs for a stopped stage, then pause and resume for a stale next fire time, then delete and create for a zombie with the new id written back into the brief and into this prompt.
+**No cron tool in this pass.** STEP 3 and STEP 4 A and B did not run and nothing here claims they did.
+This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. The call it
+would have made is cron with action list, then action runs with the cron id from HEALTH-BRIEF's table for
+any stopped stage. Nothing was left paused and no past row of PROGRESS.md was edited.
