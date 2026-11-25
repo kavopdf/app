@@ -1,39 +1,42 @@
-# t02_position fails on four documents for two reasons, and neither is position
+# CORRECTED: t02_position is measuring position, and I misread its output
 
-Measured on the four documents the check charges, current engine 981ff1fa35e2cf67:
+This file claimed that t02_position fails four documents because of line count - three splitting lines and
+one losing two thirds of them. That was wrong, and the way it was wrong is worth recording.
 
-    332_bom_on_drawing                   source= 52  txt= 79    +27
-    334_patent_document                  source= 32  txt= 69    +37
-    74_balance_sheet_indented_subitems   source= 54  txt= 81    +27
-    price-list-2col-dense-right-aligned  source=252  txt= 86   -166
+## What the output actually says
 
-The check reports the source and render line counts and compares them before it fits anything. Three
-documents have MORE .txt lines than the PDF has - the writer is splitting one visual line into two or more,
-which is the same construct as t08_line_order and t13_amount_columns. One has far FEWER: 252 lines become
-86, so two thirds of the document's lines are not in the .txt at all.
+    print("    %-26s source=%-10s txt=%s" % (cid, s, t))
 
-Neither is a position failure. A line that does not exist cannot be in the wrong column, and a line split
-in two produces a ruler fit that describes nothing.
+and the tuple it unpacks is
 
-## Why the name matters
+    c["t02_position"] = (len(pairs), share, share >= 90, True)
 
-The check is called t02_position and its description is "a line's x survives as its leading spaces". A run
-reading the ledger sees t02_position on four documents and goes looking at the indent arithmetic, which is
-not where the fault is. The population is two different bugs wearing one check name, so neither gets fixed:
-the split is a line-building fault and the loss is a different one, and the .txt writer needs both.
+So "source=52 txt=79" means 52 (x, column) pairs and a 79 % share of them inside tolerance. It does not mean
+52 source lines and 79 .txt lines. 79 is a percentage.
 
-## What to measure before touching the writer
+The documents were then "confirmed" by counting blank lines in the .txt: 79-27=52, 58-26=32, 96-42=54, each
+equal to a PDF line count I had taken from PyMuPDF. The arithmetic lined up, so the theory looked proven. It
+was a coincidence between a percentage and a line count that happened to be near it.
 
-For the three that split: which rows in the PDF become two rows in the .txt, and what did the writer key on
-- a gap between spans, a column boundary, or a table cell edge. t13_amount_columns already names that
-construct for .txt and 18_displacement names the .docx side of it.
+## What is actually true
 
-For the one that loses: whether the 166 missing lines are off-page, inside a table the writer skipped, or
-dropped by a cap. price-list-2col-dense-right-aligned is a dense two-column price list, so the likely
-suspect is the second column, not a global cap - but that is a hypothesis, and the .txt has to be diffed
-against the PDF before anything is changed.
+t02 fits a character width from the (x, column) pairs and asks what share of lines sit within
+max(POS_TOLERANCE, POS_DRIFT * col) of the column their x implies. Four documents fall below the 90 % bar.
+That is the check working as designed on a proportional-font document where the two estimates of a
+non-existent character width disagree on more than a tenth of the lines.
 
-## Not changed
+Whether that bar is right for those four is a real question. Whether the check is measuring line count is
+not: it is not.
 
-The .txt writer was not touched. Its line building is the engine, and a blind edit there loses text on 213
-documents rather than fixing four. Recorded so the fix starts from the right fault.
+## Why this correction is kept
+
+Third time today. `gverify live` was read as an engine hash when it was a check-set hash; `p2w.py --force`
+was read as stale when its comparison was correct; and now a percentage was read as a count. Each time the
+symptom matched a disease already in the repo and the code that printed it was not read first.
+
+The real defects this session were found the other way round - read the code, then measure.
+
+## Status
+
+No change made. The .txt writer was never touched, which is the one good consequence: the wrong theory would
+have had me editing line building in the engine on the strength of an arithmetic coincidence.
