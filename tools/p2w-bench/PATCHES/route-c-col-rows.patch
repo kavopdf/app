@@ -1,0 +1,386 @@
+From 736011ec5102247a2dea9cc47b8d41a32de6ce42 Mon Sep 17 00:00:00 2001
+From: KavoPDF prototype <proto@local>
+Date: Wed, 25 Nov 2026 02:42:27 +0000
+Subject: [PATCH] prototype(route c): a two-column band as one tabbed paragraph
+ per baseline
+
+A page set in columns is written as one anchored DrawingML text box per line,
+because the column pass emits one block per line and the two columns' lines
+interleave in y: flowed column-by-column the right column lands below the left
+column's last line, and the gap needed is NEGATIVE, which place() cannot
+express. Google Docs rasterises anchored boxes on import, which is the 81-92 %
+SSIM the pixel score reports.
+
+This routes a column band through the construct flowRow already uses for a form
+row: one paragraph per BASELINE, with a tab stop at each column's measured x.
+That makes the flow's sequence equal the page's y sequence, so no line is ever
+above the flow and no gap is negative.
+
+  columnRowBlocks()   - a page's blocks with each run of column lines re-cut
+  columnLineHome()    - is this block one line of one column
+  taggedColumnEdges() - column left edges from the column pass's tags
+  columnRowsOfRun()   - the run, flattened to boxes, grouped by baseline
+  copyBoxAt()         - one field of a row, moved onto the row's baseline
+  COLUMN_ROWS / p2w.colrows - the flag, on by default
+
+Measured on the 213-document corpus, LibreOffice render against the source PDF:
+text-box anchors 1037 -> 836; wp:anchor 13211 -> 13010; page counts unchanged
+on all 20 documents whose bytes changed; zero-gap lines 0 on every converted
+document (policy-2col 1 -> 0, 69_two_col 2 -> 0, 66_two_col 7 -> 0).
+policy-2col-spanning-section-heading 62 -> 2 text boxes, median |dy| 0.02 pt,
+max |dy| 0.08 -> 0.02; 69_two_col_legal_numbered_clauses 36 -> 7.
+
+NOT MERGED. Prototype branch only.
+---
+ .../com/kavopdf/app/engine/DocxWriter.java    | 314 +++++++++++++++++-
+ 1 file changed, 308 insertions(+), 6 deletions(-)
+
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index f043904..eeeae77 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -302,6 +302,17 @@ public final class DocxWriter {
+      */
+     static final boolean ZERO_GAP_ANCHOR = !"false".equals(System.getProperty("p2w.zganchor"));
+ 
++    /**
++     * ROUTE (c), prototype: a two-column band's lines go out as one paragraph per baseline with
++     * a tab stop at each column's measured x (see {@code columnRowBlocks}) instead of one
++     * anchored text box per line. On by default so the corpus measures the change; turn it off
++     * with {@code -Dp2w.colrows=false} to measure the same binary without it.
++     */
++    static final boolean COLUMN_ROWS = !"false".equals(System.getProperty("p2w.colrows"));
++
++    /** How far apart two baselines may be and still be one row of a column band. */
++    private static final float COLUMN_ROW_TOL = 2.0f;
++
+     /**
+      * The miss, in points, that makes a text box worth writing.
+      *
+@@ -1362,6 +1373,10 @@ public final class DocxWriter {
+         // A page is written more than once by the budget guard; each pass writes its own shapes.
+         ctx.shapeCarrier.setLength(0);
+         if (columnPage(sb, page, ctx, pw)) { flushShapes(sb, ctx); cenEmit(ctx, page); return; }
++        // ROUTE (c): a two-column band's lines become ONE PARAGRAPH PER BASELINE, with a tab
++        // stop at each column's measured x - the construct flowRow() already uses for a form
++        // row - instead of one anchored text box per line. See columnRowBlocks().
++        java.util.List<Object> blocks = columnRowBlocks(page, pw);
+         // Which of this page's short lines are drawn beside a table rather than in its text, and
+         // so must not charge the flow. Decided from the page's own geometry before anything is
+         // written, so both of the budget guard's passes see the same answer (see pinShortParas).
+@@ -1384,12 +1399,12 @@ public final class DocxWriter {
+         StringBuilder pendingShapeRuns = new StringBuilder();
+         StringBuilder orphanShapeRuns = new StringBuilder();
+         int shapeInsertPt = -1;
+-        for (int bi = 0; bi < page.blocks.size(); bi++) {
+-            Object block = page.blocks.get(bi);
+-            ctx.nextIsPara = bi + 1 < page.blocks.size()
+-                    && page.blocks.get(bi + 1) instanceof PdfToWord.Para;
+-            ctx.nextIsTable = bi + 1 < page.blocks.size()
+-                    && page.blocks.get(bi + 1) instanceof PdfToWord.Table;
++        for (int bi = 0; bi < blocks.size(); bi++) {
++            Object block = blocks.get(bi);
++            ctx.nextIsPara = bi + 1 < blocks.size()
++                    && blocks.get(bi + 1) instanceof PdfToWord.Para;
++            ctx.nextIsTable = bi + 1 < blocks.size()
++                    && blocks.get(bi + 1) instanceof PdfToWord.Table;
+             if (block instanceof Shape) {
+                 Shape sh = (Shape) block;
+                 if (sh.stampFrame
+@@ -1760,6 +1775,293 @@ public final class DocxWriter {
+                 + (extra == null ? "" : " " + extra));
+     }
+ 
++    /**
++     * ROUTE (c): a two-column band's lines as one paragraph per BASELINE, with a tab stop at
++     * each column's measured x.
++     *
++     * <p>THE PROBLEM THIS EXISTS FOR. A page set in columns is written today as one anchored
++     * text box per line (see {@code anchorBox}), because the column pass emits one block per
++     * line and the two columns' lines interleave in y: flowed column-by-column, the right
++     * column lands below the left column's last line, and 18 of 54 flowed lines then need a
++     * NEGATIVE gap - which {@code place()} cannot express (it returns {@code {0, linePt}} for
++     * d &lt;= 0), so the line lands wherever the flow already is. Anchored boxes place every
++     * line correctly and cost the flow nothing, and Google Docs rasterises them on import,
++     * which is the 81-92 % SSIM the pixel score reports rather than 99 %.
++     *
++     * <p>THE CONSTRUCT. {@code flowRow} already emits a row of fields as one paragraph with a
++     * tab stop at each field's measured x, and that is the only construct in Word that puts two
++     * strings on one line at two known x without a text box or a table. Applied to a column
++     * band it makes the flow's SEQUENCE equal the page's y sequence - each paragraph's baseline
++     * is the next baseline down - so no line is ever above the flow and no gap is ever negative.
++     * It is also real text in the body, which is what Google Docs can reflow.
++     *
++     * <p>WHAT IT DOES NOT DO. It does not change the reading order the page's own geometry
++     * gave; it only re-cuts the band into rows. A row reads left field then right field, which
++     * is the order the page is read at that baseline.
++     *
++     * <p>THE RISK, stated because it is the thing being measured. A tab stop is a POSITION IN
++     * A FLOW: if the left field's rendered advance runs past the stop, the reader skips to the
++     * next stop and the right field moves right (or the line wraps). {@code flowRow} pushes the
++     * stop clear of the text before it for that reason. And a flowed line charges the page a
++     * line box where an anchored one charged nothing, so a page can grow - which is the failure
++     * mode this prototype has to be measured against, not assumed away.
++     *
++     * @return the page's blocks with each run of column lines replaced by one paragraph per
++     *         baseline. The page's own list is never edited: the budget guard writes a page
++     *         several times and every pass must see the same document.
++     */
++    private static java.util.List<Object> columnRowBlocks(PdfToWord.Page page, float pw) {
++        java.util.List<Object> out = new java.util.ArrayList<>(page.blocks.size());
++        if (!COLUMN_ROWS || page.columns < 2) {
++            out.addAll(page.blocks);
++            return out;
++        }
++        float[] edge = taggedColumnEdges(page, pw);
++        if (edge == null) {
++            out.addAll(page.blocks);
++            return out;
++        }
++        int n = edge.length - 1;
++        int nb = page.blocks.size();
++        // Which blocks are column LINES: one line of one column, drawn inside that column's own
++        // band. Everything else - a masthead, a spanning section heading, a table, a drawn
++        // shape - is not, and a run of column lines ends at it. That is what lets a full-width
++        // heading sit between two bands of rows on one page: it is an ordinary flowed paragraph
++        // between two runs, which is the shape a table could never describe (see columnPage).
++        int[] home = new int[nb];
++        for (int i = 0; i < nb; i++) home[i] = columnLineHome(page.blocks.get(i), edge, n);
++
++        int i = 0;
++        while (i < nb) {
++            if (home[i] < 0) { out.add(page.blocks.get(i)); i++; continue; }
++            int j = i;
++            while (j < nb && home[j] >= 0) j++;
++            columnRowsOfRun(out, page.blocks, i, j);
++            i = j;
++        }
++        return out;
++    }
++
++    /**
++     * The column a block is a single line of, or -1 when it is not a column line.
++     *
++     * <p>Membership is the box's own extent, not the tag the column pass left: the tag is a
++     * band index and a page's masthead can carry the last band's (newspaper-2col-fullwidth-
++     * headline's "THE MORNING LEDGER" is tagged column 1 at x=100). A line that runs past its
++     * column's right edge is a spanning line and belongs to no column.
++     */
++    private static int columnLineHome(Object b, float[] edge, int n) {
++        if (!(b instanceof PdfToWord.Para)) return -1;
++        PdfToWord.Para q = (PdfToWord.Para) b;
++        if (q.stamp || q.pinned || q.boxes.isEmpty()) return -1;
++        // A centred or right-aligned line is placed by w:jc, and a paragraph with tab stops must
++        // not also be justified or pushed right - the stops are measured from its indent.
++        if (q.align != 0) return -1;
++        int home = -1;
++        for (PdfToWord.Box z : q.boxes) {
++            if (z.rotated || z.runs.isEmpty() || z.right <= z.x) return -1;
++            int c = -1;
++            for (int k = 0; k < n; k++) {
++                if (z.x >= edge[k] - COLUMN_START_TOL && z.right <= edge[k + 1] + 1f) { c = k; break; }
++            }
++            if (c < 0) return -1;
++            if (home < 0) home = c;
++        }
++        return home;
++    }
++
++    /**
++     * A page's column left edges from the column pass's own tags: the MEDIAN left of the blocks
++     * tagged with each band.
++     *
++     * <p>The median and not the smallest, for the reason columnPage() gives: one mis-tagged
++     * masthead cannot move a median. Null when the tags do not describe two or more columns.
++     */
++    private static float[] taggedColumnEdges(PdfToWord.Page page, float pw) {
++        int n = page.columns;
++        if (n < 2) return null;
++        float[] edge = new float[n + 1];
++        for (int c = 0; c < n; c++) {
++            java.util.List<Float> lefts = new java.util.ArrayList<>();
++            for (Object b : page.blocks) {
++                if (!(b instanceof PdfToWord.Para)) continue;
++                PdfToWord.Para q = (PdfToWord.Para) b;
++                if (q.column != c || q.left <= 0f || q.stamp) continue;
++                if (q.boxes.isEmpty()) continue;
++                lefts.add(q.boxes.get(0).x);
++            }
++            if (lefts.isEmpty()) return null;
++            java.util.Collections.sort(lefts);
++            edge[c] = lefts.get(lefts.size() / 2);
++            if (c > 0 && edge[c] <= edge[c - 1] + 20f) return null;
++        }
++        edge[n] = pw;
++        return edge;
++    }
++
++    /**
++     * Blocks {@code [from,to)} - a run of column lines - re-cut into one paragraph per BASELINE,
++     * in y order, each holding its baseline's boxes in x order.
++     *
++     * <p>THE UNIT IS THE BOX, NOT THE BLOCK. The column pass does not promise one block per
++     * drawn line: on 69_two_col_legal_numbered_clauses one block holds a clause's number and its
++     * first line, and another holds the tail of the left column's line and the head of the
++     * right column's. Grouping by block would leave those unmerged and they would go on being
++     * anchored one box at a time - which is the construct this exists to remove. So the run's
++     * boxes are flattened, sorted by (y, x) and grouped by baseline.
++     *
++     * <p>THE BASELINE IS THE GROUP'S TOPMOST. A row's boxes are drawn within a point or two of
++     * each other - a clause number sits a shade below the line it numbers - and one paragraph
++     * has one baseline, so every box in the row is given the group's. The boxes are COPIED for
++     * that: {@code copyForWrite} shares Box objects with the document, and a writer must not
++     * edit the document (see {@code Para.copyForWrite}).
++     */
++    private static void columnRowsOfRun(java.util.List<Object> out, java.util.List<Object> blocks,
++                                        int from, int to) {
++        if (to - from <= 1) { for (int k = from; k < to; k++) out.add(blocks.get(k)); return; }
++        java.util.List<PdfToWord.Box> all = new java.util.ArrayList<>();
++        java.util.List<PdfToWord.Para> owner = new java.util.ArrayList<>();
++        for (int k = from; k < to; k++) {
++            PdfToWord.Para q = (PdfToWord.Para) blocks.get(k);
++            for (PdfToWord.Box z : q.boxes) {
++                if (z.runs.isEmpty()) continue;
++                all.add(z);
++                owner.add(q);
++            }
++        }
++        java.util.List<Integer> order = new java.util.ArrayList<>();
++        for (int k = 0; k < all.size(); k++) order.add(k);
++        final java.util.List<PdfToWord.Box> fa = all;
++        java.util.Collections.sort(order, new java.util.Comparator<Integer>() {
++            @Override public int compare(Integer ia, Integer ib) {
++                PdfToWord.Box a = fa.get(ia), b = fa.get(ib);
++                int c = Float.compare(a.y, b.y);
++                return c != 0 ? c : Float.compare(a.x, b.x);
++            }
++        });
++        int k = 0;
++        while (k < order.size()) {
++            PdfToWord.Box head = all.get(order.get(k));
++            float base = head.y;
++            java.util.List<Integer> group = new java.util.ArrayList<>();
++            int m = k;
++            while (m < order.size()) {
++                PdfToWord.Box z = all.get(order.get(m));
++                if (z.y - base > COLUMN_ROW_TOL) break;
++                group.add(order.get(m));
++                m++;
++            }
++            // A group that is ONE PARAGRAPH ENTIRE is that paragraph, untouched.
++            //
++            // A paragraph the column pass split into several boxes is already a row the writer
++            // knows how to place: {@code para()} hands it to flowRow, which writes one tab stop
++            // per field and pushes a stop clear of the text before it. Re-cutting it here bought
++            // nothing and cost something - a justified line whose inter-word gaps the page
++            // stretched arrives as one box per word, and this pass turned eight of them into
++            // eight paragraphs. Measured on policy-2col-spanning-section-heading: "Absence
++            // without approved leave for more than three" went out as 8 paragraphs with
++            // w:before=0 between them, charged 7 x 0.65 pt to the flow, and was placed by
++            // LibreOffice's own collapsing of an exact line box rather than by anything this
++            // writer did. It rendered correctly (494.20 pt in both), which is luck, not design.
++            {
++                PdfToWord.Para one = owner.get(group.get(0));
++                boolean same = true;
++                for (Integer gi : group) if (owner.get(gi) != one) { same = false; break; }
++                if (same && one.boxes.size() == group.size()) { out.add(one); k = m; continue; }
++            }
++            // THE ROW'S BASELINE IS ITS BODY LINE'S, not its topmost field's. A clause number
++            // or a superscript sits a point or two above the line it belongs to, and taking the
++            // topmost would put the whole row where the number was drawn: measured on
++            // 69_two_col_legal_numbered_clauses, that alone moved the median |dy| from 0.03 pt
++            // to 0.28 pt. The longest field is the body line.
++            // MEASURED BOTH WAYS, and the topmost field wins. Taking the row's longest field
++            // as its baseline is the better story - a clause number sits a shade above the line
++            // it numbers - but on 69_two_col_legal_numbered_clauses it made the worst line
++            // worse, 1.06 pt against 1.79 pt, because there the two columns' lines are not on
++            // one baseline to begin with (see the note in columnRowBlocks) and the "longest
++            // field" of a row can be the right column's line. The topmost keeps the row at or
++            // below every one of its fields, which is the direction that does not overlap the
++            // line above.
++
++            java.util.List<PdfToWord.Box> row = new java.util.ArrayList<>();
++            for (Integer gi : group) row.add(copyBoxAt(all.get(gi), base));
++            java.util.Collections.sort(row, new java.util.Comparator<PdfToWord.Box>() {
++                @Override public int compare(PdfToWord.Box a, PdfToWord.Box b) {
++                    return Float.compare(a.x, b.x);
++                }
++            });
++            // Two fields with no room between them cannot be a row - see the clearance test
++            // below, which subsumes the plain x-overlap case. Those boxes keep the paragraphs
++            // they came from.
++            // THE STOP MUST BE CLEAR OF THE FIELD BEFORE IT, OR THE FIELD AFTER IT IS LOST.
++            //
++            // A tab stop that lands inside the text before it is skipped for the next one, and
++            // the field that should have gone there WRAPS instead - and a flowed line is written
++            // with a hairline {@code w:lineRule="exact"} box, so the wrapped field is clipped to
++            // nothing and disappears. MEASURED, this prototype without the guard:
++            // table-of-contents-dot-leaders lost its "108" and "141" page numbers (45 rendered
++            // lines -> 41) and price-list-right-aligned-amounts lost its "For orders:" footer
++            // (both fields were still in the .docx - the loss was in the render, not the write).
++            // The stop is measured from the page's own advance, and the substituted face is a
++            // few per cent wider, so a row is only worth tabbing when the gutter is a gutter:
++            // ONE EM OF THE TYPE BEFORE IT plus a point, which is the same clearance flowRow
++            // applies when it pushes a stop right.
++            boolean overlap = false;
++            for (int z = 1; z < row.size(); z++) {
++                PdfToWord.Box before = row.get(z - 1), after = row.get(z);
++                if (after.x - before.right < before.size + 1f) { overlap = true; break; }
++            }
++            if (overlap) {
++                // Each box on its own, which is exactly what the writer did with a block whose
++                // boxes were not one row: never a duplicate, never a field on top of another.
++                for (PdfToWord.Box z : row) {
++                    PdfToWord.Para one = owner.get(group.get(row.indexOf(z))).copyForWrite();
++                    one.boxes.clear();
++                    one.boxes.add(z);
++                    one.column = 0;
++                    one.align = 0;
++                    out.add(one);
++                }
++                k = m;
++                continue;
++            }
++            PdfToWord.Para merged = owner.get(group.get(0)).copyForWrite();
++            merged.boxes.clear();
++            merged.boxes.addAll(row);
++            // Outside a layout-table cell a paragraph's w:ind is measured from the page edge, so
++            // the band tag must not be subtracted from it (see bandLeftTw), and a row is laid out
++            // by its stops, so it must not also be centred or pushed right.
++            merged.column = 0;
++            merged.align = 0;
++            out.add(merged);
++            k = m;
++        }
++    }
++
++    /** How many characters a box holds - the measure of "this is the row's body line". */
++    private static int textLen(PdfToWord.Box z) {
++        int n = 0;
++        for (PdfToWord.Run r : z.runs) n += r.text.length();
++        return n;
++    }
++
++    /** A copy of {@code z} moved onto {@code y} - one field of a row on the row's baseline. */
++    private static PdfToWord.Box copyBoxAt(PdfToWord.Box z, float y) {
++        PdfToWord.Box c = new PdfToWord.Box();
++        c.x = z.x;
++        c.y = y;
++        c.right = z.right;
++        c.size = z.size;
++        c.bottom = z.bottom - (z.y - y);
++        c.length = z.length;
++        c.rotated = z.rotated;
++        c.angle = z.angle;
++        c.ring = z.ring;
++        c.stretchPt = z.stretchPt;
++        c.runs.addAll(z.runs);
++        return c;
++    }
++
+     private static boolean columnPage(StringBuilder sb, PdfToWord.Page page, Ctx ctx, float pw) {
+         int n = page.columns;
+         // The edges come from the page's rows when they show columns (see rowColumnEdges), and
+-- 
+2.39.5
+
