@@ -5442,3 +5442,12 @@
 {"t": 1795565038.1725376, "ist": "05:33:58", "ev": "beat", "d": "regress check after patch"}
 {"t": 1795565073.046237, "ist": "05:34:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795565094.6231694, "ist": "05:34:54", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795565097.6314359, "ist": "05:34:57", "ev": "attempt", "d": "25_invisible_text -> lead"}
+{"t": 1795565097.740502, "ist": "05:34:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795565097.8314025, "ist": "05:34:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795565098.175251, "ist": "05:34:58", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795565110.3168657, "ist": "05:35:10", "ev": "beat", "d": "building zganchor=false probe build"}
+{"t": 1795565132.5436924, "ist": "05:35:32", "ev": "beat", "d": "measuring displacement on anchor-off build"}
+{"t": 1795565399.1677623, "ist": "05:39:59", "ev": "beat", "d": "cap-only probe build"}
+{"t": 1795565707.927736, "ist": "05:45:07", "ev": "beat", "d": "committing decomposition findings"}
+{"t": 1795565720.6579473, "ist": "05:45:20", "ev": "beat", "d": "attempt.py: recording an attempt"}

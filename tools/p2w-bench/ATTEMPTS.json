@@ -222,16 +222,9 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 61,
+  "attempts": 62,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-23 21:29",
-    "moved": 0,
-    "outcome": "lead",
-    "reason": "nine live Google renders of table-with-no-header-row: Google honours w:trHeight (600tw->30/31pt) and quantises the rendered row pitch to whole points (352tw->18.0, 354/356tw->19.0, 368tw->19.5); the 1",
-    "total": 0
-   },
    {
     "at": "2026-11-24 02:08",
     "moved": 0,
@@ -380,6 +373,17 @@
     "outcome": "lead",
     "reason": "row-pitch dither alone: ditherOn true, trHeight moves onto the 0.75pt grid (mobile-bill 360/380 -> 345/360/375); page result unmeasured because p2w.py --force measured stale docx (mtime 19:57 vs patch",
     "total": null
+   },
+   {
+    "at": "2026-11-25 05:45",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "00_page_count: land the column-page shape merge - 21 documents, 0 regressions"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Separated the two box-text knobs by measurement. The pair (gapcap 20000tw + zganchor=false) REGRESSES 65_two_col_full_width_figure_caption from share@5px 1.75 to 7.75 and max 8.6pt to 31.7pt, problem ",
+    "total": null
    }
   ],
   "last": null,
@@ -447,13 +451,14 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
   "park_reason": "no progress in the last 12 attempts (lead, lead, lead, lead, reverted, lead, lead, reverted, reverted, lead, lead, lead)",
   "parked_at": "24 Nov 03:30",
   "ratchet_at": "23 Nov 04:09",
   "ratchet_docs": 212,
-  "reason": "row-pitch dither alone: ditherOn true, trHeight moves onto the 0.75pt grid (mobile-bill 360/380 -> 345/360/375); page result unmeasured because p2w.py --force measured stale docx (mtime 19:57 vs patch 19:59). Engine reverted.",
+  "reason": "Separated the two box-text knobs by measurement. The pair (gapcap 20000tw + zganchor=false) REGRESSES 65_two_col_full_width_figure_caption from share@5px 1.75 to 7.75 and max 8.6pt to 31.7pt, problem flips to content-missing-partly-replaced - it passes 18_displacement today, so the pair must not ship. zganchor=false alone is catastrophic on policy-2col-spanning-section-heading (2.36 -> 48.34 share@5px, 14.4 -> 57.1pt max): the anchor is load-bearing. cap 20000tw alone is benign on both witnesses - 27 keeps 1.62/7.7 while its 57 box chars go to 0 (the document already proven 42/42 in Google under the pair), and 65 keeps 624 of 627 box chars with position bit-identical to HEAD. 65 is only zeroed when BOTH knobs are on, so the cap alone cannot cause its regression. Cap alone is the shippable candidate; 21 of its 23 changed documents are still unmeasured.",
   "reasons": [
    "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 pt mark, Google does not implement lineRule=exact and buys a fraction of it. Applied it (w:before=spacerTw, w:line=1) and measured bank-statement-5-pages through Drive: GOOGLE 40/47 -> 36/47, WORSE, and 27_text_off_page went 0 -> 12 as the extra space overflowed the page. LibreOffice unchanged at 47/47. The reason it cannot work: the spacer is NOT where the 57 pt comes from. Counted in the emitted docx, bank-statement-5-pages carries 9 spacers totalling 81.0 pt across 5 pages, max 16.2 pt - at most 16 pt per page against a measured uniform upward shift of 56.9-57.1 pt on pages 1-4. Forcing the full gap in therefore adds space the page never had and pushes rows off it.",
    "ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 pt - the paper's top edge), while LibreOffice places it at 56.80. The engine emits exactly that construct: bank-statement-5-pages carries w:before=1103 twips (55.15 pt) on the first paragraph of each page, and the measured Google dy on its pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Same number. The probe also found the construct Google DOES honour at a page top: a 1x1 table row with w:trHeight hRule=exact, 55.83 pt of 55.15 asked, exact in LibreOffice. Ruled out with numbers: the table-spacer paragraph (at most 16.2 pt per page against a 57 pt shift, and moving its gap into w:before took Google 40/47 -> 36/47, LO unchanged - reverted), w:line exact (LO honours it, so it cannot split the two renderers), auto line boxes (face-dependent in both). Next run: emit the page-first gap as a trHeight-exact table row and set that paragraph's w:before to 0. FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md has the probe table.",
@@ -514,7 +519,8 @@
    "2880-tw spacer cap raised to 4320: census over all 213 emitted document.xml shows 133 sz=2 spacers and FIVE at the cap (not one); the raise changes 4 documents, flips only 360_restaurant_menu into the spendable branch, and in Google that is 38/42 -> 38/42 with worst_dy 109.9 -> 106.7. No document becomes clean, three more move unmeasured in the worse direction. Reverted; FINDINGS/18_displacement-SPACER-CAP-2880-IS-FIVE-DOCS-AND-RAISING-IT-MOVES-NONE-2250-fixer.md",
    "census of the 13 one-check-away docs: 7 carry 11 un-split spacers (guard-refused), 6 carry none and no page break, rows floored w:trHeight atLeast. Two shapes, not one; old finding's patch already landed at 6050-6115.",
    "13 docs fail only this check: 7 carry 11 un-split spacers the guard refuses, 6 carry none and no page break with rows floored w:trHeight atLeast. Two constructs; old finding's patch already landed at DocxWriter.java:6050-6115.",
-   "row-pitch dither alone: ditherOn true, trHeight moves onto the 0.75pt grid (mobile-bill 360/380 -> 345/360/375); page result unmeasured because p2w.py --force measured stale docx (mtime 19:57 vs patch 19:59). Engine reverted."
+   "row-pitch dither alone: ditherOn true, trHeight moves onto the 0.75pt grid (mobile-bill 360/380 -> 345/360/375); page result unmeasured because p2w.py --force measured stale docx (mtime 19:57 vs patch 19:59). Engine reverted.",
+   "Separated the two box-text knobs by measurement. The pair (gapcap 20000tw + zganchor=false) REGRESSES 65_two_col_full_width_figure_caption from share@5px 1.75 to 7.75 and max 8.6pt to 31.7pt, problem flips to content-missing-partly-replaced - it passes 18_displacement today, so the pair must not ship. zganchor=false alone is catastrophic on policy-2col-spanning-section-heading (2.36 -> 48.34 share@5px, 14.4 -> 57.1pt max): the anchor is load-bearing. cap 20000tw alone is benign on both witnesses - 27 keeps 1.62/7.7 while its 57 box chars go to 0 (the document already proven 42/42 in Google under the pair), and 65 keeps 624 of 627 box chars with position bit-identical to HEAD. 65 is only zeroed when BOTH knobs are on, so the cap alone cannot cause its regression. Cap alone is the shippable candidate; 21 of its 23 changed documents are still unmeasured."
   ],
   "requeues": 0,
   "status": "PARKED"
