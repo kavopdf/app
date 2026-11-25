@@ -310,14 +310,73 @@ LO_PROFILE_ROOT = "/tmp/p2w-lo"
 _LO_PROFILE = None
 
 
-def _soffice_profile():
-    """A user-profile argument this process alone owns."""
+def _soffice_profile(fresh=False):
+    """A user-profile argument this process alone owns.
+
+    `fresh=True` abandons the current profile and takes a new one. It is used when a launch
+    produced nothing: the profile it ran on is the one thing that can be poisoned by an orphan
+    (see _kill_profile_holders), and a retry on a fresh profile answers the question the retry
+    is asking - "would soffice convert this document at all" - instead of repeating the same
+    poisoned launch.
+    """
     global _LO_PROFILE
-    if _LO_PROFILE is None:
+    if _LO_PROFILE is None or fresh:
         d = os.path.join(LO_PROFILE_ROOT, "p%d-%s" % (os.getpid(), uuid.uuid4().hex[:8]))
         os.makedirs(d, exist_ok=True)
         _LO_PROFILE = "-env:UserInstallation=file://" + d
     return _LO_PROFILE
+
+
+def _profile_path(profile):
+    """The directory inside a -env:UserInstallation argument."""
+    return profile.split("file://", 1)[1] if "file://" in (profile or "") else ""
+
+
+def _profile_holders(profile):
+    """PIDs of live soffice processes whose command line names OUR profile directory.
+
+    OUR directory is unique per process (pid + uuid), so this can only ever match a launch this
+    run made - it can never kill another run's soffice, or one a human started.
+    """
+    d = _profile_path(profile)
+    if not d:
+        return []
+    out = []
+    for p in os.listdir("/proc"):
+        if not p.isdigit():
+            continue
+        try:
+            cl = open("/proc/%s/cmdline" % p, "rb").read().decode("utf8", "replace")
+        except OSError:
+            continue
+        if "soffice" in cl and d in cl:
+            out.append(int(p))
+    return out
+
+
+def _kill_profile_holders(profile):
+    """Kill soffice processes still holding our profile; return what was killed.
+
+    /usr/bin/soffice IS A SHELL SCRIPT THAT `exec`s oosplash, WHICH FORKS soffice.bin. Killing
+    the wrapper's pid therefore kills neither the splash nor the binary - measured 25 Nov: a
+    conversion of 416_many_tiny_pages was SIGKILLed by its wrapper's pid at 2 s and
+    /usr/lib/libreoffice/program/soffice.bin (pid 1686) was still running, still holding
+    -env:UserInstallation=<our profile>, two seconds later. `subprocess.run(timeout=...)` - which
+    is how the warm launch is bounded - does exactly that kill, so a warm launch that is slow on
+    a fresh profile leaves a soffice behind that owns the profile every conversion in this
+    process then needs. This is the sweep that makes "kill by pid" and "kill by group" both
+    insufficient on this image.
+    """
+    killed = []
+    for pid in _profile_holders(profile):
+        if pid == os.getpid():
+            continue
+        try:
+            os.kill(pid, 9)
+            killed.append(pid)
+        except OSError:
+            pass
+    return killed
 
 # SOFFICE NEEDS A PROFILE OF ITS OWN, AND WITHOUT ONE THE FIRST LAUNCH ON A FRESH POD
 # CONVERTS NOTHING AND SAYS NOTHING.
@@ -366,12 +425,33 @@ def _soffice_warm(profile=None):
     if key in _LO_WARMED:
         return
     _LO_WARMED.add(key)
+    # THE WARM LAUNCH IS THE ONLY ONE THAT COULD LEAVE AN ORPHAN, AND IT IS THE ONE THAT
+    # USED TO KILL BY PID. It now gets its own session and is killed by process GROUP on
+    # timeout, exactly like soffice_pdf, and the profile is swept afterwards - so a warm launch
+    # that runs long cannot leave a soffice holding the profile every later conversion needs.
+    # The timeout is 45 s rather than 90: a warm launch that has not finished in 45 s on a
+    # profile nobody is using is not warming, and the conversion that follows it is the launch
+    # that actually matters.
     try:
-        subprocess.run([_soffice_exe(), "--headless", "--norestore"]
-                       + ([profile] if profile else []) + ["--terminate_after_init"],
-                       timeout=90,
-                       stdin=subprocess.DEVNULL,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        w = subprocess.Popen([_soffice_exe(), "--headless", "--norestore"]
+                             + ([profile] if profile else []) + ["--terminate_after_init"],
+                             stdin=subprocess.DEVNULL,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                             start_new_session=True)
+        try:
+            w.wait(timeout=45)
+        except subprocess.TimeoutExpired:
+            log("soffice: the profile warm-up ran over 45 s - killing its process group")
+        finally:
+            try:
+                os.killpg(os.getpgid(w.pid), 9)
+            except Exception:
+                pass
+            try:
+                w.wait(timeout=5)
+            except Exception:
+                pass
+            _kill_profile_holders(profile)
     except Exception:
         pass
 
@@ -446,6 +526,10 @@ def soffice_pdf(files, outdir, deadline=None, extra=None):
             p.wait(timeout=5)
         except Exception:
             pass
+        # THE GROUP KILL IS NOT ENOUGH ON THIS IMAGE: the wrapper execs oosplash, which forks
+        # soffice.bin, and the binary can outlive a group that was killed before it started.
+        # Sweeping by profile is the only kill that covers it (see _kill_profile_holders).
+        _kill_profile_holders(prof)
     if not got:
         got = [w for w in want if os.path.exists(w) and os.path.getsize(w) > 0]
     # A LAUNCH THAT PRODUCED NOTHING GETS ONE MORE CHANCE, AND IT IS ANNOUNCED.
@@ -455,10 +539,25 @@ def soffice_pdf(files, outdir, deadline=None, extra=None):
     # corpus passes in a row read "measured 0 of 213" and every one of them looked like
     # the measurement loop's fault. A retry costs 3 s on a chunk that would otherwise be
     # lost, and the line on stderr means the next run can tell a one-off from a pattern.
-    if not got and time.time() < end:
-        log("soffice produced nothing for %d file(s) - retrying once (see _LO_PROFILE note)"
-            % len(files))
-        return soffice_pdf(files, outdir, deadline=end, extra=extra)
+    #
+    # THE RETRY NOW RUNS ON A FRESH PROFILE, AND THE DOCUMENT IS NAMED.
+    #
+    # "soffice produced nothing for 12 file(s)" is the line that let a stall stay unnamed for
+    # three calls on 25 Nov: it says a number, not which document, and it retries the same
+    # poisoned profile. The retry therefore (a) sweeps any orphan still holding the profile,
+    # (b) takes a profile nobody has converted on, so a retry that fails is evidence about the
+    # DOCUMENT, not about the profile, and (c) prints the basenames that got nothing.
+    if not got:
+        names = ", ".join(os.path.basename(f) for f in files)
+        log("soffice gave no render in %.0fs for: %s" % (time.time() - t_launch, names[:200]))
+        killed = _kill_profile_holders(prof)
+        if killed:
+            log("soffice: killed %d orphan(s) still holding the profile: %s"
+                % (len(killed), killed))
+        if time.time() < end - 5:
+            _soffice_profile(fresh=True)
+            log("soffice: retrying %d file(s) once on a fresh profile" % len(files))
+            return soffice_pdf(files, outdir, deadline=end, extra=extra)
     return got
 
 # THE RENDER CACHE IS KEYED BY THE DOCX, NOT BY ITS NAME.
@@ -526,8 +625,46 @@ def conv(dx,od):
 # 250 s budget (2.1x) and the same numbers: the cached PDF is the byte-for-byte output of the
 # same soffice on the same docx, and a re-measure of an already-measured document through the
 # cache reproduced its stored share5 and page counts exactly.
+# A DOCUMENT THAT GIVES NO RENDER IS SKIPPED BY NAME ON EVERY LATER CALL, NOT JUST THIS ONE.
+#
+# Measured 25 Nov, BLOCKERS 812: call 1 rendered 12, call 2 printed nothing, call 3 said
+# "prerender 1 docx" and never finished. The per-document skip is per-CALL: the documents that
+# did render are cached, so the next call's chunk shrinks to exactly the document that gives
+# nothing and stalls on it again - the skip is announced and then forgotten, and the class can
+# never finish. The ledger below is on disk and keyed by the docx's stamp, so a rebuilt docx gets
+# a fresh chance and a document that has failed twice costs no launch at all after that, while
+# still being named in the log on every call. Nothing is deleted - the record IS the evidence.
+SOFFICE_FAIL_LIMIT = 2
+
+
+def _fails_load():
+    try:
+        with open(PRE + "/.soffice-fail", encoding="utf-8") as fh:
+            d = json.load(fh)
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def _fails_save(d):
+    try:
+        with open(PRE + "/.soffice-fail", "w", encoding="utf-8") as fh:
+            json.dump(d, fh, indent=1, sort_keys=True)
+    except OSError:
+        pass
+
+
 def prerender(names,end):
     os.makedirs(PRE,exist_ok=True); n=0
+    fails=_fails_load()
+    def fkey(b):
+        return b + "@" + _stamp(DOCX+"/"+b+".docx")
+    _skip=[b for b in names if fails.get(fkey(b),0)>=SOFFICE_FAIL_LIMIT]
+    if _skip:
+        log("prerender: %d document(s) skipped - soffice gave no render for them %d times "
+            "(PRE/.soffice-fail): %s" % (len(_skip), SOFFICE_FAIL_LIMIT, ",".join(_skip)[:200]))
+        names=[b for b in names if b not in set(_skip)]
+    launches=0
     for i in range(0,len(names),CHUNK):
         if time.time()>=end: break
         grp=[b for b in names[i:i+CHUNK]
@@ -548,6 +685,7 @@ def prerender(names,end):
         # measured 25 Nov, 6 of 23 rendered where the batch alone does all 23. Half the remaining
         # budget always leaves room to isolate what the batch lost, and never starves the batch.
         batch_end = end - min(PER_DOC, max(0.0, (end - time.time()) * 0.5))
+        launches+=1
         soffice_pdf(fs, PRE, deadline=min(batch_end, time.time()+280))
         miss=[f for f in fs
               if not os.path.exists(PRE+"/"+os.path.splitext(os.path.basename(f))[0]+".pdf")]
@@ -557,17 +695,36 @@ def prerender(names,end):
             for f in miss:
                 if time.time()>=end: break
                 t_one=time.time()
+                launches+=1
                 soffice_pdf([f], PRE, deadline=min(end, t_one+PER_DOC))
                 b=os.path.splitext(os.path.basename(f))[0]
                 if os.path.exists(PRE+"/"+b+".pdf"):
                     log("prerender: %s rendered alone in %.0fs" % (b, time.time()-t_one))
+                    fails[fkey(b)]=0; _fails_save(fails)
                 else:
-                    log("prerender: %s gave no render in %.0fs - SKIPPED (named, not blocking)"
-                        % (b, time.time()-t_one))
+                    k=fkey(b)
+                    fails[k]=fails.get(k,0)+1; _fails_save(fails)
+                    if fails[k]>=SOFFICE_FAIL_LIMIT:
+                        log("prerender: %s gave no render in %.0fs - SKIPPED on this and every "
+                            "later call (%d/%d failures recorded in PRE/.soffice-fail)"
+                            % (b, time.time()-t_one, fails[k], SOFFICE_FAIL_LIMIT))
+                    else:
+                        log("prerender: %s gave no render in %.0fs - retried next call "
+                            "(%d/%d)" % (b, time.time()-t_one, fails[k], SOFFICE_FAIL_LIMIT))
         for f in fs:
             p = PRE + "/" + os.path.splitext(os.path.basename(f))[0] + ".pdf"
             if os.path.exists(p): _stamp_render(f, p)
         n+=len(fs)
+        # A RENDERER THAT CONVERTS NOTHING IS NOT ONE SLOW DOCUMENT.
+        #
+        # If the batch and every isolated retry produced no PDF at all, the problem is soffice,
+        # not the documents, and the remaining chunks would spend the whole budget proving it
+        # again one launch at a time - which is the shape of the three-call stall: a call that
+        # ends with nothing, no error and no progress. Say it once and stop.
+        if not glob.glob(PRE+"/*.pdf") and launches:
+            log("prerender: soffice converted NOTHING in %d launch(es) - that is the renderer, "
+                "not a document; stopping this call's prerender" % launches)
+            break
     return n
 
 def pad3(a,H,W):
