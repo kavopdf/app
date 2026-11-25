@@ -95,6 +95,17 @@ accumulate. And Drive allows about 1000 requests per 100 s per user at three per
 twenty-five is seventy-five requests - comfortably inside, but do not launch two batches at once.
 
 
+## THE CRON PROMPT IS ONE PARAGRAPH BEHIND THIS FILE
+
+The prompt that starts a run still says `attempt.py` "records it as lead with 0 moved" on a dirty tree. It
+does not: the measured number is kept as `pending_moved` with its reason, and no attempt is counted. This
+file is the authority - the prompt is a summary and summaries drift.
+
+Same for the beacon: the prompt says a 45-minute silence window reaps a run that goes quiet, which is true,
+but it does not say that a run inside one long operation writes no beat at all. `round.py --heartbeat` before
+any step that can take minutes, not only before a batch.
+
+
 ## TWO HABITS THAT DECIDE HOW MUCH A RUN IS WORTH
 
 COMMIT BEFORE YOU MEASURE, AND MEASURE BEFORE YOU BUILD.
