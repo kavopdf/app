@@ -785,8 +785,13 @@
   "ended_how": "killed - slot cleared by a force release"
  },
  {
+<<<<<<< HEAD
   "started": "06:14",
   "started_ts": 1795567473.3039522,
+=======
+  "started": "06:59",
+  "started_ts": 1795570162.0304136,
+>>>>>>> eb329cc7 (fixer 25 Nov: foot-band spend measured - fires on 2 of 12, neutral on the pixel instrument; engine deterministic at document.xml, not at the .docx byte)
   "ended": "(never)",
   "ended_ts": null,
   "attempts": 0,

@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 | 22 Nov 04:18 | fixer | slot claimed - fixer running |
+=======
+>>>>>>> eb329cc7 (fixer 25 Nov: foot-band spend measured - fires on 2 of 12, neutral on the pixel instrument; engine deterministic at document.xml, not at the .docx byte)
 | 22 Nov 04:49 | fixer | attempt 32_stroke_lines -> lead (0/? moved) |
 | 22 Nov 04:50 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 22 Nov 05:14 | fixer | slot claimed - fixer running |
@@ -196,5 +199,11 @@
 | 25 Nov 05:34 | fixer | attempt 25_invisible_text -> lead (0/? moved) |
 | 25 Nov 05:45 | fixer | attempt 18_displacement -> lead (0/? moved) |
 | 25 Nov 05:47 | fixer | slot FORCED released - see INCIDENTS.md for why |
+<<<<<<< HEAD
 | 25 Nov 06:14 | fixer | slot claimed - fixer running |
 | 25 Nov 07:32 | fixer | attempt 04_chars_missing -> lead (0/212 moved) |
+=======
+| 25 Nov 06:41 | fixer | attempt 00_page_count -> lead (0/? moved) |
+| 25 Nov 07:02 | fixer | slot claimed - fixer running |
+| 25 Nov 07:47 | fixer | attempt 04_chars_missing -> lead (0/? moved) |
+>>>>>>> eb329cc7 (fixer 25 Nov: foot-band spend measured - fires on 2 of 12, neutral on the pixel instrument; engine deterministic at document.xml, not at the .docx byte)
