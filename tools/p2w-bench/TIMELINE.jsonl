@@ -5487,3 +5487,12 @@
 {"t": 1795569054.107937, "ist": "06:40:54", "ev": "beat", "d": "testing the degenerate-line-height hypothesis on 6 docs"}
 {"t": 1795569088.5276096, "ist": "06:41:28", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795569115.6342766, "ist": "06:41:55", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795569117.8619816, "ist": "06:41:57", "ev": "attempt", "d": "00_page_count -> lead"}
+{"t": 1795569117.967308, "ist": "06:41:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795569118.028704, "ist": "06:41:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795569118.392398, "ist": "06:41:58", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795569172.0317798, "ist": "06:42:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569173.3966653, "ist": "06:42:53", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795569173.7760172, "ist": "06:42:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569175.1185625, "ist": "06:42:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795569179.534842, "ist": "06:42:59", "ev": "beat", "d": "committing findings + report"}

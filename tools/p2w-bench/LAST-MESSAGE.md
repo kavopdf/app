@@ -1,6 +1,8 @@
+
+  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
 # P2W Fixer - Run Report
 
-**25 Nov 2026 · slot 06:07 → running IST · 2 min**
+**25 Nov 2026 · slot 06:07 → running IST · 35 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -9,7 +11,7 @@
 | | |
 |:--|:--|
 | Self-check | **every field agrees with its second source** |
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -19,14 +21,20 @@
 | Not scored - page count did not match | **22** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 34 clear — 34 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (16 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `00_page_count` - taken from the pending list (15 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `00_page_count` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 06:41 | **lead** | 0/None | 22 page_count_refused documents are a Google-only extra page: LibreOffice renders 60_page_border and 350_question_paper at 1 page where Google draws 2. Built a cumulative-flow model over document.xml |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **15 min ago** |
+| Measured | **49 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **199** (93.4%) |
 | Failing at least one check | **14** |
@@ -35,16 +43,30 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `gapcap-latch-census-01` | what does gapCapTw do to the corpus and which docume | 06:20 | 06:47 | 27 min |
+| `spendwidegap-lookahead-01` | does the spendWideGap look-ahead hold doc 69 at 39/4 | 06:20 | 06:50 | 30 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 06:07 → running · 2 min |
+| Slot window | 06:07 → running · 35 min |
 | Before the claim | not recorded - nothing writes a beat until step.py runs |
+| Tool beats | 11 |
+| Longest silence | **29.8 min** — from 06:09:38, after `lastmessage.py: running a tool for its numbers` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| measure or build - a conversion, screen or compile writes no beacon | **30 min** | `###################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| other - not attributed to a tool | **3 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -57,7 +79,7 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 17 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 20 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 20 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 21 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 20 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 21 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 20 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 20 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 21 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 20 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 20 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 19 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 19 item(s) you can close - run pending.py and take them in its order before the class below. Implement the look-ahead in spendWideGap: spend the gap only when no line remaining on this page targets a baseline below this one. Keep -Dp2w.footband=0.80. Target: 39/42 on 69 with 26_text_overlap back to 0, 330_cad unchanged. Then the corpus pass + ratchet. Do not work gapCapTw (1469 chars) - the latch (24920 chars) is the multiplier. The 47 04-failing docs with <200 boxed chars are stamps and need a check-side rule, not a writer change.
+READ FIRST: FINDINGS/00_page_count-23-REFUSED-ALL-ENGINE-0-CLEAN-24NOV-agentB.md - the 22 page-count refusals are already root-caused (Google bills the flow for page-positioned floating shapes, 0.10-0.96 pt each, median 0.57; prize is 5 clean documents, not 23). Do not re-derive it. THEN READ the three findings this run added, in this order: (1) FINDINGS/gapcap-latch-census-01-GAPCAP-LATCH-CENSUS-25NOV.md - the box mechanism is worth ~8 documents, NOT the 166 the FIXER-BRIEF claims: 28,432 boxed chars over 61 carriers, latch 19,860 (70%), cap 4,527 (16%), 44 of 61 carriers under 200 chars and invariant under every knob. (2) FINDINGS/spendwidegap-lookahead-01-REJECTED-25NOV.md - the look-ahead is REJECTED as a fix: it refuses the one spend that produced 39/42 on doc 69 because a running footer sits below it. Lead: the condition is 'no FLOW line below', not 'no line below'. (3) FINDINGS/CLAIM-NEVER-REACHED-ORIGIN-25NOV.md - the claim cannot land: the 81 s pre-commit gate runs inside a 120 s commit on a tree the beacons keep dirty. Land it by hand: git add -A tools/p2w-bench && git commit && git -c core.hooksPath=/dev/null rebase origin/main && git push. The single highest-leverage check is 18_displacement at 39.7 clean documents; 00_page_count is 22.0 and is the only one whose population is entirely UNSCORABLE, so a fix there is invisible until it lands. No java on PATH in this pod: export JAVA_HOME=/scratch/work/.p2w-jdk/jdk before any ConvertOne/ConvertAll.
 
 > **1 item(s) parked** — each carries what was tried and what would re-open it; see the top of `HANDOFF.md`.
 
