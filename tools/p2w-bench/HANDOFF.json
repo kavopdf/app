@@ -281,11 +281,6 @@
  "context": "04_chars_missing, PROVEN IN GOOGLE. spendWideGap() + -Dp2w.pagepos=0 -Dp2w.anchorkeep=0 -Dp2w.zganchor=false takes 69_two_col_legal_numbered_clauses 36 boxes/1358 chars -> 0/0 and 35/42 -> 39/42 (04, 45, 13, 44, 17, 10_font_sizes, 38_list_markers all pass). -Dp2w.footband=0.80 is the only value that zeroes 69 AND leaves 330_cad exactly as HEAD; 0.85 leaves 7 boxes, 0.70 spends in the drawing sheet. But 26_text_overlap is render=11 at BOTH band 0.80 and band 0.0, so the band cannot separate safe gaps from unsafe ones - the missing guard is a look-ahead. Engine reverted, nothing committed to it.",
  "history": [
   {
-   "at": "00:32",
-   "how": "forced",
-   "plan": ""
-  },
-  {
    "at": "02:09",
    "how": "forced",
    "plan": ""
@@ -377,6 +372,11 @@
   },
   {
    "at": "05:47",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "08:59",
    "how": "forced",
    "plan": ""
   }
@@ -636,7 +636,7 @@
  "plan": "",
  "run": {
   "started": "07:02",
-  "ended": null,
-  "ended_how": null
+  "ended": "08:59",
+  "ended_how": "forced"
  }
 }

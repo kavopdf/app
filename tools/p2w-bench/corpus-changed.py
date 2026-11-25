@@ -33,16 +33,23 @@ CHANGED = os.path.join(ROOT, "benchmarks", "DOCX-CHANGED.json")
 GVERIFY = os.path.join(ROOT, "benchmarks", "gverify")
 
 
-def _sha(path, blocks=1 << 20):
-    h = hashlib.sha256()
-    try:
-        with open(path, "rb") as f:
-            for chunk in iter(lambda: f.read(blocks), b""):
-                h.update(chunk)
-    except OSError:
-        return ""
-    return h.hexdigest()
+def _sha(path):
+    """sha256 of word/document.xml, NOT of the .docx file.
 
+    A .docx IS NOT DETERMINISTIC AS A FILE. Measured 24 Nov: two conversions of the same PDF by the
+    same engine produced different file hashes, and every part inside them was byte-identical - the
+    difference is zip local-header timestamps. Hashing the whole file therefore reported all 213
+    documents as changed after every rebuild, which is exactly what this tool exists to avoid.
+
+    document.xml is the part the engine actually writes, and it is stable. That is what gets hashed.
+    """
+    import zipfile
+    try:
+        with zipfile.ZipFile(path) as z:
+            data = z.read('word/document.xml')
+    except Exception:
+        return ''
+    return hashlib.sha256(data).hexdigest()
 
 def _now():
     out = {}
