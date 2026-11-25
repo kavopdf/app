@@ -17,7 +17,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 sys.path.insert(0, "/scratch/work/vv2/tools/p2w-bench")
 
-COLS = ["document", "pages_src", "pages_render", "ink_iou_d1_pct", "ssim_pct", "agree_pct", "defects"]
+COLS = ["document", "pages_src", "pages_render", "ink_iou_d1_pct", "ssim_pct", "agree_pct",
+        "ssim_method", "defects"]
 
 
 def main(argv):
@@ -69,6 +70,7 @@ def main(argv):
                 "ink_iou_d1_pct": r.get("ink_iou_mean", ""),
                 "ssim_pct": r.get("ssim_mean", ""),
                 "agree_pct": r.get("agree_mean", ""),
+                "ssim_method": "half-res-stride2",
                 "defects": ";".join(str(x.get("kind") if isinstance(x, dict) else x) for x in (r.get("defects") or [])) or r.get("error", ""),
             }
             w.writerow(row)
