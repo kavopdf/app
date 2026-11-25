@@ -274,6 +274,16 @@ def baseline():
     d, t = stamp()
     scores, base = rank_scores(RANK), rank_scores(RANK_BASE)
     total = need(len(scores), "benchmarks/RANKING.csv has no scored rows - nothing to report on")
+    # THE CORPUS IS WHAT GVERIFY SAW, NOT WHAT RANKING ROWS SAY.
+    #
+    # RANKING.csv holds the LibreOffice scores and can lag the Google store by a document:
+    # 25 Nov it carried 212 rows while gverify held 213 verdicts, and the table printed
+    # "Google measured 213 of 212" - a count larger than its own denominator. health.py
+    # closed this in _corpus_total(); this generator never got the rule. Take the larger
+    # of the two so a numerator can never exceed the denominator it is printed against.
+    _gv = len([f for f in os.listdir(os.path.join(ROOT, "benchmarks", "gverify"))
+              if f.endswith(".json")]) if os.path.isdir(os.path.join(ROOT, "benchmarks", "gverify")) else 0
+    total = max(total, _gv)
     open_ = sum(1 for v in scores.values() if v > 1.0)
     fixed = total - open_
     trows, tclean, tfail = txt_state()
