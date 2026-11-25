@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 01:25 → running IST · 22 min**
+**26 Nov 2026 · slot 01:25 → running IST · 23 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -12,8 +12,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 2 |
-| Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 6 vs ATTEMPTS.json history 3 |
+| Document-moves this run | **0** — 6 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -31,6 +31,7 @@
 |--:|:--|--:|:--|
 | 01:45 | **lead** | 0/0 | Live Google round trip on the 3 solo-59 documents + 2 passing controls. Shipped instrument reproduced 41/42 and identical source/render counts. All convictions are same-box, dy +3.2 to +3.65 pt; per-r |
 | 01:47 | **lead** | 0/0 | Probe 2: rebuilt 52_one_cm_margin_wide_body.docx with w:hRule atLeast->exact on all 6 rows, rendered in Google. Byte-identical render to the twip (7 baselines identical, 59 source=18 render=15 unchang |
+| 01:48 | **lead** | 0/0 | Probe 3: 52 rebuilt with all 37 w:lineRule exact->atLeast, rendered in Google. Document destroyed - 2 pages instead of 1, 23_line_pitch source 17.0 render 23.0, 18_displacement source=0 render=1. w:li |
 
 ## Verdict
 
@@ -41,7 +42,7 @@ produced every number above is the tree that was committed, and `regress.py --ch
 **What the run bought is a falsification, and it was not free.** Three documents (`351_omr_answer_sheet`,
 `48_form_coloured_border_coloured_values`, `52_one_cm_margin_wide_body`) have been carried since 24 Nov
 as instrument artefacts — "the check is wrong, `_same_object` is dead code, fix the check and they go
-clean". Five live Google renders in this slot say otherwise:
+clean". Six live Google renders in this slot say otherwise:
 
 * the shipped instrument reproduced the committed verdicts **exactly** (41/42, and the `source`/`render`
   counts to the unit), so the renders and the store are the same measurement;
@@ -53,30 +54,34 @@ clean". Five live Google renders in this slot say otherwise:
 Wiring `_same_object` in would have changed **zero** convictions and left three documents failing while
 looking fixed. That is the trap this run was sent to check, and the answer is that the check is right.
 
-**And the first fix anyone would reach for is dead.** The 0.75 pt row-quantum law predicts the
-declaration is the lever. Rebuilt `52` with `hRule` atLeast → exact on all six rows and rendered it:
-**byte-identical to the twip**, same seven baselines, same 41/42, same `source=18 render=15`.
-`w:trHeight` does not control the pitch Google lays here — the pitch is 18.41 · 17.25 · 16.09 · 18.41 ·
-18.00 on six identically declared rows, i.e. content-driven, because Google ignores `w:line exact` as a
-height on 8.5 pt cell text.
+**And both fix candidates are now measured dead, on the same document.**
 
-**Two attempts, both `lead`, no document moved.** The honest state of `59_shape_anchor` is: three
+| probe | change | Google's answer |
+|---|---|---|
+| 2 | `w:trHeight hRule` atLeast → exact, all 6 rows | **identical to the twip** — 7 baselines unchanged, still 41/42, still `source=18 render=15` |
+| 3 | all 37 `w:lineRule` exact → atLeast | **document destroyed** — 2 pages, `23_line_pitch` 17.0 → 23.0, `18` source=0 render=1 |
+
+Source row pitch is 17.00 pt six times; Google's is 18.41 · 17.25 · 16.09 · 18.41 · 18.00 on six
+identically declared rows — content-driven, because Google ignores `w:line exact` as a height on 8.5 pt
+cell text, and that construct cannot be traded away because the page's layout depends on it.
+
+**Three attempts, all `lead`, no document moved.** The honest state of `59_shape_anchor` is: three
 documents, a real 3.2 pt displacement, the mechanism narrowed from "the check is wrong" to "the row
-pitch is not expressible through `w:trHeight`", and one named next test — instrument `rowHeightTw` and
-the cell paragraph's `w:before`/`w:line` emission on `52` alone. If no .docx construct lays a fixed
-17.00 pt row in Google, these three belong in a written waiver with this measurement behind them, not
-in a fix queue for a fourth run.
+pitch is not expressible through any construct this engine can emit", and one named next test —
+instrument `rowHeightTw` and the cell paragraph's `w:before`/`w:line` emission on `52` alone. If no
+construct lays a fixed 17.00 pt row in Google, these three belong in a written waiver with these three
+probes behind them, not in a fourth run's fix queue.
 
 **Self-check, stated rather than hidden.** `report.py` reports one disagreement: `RUN.json`'s attempt
-counter reads 4 against 2 in `ATTEMPTS.json`. The ledger is right — this run made two attempts — and the
-counter incremented by two on each `attempt.py` call. The counter is not edited by hand here; the
+counter reads 6 against 3 in `ATTEMPTS.json`. The ledger is right — this run made three attempts — and
+the counter increments by two on each `attempt.py` call. The counter is not edited by hand here; the
 ledger and this report carry the real number.
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **27 min ago** |
+| Measured | **28 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **204** (95.8%) |
 | Failing at least one check | **9** |
@@ -91,9 +96,9 @@ ledger and this report carry the real number.
 
 | | |
 |:--|:--|
-| Slot window | 01:25 → running · 22 min |
+| Slot window | 01:25 → running · 23 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 16 |
+| Tool beats | 21 |
 | Longest silence | **19.6 min** — from 01:25:43, after `gaps.py: reading the timeline` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -103,8 +108,9 @@ ledger and this report carry the real number.
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **19 min** | `###################` |
-| record - attempt, handoff, class rows | **2 min** | `###` |
+| fix - diagnose and change the engine | **19 min** | `##################` |
+| record - attempt, handoff, class rows | **3 min** | `###` |
+| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -121,16 +127,16 @@ ledger and this report carry the real number.
 `60_text_column_right_edge` 6, `47_margins` 3, `59_shape_anchor` 3, `32_stroke_lines` 2,
 `17_matched_runs` 1.
 
-**Do not take `59_shape_anchor` as a check-side fix.** This run measured it and the check is right:
-the three solo documents carry a real 3.2-3.9 pt downward displacement inside a box Google reproduces,
-and `_same_object` would not change one conviction. Read
-`FINDINGS/59_shape_anchor-IS-RIGHT-THE-THREE-SOLO-DOCS-ARE-3PT-LOW-0150-relay.md` before touching 59.
+**Do not take `59_shape_anchor` as a check-side fix.** This run measured it three ways and the check is
+right: the three solo documents carry a real 3.2-3.9 pt downward displacement inside a box Google
+reproduces, and `_same_object` would not change one conviction. Both .docx constructs that could have
+explained it are closed — `hRule` atLeast/exact render identically, and `w:line` cannot be relaxed
+without destroying the document. Read
+`FINDINGS/59_shape_anchor-IS-RIGHT-THE-THREE-SOLO-DOCS-ARE-3PT-LOW-0150-relay.md` before touching 59,
+and if no construct lays a fixed 17.00 pt row, write the waiver rather than the fourth attempt.
 
-**Take `18_displacement` construct A** (the refused table spacer, 7 documents, `68_journal` the
-proof document) or `47_margins`. Both are engine-side; both have the leverage. The one thing this run
-added to 18: on `52_one_cm_margin_wide_body` the row pitch Google lays is content-driven, not
-declaration-driven — `hRule` atLeast and exact render identically to the twip — so the row-height
-family is dead for that document and the spacer/`w:before` family is where the money is.
+**Take `18_displacement` construct A** (the refused table spacer, 7 documents, `68_journal` the proof
+document) or `47_margins`. Both are engine-side; both have the leverage.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

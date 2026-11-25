@@ -156,3 +156,28 @@ python3 tools/p2w-bench/verify_google.py /scratch/work/p2w/corpus/<doc>.pdf <goo
 ```
 Renders were made in `KavoPDF-Verify` (`11-mkegjnnIOmVdO7c44nDSgxrw2qkWn6`) and the five probe Docs
 were deleted after measurement; nothing was left in the user's Drive.
+
+## Attempt 3 — `w:line` cannot be relaxed either, and that closes the family
+
+If Google ignores `w:line="12" w:lineRule="exact"` as a height and takes the row's natural line
+height, the obvious counter-move is to stop asking for an exact line. Rebuilt `52` with all 37
+`w:lineRule="exact"` → `"atLeast"` and rendered it in Google.
+
+**Result: the document is destroyed, not improved.**
+
+| render | page count | 59 | 18 | 23 line pitch |
+|---|---:|---|---|---|
+| source | 1 | — | — | 17.0 |
+| Google, HEAD | 1 | FAIL 18/15 | pass | — |
+| Google, `lineRule="atLeast"` | **2** | — | source=0 render=1 | **source 17.0 → render 23.0** |
+
+The `.docx`'s whole vertical layout is carried by `w:line exact`; relaxing it re-flows the page onto
+two sheets and changes the line pitch by 6 pt. So the construct is load-bearing and cannot be
+traded away to buy a uniform row pitch.
+
+**The family is closed for `52`:** `w:trHeight` (atLeast vs exact) makes no difference to Google
+(attempt 2), and `w:line` cannot be relaxed at all (attempt 3). Google's row pitch here is a function
+of the row's glyphs and no .docx construct this engine can emit fixes it. The remaining honest
+question is whether the engine can express a fixed 17.00 pt row at all — and if it cannot, these three
+documents belong in a written waiver, with these three probes behind it, rather than in a fourth run's
+fix queue.
