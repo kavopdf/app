@@ -1,0 +1,11 @@
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6581,7 +6581,7 @@
+             inner.append("<w:tr>");
+             if (rowTwHere > 0) {
+                 inner.append("<w:trPr><w:trHeight w:val=\"").append(rowHeightTw)
+-                     .append("\" w:hRule=\"atLeast\"/><w:cantSplit/></w:trPr>");
++                     .append("\" w:hRule=\"exact\"/><w:cantSplit/></w:trPr>");
+             }
+             int c = 0;
+             while (c < cols) {
