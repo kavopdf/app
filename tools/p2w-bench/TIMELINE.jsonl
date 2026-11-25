@@ -5724,3 +5724,17 @@
 {"t": 1795581138.0690303, "ist": "10:02:18", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795581138.4806936, "ist": "10:02:18", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795581140.2523465, "ist": "10:02:20", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795580969.4932, "ist": "09:59:29", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795580969.6430168, "ist": "09:59:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795580969.7358909, "ist": "09:59:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795581276.6900558, "ist": "10:04:36", "ev": "beat", "d": "install-gate timed out, inspecting"}
+{"t": 1795581283.3170981, "ist": "10:04:43", "ev": "beat", "d": "running pod-prep (mostly warm)"}
+{"t": 1795581489.4783256, "ist": "10:08:09", "ev": "beat", "d": "gate check"}
+{"t": 1795581501.1818383, "ist": "10:08:21", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795581503.732769, "ist": "10:08:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795581507.6667736, "ist": "10:08:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795583404.2341745, "ist": "10:40:04", "ev": "beat", "d": "building corpus slice 45 to go"}
+{"t": 1795583637.2592804, "ist": "10:43:57", "ev": "beat", "d": "corpus DONE, gate check"}
+{"t": 1795583699.1009893, "ist": "10:44:59", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795583721.044391, "ist": "10:45:21", "ev": "beat", "d": "recording the census attempt"}
+{"t": 1795583721.2924216, "ist": "10:45:21", "ev": "beat", "d": "attempt.py: recording an attempt"}

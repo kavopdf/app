@@ -13,10 +13,11 @@
       }
     ]
   },
-  "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795580719.152988,
-  "fixer_started": 1795581641.9510906,
-  "history": [
+  "fixer_doing": "recording the census attempt",
+  "fixer_doing_since": 1795583721.045449,
+  "fixer_engine_at_claim": "85b8735f",
+  "fixer_last_beat": 1795583721.04545,
+  "fixer_started": 1795580966.436359,  "history": [
     {
       "at": "2026-11-12 09:46",
       "phase": "measure",

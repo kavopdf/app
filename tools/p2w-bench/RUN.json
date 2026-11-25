@@ -1,20 +1,13 @@
 {
- "started_ts": 1795578201.0,
- "started": "09:13",
- "window_for_claim": 1795578201.0,
- "ended_ts": null,
- "ended": null,
+ "agents": [],
  "attempts": 1,
+ "class": "",
+ "docs_improved": 0,
+ "ended": null,
+ "ended_ts": null,
  "kept": 0,
- "agents": [
-  {
-   "id": "18-DISPLACEMENT-PROPOSAL-25NOV",
-   "status": "landed"
-  },
-  {
-   "id": "PENDING-ANSWERS-25NOV",
-   "status": "landed"
-  }
- ],
- "docs_improved": 0
+ "needs_human": 0,
+ "obstacles_cleared": 0,
+ "started": "09:59",
+ "started_ts": 1795580970.1767907
 }
