@@ -1,31 +1,28 @@
 # P2W Baseline - Run Report
 
-**25 Nov 2026 · 12:52 IST**
+**25 Nov 2026 · 17:06 IST**
 
-> 153 of 212 documents are at or under 1% share@5px in LibreOffice. The corpus is 39.7% closer to the 15 Nov baseline than it started.
+> 154 of 213 documents are at or under 1% share@5px in LibreOffice. The corpus is 40.0% closer to the 15 Nov baseline than it started.
 
-This run rebuilt the corpus from the release with the engine in the tree, measured every
-document the instrument could read, and re-scored every .txt against those fresh renders. The
-.txt table came back identical to the published one, so what was committed is the refresh and
-its ledger, not new scores. The conversion loop and the soffice renders wrote no beacon.
+This run was not the measure phase, so nothing here is a fresh publication: the fixer holds the round. What it did do was build the corpus from the release zips, convert every PDF, and measure the whole corpus with the current engine, then re-score the whole .txt half with the current verifier. Both halves reproduce the committed tables document for document - no .docx moved and no .txt row moved - which is exactly the check this run exists to make. The conversion loop and the soffice renders write no beacon, so this paragraph is the only record that they ran.
 
 ## Corpus
 
 | | |
 |:--|--:|
-| Documents | **212** |
-| .docx at or under 1% share@5px (LibreOffice) | **153** |
+| Documents | **213** |
+| .docx at or under 1% share@5px (LibreOffice) | **154** |
 | .docx still open | **59** |
-| .txt clean | **199** |
-| .txt failing | **14** |
-| Google measured | **213** of 212 |
+| .txt clean | **202** |
+| .txt failing | **11** |
+| Google measured | **213** of 213 |
 | Google clean | **42** |
 
 ## Against the 15 Nov baseline
 
 | | baseline | now | |
 |:--|--:|--:|:--|
-| mean share@5 | 6.15 | **3.71** | -39.70% |
+| mean share@5 | 6.15 | **3.69** | -39.98% |
 | documents improved at all (any fall) | | **65** | |
 | regressions | | **0** | none |
 
