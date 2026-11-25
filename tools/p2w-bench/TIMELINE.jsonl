@@ -6618,3 +6618,23 @@
 {"t": 1795643065.7108674, "ist": "03:14:25", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795643065.9072814, "ist": "03:14:25", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795643100.9795582, "ist": "03:15:00", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795639996.992856, "ist": "02:23:16", "ev": "beat", "d": "heartbeat before any claim: relay: prep warm, reading brief"}
+{"t": 1795640323.4304578, "ist": "02:28:43", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795640660.2745607, "ist": "02:34:20", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795640662.6765203, "ist": "02:34:22", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795640663.249533, "ist": "02:34:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795640663.817892, "ist": "02:34:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795640664.3495095, "ist": "02:34:24", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795640668.8539104, "ist": "02:34:28", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795640668.943224, "ist": "02:34:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795640674.0574646, "ist": "02:34:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795640676.3775048, "ist": "02:34:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795640703.6496859, "ist": "02:35:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795640703.760695, "ist": "02:35:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795640704.355108, "ist": "02:35:04", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795640704.4614763, "ist": "02:35:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795641309.893548, "ist": "02:45:09", "ev": "beat", "d": "applying pgMar-top patch, rebuilding engine"}
+{"t": 1795641560.0194857, "ist": "02:49:20", "ev": "beat", "d": "converting corpus on the pgMar engine (160 to go)"}
+{"t": 1795642201.668906, "ist": "03:00:01", "ev": "beat", "d": "measuring 212 on the pgMar engine"}
+{"t": 1795642763.797554, "ist": "03:09:23", "ev": "beat", "d": "measuring (84/212) on the pgMar engine"}
+{"t": 1795643924.0576782, "ist": "03:28:44", "ev": "beat", "d": "212/212 measured; running the gate"}
