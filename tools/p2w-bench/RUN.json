@@ -1,7 +1,10 @@
 {
- "agents": [],
- "attempts": 1,
- "class": "",
+ "agents": [
+  "60_tA-01",
+  "instB-01"
+ ],
+ "attempts": 2,
+ "class": "60_text_column_right_edge",
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,

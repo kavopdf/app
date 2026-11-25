@@ -230,5 +230,16 @@
   ],
   "docs_improved": 0,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "00:23",
+  "started_ts": 1795632817.7317436,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
