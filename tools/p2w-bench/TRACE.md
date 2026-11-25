@@ -6,8 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 22 Nov 23:33 | fixer | attempt | 18_displacement -> lead (0/? moved) |
-| 22 Nov 23:54 | fixer | claim | fixer claimed the slot |
 | 23 Nov 00:11 | fixer | attempt | 18_displacement -> lead (0/3 moved) |
 | 22 Nov 23:10 | fixer | claim | fixer claimed the slot |
 | 22 Nov 23:10 | fixer | stale-claim | fixer slot was stale (12 min) - the previous run ended without releasing it |
@@ -407,3 +405,6 @@
 | 26 Nov 01:48 | fixer | attempt | 59_shape_anchor -> lead (0/? moved) |
 | 26 Nov 02:15 | ? | attempt | 18_displacement -> lead (9/? moved) |
 | 26 Nov 02:15 | baseline | claim | baseline claimed the slot |
+| 26 Nov 03:31 | fixer | attempt | 18_displacement -> lead (0/25 moved) |
+| 26 Nov 02:28 | fixer | claim | fixer claimed the slot |
+| 26 Nov 03:31 | fixer | attempt | 18_displacement -> lead (0/25 moved) |
