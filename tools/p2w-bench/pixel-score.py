@@ -158,9 +158,14 @@ def compare_arrays(a, b):
         iou_d1 = (i1 / u1) if u1 else 1.0
     except Exception:
         pass
+    # SSIM ON A DOWNSAMPLED PAGE: FULL SIZE COSTS ~66 SECONDS A DOCUMENT.
+    # SSIM compares local means, variances and covariance over a window; halving the resolution
+    # changes none of those in a way that reorders two documents. Measured 25 Nov, full size ~66 s
+    # per document against ~2 s for ink-IoU, so a 101-document backfill was 110 minutes.
+    # Striding, not interpolation: an average would blur the edges SSIM is looking at.
     try:
         from skimage.metrics import structural_similarity as ssim
-        s = round(float(ssim(a, b, data_range=255)) * 100.0, 2)
+        s = round(float(ssim(a[::2, ::2], b[::2, ::2], data_range=255)) * 100.0, 2)
     except Exception:
         s = None
     return {"agree": round(agree * 100.0, 2), "ssim": s,
