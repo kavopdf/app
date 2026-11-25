@@ -1,11 +1,17 @@
 {
  "agents": [],
- "attempts": 1,
- "class": "",
+ "attempts": 3,
+ "class": "content-present-partly-displaced",
+ "counted": [
+  [
+   "content-present-partly-displaced",
+   0
+  ]
+ ],
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
- "kept": 0,
+ "kept": 1,
  "needs_human": 0,
  "obstacles_cleared": 0,
  "started": "15:06",
