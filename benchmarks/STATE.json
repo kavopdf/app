@@ -1,6 +1,6 @@
 {
- "ran_at": "2026-11-23T10:57:17",
- "engine": "5beb8b9d+71ec0fe4d4",
+ "ran_at": "2026-11-25T01:54:14",
+ "engine": "b7699196+00e99cabf1",
  "layers": {
   "ground_truth": {
    "status": "pass",
@@ -32,9 +32,9 @@
   }
  },
  "signatures": [
-  "[10:59:32]   content-loss    16 docs  median share@1px  39.4%",
-  "[10:59:32]   displacement    32 docs  median share@1px  29.6%",
-  "[10:59:32]   clean          153 docs  median share@1px   1.3%"
+  "[01:57:08]   content-loss    16 docs  median share@1px  39.4%",
+  "[01:57:08]   displacement    32 docs  median share@1px  29.6%",
+  "[01:57:08]   clean          153 docs  median share@1px   1.3%"
  ],
  "round": 1,
  "ratchet": {

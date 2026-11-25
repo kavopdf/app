@@ -1,11 +1,11 @@
 document,problem,share5,max_pt,worst_page,pages,src_chars,docx_chars,src_images,docx_images,src_drawings,docx_tables,docx_cells,src_annots,src_images_any,signal,dx_pt,dy_pt,explains,moved_gt20
 041122-Account_Opening_Form,content-missing-partly-replaced,98.65,937.92,9,9,48837,48623,1,1,2534,26,659,0,1,none-identified,38.6,-39.5,1.0,70.0
 Account_Opening_Form_Fillable_filled,content-missing-partly-replaced,97.62,358.08,7,9,48936,48702,1,1,2534,26,659,0,1,none-identified,3.4,-17.5,2.0,66.0
-one-page-rotated-180-degrees,content-missing-partly-replaced,81.64,177.6,2,2,1951,1884,0,0,42,2,59,0,0,none-identified,0.0,0.0,0.0,23.0
+one-page-rotated-180-degrees,content-missing-partly-replaced,81.64,177.6,2,2,1951,1923,0,0,42,2,59,0,0,none-identified,0.0,0.0,0.0,23.0
 600_reviewed_invoice_with_annotations,content-missing-partly-replaced,62.46,62.88,1,1,776,831,0,0,23,2,50,6,0,annotations-present,0.0,102.7,28.0,1.0
 601_fillable_admission_form,content-missing-partly-replaced,52.39,27.84,1,1,562,539,0,0,13,0,0,0,0,none-identified,0.0,26.9,15.0,8.0
 itr-computation-with-slab-table,content-partly-lost-and-displaced,42.33,15.36,1,1,2041,1881,0,0,61,4,130,0,0,none-identified,0.0,-0.5,1.0,0.0
-table-inside-two-column-page,content-present-wholly-displaced,35.87,21.6,1,1,2522,2278,0,0,15,1,2,0,0,none-identified,0.0,0.0,0.0,0.0
+table-inside-two-column-page,content-present-wholly-displaced,35.87,21.6,1,1,2522,2333,0,0,15,1,2,0,0,none-identified,0.0,0.0,0.0,0.0
 360_restaurant_menu,content-missing-partly-replaced,34.43,45.6,1,1,1778,2116,0,0,45,2,82,0,0,none-identified,0.0,0.0,0.0,3.0
 text-held-twice-shadow-text,content-missing-partly-replaced,30.29,60.48,1,1,2165,2122,0,0,16,1,28,0,0,none-identified,0.0,0.0,0.0,28.0
 71_invoice_space_aligned_no_rules,content-present-wholly-displaced,26.88,9.12,1,1,1441,1464,0,0,2,2,58,0,0,none-identified,0.0,1.4,4.0,0.0
@@ -22,7 +22,7 @@ academic-paper-ieee-2col-abstract,content-present-partly-displaced,5.66,17.28,2,
 payslip-label-left-amount-right,content-present-partly-displaced,5.59,4.32,1,1,1491,1407,0,0,9,3,84,0,0,none-identified,0.0,0.0,0.0,0.0
 417_rotate180_and_mirrored,content-present-wholly-displaced,5.5,5.76,2,2,411,403,0,0,0,0,0,0,0,none-identified,0.7,0.0,3.0,0.0
 23_timetable_grid_txtpos,content-missing-nothing-in-its-place,5.16,46.56,1,1,909,847,0,0,26,1,56,0,0,none-identified,0.0,0.0,0.0,4.0
-table-of-contents-dot-leaders,content-present-partly-displaced,4.97,26.4,1,1,3358,3215,0,0,2,0,0,0,0,none-identified,-0.5,0.0,1.0,0.0
+table-of-contents-dot-leaders,content-present-partly-displaced,4.97,26.4,1,1,3358,3304,0,0,2,0,0,0,0,none-identified,-0.5,0.0,1.0,0.0
 330_cad_drawing_sheet,content-present-partly-displaced,4.91,14.88,1,1,497,384,0,0,113,2,40,0,0,text-missing,0.0,0.0,0.0,0.0
 33_sans_nondefault_body,content-partly-lost,4.49,36.0,1,1,1469,1438,0,0,11,1,18,0,0,none-identified,0.0,0.0,0.0,1.0
 14_stamp_chars_positioned_td,content-partly-lost-and-displaced,3.89,25.44,1,1,956,873,0,0,14,1,35,0,0,none-identified,0.0,0.0,0.0,0.0
@@ -41,7 +41,7 @@ brochure-3col-with-sidebar-box,content-present-partly-displaced,2.45,12.96,1,1,2
 very-long-single-column-table,content-present-partly-displaced,2.38,5.76,1,3,5112,4611,0,0,129,3,495,0,0,none-identified,,,,
 policy-2col-spanning-section-heading,content-present-wholly-displaced,2.36,14.4,1,1,3384,283,0,0,3,0,0,0,0,text-missing,,,,
 35_four_typefaces_one_page,content-missing-nothing-in-its-place,2.19,36.48,1,1,1175,1127,0,0,12,1,35,0,0,none-identified,,,,
-61_two_col_abstract_spanning,content-partly-lost,2.01,15.84,1,1,2532,2432,0,0,4,1,2,0,0,none-identified,,,,
+61_two_col_abstract_spanning,content-partly-lost,2.01,15.84,1,1,2532,2518,0,0,4,1,2,0,0,none-identified,,,,
 80_gstin_pan_cin_ifsc_table,content-partly-lost,2.01,13.44,1,1,1216,1173,0,0,7,5,80,0,0,none-identified,,,,
 315_gazette_notification,content-present-partly-displaced,1.91,8.64,1,1,1325,1319,0,0,5,1,2,0,0,none-identified,,,,
 admit-card,content-present-partly-displaced,1.89,14.88,1,1,1506,1390,0,0,36,2,60,0,0,none-identified,,,,
@@ -54,7 +54,7 @@ price-list-right-aligned-amounts,content-present-partly-displaced,1.79,5.76,1,1,
 mobile-bill,content-present-partly-displaced,1.55,16.8,1,1,1659,1553,0,0,221,3,101,0,0,none-identified,,,,
 electricity-bill,content-present-partly-displaced,1.33,14.4,1,1,1803,1684,0,0,265,3,120,0,0,none-identified,,,,
 salary-slip-corporate,content-present-partly-displaced,1.28,5.76,1,1,1808,1680,0,0,45,3,123,0,0,none-identified,,,,
-70_magazine_drop_cap_photo_caption,content-present-partly-displaced,1.16,10.56,1,1,1494,1418,1,1,3,0,0,0,1,none-identified,,,,
+70_magazine_drop_cap_photo_caption,content-present-partly-displaced,1.16,10.56,1,1,1494,1472,1,1,3,0,0,0,1,none-identified,,,,
 312_affidavit_stamp_paper,content-missing-nothing-in-its-place,1.07,53.76,1,1,1387,1297,0,0,4,0,0,0,0,none-identified,,,,
 31_times_body_arial_headings,content-partly-lost-and-displaced,1.04,17.76,1,1,1646,1627,0,0,2,0,0,0,0,none-identified,,,,
 landscape-page-inside-portrait-document,content-present-partly-displaced,1.02,14.4,1,3,3617,3503,0,0,28,1,88,0,0,none-identified,,,,

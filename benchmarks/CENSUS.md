@@ -87,10 +87,10 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 |---|---|---|---|---|---|---|---|---|
 | 041122-Account_Opening_Form | 98.65 | 9 | 1 | 1 | 48837 | 48623 | 2534 | 659 |
 | Account_Opening_Form_Fillable_fill | 97.62 | 7 | 1 | 1 | 48936 | 48702 | 2534 | 659 |
-| one-page-rotated-180-degrees | 81.64 | 2 | 0 | 0 | 1951 | 1884 | 42 | 59 |
+| one-page-rotated-180-degrees | 81.64 | 2 | 0 | 0 | 1951 | 1923 | 42 | 59 |
 | 601_fillable_admission_form | 52.39 | 1 | 0 | 0 | 562 | 539 | 13 | 0 |
 | itr-computation-with-slab-table | 42.33 | 1 | 0 | 0 | 2041 | 1881 | 61 | 130 |
-| table-inside-two-column-page | 35.87 | 1 | 0 | 0 | 2522 | 2278 | 15 | 2 |
+| table-inside-two-column-page | 35.87 | 1 | 0 | 0 | 2522 | 2333 | 15 | 2 |
 | 360_restaurant_menu | 34.43 | 1 | 0 | 0 | 1778 | 2116 | 45 | 82 |
 | text-held-twice-shadow-text | 30.29 | 1 | 0 | 0 | 2165 | 2122 | 16 | 28 |
 | 71_invoice_space_aligned_no_rules | 26.88 | 1 | 0 | 0 | 1441 | 1464 | 2 | 58 |
@@ -106,7 +106,7 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 | payslip-label-left-amount-right | 5.59 | 1 | 0 | 0 | 1491 | 1407 | 9 | 84 |
 | 417_rotate180_and_mirrored | 5.5 | 2 | 0 | 0 | 411 | 403 | 0 | 0 |
 | 23_timetable_grid_txtpos | 5.16 | 1 | 0 | 0 | 909 | 847 | 26 | 56 |
-| table-of-contents-dot-leaders | 4.97 | 1 | 0 | 0 | 3358 | 3215 | 2 | 0 |
+| table-of-contents-dot-leaders | 4.97 | 1 | 0 | 0 | 3358 | 3304 | 2 | 0 |
 | 33_sans_nondefault_body | 4.49 | 1 | 0 | 0 | 1469 | 1438 | 11 | 18 |
 | 14_stamp_chars_positioned_td | 3.89 | 1 | 0 | 0 | 956 | 873 | 14 | 35 |
 | 64_newspaper_uneven_columns_ad_box | 3.46 | 1 | 0 | 0 | 2597 | 2805 | 7 | 6 |

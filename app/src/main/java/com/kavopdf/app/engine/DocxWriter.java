@@ -401,6 +401,30 @@ public final class DocxWriter {
     }
 
     /**
+     * Is this line page furniture - a running foot drawn in the bottom tenth of the sheet?
+     *
+     * <p>Google Docs does not read the text of a floating drawing. A {@code wps:txbx} inside a
+     * {@code wp:anchor} with {@code behindDoc} comes back from Drive as pixels with no text layer,
+     * so every character in it is missing from the export, while LibreOffice keeps all of them.
+     * Measured on the {@code 04_chars_missing} documents (27, 55, 61, 67, 20, 13, 06, 09, 66): the
+     * missing-character multiset is fully explained by the text of the anchored boxes, and nothing
+     * else on the page is lost. The same boxes are what fails {@code 44_header_footer}.
+     *
+     * <p>The anchor rule itself is right about the position and wrong about the construct. It
+     * exists because a gap wider than the flow may spend means the flow has drifted, and spending
+     * it pushes every line below down. That justification does not hold for the last line on the
+     * sheet: there is nothing below it, and the gap is the distance the page itself left between
+     * the body and the foot. So in the bottom tenth the gap is spent as space and the foot stays
+     * text - which Google reads, and which the reader can edit.
+     */
+    private static boolean inFootBand(Ctx ctx, float y) {
+        return y > FOOT_BAND_FRACTION * ctx.pageHeightPt;
+    }
+
+    /** Where the foot band starts - see {@link #inFootBand}. */
+    private static final float FOOT_BAND_FRACTION = 0.90f;
+
+    /**
      * Charges one paragraph against the page's budget, and says how much of it may be used.
      *
      * <p>The budget is the page's own height, because {@code w:before + w:line} summed down a
@@ -3564,7 +3588,7 @@ public final class DocxWriter {
             float edgeGap = topPt - ctx.afterTablePt;
             placeTopPt = ctx.afterTablePt;
             ctx.afterTablePt = -1f;
-            if (edgeGap * TWIPS_PER_PT > gapCapTw(ctx)) {
+            if (edgeGap * TWIPS_PER_PT > gapCapTw(ctx) && !inFootBand(ctx, first.y)) {
                 // Too far below the table to be a gap - a running footer on the last line of
                 // the sheet. It is a position, so the row's fields are anchored where the page
                 // drew them rather than spaced from the table's bottom edge.
@@ -3590,7 +3614,8 @@ public final class DocxWriter {
                 // gap was written as 120 pt - 152 pt short of the gap the page drew, and the
                 // footer landed 130.6 pt above its own baseline. flowFromBox anchors the same
                 // gap rather than truncating it.
-                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)) {
+                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)
+                        && !inFootBand(ctx, first.y)) {
                     ctx.positioned = true;
                     for (PdfToWord.Box ab : cols) anchorBox(sb, p, ab, ctx);
                     return;
@@ -4446,7 +4471,7 @@ public final class DocxWriter {
             // line where the page put it and keeps it as text. Anchoring it instead made a text
             // box - not editable in Google Docs - and on brochure-3col-with-sidebar-box, whose
             // columns hold more than one band, that turned 24 lines into text boxes.
-            if (!ctx.inColumn && edgeGap * TWIPS_PER_PT > gapCapTw(ctx)) {
+            if (!ctx.inColumn && edgeGap * TWIPS_PER_PT > gapCapTw(ctx) && !inFootBand(ctx, b.y)) {
                 // A footer 340 pt below the columns is not a gap the flow may spend, it is a
                 // position - the rule the pitch branch below already applies. Spending what the
                 // cap allows instead put 62's running footer 246 pt above the foot of the page.
@@ -4483,7 +4508,7 @@ public final class DocxWriter {
                 // what the page did, and from here on the page is placed rather than flowed.
                 // Same rule inside a cell: a gap between two bands of the same column is space
                 // the cell can hold, not a reason to float the line out of the text.
-                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx)) {
+                if (!ctx.inColumn && extra * TWIPS_PER_PT > gapCapTw(ctx) && !inFootBand(ctx, b.y)) {
                     ctx.positioned = true;
                     anchorBox(sb, p, b, ctx);
                     return;

@@ -5499,3 +5499,7 @@
 {"t": 1795571654.3654218, "ist": "07:24:14", "ev": "beat", "d": "relay: gate.py, last 6 docs"}
 {"t": 1795572158.8509626, "ist": "07:32:38", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795572169.5559685, "ist": "07:32:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795572171.78463, "ist": "07:32:51", "ev": "attempt", "d": "04_chars_missing -> lead"}
+{"t": 1795572171.9079604, "ist": "07:32:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795572172.0002153, "ist": "07:32:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795572172.3636649, "ist": "07:32:52", "ev": "beat", "d": "classrow.py: refreshing the class file"}

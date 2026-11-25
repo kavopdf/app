@@ -189,4 +189,4 @@
 {"at": "2026-11-25 04:23", "attempt": 8, "class": "04_chars_missing", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-25 05:34", "attempt": 3, "class": "25_invisible_text", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-25 05:45", "attempt": 62, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
-{"at": "2026-11-25 06:41", "attempt": 10, "class": "00_page_count", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-25 07:32", "attempt": 9, "class": "04_chars_missing", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}

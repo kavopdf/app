@@ -6,9 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 22 Nov 13:56 | fixer | stale-claim | fixer slot was stale (27 min) - the previous run ended without releasing it |
-| 22 Nov 14:04 | fixer | build-engine | started |
-| 22 Nov 14:05 | fixer | build-engine | engine built in 53s |
 | 22 Nov 14:07 | fixer | build-engine | started |
 | 22 Nov 14:08 | fixer | build-engine | engine built in 52s |
 | 22 Nov 14:08 | fixer | build-engine | started |
@@ -405,4 +402,7 @@
 | 25 Nov 04:23 | fixer | attempt | 04_chars_missing -> lead (1/? moved) |
 | 25 Nov 05:34 | baseline | attempt | 25_invisible_text -> lead (0/? moved) |
 | 25 Nov 05:45 | fixer | attempt | 18_displacement -> lead (0/? moved) |
-| 25 Nov 06:41 | fixer | attempt | 00_page_count -> lead (0/? moved) |
+| 25 Nov 06:14 | fixer | claim | fixer claimed the slot |
+| 25 Nov 06:43 | fixer | build-engine | started |
+| 25 Nov 06:44 | fixer | build-engine | engine built in 34s |
+| 25 Nov 07:32 | fixer | attempt | 04_chars_missing -> lead (0/212 moved) |
