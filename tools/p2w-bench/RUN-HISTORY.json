@@ -151,5 +151,19 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [],
+  "attempts": 2,
+  "class": "t12_word_invention",
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "needs_human": 0,
+  "obstacles_cleared": 0,
+  "started": "17:16",
+  "started_ts": 1795607215.4020357,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
