@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/300_prescription_rx.pdf",
-  "render": "/tmp/lo-one/300_prescription_rx.pdf",
+  "render": "/tmp/lo-b2/300_prescription_rx.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "b7699196",
+  "engine": "d85db0a9822ddb54",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -50,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": -0.0,
+        "worst_dy": 2.1,
+        "med_dx": 0.3,
+        "bad_pages": [],
+        "runs_matched": 50
+      }
     },
     "23_line_pitch": {
       "source": 17.0,
@@ -269,5 +276,5 @@
   },
   "document": "300_prescription_rx",
   "source_file": "/scratch/work/p2w/corpus/300_prescription_rx.pdf",
-  "render_file": "/tmp/lo-one/300_prescription_rx.pdf"
+  "render_file": "/tmp/lo-b2/300_prescription_rx.pdf"
 }

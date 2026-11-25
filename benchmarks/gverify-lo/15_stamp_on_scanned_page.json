@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/15_stamp_on_scanned_page.pdf",
-  "render": "/scratch/work/lo-pdf/15_stamp_on_scanned_page.pdf",
+  "render": "/tmp/lo-b1/15_stamp_on_scanned_page.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
-  "engine": "5beb8b9d",
+  "engine": "d85db0a9822ddb54",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,7 +52,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 7.8,
+        "worst_dy": 8.1,
+        "med_dx": -1.7,
+        "bad_pages": [],
+        "runs_matched": 2
+      }
     },
     "23_line_pitch": {
       "source": 0,
@@ -246,5 +253,5 @@
   },
   "document": "15_stamp_on_scanned_page",
   "source_file": "/scratch/work/p2w/corpus/15_stamp_on_scanned_page.pdf",
-  "render_file": "/scratch/work/lo-pdf/15_stamp_on_scanned_page.pdf"
+  "render_file": "/tmp/lo-b1/15_stamp_on_scanned_page.pdf"
 }

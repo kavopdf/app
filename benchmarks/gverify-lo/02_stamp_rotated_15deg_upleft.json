@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/02_stamp_rotated_15deg_upleft.pdf",
-  "render": "/tmp/lo-one/02_stamp_rotated_15deg_upleft.pdf",
+  "render": "/tmp/lo-b1/02_stamp_rotated_15deg_upleft.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
-  "engine": "b7699196",
+  "engine": "d85db0a9822ddb54",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,7 +52,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 1.3,
+        "worst_dy": 19.4,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 88
+      }
     },
     "23_line_pitch": {
       "source": 17.0,
@@ -246,5 +253,5 @@
   },
   "document": "02_stamp_rotated_15deg_upleft",
   "source_file": "/scratch/work/p2w/corpus/02_stamp_rotated_15deg_upleft.pdf",
-  "render_file": "/tmp/lo-one/02_stamp_rotated_15deg_upleft.pdf"
+  "render_file": "/tmp/lo-b1/02_stamp_rotated_15deg_upleft.pdf"
 }

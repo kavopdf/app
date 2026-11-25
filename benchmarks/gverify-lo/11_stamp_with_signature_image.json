@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/11_stamp_with_signature_image.pdf",
-  "render": "/tmp/lo-one/11_stamp_with_signature_image.pdf",
+  "render": "/tmp/lo-b1/11_stamp_with_signature_image.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
-  "engine": "b7699196",
+  "engine": "d85db0a9822ddb54",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,7 +52,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 1.0,
+        "worst_dy": 16.4,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 24
+      }
     },
     "23_line_pitch": {
       "source": 20.0,
@@ -246,5 +253,5 @@
   },
   "document": "11_stamp_with_signature_image",
   "source_file": "/scratch/work/p2w/corpus/11_stamp_with_signature_image.pdf",
-  "render_file": "/tmp/lo-one/11_stamp_with_signature_image.pdf"
+  "render_file": "/tmp/lo-b1/11_stamp_with_signature_image.pdf"
 }

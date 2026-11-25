@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/315_gazette_notification.pdf",
-  "render": "/tmp/lo-one/315_gazette_notification.pdf",
+  "render": "/tmp/lo-b2/315_gazette_notification.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "b7699196",
+  "engine": "d85db0a9822ddb54",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -50,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": -0.0,
+        "worst_dy": 0.6,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 35
+      }
     },
     "23_line_pitch": {
       "source": 8.4,
@@ -244,5 +251,5 @@
   },
   "document": "315_gazette_notification",
   "source_file": "/scratch/work/p2w/corpus/315_gazette_notification.pdf",
-  "render_file": "/tmp/lo-one/315_gazette_notification.pdf"
+  "render_file": "/tmp/lo-b2/315_gazette_notification.pdf"
 }

@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/312_affidavit_stamp_paper.pdf",
-  "render": "/tmp/lo-one/312_affidavit_stamp_paper.pdf",
+  "render": "/tmp/lo-b2/312_affidavit_stamp_paper.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "b7699196",
+  "engine": "d85db0a9822ddb54",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -50,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": -0.2,
+        "worst_dy": 14.5,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 50
+      }
     },
     "23_line_pitch": {
       "source": 13.4,
@@ -244,5 +251,5 @@
   },
   "document": "312_affidavit_stamp_paper",
   "source_file": "/scratch/work/p2w/corpus/312_affidavit_stamp_paper.pdf",
-  "render_file": "/tmp/lo-one/312_affidavit_stamp_paper.pdf"
+  "render_file": "/tmp/lo-b2/312_affidavit_stamp_paper.pdf"
 }

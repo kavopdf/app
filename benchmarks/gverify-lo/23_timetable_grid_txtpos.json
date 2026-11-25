@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/23_timetable_grid_txtpos.pdf",
-  "render": "/tmp/lo-one/23_timetable_grid_txtpos.pdf",
+  "render": "/tmp/lo-b1/23_timetable_grid_txtpos.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "b7699196",
+  "engine": "d85db0a9822ddb54",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -50,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 1.1,
+        "worst_dy": 1.6,
+        "med_dx": 0.9,
+        "bad_pages": [],
+        "runs_matched": 66
+      }
     },
     "23_line_pitch": {
       "source": 40.0,
@@ -269,5 +276,5 @@
   },
   "document": "23_timetable_grid_txtpos",
   "source_file": "/scratch/work/p2w/corpus/23_timetable_grid_txtpos.pdf",
-  "render_file": "/tmp/lo-one/23_timetable_grid_txtpos.pdf"
+  "render_file": "/tmp/lo-b1/23_timetable_grid_txtpos.pdf"
 }

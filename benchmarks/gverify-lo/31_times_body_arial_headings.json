@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/31_times_body_arial_headings.pdf",
-  "render": "/tmp/lo-one/31_times_body_arial_headings.pdf",
+  "render": "/tmp/lo-b2/31_times_body_arial_headings.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "b7699196",
+  "engine": "d85db0a9822ddb54",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -50,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 2.7,
+        "worst_dy": 3.2,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 29
+      }
     },
     "23_line_pitch": {
       "source": 28.0,
@@ -244,5 +251,5 @@
   },
   "document": "31_times_body_arial_headings",
   "source_file": "/scratch/work/p2w/corpus/31_times_body_arial_headings.pdf",
-  "render_file": "/tmp/lo-one/31_times_body_arial_headings.pdf"
+  "render_file": "/tmp/lo-b2/31_times_body_arial_headings.pdf"
 }

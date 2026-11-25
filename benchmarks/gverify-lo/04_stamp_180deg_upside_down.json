@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/04_stamp_180deg_upside_down.pdf",
-  "render": "/tmp/lo-one/04_stamp_180deg_upside_down.pdf",
+  "render": "/tmp/lo-b1/04_stamp_180deg_upside_down.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
-  "engine": "b7699196",
+  "engine": "d85db0a9822ddb54",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,7 +52,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 0.8,
+        "worst_dy": 1.5,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 50
+      }
     },
     "23_line_pitch": {
       "source": 18.0,
@@ -246,5 +253,5 @@
   },
   "document": "04_stamp_180deg_upside_down",
   "source_file": "/scratch/work/p2w/corpus/04_stamp_180deg_upside_down.pdf",
-  "render_file": "/tmp/lo-one/04_stamp_180deg_upside_down.pdf"
+  "render_file": "/tmp/lo-b1/04_stamp_180deg_upside_down.pdf"
 }
