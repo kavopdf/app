@@ -13,10 +13,10 @@
       }
     ]
   },
-  "fixer_doing": "pushing the claim past the 81s gate",
-  "fixer_doing_since": 1795567254.3724232,
+  "fixer_doing": "claim commit",
+  "fixer_doing_since": 1795567272.5368536,
   "fixer_engine_at_claim": "b7699196",
-  "fixer_last_beat": 1795567254.372424,
+  "fixer_last_beat": 1795567272.536854,
   "fixer_started": 1795567033.7651365,
   "history": [
     {
