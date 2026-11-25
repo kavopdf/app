@@ -224,28 +224,7 @@ def prose_identities(text):
 
 
 def _report_md():
-    """report.py's own markdown, or None.
-
-    READ THE ARTIFACT, DO NOT RE-RUN THE GENERATOR. This used to run report.py again, which
-    REWRITES REPORT.md with a later clock, and verify_sections then compared the message the run had
-    just copied from REPORT.md against the version this call had written over it. Three rows move on
-    their own - `Longest silence`, `Silences over 2 min`, the `report - the report and the chain`
-    bar - so the check refused the report report.py had itself produced, every time, with nothing
-    wrong in the message. Measured 25 Nov 15:47: report.py's own body was refused for 3 Timing rows
-    and again for 3 more after a second pass.
-
-    The rows that carry the verdict - the Progress table - are still checked against a live
-    report.py run (report_py_rows). Only the copied sections read the file, which is what the run
-    copied.
-    """
-    if _MD_SNAPSHOT is not None:
-        return _MD_SNAPSHOT
-    p = os.path.join(HERE, "REPORT.md")
-    try:
-        if os.path.exists(p):
-            return open(p, encoding="utf-8").read()
-    except OSError:
-        pass
+    """report.py's own markdown, or None."""
     try:
         _beat("lastmessage.py", "running report.py for the numbers")
         r = subprocess.run([sys.executable, os.path.join(HERE, "report.py")] + _for_args(),
@@ -669,20 +648,7 @@ def verify_for(cron, text):
     return verify_tool_numbers(text, cmds, cron)
 
 
-_MD_SNAPSHOT = None
-
-
 def main(argv):
-    # SNAPSHOT REPORT.md BEFORE ANYTHING RUNS report.py. report_py_rows() and _report_json() both
-    # execute report.py, which rewrites REPORT.md with a later clock; a check that reads the file
-    # afterwards is comparing the message against a file it overwrote itself. The snapshot is the
-    # artifact the run copied from, which is the only version the message can be wrong about.
-    global _MD_SNAPSHOT
-    try:
-        _p = os.path.join(HERE, "REPORT.md")
-        _MD_SNAPSHOT = open(_p, encoding="utf-8").read() if os.path.exists(_p) else None
-    except OSError:
-        _MD_SNAPSHOT = None
     if "--check" in argv:
         _c = ""
         if "--for" in argv:

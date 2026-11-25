@@ -1,5 +1,5 @@
 {
-  "baseline_started": 1795603359.906123,
+  "baseline_started": 0,
   "classifier_started": 0,
   "fixer": {
     "agents": [
@@ -13,9 +13,11 @@
       }
     ]
   },
+  "fixer_doing": "relay: fixes landed, recording and writing the report",
+  "fixer_doing_since": 1795595009.343267,
   "fixer_engine_at_claim": "85b8735f",
   "fixer_last_beat": 1795595009.343268,
-  "fixer_started": 1795602533.7469013,
+  "fixer_started": 1795599369.1416416,
   "history": [
     {
       "at": "2026-11-12 09:46",

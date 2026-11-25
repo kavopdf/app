@@ -1,8 +1,6 @@
 {
- "agents": [
-  "instA-01"
- ],
- "attempts": 8,
+ "agents": [],
+ "attempts": 3,
  "class": "content-present-partly-displaced",
  "counted": [
   [
@@ -11,9 +9,9 @@
   ]
  ],
  "docs_improved": 0,
- "ended": "15:32",
- "ended_ts": 1795600951.7910137,
- "kept": 4,
+ "ended": null,
+ "ended_ts": null,
+ "kept": 1,
  "needs_human": 0,
  "obstacles_cleared": 0,
  "started": "15:06",

@@ -113,38 +113,5 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
- },
- {
-  "started": "15:05",
-  "started_ts": 1795599357.7357638,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
-  "agents": [
-   "instA-01"
-  ],
-  "attempts": 8,
-  "class": "content-present-partly-displaced",
-  "counted": [
-   [
-    "content-present-partly-displaced",
-    0
-   ]
-  ],
-  "docs_improved": 0,
-  "ended": "(never)",
-  "ended_ts": null,
-  "kept": 4,
-  "needs_human": 0,
-  "obstacles_cleared": 0,
-  "started": "15:06",
-  "started_ts": 1795599360.1153748,
-  "ended_how": "killed - slot cleared by a force release"
  }
 ]

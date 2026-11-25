@@ -1351,9 +1351,23 @@
   "status": "OPEN"
  },
  "content-present-partly-displaced": {
-  "attempts": 26,
+  "attempts": 24,
   "first_seen": null,
   "history": [
+   {
+    "at": "2026-11-19 23:56",
+    "moved": 0,
+    "outcome": "error",
+    "reason": "IN PROGRESS - 75_merged_header_cell_three_columns: emit w:vMerge from spanR + bucket glyphs by their own baseline band instead of the cell top edge (PdfToWord:7846); baseline 27.31 reproduced on this ",
+    "total": 18
+   },
+   {
+    "at": "2026-11-20 00:24",
+    "moved": 2,
+    "outcome": "kept",
+    "reason": "w:vMerge emitted from spanR (DocxWriter) + spanR recorded only on the row a rectangle starts (PdfToWord) + a rectangle spanning rows is a merge only when its text occupies fewer bands than the rows it",
+    "total": 18
+   },
    {
     "at": "2026-11-20 02:25",
     "moved": 1,
@@ -1503,28 +1517,6 @@
     "outcome": "kept",
     "reason": "instrument: scipy made a called prerequisite (pod-prep step 7) and a failed pip install now logs its exit code and last stderr line. The 25 Nov stall blamed on soffice was edt() on the pure-Python tra",
     "total": null
-   },
-   {
-    "at": "2026-11-25 15:30",
-    "changed": {
-     "files": [],
-     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
-    },
-    "moved": 0,
-    "outcome": "kept",
-    "reason": "instrument: the soffice prerender wedge - orphan holders swept by profile, retry on a fresh profile, a no-render docx skipped by name in PRE/.soffice-fail (7c7ab124). 23 of 23 measured in two ~4 min c",
-    "total": null
-   },
-   {
-    "at": "2026-11-25 15:30",
-    "changed": {
-     "files": [],
-     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
-    },
-    "moved": 0,
-    "outcome": "kept",
-    "reason": "instrument: scipy made a called prerequisite (pod-prep step 7) and a failed pip install now logs its exit code and last stderr line (738f78bb). The 25 Nov stall blamed on soffice was edt() on the pure",
-    "total": null
    }
   ],
   "last": null,
@@ -1555,13 +1547,11 @@
    "error",
    "kept",
    "kept",
-   "kept",
-   "kept",
    "kept"
   ],
   "ratchet_at": "20 Nov 03:40",
   "ratchet_docs": 213,
-  "reason": "instrument: scipy made a called prerequisite (pod-prep step 7) and a failed pip install now logs its exit code and last stderr line (738f78bb). The 25 Nov stall blamed on soffice was edt() on the pure-Python transform: 1.38 s vs 66.07 s per page, 48x. engine unchanged 981ff1fa35e2cf67",
+  "reason": "instrument: scipy made a called prerequisite (pod-prep step 7) and a failed pip install now logs its exit code and last stderr line. The 25 Nov stall blamed on soffice was edt() on the pure-Python transform: 1.38 s vs 66.07 s per page, 48x. A rendered class now finishes inside one call. engine unchanged (981ff1fa35e2cf67)",
   "reasons": [
    "fill-only shading rectangles were treated as table cell edges (PdfToWord:1277-1285 built an Edge from every rule, ignoring the null stroke that stampPathRules gives a non-hairline fill). Dropping them refuted: 75_merged_header_cell_three_columns 27.31 -> 46.58 and 1 page -> 2, because the shading band's edges are the only rules that close those header cells. Reverted. The real fix is the finding's: lattice-cut cells plus w:vMerge, since spanR is computed and read by nothing.",
    "recordBaseline(): a row the page drew as one baseline but emitted as two paragraphs put each continuation one hairline box low and the pitch solver never took it back, so the drift accumulated down the page (bank-statement 0.4554 pt x 12 rows = +5.85 pt). Whole corpus 13 improved, 0 worse. Also published the table this engine actually produces - ten rows were stale and had blocked every fixer run since 11:55.",
@@ -1586,9 +1576,7 @@
    "Hypothesis refuted: a single document wedges the renderer. Probed all 10 unrendered documents individually with a 45 s cap each and a fresh soffice profile: 4.9, 5.1, 5.4, 5.8, 5.8, 5.8, 5.9, 5.9, 6.0, 6.8 s, all rc=0, all produced a PDF. No document wedges the renderer.",
    "Kept, and not the cause of the stall: soffice launched with no -env:UserInstallation, so every launch shared one profile and a soffice orphaned by a killed call held it. Measured: 1-page doc 56.7 s behind a 120-page hog on the shared profile vs 13.9 s on its own; a wedged survivor took a 23-doc prerender to 0 of 23 in 90 s with no error. Patch kept on its own merits.",
    "instrument: the soffice prerender wedge - orphan holders swept by profile, retry on a fresh profile, a no-render docx skipped by name in PRE/.soffice-fail. 23 of 23 measured in two ~4 min calls where the old code stalled with no output. No document moved: this is the instrument the class needs, not the class fix. engine unchanged (981ff1fa35e2cf67)",
-   "instrument: scipy made a called prerequisite (pod-prep step 7) and a failed pip install now logs its exit code and last stderr line. The 25 Nov stall blamed on soffice was edt() on the pure-Python transform: 1.38 s vs 66.07 s per page, 48x. A rendered class now finishes inside one call. engine unchanged (981ff1fa35e2cf67)",
-   "instrument: the soffice prerender wedge - orphan holders swept by profile, retry on a fresh profile, a no-render docx skipped by name in PRE/.soffice-fail (7c7ab124). 23 of 23 measured in two ~4 min calls where the old code stalled with no output. No document moved: this is the instrument the class needs. engine unchanged 981ff1fa35e2cf67",
-   "instrument: scipy made a called prerequisite (pod-prep step 7) and a failed pip install now logs its exit code and last stderr line (738f78bb). The 25 Nov stall blamed on soffice was edt() on the pure-Python transform: 1.38 s vs 66.07 s per page, 48x. engine unchanged 981ff1fa35e2cf67"
+   "instrument: scipy made a called prerequisite (pod-prep step 7) and a failed pip install now logs its exit code and last stderr line. The 25 Nov stall blamed on soffice was edt() on the pure-Python transform: 1.38 s vs 66.07 s per page, 48x. A rendered class now finishes inside one call. engine unchanged (981ff1fa35e2cf67)"
   ],
   "requeues": 0,
   "status": "OPEN"

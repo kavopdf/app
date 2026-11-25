@@ -186,9 +186,3 @@
 | 25 Nov 14:08 | baseline | slot claimed - baseline running |
 | 25 Nov 14:17 | fixer | slot claimed - fixer running |
 | 25 Nov 15:05 | fixer | slot FORCED released - see INCIDENTS.md for why |
-| 25 Nov 15:06 | fixer | slot claimed - fixer running |
-| 25 Nov 15:06 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
-| 25 Nov 15:06 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
-| 25 Nov 15:30 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
-| 25 Nov 15:30 | fixer | attempt content-present-partly-displaced -> kept (0/? moved) |
-| 25 Nov 15:32 | fixer | slot FORCED released - see INCIDENTS.md for why |
