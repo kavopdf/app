@@ -1,26 +1,10 @@
 {
- "agents": [
-  "SCREEN-HANG-IS-SCIPY-NOT-SOFFICE",
-  "T12-UNIT-IS-CHARACTER"
- ],
- "attempts": 6,
- "class": "18_displacement",
- "counted": [
-  [
-   "content-present-partly-displaced",
-   0
-  ],
-  [
-   "t12_word_invention",
-   5
-  ]
- ],
- "docs_improved": 5,
- "ended": "17:03",
- "ended_ts": 1795606427.252962,
- "kept": 3,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "15:58",
- "started_ts": 1795599360.1153748
+ "started": "17:16",
+ "started_ts": 1795607202.1812255,
+ "ended": null,
+ "ended_ts": null,
+ "attempts": 0,
+ "kept": 0,
+ "agents": [],
+ "docs_improved": 0
 }
