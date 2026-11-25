@@ -13,11 +13,9 @@
       }
     ]
   },
-  "fixer_doing": "committing",
-  "fixer_doing_since": 1795578974.568163,
   "fixer_engine_at_claim": "b7699196",
   "fixer_last_beat": 1795578974.5681636,
-  "fixer_started": 1795578938.0537274,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
