@@ -100,6 +100,21 @@ results are two files, and they change what the work is:
   text layer. That single threshold is ~166 document-failures across `04_chars_missing`,
   `45_char_accuracy`, `13_text_colours`, `44_header_footer` and `17_matched_runs`. **It is the largest
   engine defect anyone has found, and no class-specific patch will touch it.**
+
+  > **CORRECTED 25 Nov 2026 - the size above is wrong, and two runs have now measured it.** The
+  > construct is real and the mechanism is exactly as described, but its population is small.
+  > Measured with the same reader (characters inside `<w:txbxContent>` in `word/document.xml`):
+  > **61 documents and 28,432 boxed characters** at engine `b97d8172ce642eb0`
+  > (`FINDINGS/gapcap-latch-census-01-GAPCAP-LATCH-CENSUS-25NOV.md`, 06:07), and **47 documents and
+  > 27,501 characters, 5.94 % of the corpus** at engine `981ff1fa35e2cf67`
+  > (`FINDINGS/ANCHORED-BOX-POPULATION-25NOV.md`, 08:14, with `anchors.py`). A construct present in
+  > 47 documents cannot be the mechanism of 166 failures - that is arithmetic, not opinion.
+  > The engine's own census agrees: of 690 anchor boxes, **652 (94.5 %) come from
+  > `PAGE_POSITION_ON_ANCHOR` propagation and 13 (1.9 %) from this threshold.** The prize is
+  > **~8 documents, one of them Google-proven**, not 166. The 06:07 run also measured that the latch
+  > alone zeroes no document - only the latch and the cap together do. **Do not spend another run on
+  > this construct without first running `anchors.py` and reading those two findings.** The 166
+  > figure was taken on an earlier revision and the engine has moved twice since.
 - **`18_displacement` is the engine too**, and it is two constructs: Google drops `w:before` on the first
   paragraph after a page break, and delivers only 5-10 pt of an exact line height asked of an empty spacer.
   Measured on real Google renders: `shift = 0.961 x gap - 0.58 pt`, r = 0.975.

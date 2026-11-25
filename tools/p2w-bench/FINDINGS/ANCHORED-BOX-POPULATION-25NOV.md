@@ -1,86 +1,52 @@
-# The anchored-text-box population, measured for the first time
+# The anchored-box population at engine 981ff1f: replication, drift, and the brief that was never corrected
 
-**25 Nov 2026 · engine 981ff1fa35e2cf67 · 213 documents · measured with `tools/p2w-bench/anchors.py`**
+**25 Nov 2026 · slot 08:14 · engine 981ff1fa35e2cf67 · 213 documents**
 
-## Why this measurement exists
+## What this is, and what it is not
 
-The charter's summary, and `FINDINGS/DOCS-ROOT-CAUSES-24NOV.md` before it, name one construct as the
-largest engine defect anyone has found:
+This is **not a new discovery.** `FINDINGS/gapcap-latch-census-01-GAPCAP-LATCH-CENSUS-25NOV.md`
+(Agent A, 25 Nov 06:07, engine `b97d8172ce642eb0`) measured the same population with the same reader
+and reached the same conclusion: the anchored box is worth about **8 documents, not 166**.
 
-> `DocxWriter` routes body text into an anchored DrawingML text box once a page's flow enters
-> `ctx.positioned`, triggered by a vertical gap wider than `gapCapTw()` = 120 pt. Google rasterises
-> every anchored box on import, so that text leaves the exported text layer. That single threshold
-> is ~166 document-failures across `04_chars_missing`, `45_char_accuracy`, `13_text_colours`,
-> `44_header_footer` and `17_matched_runs`.
+This run re-measured it three hours later on a **different engine**, because the charter's headline
+claim was still standing in `FIXER-BRIEF.md` and every run since 06:07 has been pointed at it. The
+replication is the finding: the population moved, and the brief did not.
 
-Every fixer run since has been pointed at that sentence. Nobody had measured the population it
-describes. This is that measurement, and the sentence does not survive it.
-
-## What was measured, and with what
-
-Two instruments, deliberately independent of each other:
+## The measurement, two independent instruments
 
 1. **The engine's own census** — `-Dp2w.census=<file>`, one line per page, counting which writer
-   wrote the page's lines (`flow`, `row`, `col`, `tbl`, `anchor`, `stamp`, `anchorRule`,
-   `anchorPos`). This counts *writer calls*.
-2. **`anchors.py`, new this run** — reads `word/document.xml` out of each `.docx` and counts the
-   characters that are actually inside a `<w:txbxContent>`. This counts *output*, and it cannot be
-   fooled by which counter a writer incremented.
-
-They agree on the shape of the answer and disagree on the exact count for a known reason (below).
-
-## The measurement
+   wrote the page's lines. This counts *writer calls*.
+2. **`anchors.py`, new this run** — reads `word/document.xml` and counts characters actually inside
+   a `<w:txbxContent>`. This counts *output*, and no counter can mislead it.
 
 ```
-census, 213 documents, 570 pages
-  flow lines        5007        rows   933      table   273
-  anchor boxes       690        of which:
-      anchorPos      652   (94.5 %) - written because the page was already in positioned mode
-      anchorRule      13   ( 1.9 %) - written by the gap threshold the charter blames
-  documents with >=1 anchor box      20
-
-anchors.py, 213 documents
-  total characters                 463,228
-  characters inside an anchored box 27,501  (5.94 %)
-  documents with any boxed text         47
+anchors.py, engine 981ff1f        anchors.py, engine b97d8172 (the 06:07 run)
+  documents              213        documents              213
+  characters         463,228        body characters    433,453
+  boxed characters    27,501 (5.94%) boxed characters    28,432
+  documents with boxed text  47     box carriers              61
 ```
 
-**The gap threshold writes 13 boxes in the whole corpus.** `anchorPos` — the propagation of
-`PAGE_POSITION_ON_ANCHOR`, where one anchored line turns every later box on the sheet into a box —
-writes 652. The census finds 20 documents; `anchors.py` finds 47, and the extra 27 are stamps and
-other text-carrying boxes that the census files under `stamp` rather than `anchor`. Both are correct
-answers to different questions; `anchors.py` answers the one that matters, because it counts the text
-that can leave the Google text layer whoever wrote the box.
+Same five top carriers to within engine drift (`041122-Account_Opening_Form` 6,840 vs 6,789;
+`policy-2col-spanning-section-heading` 3,046 vs 3,041; `academic-paper-ieee-2col-abstract` 2,942 both;
+`magazine-2col-pullquote-spanning` 2,182 both). **The population shrank from 61 documents to 47
+between the two engines.** Fourteen documents stopped carrying boxed text.
 
-The documents carrying the most boxed text are not the class members the charter names:
+The engine census puts the mechanism's split beyond doubt:
 
 ```
-041122-Account_Opening_Form          6840 of 50416 chars  13.6 %
-Account_Opening_Form_Fillable_filled 6840 of 50495       13.5 %
-policy-2col-spanning-section-heading 3046 of  3328       91.5 %
-academic-paper-ieee-2col-abstract    2942 of  6410       45.9 %
-magazine-2col-pullquote-spanning     2182 of  2387       91.4 %
+anchor boxes   690   of which anchorPos 652 (94.5 %) - PAGE_POSITION_ON_ANCHOR propagation
+                          anchorRule  13 ( 1.9 %) - the gap threshold the brief blames
+documents with >=1 anchor box   20
 ```
 
-These are forms, two-column magazine layouts and diagrams. They are the documents where a page's
-flow genuinely cannot reach a line.
+**The gap threshold writes 13 boxes in the entire corpus.** It cannot be the mechanism of anything
+large. This agrees with the 06:07 run's decomposition (latch 70 %, cap 16 %) and with its most
+important correction: *the latch alone zeroes no document; only the pair does.*
 
-## What this overturns
+## The A/B this run added: the propagation flag on its own
 
-**The construct cannot be the explanation for ~166 document-failures.** Only 47 of 213 documents
-contain a single character inside an anchored box. Arithmetic, not opinion: a construct present in 47
-documents cannot be the mechanism of 166 failures. The five classes named in that sentence have to be
-re-measured for this construct one document at a time before any run spends another hour on it.
-
-This is not a claim that the 24 Nov work was wrong. It root-caused real text loss and its mechanism
-is exactly as described. The error is in the *size*, and the size is what a run acts on. The 24 Nov
-numbers were taken on a different revision — that document cites `place()` at `:4124-4157`, and the
-same code is `flowFromBox` at `:4406` today — and the engine has moved twice since.
-
-## The A/B: what the propagation flag is worth
-
-`PAGE_POSITION_ON_ANCHOR` is on by default (`-Dp2w.pagepos=0` turns it off). Converted all 213 both
-ways and diffed `word/document.xml`:
+`-Dp2w.pagepos=0` alone, all 213 converted both ways, `word/document.xml` diffed:
 
 ```
 document.xml changed : 8 of 213
@@ -88,38 +54,46 @@ boxed characters     : 27,501 -> 22,476  (-5,025, -18 %)
 total characters     : 463,228 -> 463,265 (+37)
 ```
 
-Eight documents, 5,025 characters moved out of boxes and back into flowed text. The +37 characters
-are text that was being dropped, not moved.
+Consistent with the 06:07 dose table (`pagepos=0 + anchorkeep=0` = 8,572 chars, 0 documents zeroed).
+**Not landed:** 5,025 characters is not worth the overlap risk the flag's own comment records
+(two positioners per page, 21 overlaps and median |dy| 105.7 pt on
+`policy-2col-spanning-section-heading`), and this run had no Google verification path. A lead with a
+number on it, not a fix.
 
-That is the whole lever inside the construct, and it is worth 8 documents. It is **not landed**: the
-flag's own doc comment says turning it off puts two positioners on one page (flow and boxes) whose y
-models then disagree by the miss, measured at 21 overlaps and median |dy| 105.7 pt on
-`policy-2col-spanning-section-heading`. 5,025 characters is not worth a `26_text_overlap` regression,
-and this run had no Google verification path to prove otherwise. It is a lead with a number on it.
+## New, and not in the 06:07 finding: the `!ctx.inColumn` asymmetry is empty
 
-## The `!ctx.inColumn` asymmetry: real in code, empty in the corpus
-
-`flowFromBox` guards the wide-gap branch with `!ctx.inColumn` (`:4474`); `flowRow` does not
-(`:3591`), so a row inside a column cell could anchor to the page and land outside its cell. Patched,
-rebuilt, converted all 213, diffed `word/document.xml`:
+`flowFromBox` guards the wide-gap branch with `!ctx.inColumn` (`:4474`); `flowRow` does not (`:3591`),
+so a row inside a column cell could anchor to the page and land outside its cell. Patched, rebuilt,
+all 213 converted, `word/document.xml` diffed:
 
 ```
 document.xml changed: 0 of 213
 ```
 
-The branch is unreachable inside a column on this corpus. The patch was reverted rather than
-committed: an unmeasurable change is a finding, not a commit. The asymmetry is still a latent fault
-for a document the corpus does not contain.
+Real in code, unreachable on this corpus. **Reverted** — an unmeasurable change is a finding, not a
+commit. It stays a latent fault for a document the corpus does not contain.
+
+## What is actually wrong here, and it is not the engine
+
+The 06:07 run measured 61 carriers and wrote it down. This run measured 47 and wrote it down. The
+`FIXER-BRIEF.md` **still says**:
+
+> That single threshold is ~166 document-failures across `04_chars_missing`, `45_char_accuracy`,
+> `13_text_colours`, `44_header_footer` and `17_matched_runs`. **It is the largest engine defect
+> anyone has found.**
+
+Two runs have now disproved that sentence and neither corrected the file. A finding in `FINDINGS/`
+does not reach a run that opens `FIXER-BRIEF.md` first — which is every run, by instruction. This run
+corrected the sentence in place, keeping the original numbers visible so the correction is auditable.
 
 ## Method notes a later run should not have to rediscover
 
-- **Compare `word/document.xml`, never the `.docx` bytes.** The archive is not byte-deterministic
-  (zip timestamps). Measured: 213 of 213 differ at the byte level and 0 of 213 differ in
-  `document.xml`, between two runs of the *same* engine. A byte diff reports a false positive on
-  every document.
+- **Compare `word/document.xml`, never the `.docx` bytes.** Measured: 213 of 213 differ at the byte
+  level and **0 of 213** differ in `document.xml`, between two runs of the *same* engine (zip
+  timestamps). A byte diff is a false positive on every document.
 - **`corpus-convert.py` needs `--ensure` or `--force`.** With no flag it prints its docstring and
-  returns 2; it looks like a successful no-op and converts nothing.
-- **The census file is opened in append mode**, so it must be removed between passes or the pages of
-  two engines are summed together.
+  returns 2 — it looks like a successful no-op and converts nothing.
+- **The census file is opened in append mode**; remove it between passes or two engines' pages sum.
 - `corpus-fetch.sh` + `build-engine.sh` + a full 213-document conversion is **about 5 minutes** on a
-  2-core pod at `-j 4`. The cost that stopped earlier runs from measuring is gone; measure.
+  2-core pod at `-j 4`. With the corpus on disk the commit gate's `google-safe` line stops saying
+  "no .docx output directory - cannot check" and starts actually checking. It passed.
