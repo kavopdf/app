@@ -13,9 +13,11 @@
       }
     ]
   },
-  "fixer_engine_at_claim": "85b8735f",
-  "fixer_last_beat": 1795595009.343268,
-  "fixer_started": 1795610008.3735654,
+  "fixer_doing": "relay: committing evidence",
+  "fixer_doing_since": 1795609860.7375991,
+  "fixer_engine_at_claim": "e95af1e",
+  "fixer_last_beat": 1795609860.7376003,
+  "fixer_started": 1795607202.176022,
   "history": [
     {
       "at": "2026-11-12 09:46",
