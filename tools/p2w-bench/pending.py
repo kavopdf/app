@@ -137,6 +137,17 @@ def collect():
         except Exception:
             pass
         landed = _finding_landed(a)
+        # A LANDED FINDING IS READING WORK, NOT A BLOCKER. The item was listed for any agent still
+        # marked "running", and landing a finding did not change that status - so an agent whose
+        # FINDINGS/ file was already committed kept appearing as pending work, with the reason
+        # "its finding LANDED ... do not re-deploy this agent". 18_dB-03 sat there like that while
+        # its finding was in the repo, and it counted toward the PENDING FIRST gate that stops
+        # classpick taking new work.
+        #
+        # The finding is committed, so the next run reads FINDINGS/ regardless. The agent is done.
+        if landed:
+            a["status"] = "done"
+            continue
         silent = age is not None and age >= AGENT_SILENT_MIN and not landed
         if age is not None and age >= AGENT_DROP_MIN and not landed:
             _dead.append((a.get('id'), a.get('class'), age))
