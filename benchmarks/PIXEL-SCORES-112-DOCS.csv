@@ -109,3 +109,5 @@ document,pages_src,pages_render,ink_iou_d1_pct,ssim_pct,agree_pct,defects
 40_devanagari_shaping_font,1,1,14.26,84.99,96.12,
 410_form_xobject_reused,1,1,49.85,97.91,99.33,
 411_nested_xobject_transforms,1,1,44.25,99.03,99.71,
+412_page_labels_roman,5,5,13.07,98.37,99.58,
+413_tagged_pdf_actualtext,1,1,37.27,99.22,99.75,
