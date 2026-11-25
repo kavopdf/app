@@ -1909,7 +1909,7 @@
   "status": "OPEN"
  },
  "t12_word_invention": {
-  "attempts": 6,
+  "attempts": 7,
   "first_seen": null,
   "history": [
    {
@@ -1965,6 +1965,17 @@
     "outcome": "kept",
     "reason": "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failin",
     "total": 8
+   },
+   {
+    "at": "2026-11-25 17:05",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "fixer: foot-band four-site patch - anchored running foot becomes flowed text"
+    },
+    "moved": 5,
+    "outcome": "kept",
+    "reason": "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failin",
+    "total": 8
    }
   ],
   "last": null,
@@ -1977,6 +1988,7 @@
    "lead",
    "lead",
    "lead",
+   "kept",
    "kept"
   ],
   "reason": "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failing. txt corpus 199 -> 202 of 213.",
@@ -1986,6 +1998,7 @@
    "t12's 21 invented words on 600 split into 3 faults; source reader now sees printing annotations (21->20, blast radius 1 doc, no verdict moved); remaining 20 are the converter duplicating FreeText text and emitting sticky-note bodies",
    "footnote superscript starts its own line: toLines tol=max(0.9,size*0.18)=1.28pt for a 7.12pt marker 4.45pt above an 8.9pt baseline. Patch merges it both directions; measured 6->2 invented words on journal-2col-with-footnotes. Not landed: needs 213-doc reconvert to gate, slot ran out at 108/213.",
    "annotationRuns() reads /Contents from every annotation, not only FreeText+Stamp, and the :956 hoist lacks the drawnByAppearance guard its sibling loop at :947 has. Measured on 600: verify_txt 8/12 7 passed FAIL -> 8 passed PASS, t12 20 invented words -> 0, the .txt diff is exactly the note (7 words) + the duplicated FreeText (13). Population proved by an independent 213-PDF scan: ONE document carries annotations. Patch saved as PATCHES/600-annotation-runs-subtype-25NOV.patch and reverted: regress.py --check refuses an unmeasured engine and corpus-slice.py needs 4 slices (55 docs per 250 s) before the measurement can start.",
+   "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failing. txt corpus 199 -> 202 of 213.",
    "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failing. txt corpus 199 -> 202 of 213."
   ],
   "requeues": 0,
