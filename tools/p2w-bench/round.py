@@ -1042,7 +1042,14 @@ def release(name, force=False):
                 import json as _j
                 _rp = os.path.join(HERE, "RUN.json")
                 _prev = _j.load(open(_rp, encoding="utf-8"))
-                if _prev.get("started"):
+                # A RUN THAT ENDED IS NOT A RUN THAT DIED. This checked only `started`, so every force release
+                # stamped whatever the previous RUN.json said - including a run that had finished normally and
+                # written ended_ts. Measured 25 Nov: 66 "killed" events, and every one landed within 0.1 minutes of
+                # a heartbeat, because the run doing the release had just beaten. A kill 6 seconds after a beat is
+                # not a stale slot; it is a label applied to a corpse that was already buried.
+                #
+                # ended_ts is set by _run_record("end") and by nothing else, so it is the exact test.
+                if _prev.get("started") and not _prev.get("ended_ts"):
                     _prev["ended_how"] = "killed - slot cleared by a force release"
                     _prev["ended"] = _prev.get("ended") or "(never)"
                     _hp = os.path.join(HERE, "RUN-HISTORY.json")
