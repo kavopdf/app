@@ -1,9 +1,11 @@
 {
  "agents": [
   "scresoffice prerender-01",
-  "t12_txt instrument-01"
+  "t12_txt instrument-01",
+  "SCREsoffice prerender-01",
+  "T12-txt instrument-01"
  ],
- "attempts": 6,
+ "attempts": 7,
  "class": "t12_word_invention",
  "counted": [
   [
