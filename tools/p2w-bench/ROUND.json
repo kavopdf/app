@@ -17,10 +17,10 @@
       }
     ]
   },
-  "fixer_doing": "p2w.py: scoring 412_page_labels_roman (12 in this pass)",
-  "fixer_doing_since": 1795710876.8768861,
+  "fixer_doing": "corpus-slice: 48 of 53 converted",
+  "fixer_doing_since": 1795715573.041117,
   "fixer_engine_at_claim": "aa496ebe",
-  "fixer_last_beat": 1795710876.8768868,
+  "fixer_last_beat": 1795715573.0411177,
   "fixer_started": 1795711322.5852764,
   "history": [
     {

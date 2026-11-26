@@ -7834,3 +7834,51 @@
 {"t": 1795712250.356109, "ist": "22:27:30", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795712251.2891567, "ist": "22:27:31", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795712256.541641, "ist": "22:27:36", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795714465.840801, "ist": "23:04:25", "ev": "beat", "d": "install-gate timed out; inspecting"}
+{"t": 1795714473.1952806, "ist": "23:04:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795714687.2280207, "ist": "23:08:07", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795714688.4946136, "ist": "23:08:08", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795714692.8269193, "ist": "23:08:12", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795714693.0462072, "ist": "23:08:13", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795714693.2892494, "ist": "23:08:13", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795714693.4707053, "ist": "23:08:13", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795714693.6383832, "ist": "23:08:13", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795714693.8035402, "ist": "23:08:13", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795714740.693429, "ist": "23:09:00", "ev": "beat", "d": "gate is blocked by aa496ebe; testing a revert"}
+{"t": 1795714741.240216, "ist": "23:09:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795715024.810722, "ist": "23:13:44", "ev": "beat", "d": "restoring measured engine; testing gate"}
+{"t": 1795715033.9339938, "ist": "23:13:53", "ev": "beat", "d": "engine restored to a4de7df; running the gate"}
+{"t": 1795715262.9367104, "ist": "23:17:42", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795715263.136112, "ist": "23:17:43", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795715263.3483584, "ist": "23:17:43", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795715263.536471, "ist": "23:17:43", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795715263.7483137, "ist": "23:17:43", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795715263.93965, "ist": "23:17:43", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795715264.1302094, "ist": "23:17:44", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795715264.3516119, "ist": "23:17:44", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795715284.595203, "ist": "23:18:04", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795715289.7126353, "ist": "23:18:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795715291.5965362, "ist": "23:18:11", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795715293.9913034, "ist": "23:18:13", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795715294.2528543, "ist": "23:18:14", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795715296.4041207, "ist": "23:18:16", "ev": "beat", "d": "gate open; writing the report"}
+{"t": 1795715332.9561067, "ist": "23:18:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795715334.9090137, "ist": "23:18:54", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795715335.4361227, "ist": "23:18:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795715337.5236998, "ist": "23:18:57", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795715342.0193772, "ist": "23:19:02", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795715342.1113708, "ist": "23:19:02", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795715346.9470243, "ist": "23:19:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795715347.0607212, "ist": "23:19:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795715349.5378056, "ist": "23:19:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795715351.358051, "ist": "23:19:11", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795715351.7442222, "ist": "23:19:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795715353.7175112, "ist": "23:19:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795715566.1015146, "ist": "23:22:46", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795715567.1957645, "ist": "23:22:47", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795715571.5164962, "ist": "23:22:51", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795715572.1475687, "ist": "23:22:52", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795715572.393569, "ist": "23:22:52", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795715572.618849, "ist": "23:22:52", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795715572.849841, "ist": "23:22:52", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795715573.0405965, "ist": "23:22:53", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}

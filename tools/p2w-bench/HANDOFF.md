@@ -16,7 +16,7 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. measure the last 4 documents, then bisect aa496ebe on itr-computation-with-slab-table
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. measure the last 4 documents, then bisect aa496ebe on itr-computation-with-slab-table
 
 ## Agents deployed and not yet accounted for
 
@@ -30,6 +30,7 @@ unfinished work, not as a result.
 | --he-01 | --help |  |  | 19:43 |  | running |  |
 | t09_A-01 | t09_page_furniture | A | is the 125 single-char present a TxtWriter line-assembly defect or a t | 20:47 | 19:45 | running |  |
 | 18_dA-02 | 18_displacement | A | find the single construct behind the displaced runs on the 25 document | 22:14 | 16:10 | running |  |
+| commA-01 | commit_gate | A | which clause of aa496ebe moves itr-computation and can it be split fro | 23:19 | 17:33 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
@@ -49,6 +50,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `22:12` attempt 94 on 18_displacement -> lead (0/208 moved)
 - `22:14` agent deployed: 18_displacement / A - find the single construct behind the displaced runs on the 25 documents that fai
 - `22:14` measured aa496ebe across 208 of 212: newsletter 0.20->86.30, 600 54.30->62.46, itr-computation 42.33->9.10 - regression, engine unstamped
+- `23:19` agent deployed: commit_gate / A - which clause of aa496ebe moves itr-computation and can it be split from the news
 
 ## Where the rest of the state lives
 

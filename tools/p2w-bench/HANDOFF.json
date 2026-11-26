@@ -91,6 +91,17 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-26T22:14"
+  },
+  {
+   "id": "commA-01",
+   "class": "commit_gate",
+   "angle": "A",
+   "question": "which clause of aa496ebe moves itr-computation and can it be split from the newsletter break",
+   "expected": "17:33",
+   "deployed": "23:19",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-26T23:19"
   }
  ],
  "history": [
@@ -120,7 +131,7 @@
    "plan": ""
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. measure the last 4 documents, then bisect aa496ebe on itr-computation-with-slab-table",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. measure the last 4 documents, then bisect aa496ebe on itr-computation-with-slab-table",
  "notes": [
   {
    "at": "15:12",
@@ -173,6 +184,10 @@
   {
    "at": "22:14",
    "text": "measured aa496ebe across 208 of 212: newsletter 0.20->86.30, 600 54.30->62.46, itr-computation 42.33->9.10 - regression, engine unstamped"
+  },
+  {
+   "at": "23:19",
+   "text": "agent deployed: commit_gate / A - which clause of aa496ebe moves itr-computation and can it be split from the news"
   }
  ],
  "plan": "",
