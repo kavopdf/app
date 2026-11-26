@@ -17,9 +17,11 @@
       }
     ]
   },
+  "fixer_doing": "p2w.py: scoring 412_page_labels_roman (12 in this pass)",
+  "fixer_doing_since": 1795710876.8768861,
   "fixer_engine_at_claim": "aa496ebe",
-  "fixer_last_beat": 1795706034.7198548,
-  "fixer_started": 0,
+  "fixer_last_beat": 1795710876.8768868,
+  "fixer_started": 1795707601.7471201,
   "history": [
     {
       "at": "2026-11-12 09:46",

@@ -7592,3 +7592,136 @@
 {"t": 1795706265.9383156, "ist": "20:47:45", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795706266.4286518, "ist": "20:47:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795706268.5705335, "ist": "20:47:48", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795707571.5037603, "ist": "21:09:31", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795707571.7059803, "ist": "21:09:31", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795707571.8497589, "ist": "21:09:31", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795707572.026863, "ist": "21:09:32", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795707572.1999571, "ist": "21:09:32", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795707572.3542147, "ist": "21:09:32", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795707572.5250168, "ist": "21:09:32", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795707572.7102935, "ist": "21:09:32", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
+{"t": 1795707671.2121542, "ist": "21:11:11", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795709068.6628048, "ist": "21:34:28", "ev": "beat", "d": "reading gate state"}
+{"t": 1795709108.363068, "ist": "21:35:08", "ev": "beat", "d": "re-measuring docx corpus on engine 7e0de1ab (unblocks the gate)"}
+{"t": 1795709294.4408977, "ist": "21:38:14", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795709295.3237736, "ist": "21:38:15", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795709295.647368, "ist": "21:38:15", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795709295.8340771, "ist": "21:38:15", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795709296.057153, "ist": "21:38:16", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795709296.2947307, "ist": "21:38:16", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795709296.4967353, "ist": "21:38:16", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795709296.7333024, "ist": "21:38:16", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795709575.300029, "ist": "21:42:55", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795709575.5015182, "ist": "21:42:55", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795709575.65739, "ist": "21:42:55", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795709575.8361492, "ist": "21:42:55", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795709576.0131786, "ist": "21:42:56", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795709576.1581368, "ist": "21:42:56", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795709576.3256366, "ist": "21:42:56", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795709576.510111, "ist": "21:42:56", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795709680.1188009, "ist": "21:44:40", "ev": "beat", "d": "p2w.py: scoring 02_stamp_rotated_15deg_uplef (2 in this pass)"}
+{"t": 1795709684.83446, "ist": "21:44:44", "ev": "beat", "d": "p2w.py: scoring 04_stamp_180deg_upside_down (4 in this pass)"}
+{"t": 1795709689.8943381, "ist": "21:44:49", "ev": "beat", "d": "p2w.py: scoring 06_rect_paid_stamp_red_trans (6 in this pass)"}
+{"t": 1795709695.1190257, "ist": "21:44:55", "ev": "beat", "d": "p2w.py: scoring 08_two_overlapping_stamps (8 in this pass)"}
+{"t": 1795709700.2352936, "ist": "21:45:00", "ev": "beat", "d": "p2w.py: scoring 10_stamp_as_image (10 in this pass)"}
+{"t": 1795709705.7982073, "ist": "21:45:05", "ev": "beat", "d": "p2w.py: scoring 13_stamp_non_english (12 in this pass)"}
+{"t": 1795709728.6569638, "ist": "21:45:28", "ev": "beat", "d": "p2w.py: scoring 15_stamp_on_scanned_page (2 in this pass)"}
+{"t": 1795709735.4656386, "ist": "21:45:35", "ev": "beat", "d": "p2w.py: scoring 17_three_column_widths_txtpo (4 in this pass)"}
+{"t": 1795709743.052873, "ist": "21:45:43", "ev": "beat", "d": "p2w.py: scoring 19_hanging_indent_txtpos (6 in this pass)"}
+{"t": 1795709748.1538754, "ist": "21:45:48", "ev": "beat", "d": "p2w.py: scoring 21_form_labels_x60_values_x3 (8 in this pass)"}
+{"t": 1795709755.328215, "ist": "21:45:55", "ev": "beat", "d": "p2w.py: scoring 23_timetable_grid_txtpos (10 in this pass)"}
+{"t": 1795709760.3732932, "ist": "21:46:00", "ev": "beat", "d": "p2w.py: scoring 25_signature_block_underscor (12 in this pass)"}
+{"t": 1795709786.8603053, "ist": "21:46:26", "ev": "beat", "d": "p2w.py: scoring 27_two_column_left_short_txt (2 in this pass)"}
+{"t": 1795709792.3129838, "ist": "21:46:32", "ev": "beat", "d": "p2w.py: scoring 29_dot_leaders_txtpos (4 in this pass)"}
+{"t": 1795709798.7251308, "ist": "21:46:38", "ev": "beat", "d": "p2w.py: scoring 301_lab_report_panel (6 in this pass)"}
+{"t": 1795709805.621327, "ist": "21:46:45", "ev": "beat", "d": "p2w.py: scoring 303_discharge_summary (8 in this pass)"}
+{"t": 1795709812.6744776, "ist": "21:46:52", "ev": "beat", "d": "p2w.py: scoring 305_vaccination_certificate (10 in this pass)"}
+{"t": 1795709819.7696881, "ist": "21:46:59", "ev": "beat", "d": "p2w.py: scoring 30_mixed_font_sizes_one_base (12 in this pass)"}
+{"t": 1795709843.2589269, "ist": "21:47:23", "ev": "beat", "d": "p2w.py: scoring 311_fir_police_form (2 in this pass)"}
+{"t": 1795709849.6385913, "ist": "21:47:29", "ev": "beat", "d": "p2w.py: scoring 313_power_of_attorney (4 in this pass)"}
+{"t": 1795709858.7068048, "ist": "21:47:38", "ev": "beat", "d": "p2w.py: scoring 315_gazette_notification (6 in this pass)"}
+{"t": 1795709867.4284272, "ist": "21:47:47", "ev": "beat", "d": "p2w.py: scoring 317_rti_response (8 in this pass)"}
+{"t": 1795709878.2424164, "ist": "21:47:58", "ev": "beat", "d": "p2w.py: scoring 31_times_body_arial_headings (10 in this pass)"}
+{"t": 1795709926.9074423, "ist": "21:48:46", "ev": "beat", "d": "p2w.py: scoring 321_auditors_report (2 in this pass)"}
+{"t": 1795709933.387467, "ist": "21:48:53", "ev": "beat", "d": "p2w.py: scoring 323_credit_card_statement (4 in this pass)"}
+{"t": 1795709941.7982993, "ist": "21:49:01", "ev": "beat", "d": "p2w.py: scoring 326_itr_computation (6 in this pass)"}
+{"t": 1795709950.8311832, "ist": "21:49:10", "ev": "beat", "d": "p2w.py: scoring 330_cad_drawing_sheet (8 in this pass)"}
+{"t": 1795709957.2801282, "ist": "21:49:17", "ev": "beat", "d": "p2w.py: scoring 332_bom_on_drawing (10 in this pass)"}
+{"t": 1795709966.5289729, "ist": "21:49:26", "ev": "beat", "d": "p2w.py: scoring 334_patent_document (12 in this pass)"}
+{"t": 1795709998.4803598, "ist": "21:49:58", "ev": "beat", "d": "p2w.py: scoring 33_sans_nondefault_body (2 in this pass)"}
+{"t": 1795710004.183175, "ist": "21:50:04", "ev": "beat", "d": "p2w.py: scoring 341_shipping_manifest (4 in this pass)"}
+{"t": 1795710009.9304588, "ist": "21:50:09", "ev": "beat", "d": "p2w.py: scoring 343_air_waybill (6 in this pass)"}
+{"t": 1795710014.9396517, "ist": "21:50:14", "ev": "beat", "d": "p2w.py: scoring 34_monospace_document (8 in this pass)"}
+{"t": 1795710019.9997852, "ist": "21:50:19", "ev": "beat", "d": "p2w.py: scoring 351_omr_answer_sheet (10 in this pass)"}
+{"t": 1795710026.0918272, "ist": "21:50:26", "ev": "beat", "d": "p2w.py: scoring 353_admit_card (12 in this pass)"}
+{"t": 1795710047.8558633, "ist": "21:50:47", "ev": "beat", "d": "p2w.py: scoring 360_restaurant_menu (2 in this pass)"}
+{"t": 1795710053.1662838, "ist": "21:50:53", "ev": "beat", "d": "p2w.py: scoring 362_price_list_dense (4 in this pass)"}
+{"t": 1795710057.8675725, "ist": "21:50:57", "ev": "beat", "d": "p2w.py: scoring 364_event_ticket (6 in this pass)"}
+{"t": 1795710063.2395031, "ist": "21:51:03", "ev": "beat", "d": "p2w.py: scoring 36_embedded_subset_font (8 in this pass)"}
+{"t": 1795710069.0196965, "ist": "21:51:09", "ev": "beat", "d": "p2w.py: scoring 371_experience_certificate (10 in this pass)"}
+{"t": 1795710074.0011106, "ist": "21:51:14", "ev": "beat", "d": "p2w.py: scoring 373_leave_application_form (12 in this pass)"}
+{"t": 1795710101.2964756, "ist": "21:51:41", "ev": "beat", "d": "p2w.py: scoring 375_attendance_register (2 in this pass)"}
+{"t": 1795710106.3596106, "ist": "21:51:46", "ev": "beat", "d": "p2w.py: scoring 380_runbook_terminal_output (4 in this pass)"}
+{"t": 1795710111.5593326, "ist": "21:51:51", "ev": "beat", "d": "p2w.py: scoring 382_architecture_diagram (6 in this pass)"}
+{"t": 1795710116.3187454, "ist": "21:51:56", "ev": "beat", "d": "p2w.py: scoring 38_faux_bold_italic_synthesi (8 in this pass)"}
+{"t": 1795710121.238372, "ist": "21:52:01", "ev": "beat", "d": "p2w.py: scoring 391_survey_questionnaire_gri (10 in this pass)"}
+{"t": 1795710125.8628912, "ist": "21:52:05", "ev": "beat", "d": "p2w.py: scoring 393_spectrum_peak_table (12 in this pass)"}
+{"t": 1795710209.1724231, "ist": "21:53:29", "ev": "beat", "d": "p2w.py: scoring 39_small_caps_letter_spacing (2 in this pass)"}
+{"t": 1795710221.204649, "ist": "21:53:41", "ev": "beat", "d": "p2w.py: scoring 401_trifold_brochure (4 in this pass)"}
+{"t": 1795710232.4658804, "ist": "21:53:52", "ev": "beat", "d": "p2w.py: scoring 403_crossword_puzzle (6 in this pass)"}
+{"t": 1795710243.233966, "ist": "21:54:03", "ev": "beat", "d": "p2w.py: scoring 405_sheet_music_lyrics (8 in this pass)"}
+{"t": 1795710254.4051588, "ist": "21:54:14", "ev": "beat", "d": "p2w.py: scoring 407_id_card_front_back (10 in this pass)"}
+{"t": 1795710265.8301928, "ist": "21:54:25", "ev": "beat", "d": "p2w.py: scoring 410_form_xobject_reused (12 in this pass)"}
+{"t": 1795710277.10351, "ist": "21:54:37", "ev": "beat", "d": "p2w.py: scoring 413_tagged_pdf_actualtext (2 in this pass)"}
+{"t": 1795710287.3056536, "ist": "21:54:47", "ev": "beat", "d": "p2w.py: scoring 415_inline_images (4 in this pass)"}
+{"t": 1795710297.8293986, "ist": "21:54:57", "ev": "beat", "d": "p2w.py: scoring 42_table_coloured_header_alt (6 in this pass)"}
+{"t": 1795710308.730772, "ist": "21:55:08", "ev": "beat", "d": "p2w.py: scoring 44_coloured_underlined_hyper (8 in this pass)"}
+{"t": 1795710320.1022274, "ist": "21:55:20", "ev": "beat", "d": "p2w.py: scoring 46_chart_coloured_labels_bod (10 in this pass)"}
+{"t": 1795710330.8124287, "ist": "21:55:30", "ev": "beat", "d": "p2w.py: scoring 48_form_coloured_border_colo (12 in this pass)"}
+{"t": 1795710364.805961, "ist": "21:56:04", "ev": "beat", "d": "p2w.py: scoring 50_invoice_coloured_total_ro (2 in this pass)"}
+{"t": 1795710375.21031, "ist": "21:56:15", "ev": "beat", "d": "p2w.py: scoring 52_one_cm_margin_wide_body (4 in this pass)"}
+{"t": 1795710384.9907503, "ist": "21:56:24", "ev": "beat", "d": "p2w.py: scoring 54_two_column_body_full_widt (6 in this pass)"}
+{"t": 1795710390.0192385, "ist": "21:56:30", "ev": "beat", "d": "p2w.py: scoring 56_table_indented_from_margi (8 in this pass)"}
+{"t": 1795710395.1206987, "ist": "21:56:35", "ev": "beat", "d": "p2w.py: scoring 601_fillable_admission_form (10 in this pass)"}
+{"t": 1795710400.2323086, "ist": "21:56:40", "ev": "beat", "d": "p2w.py: scoring 61_two_col_abstract_spanning (12 in this pass)"}
+{"t": 1795710421.1291301, "ist": "21:57:01", "ev": "beat", "d": "p2w.py: scoring 63_three_column_brochure (2 in this pass)"}
+{"t": 1795710426.646175, "ist": "21:57:06", "ev": "beat", "d": "p2w.py: scoring 65_two_col_full_width_figure (4 in this pass)"}
+{"t": 1795710431.9116874, "ist": "21:57:11", "ev": "beat", "d": "p2w.py: scoring 67_two_col_with_sidebar (6 in this pass)"}
+{"t": 1795710436.963082, "ist": "21:57:16", "ev": "beat", "d": "p2w.py: scoring 69_two_col_legal_numbered_cl (8 in this pass)"}
+{"t": 1795710442.3280392, "ist": "21:57:22", "ev": "beat", "d": "p2w.py: scoring 71_invoice_space_aligned_no_ (10 in this pass)"}
+{"t": 1795710485.5240705, "ist": "21:58:05", "ev": "beat", "d": "p2w.py: scoring 73_marksheet_subject_marks_g (2 in this pass)"}
+{"t": 1795710490.891753, "ist": "21:58:10", "ev": "beat", "d": "p2w.py: scoring 75_merged_header_cell_three_ (4 in this pass)"}
+{"t": 1795710495.904881, "ist": "21:58:15", "ev": "beat", "d": "p2w.py: scoring 77_arabic_rtl_document (6 in this pass)"}
+{"t": 1795710500.434542, "ist": "21:58:20", "ev": "beat", "d": "p2w.py: scoring 79_inr_indian_digit_grouping (8 in this pass)"}
+{"t": 1795710506.2616804, "ist": "21:58:26", "ev": "beat", "d": "p2w.py: scoring admission-form-labels-left-b (10 in this pass)"}
+{"t": 1795710511.5235875, "ist": "21:58:31", "ev": "beat", "d": "p2w.py: scoring annual-review-2col-uneven-co (12 in this pass)"}
+{"t": 1795710534.4825892, "ist": "21:58:54", "ev": "beat", "d": "p2w.py: scoring bank-statement-horizontal-ru (2 in this pass)"}
+{"t": 1795710539.9170413, "ist": "21:58:59", "ev": "beat", "d": "p2w.py: scoring boq-tender-bill-of-quantitie (4 in this pass)"}
+{"t": 1795710545.9773169, "ist": "21:59:05", "ev": "beat", "d": "p2w.py: scoring bus-timetable-station-left-t (6 in this pass)"}
+{"t": 1795710551.632302, "ist": "21:59:11", "ev": "beat", "d": "p2w.py: scoring electricity-bill (8 in this pass)"}
+{"t": 1795710556.9339764, "ist": "21:59:16", "ev": "beat", "d": "p2w.py: scoring gst-invoice-3line-items (10 in this pass)"}
+{"t": 1795710563.0239716, "ist": "21:59:23", "ev": "beat", "d": "p2w.py: scoring gst-invoice-with-qr-code (12 in this pass)"}
+{"t": 1795710586.0034935, "ist": "21:59:46", "ev": "beat", "d": "p2w.py: scoring invoice-line-items-qty-rate- (2 in this pass)"}
+{"t": 1795710591.3490572, "ist": "21:59:51", "ev": "beat", "d": "p2w.py: scoring journal-2col-with-footnotes (4 in this pass)"}
+{"t": 1795710597.4838004, "ist": "21:59:57", "ev": "beat", "d": "p2w.py: scoring marksheet-subject-left-marks (6 in this pass)"}
+{"t": 1795710604.11811, "ist": "22:00:04", "ev": "beat", "d": "p2w.py: scoring mobile-bill (8 in this pass)"}
+{"t": 1795710612.8009057, "ist": "22:00:12", "ev": "beat", "d": "p2w.py: scoring newspaper-2col-fullwidth-hea (10 in this pass)"}
+{"t": 1795710619.8074212, "ist": "22:00:19", "ev": "beat", "d": "p2w.py: scoring policy-2col-spanning-section (12 in this pass)"}
+{"t": 1795710645.163994, "ist": "22:00:45", "ev": "beat", "d": "p2w.py: scoring price-list-right-aligned-amo (2 in this pass)"}
+{"t": 1795710652.620179, "ist": "22:00:52", "ev": "beat", "d": "p2w.py: scoring property-tax-receipt (4 in this pass)"}
+{"t": 1795710657.5374231, "ist": "22:00:57", "ev": "beat", "d": "p2w.py: scoring question-paper-marks-right-m (6 in this pass)"}
+{"t": 1795710663.1260498, "ist": "22:01:03", "ev": "beat", "d": "p2w.py: scoring salary-slip-corporate (8 in this pass)"}
+{"t": 1795710669.277484, "ist": "22:01:09", "ev": "beat", "d": "p2w.py: scoring table-inside-two-column-page (10 in this pass)"}
+{"t": 1795710676.4415615, "ist": "22:01:16", "ev": "beat", "d": "p2w.py: scoring table-with-merged-cells (12 in this pass)"}
+{"t": 1795710701.8812568, "ist": "22:01:41", "ev": "beat", "d": "p2w.py: scoring table-with-rotated-header (2 in this pass)"}
+{"t": 1795710711.2436068, "ist": "22:01:51", "ev": "beat", "d": "p2w.py: scoring two-tables-stacked-with-no-g (4 in this pass)"}
+{"t": 1795710723.2841306, "ist": "22:02:03", "ev": "beat", "d": "p2w.py: scoring 417_rotate180_and_mirrored (6 in this pass)"}
+{"t": 1795710733.8078845, "ist": "22:02:13", "ev": "beat", "d": "p2w.py: scoring 58_header_rule_footer_rule (8 in this pass)"}
+{"t": 1795710806.9598389, "ist": "22:03:26", "ev": "beat", "d": "p2w.py: scoring academic-paper-ieee-2col-abs (2 in this pass)"}
+{"t": 1795710816.2460723, "ist": "22:03:36", "ev": "beat", "d": "p2w.py: scoring form16-part-b (4 in this pass)"}
+{"t": 1795710826.051717, "ist": "22:03:46", "ev": "beat", "d": "p2w.py: scoring one-page-rotated-180-degrees (6 in this pass)"}
+{"t": 1795710837.3263428, "ist": "22:03:57", "ev": "beat", "d": "p2w.py: scoring landscape-page-inside-portra (8 in this pass)"}
+{"t": 1795710855.807128, "ist": "22:04:15", "ev": "beat", "d": "p2w.py: scoring very-long-single-column-tabl (10 in this pass)"}
+{"t": 1795710876.8764634, "ist": "22:04:36", "ev": "beat", "d": "p2w.py: scoring 412_page_labels_roman (12 in this pass)"}
+{"t": 1795711284.7523553, "ist": "22:11:24", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795711301.3028216, "ist": "22:11:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
