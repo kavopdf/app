@@ -6957,3 +6957,16 @@
 {"t": 1795673594.1522706, "ist": "11:43:14", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795673594.4847221, "ist": "11:43:14", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795673596.324944, "ist": "11:43:16", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795673666.8542407, "ist": "11:44:26", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795673683.1480916, "ist": "11:44:43", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795673683.2735913, "ist": "11:44:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795673683.3973322, "ist": "11:44:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795673683.8874223, "ist": "11:44:43", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795673694.0898695, "ist": "11:44:54", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795673696.2037983, "ist": "11:44:56", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795673696.739343, "ist": "11:44:56", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795673698.6806443, "ist": "11:44:58", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795673707.5565982, "ist": "11:45:07", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795673709.4519835, "ist": "11:45:09", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795673709.7909732, "ist": "11:45:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795673711.681452, "ist": "11:45:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
