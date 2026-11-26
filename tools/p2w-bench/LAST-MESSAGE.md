@@ -114,6 +114,11 @@ warns about. Four findings are committed instead, each with its number and what 
 |:--|:--|--:|--:|--:|
 | `18_dA-05` | which documents fail 18_displacement alone, and one  | 11:41 | - | not recorded |
 
+One agent, not the two the brief requires: the second slot went to the Google unblock, which was the
+blocker both agents would have measured through - the one agent sent into it came back with a 403 where
+its AFTER measurement should have been. The slot is released with `--force` for that reason, and the
+next run has the measurement path it was missing.
+
 ## Timing
 
 | | |
