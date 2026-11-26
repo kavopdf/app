@@ -1,13 +1,10 @@
 {
  "agents": [],
- "attempts": 2,
- "class": "18_displacement",
+ "attempts": 1,
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "03:01",
- "started_ts": 1795728702.8221657
+ "started": "03:24",
+ "started_ts": 1795730052.638086
 }
