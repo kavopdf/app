@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/65_two_col_full_width_figure_caption.pdf",
-  "render": "/tmp/lo-one/65_two_col_full_width_figure_caption.pdf",
+  "render": "/scratch/tmp/lo-one-_f6njx9s/65_two_col_full_width_figure_caption.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "a4d8fca469bba636",
+  "engine": "025fe9deda5ac7b1",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -251,5 +251,5 @@
   },
   "document": "65_two_col_full_width_figure_caption",
   "source_file": "/scratch/work/p2w/corpus/65_two_col_full_width_figure_caption.pdf",
-  "render_file": "/tmp/lo-one/65_two_col_full_width_figure_caption.pdf"
+  "render_file": "/scratch/tmp/lo-one-_f6njx9s/65_two_col_full_width_figure_caption.pdf"
 }

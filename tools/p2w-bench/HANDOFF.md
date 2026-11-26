@@ -29,8 +29,8 @@ unfinished work, not as a result.
 | 44_hA-01 | 44_header_footer | A | is flowFromBox the second anchor site and does the foot-band guard tra | 17:43 | 17:39 | running |  |
 | --he-01 | --help |  |  | 19:43 |  | running |  |
 | t09_A-01 | t09_page_furniture | A | is the 125 single-char present a TxtWriter line-assembly defect or a t | 20:47 | 19:45 | running |  |
-| 18_dA-02 | 18_displacement | A | which clause fails on each of the 25 one-away documents, re-derived fr | 21:42 | 21:35 | running |  |
-| 18_dB-02 | 18_displacement | B | where the engine emits w:line and row heights, and a patch for the lin | 21:42 | 21:41 | running |  |
+| 18_dA-02 | 18_displacement | A | find the single construct behind the displaced runs on the 25 document | 22:14 | 16:10 | running |  |
+| commA-01 | commit_gate | A | which clause of aa496ebe moves itr-computation and can it be split fro | 23:19 | 17:33 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
@@ -47,9 +47,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `19:43` agent deployed: --help /  - 
 - `20:35` attempt 2 on t09_page_furniture -> lead
 - `20:47` agent deployed: t09_page_furniture / A - is the 125 single-char present a TxtWriter line-assembly defect or a t09 band as
-- `21:41` attempt 94 on 18_displacement -> lead
-- `21:42` agent deployed: 18_displacement / A - which clause fails on each of the 25 one-away documents, re-derived from verify_
-- `21:42` agent deployed: 18_displacement / B - where the engine emits w:line and row heights, and a patch for the line pitch wi
+- `22:12` attempt 94 on 18_displacement -> lead (0/208 moved)
+- `22:14` agent deployed: 18_displacement / A - find the single construct behind the displaced runs on the 25 documents that fai
+- `22:14` measured aa496ebe across 208 of 212: newsletter 0.20->86.30, 600 54.30->62.46, itr-computation 42.33->9.10 - regression, engine unstamped
+- `23:19` agent deployed: commit_gate / A - which clause of aa496ebe moves itr-computation and can it be split from the news
 
 ## Where the rest of the state lives
 

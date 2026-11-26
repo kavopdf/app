@@ -1,20 +1,23 @@
 {
   "source": "/scratch/work/p2w/corpus/itr-computation-with-slab-table.pdf",
-  "render": "/tmp/lo-one/itr-computation-with-slab-table.pdf",
-  "passed": 44,
+  "render": "/scratch/tmp/lo-one-pw55c2ql/itr-computation-with-slab-table.pdf",
+  "passed": 41,
   "total": 47,
   "failed": [
+    "01_page_count",
     "18_displacement",
     "32_stroke_lines",
+    "44_header_footer",
+    "55_orientation_mix",
     "63_table_rows"
   ],
-  "engine": "a4d8fca469bba636",
+  "engine": "025fe9deda5ac7b1",
   "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
-      "render": 1,
-      "ok": true
+      "render": 2,
+      "ok": false
     },
     "04_chars_missing": {
       "source": 0,
@@ -48,7 +51,7 @@
     },
     "17_matched_runs": {
       "source": 114,
-      "render": 114,
+      "render": 112,
       "ok": true
     },
     "18_displacement": {
@@ -56,18 +59,18 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -2.9,
-        "worst_dy": 14.3,
+        "med_dy": 0.8,
+        "worst_dy": 7.5,
         "med_dx": 0.6,
         "bad_pages": [
           0
         ],
-        "runs_matched": 114
+        "runs_matched": 112
       }
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 17.9,
+      "render": 18.4,
       "ok": true
     },
     "25_invisible_text": {
@@ -97,7 +100,7 @@
     },
     "32_stroke_lines": {
       "source": 3,
-      "render": 1,
+      "render": 2,
       "ok": false
     },
     "34a_span_size_match": {
@@ -160,8 +163,8 @@
     },
     "44_header_footer": {
       "source": 18,
-      "render": 18,
-      "ok": true
+      "render": 17,
+      "ok": false
     },
     "45_char_accuracy": {
       "source": 100,
@@ -227,13 +230,13 @@
       ],
       "render": [
         0,
-        1
+        2
       ],
-      "ok": true
+      "ok": false
     },
     "59_shape_anchor": {
       "source": 97,
-      "render": 96,
+      "render": 94,
       "ok": true
     },
     "60_text_column_right_edge": {
@@ -282,5 +285,5 @@
   },
   "document": "itr-computation-with-slab-table",
   "source_file": "/scratch/work/p2w/corpus/itr-computation-with-slab-table.pdf",
-  "render_file": "/tmp/lo-one/itr-computation-with-slab-table.pdf"
+  "render_file": "/scratch/tmp/lo-one-pw55c2ql/itr-computation-with-slab-table.pdf"
 }

@@ -6,8 +6,8 @@
 
 ## Progress
 
-| Check-instances passing | **8479** of 8969 (94.5%) on 207 documents |
-| Check-instances still failing | **490** |
+| Check-instances passing | **0** of 0 (0.0%) on 1 documents |
+| Check-instances still failing | **0** |
 | Kept attempts vs documents clean | **16** classes with a kept attempt, **55** documents clean - a kept attempt is progress inside a class, not a finished document |
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
@@ -34,17 +34,48 @@
 
 > The class was `18_displacement` because the run before this one left a specific, testable claim about it, and the claim turned out to be wrong in a way that changes where the whole class's remaining population lives.
 >
-> Two agents were deployed before any of my own work. The first re-derived the check's three clauses from `verify_google.py` instead of from the prose, and three premises in the handover did not survive: the count budget is **per page**, not per document (`len(ds)` is the upright runs on that page, so "24 runs forgives 2" was right by luck and "a 589-run document" was not a thing); the tail fires at `2 x clamp(0.35*size, 1.5, 4.5)` on **each run's own size**, so its threshold is 3.0-9.0 pt and 6.3 pt only at exactly 9 pt type — not a flat 6.3/7.0; and there is no median clause at all, `med_dy` is computed and never scored. Of the 25 documents that fail only `18_displacement`, **6 fail the count clause alone, 9 fail count and tail, 7 fail the tail by arithmetic alone, 3 could not be decided from the store**. The handover said 14 of them were count-limited. They are not: 16 of the 25 fire the tail, and no count-budget change can reach those. The absolute ceiling for any count relaxation is 9 documents, and reaching it needs 12 runs out on a 24-run page — that is moving the goalposts, not a fix, so I did not touch the threshold.
+> **The blocker, named exactly.** `regress.py --check` refused with *"ENGINE CHANGED (docx): table
+> measured on a4de7df896875a39, the tree is 7e0de1abdeb221ae"*, and `measure_gate.py` agreed: NOT READY.
+> I computed `regress.engine_fingerprint()` per commit with the tool's own exclusion list, and the two
+> hashes are two adjacent commits: a4de7df is `9f0a8207`, the state both tables were stamped on, and
+> 7e0de1a is `aa496ebe` - the page-top `w:pgMar` patch, the only engine change since. Every commit since,
+> including three report commits, had to be forced past the hook. Re-measuring 212 documents through
+> Google is not a slot's work, so the pipeline had been stuck for a day and each run wrote a report about
+> being stuck.
 >
-> The second agent went after the mechanism and found a construct nobody had measured: `flowParagraph` — the annotation / OCR / form-value path, `DocxWriter.java:4813-4833` — emits `<w:pStyle>` and `<w:snapToGrid>` and **no `<w:spacing>`**, so it inherits `docDefaults` `w:after=120` plus the heading style's own before/after. On `600_reviewed_invoice_with_annotations` three such paragraphs should cost 101.6 pt; the store says Google `med_dy` is **+104.2**. On `601_fillable_admission_form` one should cost 27.7 pt; the store says **+27.3**. Predicted against measured, two documents, no free parameters. That is the best evidence any attempt this month started from, so it got the slot.
+> **The record that kept it stuck was wrong in its sign.** ATTEMPTS.json and both reports carry
+> "itr-computation 42.33->9.10 - a 33pt regression, so the engine stays unstamped". `share5` is the share
+> of a page's ink more than 5 px from where the original PDF drew it - **lower is better** - so 42.33 to
+> 9.10 is a 33.23-point IMPROVEMENT, the third-largest move in the corpus. The previous run's stated next
+> step was to bisect aa496ebe *on itr-computation-with-slab-table*, i.e. to hunt down the best thing that
+> commit did. Its real damage is `newsletter-3col-header-footer` 0.20 -> 86.30 and
+> `600_reviewed_invoice_with_annotations` 54.30 -> 62.46.
 >
-> I built it: explicit `<w:spacing>` with `before=0` and the same hairline exact box every other flow line already gets. `git apply` clean, engine compiled, both documents converted on the patched and the unpatched engine, both uploaded to Google as Docs, exported as PDF, scored with the 44 and 42 checks. The `.docx` changed exactly where the model said — 3 of 67 paragraphs on `600`, 1 of 20 on `601`, zero without spacing after.
+> **What I did.** Restored `DocxWriter.java` to `9f0a8207` - the exact source both tables were measured
+> and stamped on - and kept the change as a re-landable 229-line patch at
+> `PATCHES/aa496ebe-pagetop-not-identity.patch`. Nothing was deleted and no history was rewritten. The
+> repository is self-consistent again: docx tree a4de7df == docx stamp a4de7df, txt tree a4d8fca == txt
+> stamp a4d8fca.
 >
-> The mechanism is confirmed and the fix is wrong. `600`'s Google `med_dy` went **104.2 → 11.7** (predicted 5.6) and `worst_dy` **125.9 → 33.4**; `601`'s went **27.3 → 2.7** (predicted 0.8). 98.5 pt came out of one document and 24.6 out of the other, exactly as modelled. And both documents got **worse**: `600` 37/44 → **34/44** with `26_text_overlap`, `27_text_off_page` and `59_shape_anchor` newly failing, `601` 37/42 → **36/42** with `27_text_off_page`, its `worst_dy` rising 230.4 → 252.5. The reason is the next construct: `PdfToWord` gives an annotation paragraph `p.top = 0`, so it is appended at the top of the body and its own 100 pt height is the only thing holding it away from the page origin. Making it 3 pt tall drops the annotation text onto the body. A construct that is 98 pt too tall is not fixed by making it short — the ordering is the defect and the spacing is the symptom. The patch is reverted, the two store rows are restored to their `13:24` values, and the measurement is written up as `FINDINGS/FLOWPARAGRAPH-SPACING-REMOVES-98PT-AND-BREAKS-THE-PAGE-26NOV-fixer.md` with the exact commands and the two tests that would refute it.
+> **Measured, before and after.** Before: `regress.py --check` REFUSED, `measure_gate.py` NOT READY.
+> After: `regress.py --check` PASS - "nothing got worse in the .docx only, and the table matches this
+> engine" - and `measure_gate.py` READY, 212/212 scored, 1 exempt, 0 blocking, 0 expected short.
 >
-> Nothing was committed to the engine, and not only because the patch is wrong. `measure_gate.py` reads **NOT READY**: `RANKING.csv` was measured on docx engine `a4de7df896875a39` and the tree is `7e0de1abdeb221ae`, so `regress.py --check` refuses on the engine fingerprint alone and a full 212-document `share@5px` pass is the only thing that can clear it. `regress.py --check` also still times out at 250 s building the corpus, because 126 of 213 documents are unconverted on this pod — `pod-prep.sh` had already fetched the corpus, the JDK and the libs and compiled the engine, so this is the conversion backlog, not a broken prerequisite. `install-gate.sh` timed out inside `pod-prep.sh` on this pod and I installed the hook by hand instead; it is installed now, and it will refuse the next engine commit for exactly the reason above, which is the gate doing its job.
+> **What it cost, stated rather than buried.** The 205 documents' Google check results were collected
+> while the tree was `aa496ebe`, so on the restored engine they no longer read as current - report.py now
+> says the check-instance row "could not be read" and refuses to state a zero. That is the honest price:
+> the visual-match table (share5, 212 scored) is now authoritative and the 42-check store needs
+> re-measuring on this engine, 205 documents of it. I judged an open gate plus a truthful stale store
+> better than a closed gate and a store that flatters. The next run should spend its Google budget on
+> `gverify --plan` rather than on a class.
 >
-> The census is the other thing worth carrying. The store keeps no `n_out`, no per-page run count and no per-run `dy`, so a clause census had to be rebuilt from a one-off probe whose rows were already stale for 8 of 25 documents after a single engine change. Storing `n_out`, `budget` and `worst_ratio` beside `med_dy`/`worst_dy` in the `displacement` block moves no verdict and makes every future census re-derivable in one query instead of one agent. I did not write it, because `verify_google.py` is the instrument and an instrument change needs its own before/after — but it is the cheapest durable thing on the list.
+> **One agent, on the real problem.** It bisected `aa496ebe` from the source: it found the itr win and
+> the newsletter break come from the same clause, so the clause cannot be split by inspection, and
+> proposed the testable version - gate it on page count, `pageTopTw = 0` when pages == 1 - with the six
+> documents that would decide it (newsletter, 600, 601, 401 must not move; itr-computation and
+> bank-statement-5-pages must keep their gain). Its report is `AA496EBE-BISECT.md`. The second slot I did
+> not spend: the gate had to be opened inside this window and a second agent on a cold pod would have
+> spent the window on `pod-prep.sh`, which already blew the 300 s ceiling once here.
 >
 > ## For the next run
 >
@@ -144,3 +175,5 @@ READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-A
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run

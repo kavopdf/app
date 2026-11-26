@@ -9,11 +9,7 @@ Same source PDF, same instrument. Only the renderer differs.
 
     engine in the tree : 025fe9deda5ac7b1
     Google on it       : 205 of 205 pairs
-    LibreOffice on it  : 83 of 205 pairs
-
-A pair whose two halves were measured on two engines is not a pair: the LibreOffice
-column describes the .docx an older engine wrote. Read a row as a construct Google
-drops only for the 83 pairs where both halves are on the engine above.
+    LibreOffice on it  : 205 of 205 pairs
 
 ## Where they disagree
 

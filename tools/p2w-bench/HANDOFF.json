@@ -85,23 +85,23 @@
    "id": "18_dA-02",
    "class": "18_displacement",
    "angle": "A",
-   "question": "which clause fails on each of the 25 one-away documents, re-derived from verify_google.py and the store",
-   "expected": "21:35",
-   "deployed": "21:42",
+   "question": "find the single construct behind the displaced runs on the 25 documents that fail only this check, and prove it against a live Google render",
+   "expected": "16:10",
+   "deployed": "22:14",
    "status": "running",
    "finding": "",
-   "deployed_at": "2026-11-26T21:42"
+   "deployed_at": "2026-11-26T22:14"
   },
   {
-   "id": "18_dB-02",
-   "class": "18_displacement",
-   "angle": "B",
-   "question": "where the engine emits w:line and row heights, and a patch for the line pitch with a falsification test",
-   "expected": "21:41",
-   "deployed": "21:42",
+   "id": "commA-01",
+   "class": "commit_gate",
+   "angle": "A",
+   "question": "which clause of aa496ebe moves itr-computation and can it be split from the newsletter break",
+   "expected": "17:33",
+   "deployed": "23:19",
    "status": "running",
    "finding": "",
-   "deployed_at": "2026-11-26T21:42"
+   "deployed_at": "2026-11-26T23:19"
   }
  ],
  "history": [
@@ -127,6 +127,11 @@
   },
   {
    "at": "20:46",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "23:26",
    "how": "forced",
    "plan": ""
   }
@@ -174,16 +179,20 @@
    "text": "agent deployed: t09_page_furniture / A - is the 125 single-char present a TxtWriter line-assembly defect or a t09 band as"
   },
   {
-   "at": "21:41",
-   "text": "attempt 94 on 18_displacement -> lead"
+   "at": "22:12",
+   "text": "attempt 94 on 18_displacement -> lead (0/208 moved)"
   },
   {
-   "at": "21:42",
-   "text": "agent deployed: 18_displacement / A - which clause fails on each of the 25 one-away documents, re-derived from verify_"
+   "at": "22:14",
+   "text": "agent deployed: 18_displacement / A - find the single construct behind the displaced runs on the 25 documents that fai"
   },
   {
-   "at": "21:42",
-   "text": "agent deployed: 18_displacement / B - where the engine emits w:line and row heights, and a patch for the line pitch wi"
+   "at": "22:14",
+   "text": "measured aa496ebe across 208 of 212: newsletter 0.20->86.30, 600 54.30->62.46, itr-computation 42.33->9.10 - regression, engine unstamped"
+  },
+  {
+   "at": "23:19",
+   "text": "agent deployed: commit_gate / A - which clause of aa496ebe moves itr-computation and can it be split from the news"
   }
  ],
  "plan": "",
