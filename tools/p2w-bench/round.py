@@ -1200,14 +1200,45 @@ def main(argv):
                 _run = {}
             if float(_run.get("started_ts") or 0) < float(_claimed) and \
                     float(_run.get("window_for_claim") or 0) != float(_claimed):
+                # NEVER ZERO THE COUNTER - READ IT BACK FROM THE HISTORY. Measured 26 Nov: attempt.py
+                # bumped attempts 0 -> 1 at 06:04 so that report.py's self-check would stop printing
+                # "counter 0 vs history 1"; a git pull --rebase then brought in state from another cron,
+                # and this reset rewrote attempts back to 0 one step later. The self-check printed the
+                # disagreement again, and the counter was then set back to 1 by hand - which is a ledger
+                # reconciled by editing, the thing this file says is not a ledger.
+                #
+                # The reset condition is a test on the clock, not on the work. A window that moved for a
+                # legitimate reason - a re-claim after the pull - is indistinguishable from a window that
+                # never belonged to this run, so zeroing throws away a count that is still true. The
+                # records in ATTEMPTS.json survive the rebase, so the count is derived from them inside
+                # the new window instead. That cannot invent a count: it is the same number whenever the
+                # window is right, and the smaller number when it is not.
+                _att = 0
+                try:
+                    with open(os.path.join(HERE, "ATTEMPTS.json"), encoding="utf-8") as _af:
+                        _ah = json.load(_af)
+                    for _row in _ah.values():
+                        if not isinstance(_row, dict):
+                            continue
+                        for _x in (_row.get("history") or []):
+                            try:
+                                _ts = time.mktime(time.strptime(str(_x.get("at") or ""),
+                                                                "%Y-%m-%d %H:%M")) - 19800
+                            except Exception:
+                                continue
+                            if _ts >= float(_claimed) - 60:
+                                _att += 1
+                except Exception:
+                    _att = 0
                 _fresh = {"started_ts": _claimed,
                           "started": time.strftime("%H:%M", time.gmtime(float(_claimed) + 5 * 3600 + 30 * 60)),
                           "window_for_claim": float(_claimed),
-                          "ended_ts": None, "ended": None, "attempts": 0, "kept": 0,
+                          "ended_ts": None, "ended": None, "attempts": _att, "kept": 0,
                           "agents": [], "docs_improved": 0}
                 with open(_rp, "w", encoding="utf-8") as _f:
                     json.dump(_fresh, _f, indent=1)
-                print("run window reset - RUN.json described the run before this claim")
+                print("run window reset - RUN.json described the run before this claim "
+                      "(attempts kept at %d from ATTEMPTS.json)" % _att)
         except Exception as _e:
             print("could not repair the run window: %s" % _e)
         if doing:
