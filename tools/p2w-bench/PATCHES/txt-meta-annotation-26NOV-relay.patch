@@ -1,0 +1,52 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index ad56dac1..dda328d5 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -126,6 +126,14 @@ public final class PdfToWord {
+          * margin over "Name of candidate". See {@code DocxWriter.pinnedBoxes}.
+          */
+         public boolean pinned;
++        /**
++         * True when this paragraph is an ANNOTATION'S own words - a note, a comment, a stamp's
++         * caption - and not the page's printed text. A reader shows these in a panel; the page
++         * itself prints nothing of them, so the .txt must not carry them as body text. The
++         * .docx does carry them (50_annotation_text asks for the string), which is why this is
++         * a flag on the paragraph and not a decision to stop reading annotations.
++         */
++        public boolean meta;
+         public int column;           // which column band it sits in
+         /** The lines the PDF actually drew, in order. A .txt has no paragraph concept, so the
+          *  plain-text output keeps them instead of hard-wrapping a paragraph back into lines
+@@ -959,6 +967,7 @@ public final class PdfToWord {
+                 }
+                 Para p = new Para();
+                 p.runs.add(ar);
++                p.meta = true;
+                 p.top = 0;
+                 page.blocks.add(p);
+                 report.paragraphs++;
+diff --git a/app/src/main/java/com/kavopdf/app/engine/TxtWriter.java b/app/src/main/java/com/kavopdf/app/engine/TxtWriter.java
+index 95205dbc..599d3fb8 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/TxtWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/TxtWriter.java
+@@ -88,6 +88,20 @@ public final class TxtWriter {
+                 }
+                 pageNo++;
+                 if (page == null || page.blocks == null) continue;
++                // AN ANNOTATION'S WORDS ARE NOT THE PAGE'S TEXT. A note, a comment or a stamp's
++                // caption lives in the annotation panel; the page prints none of it, so a .txt
++                // that carries it invents characters the source never drew - t12_word_invention
++                // on 600_reviewed_invoice_with_annotations counted 91 of them ("Rate for HSN
++                // 8536 confirmed with PO.", "Approved"). The .docx keeps them, because
++                // 50_annotation_text asks for that string; this is the .txt and it must not.
++                //
++                // Dropping them HERE is what makes the change .txt-only: every caller writes
++                // the .docx first and calls writeTxt last (ReadingOrder.java:24-30, and
++                // ConvertAll in tools/engine-verify), so by the time this line runs the .docx
++                // bytes are already on disk. The three probe documents were re-converted after
++                // the change and their .docx are byte-identical.
++                page.blocks.removeIf(b -> b instanceof PdfToWord.Para
++                        && ((PdfToWord.Para) b).meta);
+                 float pitch = pagePitch(page, docPitch);
+                 int[] snap = paraEndSnap(page, charW, endSnap);
+                 float lastY = -1f;

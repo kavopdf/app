@@ -898,3 +898,17 @@ next_fire_at, never leaving one paused.
 open lead from 2026-11-25 20:19 - the annotation `/Contents` hoist patch, `PATCHES/600-annotation-runs-subtype-25NOV.patch`,
 reproduced on one engine at 600 txt 7/8, with the .docx half still to do. The work is not out of ideas;
 the slot was silent, not stuck.
+
+---
+
+## 2026-11-26 05:28 IST — relay fixer: the .docx table cannot be re-scored inside a slot, so no engine change can land whatever it does
+
+| time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
+|---|---|---|---|---|---|
+| 05:20 | landing a measured .txt fix (600_reviewed_invoice_with_annotations FAIL `t12` 83 -> PASS, `word/document.xml` byte-identical on all three probe documents) | `regress.py --check` refuses on an unmeasured engine: any engine change moves the fingerprint of every engine file, so `scope.py` says `docx, txt` and BOTH tables must be re-measured. The .txt table is cheap (213 `verify_txt.py` runs, ~4 min). The .docx table is `benchmarks/p2w.py` over 212 documents | built the corpus for the changed engine (4 slices, 213 of 213, stamp written), then ran `p2w.py --budget 265` twice: **24 measured of 212**, then **18 measured of 212** and `remaining` went **188 -> 194** - progress does not carry between calls, and `RANKING.partial.csv` is rewritten from scratch each time. At ~7 s/document a full re-score is 25-45 min of calls, and the whole slot is 90 | **no** - measured, not assumed: the first pass measured 24 in 170 s, the second 18 in 265 s, and `remaining` rose | either a `p2w.py` that resumes (`--partial` currently restarts; the docx counter reads `19/213` after a pass that measured 24) or a re-score budget of ~45 min handed to a slot that does nothing else. Until then **every** engine change is unlandable, including one that cannot move a .docx byte - the fingerprint is per-file, not per-effect |
+| 05:25 | the same change, reverted | after reverting, the corpus on disk was stamped for the changed engine, so the gate rebuilt 213 documents (4 slices, 11 min of the slot) before it would pass again | `corpus-slice.py -j 6` four times, then `regress.py --check` -> PASS | yes, at the cost of 11 min | a corpus stamp keyed on the *output* hash of the documents a change can move, not on the engine fingerprint - a .txt-only change would then cost one slice, not four |
+
+**Evidence the change is right and safe.** `PATCHES/txt-meta-annotation-26NOV-relay.patch`,
+`FINDINGS/TXT-600-ANNOTATION-META-MEASURED-CLEAN-UNLANDABLE-26NOV-relay.md`. The .docx is inert by
+construction (writeTxt runs after DocxWriter in every caller) and byte-identical by measurement
+(`word/document.xml` sha256 on 600, 041122, 601).

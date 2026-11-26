@@ -1,5 +1,3 @@
-| 22 Nov 15:17 | fixer | slot claimed - fixer running |
-| 22 Nov 15:28 | fixer | attempt 18_displacement -> lead (0/? moved) |
 | 22 Nov 15:40 | fixer | attempt 18_displacement -> lead (0/16 moved) |
 | 22 Nov 15:55 | fixer | slot claimed - fixer running |
 | 22 Nov 16:36 | fixer | attempt 18_displacement -> lead (0/16 moved) |
@@ -198,3 +196,5 @@
 | 26 Nov 02:15 | fixer | attempt 18_displacement -> lead (9/? moved) |
 | 26 Nov 02:15 | baseline | slot claimed - baseline running |
 | 26 Nov 03:31 | fixer | attempt 18_displacement -> lead (0/25 moved) |
+| 26 Nov 04:27 | fixer | slot claimed - fixer running |
+| 26 Nov 05:33 | fixer | attempt t12_word_invention -> lead (0/213 moved) |
