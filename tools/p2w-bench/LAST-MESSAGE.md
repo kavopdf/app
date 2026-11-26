@@ -1,6 +1,3 @@
-# Fixer report - 2026-11-26 12:16
-
-```
 # P2W Fixer - Run Report
 
 **26 Nov 2026 · slot 12:16 → 15:13 IST · 2h 56m**
@@ -83,7 +80,7 @@
 
 | | |
 |:--|:--|
-| Measured | **3.9 h ago** |
+| Measured | **4.0 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -131,51 +128,7 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.
-
-## Next run
-
-**Read `FINDINGS/18-displacement-TABLE-ROW-ATTRIBUTION-REFUTED-26NOV-relay.md` before touching
-`18_displacement`.** Three things this run measured forbid the obvious moves:
-
-- `attribution=table-row` is not a cause in Google. Median displacement does not scale with
-  `docx_table_rows`; the slope is negative and r² is 0.00. Do not write a row-height, `trHeight` or
-  cell-margin patch on the strength of that label.
-- There is no corpus-wide page constant. The solo documents span 18.4 pt in both directions. Do not
-  pair page origins looking for one number.
-- The class is three families by the *size* of the worst run: 17 documents a fifth to four fifths of a
-  page out (none of them fails `00_page_count`, so the page count is right and a later page's content
-  is not), 38 between 9 and 100 pt, and 58 at or under 9 pt. A line-box change can only reach the 58,
-  and those are the ones whose median line is already correct.
-
-**The first attempt of the next run should be on `bank-statement-5-pages`.** The second angle of this
-run read the emitted XML of the eight largest-`worst_dy` documents and found the mechanism: the writer
-places every source page as a hand-built block — furniture, one table fragment, spacers — at **97 % of
-the usable height with about 25 pt of slack**, terminated by an explicit `<w:br w:type="page"/>`
-(`DocxWriter.java:690`), with `w:pgMar` zero on all four sides. Every row is `w:hRule="atLeast"` with
-`<w:cantSplit/>`, so the renderer may grow a row but may not cut one. Once row growth eats the 25 pt,
-the renderer breaks *before* the writer's break and the whole following block — a 522–659 pt `w:before`
-spacer, the next table fragment — lands one block late. That is hundreds of points, and it is why the
-page count stays right while the content does not. The cheapest falsifier is to emit `hRule="exact"` on
-the cell rows of that one document: if `worst_dy` does not fall below 100 pt, the break is not being
-pushed by row growth and the candidate is refuted for the family at the cost of one document. See
-`FINDINGS/18-displacement-PAGE-BREAK-IS-UNEARNED-26NOV-relay.md`.
-
-**Pod cost, priced:** a cold pod needs `pod-prep.sh` four to five times before the commit gate can run
-at all (213 PDFs, a JDK, four jars, then the engine compile, then the corpus conversion in 240 s
-slices). `install-gate.sh` will be killed at 300 s on a cold pod every time. Run `pod-prep.sh` first,
-repeatedly, and only then the gate.
-
-**Instrument note, not a defect:** the writer is deterministic in content but not in bytes - every
-difference between two conversions of one PDF is the ZIP entry mtime (`ZipEntry` defaults to
-`System.currentTimeMillis()`; nothing calls `setTime`). Comparing two `.docx` by hash will always say
-"changed". Compare the XML parts, or normalise the ZIP time fields first.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-```
-
-Written by report.py from committed files only. Every number above is read from
-ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
-and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
