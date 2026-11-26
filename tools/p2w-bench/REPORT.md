@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 12:16 → running IST · 2h 44m**
+**26 Nov 2026 · slot 12:16 → running IST · 2h 54m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -77,11 +77,54 @@
 > That is why no engine change was committed: the next patch has to be chosen against that split, and
 > choosing it blind is what the last five attempts did.
 
+### The run before this one said
+
+> Nothing moved because this run spent its first 40 minutes making the pod able to measure at all, and
+> then spent the rest proving that the class it was about to work cannot be worked the way every earlier
+> run has worked it.
+>
+> The pod cost is real and worth stating: `install-gate.sh` was killed at 300 s because `pod-prep.sh`
+> fetches 213 corpus PDFs, a JDK and four jars and then compiles the engine, and none of that is cached
+> on a cold pod. Re-running it four times finished the corpus; the gate then passed first time
+> (`regress.py --check` silent, `measure_gate.py` READY, engine a4de7df896875a39). So the gate was never
+> the obstacle this run - the cold pod was, and that is a known, priced 25-30 minutes.
+>
+> The class was `18_displacement`: 113 of 207 documents fail it, and `classpick.py --leverage` values it
+> at 51.9 CLEAN documents, five times the next check. The obvious theory was sitting in the repo as a
+> column: `benchmarks/DISP-TABLE.csv` labels 75 documents `attribution=table-row`, i.e. rows growing
+> slightly and the drift accumulating down the page. It has never been tested against a Google render -
+> its `google_per_row_growth_pt` column is empty for all 213 rows.
+>
+> It is false. On the 207 committed Google results, median displacement has a *negative* slope against
+> table row count (-0.108, r² = 0.00) and worst displacement has a slope of 0.518 pt/row at r² = 0.01.
+> Nine rows or nineteen, the page is displaced by the same amount. The row counts themselves were
+> re-derived from the `.docx` files to make sure the join was not the fault: 76 of 76 agree.
+>
+> Two more standing assumptions fell with it. There is no corpus-wide page constant - the 23 documents
+> that fail this check and nothing else span 18.4 pt in both directions (sd 4.37), so the page-origin
+> pairing the 10:54 slot recommended would have been 23 different answers, not one. And the class is not
+> one defect: 82 of the 113 are systematically displaced (|med_dy| >= 1.5 pt), 31 are not displaced at
+> all (worst_dy median 5.0 pt, med_dy under 1.5) and fail only the check's third clause, a single run
+> twice its tolerance out.
+>
+> What is left is a real lead, and it is a different shape from everything tried so far. The tail grows
+> with document length (worst_dy = 13.55 + 0.287 x runs_matched, r² = 0.31) while the median line does
+> not move at all (r² = 0.05). Sorted by the size of the worst run, 17 documents are a fifth to four
+> fifths of a *page* out, and not one of them fails `00_page_count` - the page count is right and the
+> content on a later page is in the wrong place. No line-box construct reaches those. The 58 line-scale
+> documents are the only ones a line construct is testable on, and they are exactly the ones whose
+> median is already correct.
+>
+> That is why no engine change was committed: the next patch has to be chosen against that split, and
+> choosing it blind is what the last five attempts did.
+
+Accounts share 100% of their significant words - **the same blocker, named twice** (the cut is 50%).
+
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **3.7 h ago** |
+| Measured | **3.9 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -96,11 +139,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 12:16 → running · 2h 44m |
+| Slot window | 12:16 → running · 2h 54m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
 | Tool beats | 53 |
 | Longest silence | **27.9 min** — from 14:14:50, after `lastmessage.py: running a tool for its numbers` |
-| Silences over 2 min | 18 |
+| Silences over 2 min | 19 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -110,9 +153,9 @@
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **2 min** | `#` |
 | fix - diagnose and change the engine | **24 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **1h 20m** | `###########` |
+| measure or build - a conversion, screen or compile writes no beacon | **1h 20m** | `##########` |
 | record - attempt, handoff, class rows | **4 min** | `#` |
-| report - the report and the chain | **11 min** | `##` |
+| report - the report and the chain | **21 min** | `###` |
 | other - not attributed to a tool | **35 min** | `#####` |
 ## Best results this round
 
