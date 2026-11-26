@@ -256,6 +256,38 @@ def self_check():
     except Exception as _e:
         out.append(("self-check", "the txt age check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
 
+    # 4b. THE RUN WINDOW AGAINST ITS OWN CLAIM. RUN.json is a whole file that a rebase can conflict on and
+    # a merge can take from the remote side, which wipes the claim; round.py --claim-fixer then writes a
+    # fresh started_ts and the header reads "1 min" for a run that worked for an hour and a half. Measured
+    # 26 Nov: the 08:27 header said "1 min" over an 89-minute run with 21 beats, and only the prose below
+    # the table said so. TIMELINE.jsonl is append-only and survives the merge, and it records the claim
+    # itself, so the claim event - not a beat - is the second source. A beat is not used here because beats
+    # from the run before this one also sit before the claim, and flagging those would be a false alarm.
+    try:
+        _rs = float(json.load(open(os.path.join(HERE, "RUN.json"), encoding="utf-8")).get("started_ts") or 0)
+        _lc = _lr = None
+        for _line in open(os.path.join(HERE, "TIMELINE.jsonl"), encoding="utf-8"):
+            _line = _line.strip()
+            if not _line:
+                continue
+            try:
+                _row = json.loads(_line)
+                _ev = _row.get("ev")
+                _tv = float(_row.get("t") or 0)
+            except Exception:
+                continue
+            if _ev == "claim":
+                _lc = _tv
+            elif _ev in ("release", "killed"):
+                _lr = _tv
+        if _rs and _lc and (_lr is None or _lc > _lr) and (_rs - _lc) > 600:
+            out.append(("run window",
+                        "RUN.json says this run began at %s" % time.strftime("%H:%M", time.gmtime(_rs + 19800)),
+                        "TIMELINE.jsonl records the claim at %s, so the window was reset and the duration is short"
+                        % time.strftime("%H:%M", time.gmtime(_lc + 19800))))
+    except Exception as _e:
+        out.append(("self-check", "the run window check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
+
     # 5. clean counts: gverify's own count against the number the ranking table carries.
     try:
         _gc = g.get("google_fixed_current")
