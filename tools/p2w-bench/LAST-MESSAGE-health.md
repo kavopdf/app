@@ -1,35 +1,37 @@
 # P2W Watchdog - Run Report
 
-**26 Nov 2026 · 18:12 IST**
+**27 Nov 2026 · 00:07 IST**
 
 > Nothing is stopped.
 
-This pass read the evidence rather than the reports: a Google measurement is in flight right now (the newest result files were written this minute), so measure-google is moving and classify is correctly waiting behind it. The fixer slot was free when this pass looked and a fixer claimed it while this pass was still running, so the fix stage is live rather than held by a dead run; the round phase is fix, so the reopen guard does not apply. The .docx column is still flat while the .txt column moved, the same shape as earlier today; that is recorded in BLOCKERS.md, not treated as a fault to guess past. One thing is missing, not decided: this pass has no cron tool in its tool list, so a paused or zombie cron cannot be moved by automation, and the exact calls it would have made are written into BLOCKERS.md.
-
 ## Stages
-
-> **Today's row is stale** - google: committed row says 208, the data says 207. The trend below is the committed row; the data has moved.
 
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | moving | 88 of 213 | 1.4 h |
-| matrix | done | 213 of 213 | 4.0 h |
-| classify | waiting |  | 11.7 h |
-| fix | moving | 3 attempt(s) in 3 h | 0.6 h |
-| txt | moving | 205 clean, 8 failing | 3.3 h |
+| measure-google | moving | 68 of 213 | 0.4 h |
+| matrix | done | 213 of 213 | 1.5 h |
+| classify | waiting |  | 17.6 h |
+| fix | moving | 1 attempt(s) in 3 h | 1.9 h |
+| txt | moving | 205 clean, 8 failing | 9.2 h |
 
 ## Trend
 
 | | 2026-11-25 | 2026-11-26 | |
 |:--|--:|--:|:--|
-| .docx open | 59 | **59** | no change |
+| .docx open | 59 | **60** | +1 |
 | .txt failing | 9 | **8** | -1 |
-| Google measured | 213 | **208** | -5 |
-| Google clean | 42 | **42** | no change |
+| Google measured | 213 | **205** | -8 |
+| Google clean | 42 | **47** | +5 |
 
 ## What this pass did
 
 * Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
 * Nothing needed moving.
 
+
+This pass has no cron tool in its tool list, so the platform half of the watchdog could not run: a paused
+or zombie cron cannot be moved by automation from here. The calls it would have made are written out in
+BLOCKERS.md with the ids from HEALTH-BRIEF's table. Nothing was stopped, so nothing needed moving; the
+one thing that did need doing was today's trend row, which the live tables had moved past, and
+progress.py --amend rewrote it from those tables and named what it used to say.

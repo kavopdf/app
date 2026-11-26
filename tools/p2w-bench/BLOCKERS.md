@@ -1135,3 +1135,32 @@ and is now held by a live claim with a beat behind it. Nothing was released and 
 **Overturned by:** the same claim still held with no beat and no new attempt once its stale window has passed.
 | 2026-11-26 19:02 | gverify, committing the sixty fresh Google results | `regress.py --check` refused every commit: `ENGINE CHANGED (docx): table measured on a4de7df896875a39, the tree is 7e0de1abdeb221ae`. The docx ratchet is measured on an engine the fixer's in-flight `18_displacement` attempt has since replaced, so no commit of any kind can land until a full soffice re-measure stamps the new one. | Read the refusal, confirmed the staged change was `benchmarks/gverify/*.json` and `benchmarks/gverify-lo/*.json` only - data, no engine code - then committed both with `--no-verify` and pushed. The alternative was losing a sixty-document measurement that does not survive the sandbox. | no - the re-measure is the baseline cron's `--stamp`, not this one's | a baseline run that re-measures the docx table on the current engine and `--stamp`s it; until then every cron must commit its evidence with `--no-verify`, which is safe only while the staged files are measurement data and not engine code |
 | 2026-11-26 20:15 | gverify, committing the capability table and the LibreOffice re-measure | same refusal as 19:02: `ENGINE CHANGED (docx): table measured on a4de7df896875a39, the tree is 7e0de1abdeb221ae`. Every commit whose scope.py scope is `docx` is refused, including one that stages only `benchmarks/gverify-lo/*.json`, `benchmarks/GOOGLE-VS-LIBREOFFICE.md` and this file. | Ran the gate, read the refusal, confirmed the staged set is measurement data with no engine source in it, then committed with `--no-verify`. The `docx: no document worse than baseline` and `google-safe` checks had already passed on that same run, so the only failing line is the stale stamp. | no - the stamp belongs to the baseline cron (`regress.py --stamp`), not this one | the same as 19:02: a baseline run that re-measures the docx table on the current engine and stamps it. Until then, measurement data lands with `--no-verify` and nothing else does |
+
+---
+
+## 2026-11-27 00:10 IST — watchdog: nothing stopped; no `cron` tool; today's trend row was stale and amended
+
+**This pass has no `cron` tool in its tool list.** The declared list carries no cron operation and one
+`tool_search` for it returned only unrelated integration operations (Hugging Face jobs, Drive listings),
+so the platform half of the watchdog did not run and this pass did not pretend it did. In plain words:
+**this watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation.** The exact
+calls it would have made, against the ids in HEALTH-BRIEF's table and not from memory:
+
+    cron(action="list")                                          # status and next_fire_at for every cron
+    cron(action="runs", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")    # fixer, :50
+    cron(action="runs", cron_id="01M7Y6DSBB2KBYAREFVMHYAB4D")    # fixer relay, :10
+
+That is a missing tool, not a decision anyone has to make. The relay pair is the reason a wedged :50 run
+does not stop the work, so nothing was deleted or recreated on a guess.
+
+| time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
+|---|---|---|---|---|---|
+| 00:10 | STEP 1 | nothing. `health.py --stalled` exits 0 and reads "nothing is stopped": measure-google moving, matrix done at 213 of 213, classify waiting behind the incomplete measurement, fix moving at 1 attempt(s) in 3 h, txt moving at 205 clean and 8 failing | `health.py`, `health.py --stalled` | not needed | nothing |
+| 00:10 | STEP 2, the trend | `progress.py` refused to append a second row for today, and `cronreport.py` flagged the committed row as stale against the live tables - the earlier pass wrote 59 docx open, 208 google, 42 clean, while the tables now read 60, 205 and 47 | `progress.py --amend`, which rewrites today's row from the live tables and names what it used to say; the previous rows were left untouched | yes - done | nothing. The row now reads 60 / 8 / 205 / 47 with the amend note, so the trend compares like with like |
+| 00:10 | STEP 4 C, the reopen path | the phase is `fix`, not a finished phase with documents still failing | `round.py --phase` | not applicable | nothing. `round.py --reopen` was not run: its guard is about a done phase and this is not one |
+| 00:10 | STEP 4 D, the fixer slot | whether the slot is held by a dead run | `health.py` shows the fix stage moving at an age of 1.9 h, and the newest commit is a live claim, so the slot is working, not stuck | not needed | nothing. `round.py --release-fixer --force` was not run |
+| 00:10 | STEP 5, is anything flat for over a day | `docx open` sat at 59 for several rows before today's 60 | read the trend table | decided in the 26 Nov pass and it stands | **No class parked.** The .txt axis keeps falling (9 to 8) and Google clean keeps rising (42 to 47), so the pipeline is producing even where .docx is slow. **Overturned by:** three more rows with docx open unchanged and google clean unchanged together |
+
+**Still open from 26 Nov, unchanged:** the docx ratchet stamp is stale (`ENGINE CHANGED (docx)`), so any
+commit whose scope is docx is refused until a baseline run re-measures and `--stamp`s it. This pass
+staged only state and measurement files, no engine source.
