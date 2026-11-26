@@ -6785,3 +6785,28 @@
 {"t": 1795661733.8481903, "ist": "08:25:33", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795661735.8206642, "ist": "08:25:35", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795662319.856034, "ist": "08:35:19", "ev": "beat", "d": "heartbeat before any claim: gverify: converting corpus slices, then measuring 60 through Google"}
+{"t": 1795661866.122256, "ist": "08:27:46", "ev": "beat", "d": "heartbeat before any claim: writing the report"}
+{"t": 1795661870.5092854, "ist": "08:27:50", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795661870.6267333, "ist": "08:27:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795661871.2268913, "ist": "08:27:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795661871.3524644, "ist": "08:27:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795661871.955617, "ist": "08:27:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795661872.0545268, "ist": "08:27:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795661872.6946986, "ist": "08:27:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795661872.7920513, "ist": "08:27:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795661950.5412326, "ist": "08:29:10", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795661952.207142, "ist": "08:29:12", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795661952.5459135, "ist": "08:29:12", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795661954.2705648, "ist": "08:29:14", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795661959.0605674, "ist": "08:29:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795661959.1972282, "ist": "08:29:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795661959.803954, "ist": "08:29:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795661959.9117541, "ist": "08:29:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795661972.321639, "ist": "08:29:32", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795661974.0680258, "ist": "08:29:34", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795661974.4292064, "ist": "08:29:34", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795661976.1310723, "ist": "08:29:36", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795661979.7371264, "ist": "08:29:39", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795661981.3595476, "ist": "08:29:41", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795661981.757593, "ist": "08:29:41", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795661983.5692515, "ist": "08:29:43", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
