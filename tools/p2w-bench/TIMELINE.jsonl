@@ -7392,3 +7392,6 @@
 {"t": 1795688938.1707623, "ist": "15:58:58", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795688938.5719416, "ist": "15:58:58", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795688939.1813931, "ist": "15:58:59", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795690140.8856728, "ist": "16:19:00", "ev": "release", "d": "fixer released"}
+{"t": 1795690141.0417616, "ist": "16:19:01", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795690141.1507683, "ist": "16:19:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
