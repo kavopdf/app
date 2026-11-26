@@ -354,5 +354,29 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   {
+    "id": "5K6VD2QX509EHTJ0N4AJ1RAQKX",
+    "angle": "engine spacing code map - spacing() :149, ctx.newPage :819, cleared :3800/:4722, spacer emitter :6055-6185",
+    "result": "returned the patch shapes and line numbers this run used"
+   },
+   {
+    "id": "4XPVKR9J4N9V4R2CA0ZHN5DGR0",
+    "angle": "residual run analysis on the positive control - 41 failing runs grouped by size and band",
+    "result": "37 of 41 are table cells at 7.20pt: entry -3.0pt, pitch +0.652pt/row"
+   }
+  ],
+  "attempts": 2,
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "started": "11:50",
+  "started_ts": 1795674027.6594987,
+  "window_for_claim": 1795674027.6594987,
+  "class": "18_displacement",
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

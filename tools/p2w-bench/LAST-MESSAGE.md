@@ -1,8 +1,9 @@
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 11:50 → running IST · 8 min**
 
-> One document went clean in Google on an unlanded construct (`72_bank_statement`, 41/42 -> 42/42). Nothing was committed to the engine: the corpus has not been measured on the new defaults, and rule 3 forbids landing it blind.
+**26 Nov 2026 · slot 11:50 → 12:00 IST · 9 min**
+
+> One document went clean in Google on an unlanded construct (`72_bank_statement`, 41/42 -> 42/42). Nothing was committed to the engine: the corpus has not been measured on the new defaults, and rule 3 forbids landing it blind. The 90-minute slot began at 11:20; the clock below restarted when the claim was re-taken at 11:50 after a rebase reset `RUN.json`.
 
 ## Progress
 
@@ -12,7 +13,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| Self-check | **every field agrees with its second source** |
+| **Self-check** | **1 disagreement(s)** - subagents: 2 deployed vs no FINDINGS file for 5K6VD2QX509EHTJ0, 4XPVKR9J4N9V4R2C |
 | Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+40.32%** — mean 6.15 → 3.67 |
@@ -39,36 +40,13 @@
 
 | | |
 |:--|:--|
-| Measured | **14 min ago** |
+| Measured | **17 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 3 documents |
 
-## Subagents
-
-*None deployed this run.*
-
-## Timing
-
-| | |
-|:--|:--|
-| Slot window | 11:50 → running · 8 min |
-| Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 12 |
-| Longest silence | **4.1 min** — from 11:54:15, after `lastmessage.py: running report.py for the numbers` |
-| Silences over 2 min | 1 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
-
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| record - attempt, handoff, class rows | **0 min** | `##` |
-| report - the report and the chain | **6 min** | `#################` |
-| other - not attributed to a tool | **1 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -101,13 +79,17 @@ Read `FINDINGS/18-displacement-PAGEFIRST-DEAD-CODE-AND-AUTOFLOW-1200-relay.md` f
 
 Two. The first mapped the engine's spacing construct - `spacing()` :149, the `ctx.newPage` state (:819, cleared at :3800 and :4722), the table spacer emitter :6055-6185 - and returned the line numbers and patch shapes this run used. The second classified the 41 residual runs on the positive control: 10 distinct lines, 37 of them table cells at 7.20 pt, a two-parameter table defect (entry -3.0 pt, pitch +0.652 pt/row) plus 4 page-furniture runs. Both landed in FINDINGS.
 
+## Subagents
+
+Two. The first mapped the engine's spacing construct - `spacing()` :149, the `ctx.newPage` state (:819, cleared at :3800 and :4722), the table spacer emitter :6055-6185 - and returned the line numbers and patch shapes this run used. The second classified the 41 residual runs on the positive control: 10 distinct lines, 37 of them table cells at 7.20 pt, a two-parameter table defect (entry -3.0 pt, pitch +0.652 pt/row) plus 4 page-furniture runs. Both landed in FINDINGS.
+
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 11:50 → running · 8 min |
+| Slot window | 11:50 → 12:00 · 9 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 12 |
+| Tool beats | 18 |
 | Longest silence | **4.1 min** — from 11:54:15, after `lastmessage.py: running report.py for the numbers` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -117,6 +99,6 @@ Two. The first mapped the engine's spacing construct - `spacing()` :149, the `ct
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **0 min** | `##` |
-| report - the report and the chain | **6 min** | `#################` |
-| other - not attributed to a tool | **1 min** | `###` |
+| record - attempt, handoff, class rows | **1 min** | `###` |
+| report - the report and the chain | **7 min** | `#################` |
+| other - not attributed to a tool | **1 min** | `##` |
