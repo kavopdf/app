@@ -1626,6 +1626,19 @@ def main(argv):
                     _prev = _body.strip()
         except Exception:
             _prev = ""
+        # A SELF-COMPARISON, HOWEVER MANY TIMES IT HAS BEEN EMBEDDED. Exact equality is not enough:
+        # once the section has embedded itself, the previous body CONTAINS this run's account rather
+        # than equalling it. So the test is containment of a window of the current text.
+        if _prev and _wt and _wt.strip()[:60] and _wt.strip()[:60] in _prev:
+            _prev = ""
+        if _prev and _prev.strip() == (_wt or "").strip():
+            # THE PREVIOUS MESSAGE IS THIS RUN'S OWN. A run that commits its report and then re-runs
+            # report.py (to pick up an agent's landing time, or to fix a number) makes HEAD its own
+            # message, so the "run before this one" is this one. Left unguarded the section compares
+            # the run to itself, then embeds it, then the next regeneration embeds the embedding - on
+            # 26 Nov a report reached 22 KB with the same account pasted three times. An identical
+            # body is not a previous run, so there is nothing to put beside this one.
+            _prev = ""
         if _prev:
             L.append("### The run before this one said")
             L.append("")
