@@ -17,11 +17,9 @@
       }
     ]
   },
-  "fixer_doing": "relay: gate.py final, writing STATE",
-  "fixer_doing_since": 1795715774.2111087,
   "fixer_engine_at_claim": "aa496ebe",
   "fixer_last_beat": 1795715774.2111096,
-  "fixer_started": 1795711838.7837405,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
