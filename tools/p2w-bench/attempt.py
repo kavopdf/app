@@ -172,7 +172,27 @@ def save(d):
         _rp = os.path.join(HERE, "RUN.json")
         with open(_rp, encoding="utf-8") as _f:
             _r = json.load(_f)
-        _r["attempts"] = int(_r.get("attempts", 0) or 0) + 1
+        # DERIVE THE COUNTER, DO NOT INCREMENT IT. An incremented counter is a cached sum that any
+        # path can drift away from the ledger: a save() with no history row adds one, two rows for one
+        # attempt add two, and nothing ever takes them back. Measured 26 Nov: RUN.json said 8 while
+        # ATTEMPTS.json held 5 records inside the same window, and report.py's self-check printed
+        # "attempts: RUN.json counter 8 vs ATTEMPTS.json history 5" - a disagreement about a number
+        # that only ever existed to be compared with the ledger. The ledger is the truth, so the
+        # counter is now the count of records inside this run's window and cannot disagree with it.
+        _st = float(_r.get("started_ts") or 0)
+        _n = 0
+        for _row in d.values():
+            if not isinstance(_row, dict):
+                continue
+            for _x in (_row.get("history") or []):
+                try:
+                    _ts = time.mktime(time.strptime(str(_x.get("at") or ""),
+                                                    "%Y-%m-%d %H:%M")) - 19800
+                except Exception:
+                    continue
+                if _ts >= _st - 60:
+                    _n += 1
+        _r["attempts"] = _n
         with open(_rp, "w", encoding="utf-8") as _f:
             json.dump(_r, _f, indent=1, sort_keys=True)
     except Exception as _e:

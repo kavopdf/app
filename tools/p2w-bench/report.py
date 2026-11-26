@@ -375,8 +375,22 @@ def self_check():
                 if _id and not any(_id[:12] in _n for _n in _have):
                     _missing.append(_id[:16])
             if _missing:
+                # SAY WHAT IS CHECKABLE, AND NOTHING ELSE. "no FINDINGS file for R-01" is true and
+                # useless on its own: it cannot tell a reader whether the agent's work was lost or was
+                # written up under a topic name, and those need different answers. Measured 26 Nov: two
+                # agents deployed as R-01 and R-02, both landed, and the findings were written as
+                # 18-displacement-PAGE-BREAK-IS-UNEARNED-26NOV-relay.md - real work, invisible to a
+                # check that looks for the id in the filename.
+                #
+                # An earlier version of this message also counted how many files were written inside
+                # the run window, using os.path.getmtime. That was removed: a git checkout resets
+                # mtime, so the count would have said "nothing written this run" about a run that
+                # wrote four findings - the same false-current shape as the .txt age row. The only
+                # fact here that survives a checkout is the filenames themselves.
                 out.append(("subagents", "%d deployed" % len(_claimed),
-                            "no FINDINGS file for %s" % ", ".join(_missing[:2])))
+                            "no FINDINGS filename carries %s - the work may be on disk under a topic "
+                            "name, and the next run cannot find it by id; rename it with the id first"
+                            % ", ".join(_missing[:2])))
     except Exception as _e:
         # A CHECK THAT CANNOT RUN IS NOT A CHECK THAT PASSED. Every block above swallowed its own
         # exception, and that is exactly how five of these checks were dead code while looking live:
