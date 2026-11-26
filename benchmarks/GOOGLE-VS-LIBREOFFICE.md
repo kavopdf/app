@@ -7,9 +7,13 @@ Same source PDF, same instrument. Only the renderer differs.
 
 ## Which engine each half was measured on
 
-    engine in the tree : 025fe9deda5ac7b1
-    Google on it       : 205 of 205 pairs
-    LibreOffice on it  : 205 of 205 pairs
+    engine in the tree : a4d8fca469bba636
+    Google on it       : 189 of 205 pairs
+    LibreOffice on it  : 71 of 205 pairs
+
+A pair whose two halves were measured on two engines is not a pair: the LibreOffice
+column describes the .docx an older engine wrote. Read a row as a construct Google
+drops only for the 71 pairs where both halves are on the engine above.
 
 ## Where they disagree
 
@@ -17,8 +21,8 @@ Same source PDF, same instrument. Only the renderer differs.
 |---|---:|---:|---|
 | `18_displacement` | 18 | 105 | **Google** |
 | `04_chars_missing` | 2 | 47 | **Google** |
-| `60_text_column_right_edge` | 18 | 61 | **Google** |
-| `59_shape_anchor` | 10 | 46 | **Google** |
+| `60_text_column_right_edge` | 18 | 60 | **Google** |
+| `59_shape_anchor` | 10 | 45 | **Google** |
 | `45_char_accuracy` | 2 | 33 | **Google** |
 | `13_text_colours` | 1 | 32 | **Google** |
 | `17_matched_runs` | 5 | 29 | **Google** |

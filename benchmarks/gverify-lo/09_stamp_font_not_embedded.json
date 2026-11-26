@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/09_stamp_font_not_embedded.pdf",
-  "render": "/scratch/tmp/lo-one-sy2r6vms/09_stamp_font_not_embedded.pdf",
+  "render": "/scratch/tmp/lo-one-g5mzkwul/09_stamp_font_not_embedded.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "a4d8fca469bba636",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -253,5 +253,5 @@
   },
   "document": "09_stamp_font_not_embedded",
   "source_file": "/scratch/work/p2w/corpus/09_stamp_font_not_embedded.pdf",
-  "render_file": "/scratch/tmp/lo-one-sy2r6vms/09_stamp_font_not_embedded.pdf"
+  "render_file": "/scratch/tmp/lo-one-g5mzkwul/09_stamp_font_not_embedded.pdf"
 }

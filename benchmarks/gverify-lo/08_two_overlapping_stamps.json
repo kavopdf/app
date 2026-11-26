@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/08_two_overlapping_stamps.pdf",
-  "render": "/scratch/tmp/lo-one-5su715aw/08_two_overlapping_stamps.pdf",
+  "render": "/scratch/tmp/lo-one-jr6ghsgo/08_two_overlapping_stamps.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "a4d8fca469bba636",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -253,5 +253,5 @@
   },
   "document": "08_two_overlapping_stamps",
   "source_file": "/scratch/work/p2w/corpus/08_two_overlapping_stamps.pdf",
-  "render_file": "/scratch/tmp/lo-one-5su715aw/08_two_overlapping_stamps.pdf"
+  "render_file": "/scratch/tmp/lo-one-jr6ghsgo/08_two_overlapping_stamps.pdf"
 }
