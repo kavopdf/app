@@ -1128,3 +1128,8 @@ That is a missing tool, not a decision anyone has to make.
 | 18:12 | STEP 4 C, the reopen path | the phase is `fix`, not a finished phase with documents still failing | `round.py --phase` | not applicable | nothing. `round.py --reopen` was not run because its guard is about a done phase and this is not one |
 | 18:12 | STEP 4 D, the fixer slot | whether the slot is held by a dead run | `git log`: the newest commit is `release: fixer frees the slot`, and `health.py` shows the fix stage moving at an age of 0.6 h | **not needed** | nothing. The slot is free and the work behind it is recent, so `round.py --release-fixer --force` was not run |
 | 18:12 | STEP 5, the flat `.docx open` column | `docx open` reads 59 in the committed row and 59 the row before it - unchanged, while the fixer works | read the trend table and `ROUND.json` | decided earlier today, and it stands | **No class parked.** The gate charges a full corpus re-score to every change, so changes are measured, reverted and never land; the recorded replacement is a scope keyed on the documents a change can move. The `.txt` axis moved 9 to 8 today, so the pipeline is producing something even where `.docx` is flat. **Overturned by:** one engine change that lands and moves `docx open` |
+
+**18:16 addendum to the row above on STEP 4 D.** While this pass was running, `ROUND.json` recorded a new
+`fixer_started` and commit `46f46097 claim: fixer takes the slot` landed, so the slot was free when checked
+and is now held by a live claim with a beat behind it. Nothing was released and nothing needed releasing.
+**Overturned by:** the same claim still held with no beat and no new attempt once its stale window has passed.

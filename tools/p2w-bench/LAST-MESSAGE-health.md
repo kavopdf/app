@@ -4,7 +4,7 @@
 
 > Nothing is stopped.
 
-This pass read the evidence rather than the reports: a Google measurement is in flight right now (the newest result files were written this minute), so measure-google is moving and classify is correctly waiting behind it. The fixer slot is free - the newest commit is the release - and the round phase is fix, so the reopen guard does not apply. The .docx column is still flat while the .txt column moved, the same shape as earlier today; that is recorded in BLOCKERS.md, not treated as a fault to guess past. One thing is missing, not decided: this pass has no cron tool in its tool list, so a paused or zombie cron cannot be moved by automation, and the exact calls it would have made are written into BLOCKERS.md.
+This pass read the evidence rather than the reports: a Google measurement is in flight right now (the newest result files were written this minute), so measure-google is moving and classify is correctly waiting behind it. The fixer slot was free when this pass looked and a fixer claimed it while this pass was still running, so the fix stage is live rather than held by a dead run; the round phase is fix, so the reopen guard does not apply. The .docx column is still flat while the .txt column moved, the same shape as earlier today; that is recorded in BLOCKERS.md, not treated as a fault to guess past. One thing is missing, not decided: this pass has no cron tool in its tool list, so a paused or zombie cron cannot be moved by automation, and the exact calls it would have made are written into BLOCKERS.md.
 
 ## Stages
 
