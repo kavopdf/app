@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/10_stamp_as_image.pdf",
-  "render": "/tmp/lo-one/10_stamp_as_image.pdf",
+  "render": "/scratch/tmp/lo-one-70rcx3l7/10_stamp_as_image.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "a4d8fca469bba636",
+  "engine": "025fe9deda5ac7b1",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -251,5 +251,5 @@
   },
   "document": "10_stamp_as_image",
   "source_file": "/scratch/work/p2w/corpus/10_stamp_as_image.pdf",
-  "render_file": "/tmp/lo-one/10_stamp_as_image.pdf"
+  "render_file": "/scratch/tmp/lo-one-70rcx3l7/10_stamp_as_image.pdf"
 }

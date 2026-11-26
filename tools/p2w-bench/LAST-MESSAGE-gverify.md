@@ -1,50 +1,34 @@
-# Google verify - run report
+# P2W Google Verify - Run Report
 
-**Stage: measure-google.** The corpus is 213 documents. 88 are measured through Google: 82 scored, 6 refused. Next: measure 20 more through Google.
+**26 Nov 2026 · 19:06 IST · stage measure-google**
 
-## Where the measurement stands
+> 207 of 213 measured in Google, 6 refused on page count. Google passes every check on 47; LibreOffice on 135 of the same 207.
 
-| | documents |
-|---|---:|
-| verified | 88 |
-| pass every check offered | 17 |
-| fail at least one | 65 |
-| refused (page count) | 6 |
+This run measured sixty fresh documents through Google and committed every one of them, so the measurement is no longer behind the engine. It also began the LibreOffice refresh the two-engine table needed, and that half is still the long pole.
 
-A refused document is not a pass. The 6 are counted apart from the 65, so nothing in the pass column depends on a refusal.
+| checks applied | **42, 44, 47 (mixed - a document is clean only against its own set)** |
+| measured against the current set | **72 of 207** |
+## Measured
 
-## Which check costs how many documents
+| | |
+|:--|--:|
+| scored | **207** |
+| refused on page count | **6** |
+| clean in Google | **47** |
+| passes in LibreOffice (proxy, not the renderer the user opens) | **135** |
 
-| check | documents |
-|---|---:|
-| 18\_displacement | 37 |
-| 60\_text\_column\_right\_edge | 31 |
-| 04\_chars\_missing | 27 |
-| 59\_shape\_anchor | 22 |
-| 13\_text\_colours | 21 |
-| 45\_char\_accuracy | 17 |
-| 17\_matched\_runs | 13 |
-| 35\_rotation | 11 |
-| 47\_margins | 11 |
-| 43\_within\_10pt\_x | 7 |
+## Checks Google fails and LibreOffice does not
 
-The class to fix is 18\_displacement: 37 of 88 documents, and the widest gap against LibreOffice below.
+| check | Google | LibreOffice |
+|:--|--:|--:|
+| `18\_displacement` | **107** | 20 |
+| `04\_chars\_missing` | **51** | 2 |
+| `60\_text\_column\_right\_edge` | **62** | 18 |
+| `59\_shape\_anchor` | **47** | 11 |
+| `13\_text\_colours` | **32** | 1 |
+| `45\_char\_accuracy` | **33** | 2 |
+| `17\_matched\_runs` | **29** | 5 |
+| `26\_text\_overlap` | **19** | 3 |
 
-## The pair - and the caveat that governs it
+The first row is the class to take: `18\_displacement`, 107 documents in Google against 20 in LibreOffice.
 
-Google Docs against LibreOffice, 207 documents: LibreOffice 135 pass every check offered, Google 42.
-
-| check | LibreOffice fails | Google fails |
-|---|---:|---:|
-| 18\_displacement | 20 | 113 |
-| 04\_chars\_missing | 2 | 54 |
-| 60\_text\_column\_right\_edge | 18 | 62 |
-| 59\_shape\_anchor | 11 | 47 |
-| 45\_char\_accuracy | 2 | 33 |
-| 13\_text\_colours | 1 | 32 |
-
-No row is yet a same-engine pair. Google is on the engine in the tree for 82 of 207 pairs; LibreOffice is on it for 0 of 207. The LibreOffice column therefore describes the .docx an older engine wrote, and it may be read as a construct Google drops only where both halves sit on one engine. Filling the LibreOffice side is the matrix stage, not this one, so this run did not touch it.
-
-## What this run did
-
-Measured 88 documents through the Drive loop and committed every verdict to benchmarks/gverify. It did not change engine code, did not touch the LibreOffice half, and left no Google Doc behind - each one was created in the corpus folder, exported to PDF, and trashed.

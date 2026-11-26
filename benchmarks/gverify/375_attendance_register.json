@@ -2,7 +2,7 @@
  "name": "375_attendance_register",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T04:19:12",
+ "at": "2026-11-26T13:18:55",
  "passed": 43,
  "total": 47,
  "failed": [
@@ -20,6 +20,6 @@
   ],
   "runs_matched": 459
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795665232"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795697520"
 }

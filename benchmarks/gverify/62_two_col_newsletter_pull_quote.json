@@ -2,7 +2,7 @@
  "name": "62_two_col_newsletter_pull_quote",
  "status": "ok",
  "rc": 0,
- "at": "2026-11-26T05:26:05",
+ "at": "2026-11-26T13:24:22",
  "passed": 42,
  "total": 42,
  "failed": [],
@@ -13,6 +13,6 @@
   "bad_pages": [],
   "runs_matched": 36
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795697520"
 }
