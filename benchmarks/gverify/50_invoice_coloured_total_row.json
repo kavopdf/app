@@ -2,7 +2,7 @@
  "name": "50_invoice_coloured_total_row",
  "status": "ok",
  "rc": 0,
- "at": "2026-11-25T23:23:34",
+ "at": "2026-11-26T00:35:47",
  "passed": 42,
  "total": 42,
  "failed": [],
@@ -13,6 +13,6 @@
   "bad_pages": [],
   "runs_matched": 53
  },
- "engine": "d85db0a9822ddb54",
- "checks": "375669-1795647084"
+ "engine": "981ff1fa35e2cf67",
+ "checks": "375669-1795650942"
 }

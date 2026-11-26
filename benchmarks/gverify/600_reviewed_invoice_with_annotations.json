@@ -2,7 +2,7 @@
  "name": "600_reviewed_invoice_with_annotations",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-25T23:23:59",
+ "at": "2026-11-26T00:36:34",
  "passed": 37,
  "total": 44,
  "failed": [
@@ -15,14 +15,14 @@
   "62_table_columns"
  ],
  "displacement": {
-  "med_dy": 107.2,
-  "worst_dy": 128.9,
+  "med_dy": 104.2,
+  "worst_dy": 125.9,
   "med_dx": 0.0,
   "bad_pages": [
    0
   ],
   "runs_matched": 56
  },
- "engine": "d85db0a9822ddb54",
- "checks": "375669-1795647084"
+ "engine": "981ff1fa35e2cf67",
+ "checks": "375669-1795650942"
 }

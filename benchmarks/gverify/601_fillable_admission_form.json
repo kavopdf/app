@@ -2,7 +2,7 @@
  "name": "601_fillable_admission_form",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-25T23:24:01",
+ "at": "2026-11-26T00:36:36",
  "passed": 37,
  "total": 42,
  "failed": [
@@ -13,14 +13,14 @@
   "59_shape_anchor"
  ],
  "displacement": {
-  "med_dy": 30.3,
-  "worst_dy": 168.9,
+  "med_dy": 27.3,
+  "worst_dy": 230.4,
   "med_dx": -0.5,
   "bad_pages": [
    0
   ],
   "runs_matched": 21
  },
- "engine": "d85db0a9822ddb54",
- "checks": "375669-1795647084"
+ "engine": "981ff1fa35e2cf67",
+ "checks": "375669-1795650942"
 }
