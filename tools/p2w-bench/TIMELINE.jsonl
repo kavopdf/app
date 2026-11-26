@@ -6724,3 +6724,16 @@
 {"t": 1795654743.1308494, "ist": "06:29:03", "ev": "beat", "d": "txt_rank --rescore (213 sequential)"}
 {"t": 1795654952.5942693, "ist": "06:32:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795654954.1316144, "ist": "06:32:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795655004.6271849, "ist": "06:33:24", "ev": "beat", "d": "writing report"}
+{"t": 1795655024.673344, "ist": "06:33:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795655026.6706662, "ist": "06:33:46", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795655027.005954, "ist": "06:33:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795655028.7827668, "ist": "06:33:48", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795655056.4622097, "ist": "06:34:16", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795655058.2597582, "ist": "06:34:18", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795655058.6035886, "ist": "06:34:18", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795655060.3607225, "ist": "06:34:20", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795655066.282442, "ist": "06:34:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795655068.0000901, "ist": "06:34:28", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795655068.3783426, "ist": "06:34:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795655070.230971, "ist": "06:34:30", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

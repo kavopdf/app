@@ -190,97 +190,121 @@
    "status": "landed"
   },
   {
-   "id": "A18_displacement-01",
-   "class": "A",
    "angle": "18_displacement",
-   "question": "cell line pitch: does Google take table row pitch from w:line/w:spacing inside the cell",
+   "class": "A",
+   "deployed": "21:24",
+   "deployed_at": "2026-11-25T21:24",
    "expected": "probe a cell whose declared line height is already a whole multiple of 15 twips; does the row still ramp?",
-   "deployed": "21:24",
-   "status": "landed",
    "finding": "FINDINGS/18-displacement-ROW-HEIGHT-IS-THE-LEVER-25NOV-relay.md",
-   "deployed_at": "2026-11-25T21:24",
-   "landed_at": "2026-11-25T22:11"
+   "id": "A18_displacement-01",
+   "landed_at": "2026-11-25T22:11",
+   "question": "cell line pitch: does Google take table row pitch from w:line/w:spacing inside the cell",
+   "status": "landed"
   },
   {
-   "id": "B60_text_column_right_edge-01",
-   "class": "B",
    "angle": "60_text_column_right_edge",
-   "question": "root cause of the right edge of a text column in Google for the 6 documents that fail only this",
-   "expected": "find the construct and the engine site, with a measurement that discriminates it from a font-metric cause",
+   "class": "B",
    "deployed": "21:24",
-   "status": "landed",
-   "finding": "FINDINGS/18-displacement-ROW-HEIGHT-IS-THE-LEVER-25NOV-relay.md",
    "deployed_at": "2026-11-25T21:24",
-   "landed_at": "2026-11-25T22:11"
+   "expected": "find the construct and the engine site, with a measurement that discriminates it from a font-metric cause",
+   "finding": "FINDINGS/18-displacement-ROW-HEIGHT-IS-THE-LEVER-25NOV-relay.md",
+   "id": "B60_text_column_right_edge-01",
+   "landed_at": "2026-11-25T22:11",
+   "question": "root cause of the right edge of a text column in Google for the 6 documents that fail only this",
+   "status": "landed"
   },
   {
-   "id": "05_ct12 patch spec-01",
-   "class": "05_chars_extra",
    "angle": "t12 patch spec",
-   "question": "the t12 welded-Y hypothesis: exact emitter, and two axes refuted by reading the code",
+   "class": "05_chars_extra",
+   "deployed": "23:42",
+   "deployed_at": "2026-11-25T23:42",
    "expected": "23:05",
-   "deployed": "23:42",
-   "status": "running",
    "finding": "",
-   "deployed_at": "2026-11-25T23:42"
+   "id": "05_ct12 patch spec-01",
+   "question": "the t12 welded-Y hypothesis: exact emitter, and two axes refuted by reading the code",
+   "status": "running"
   },
   {
-   "id": "18_drow rule charge-01",
-   "class": "18_displacement",
    "angle": "row rule charge",
-   "question": "every vertical-space emitter with file:line, and a pre-registered prediction for the row-rule charge",
-   "expected": "23:06",
+   "class": "18_displacement",
    "deployed": "23:42",
-   "status": "running",
+   "deployed_at": "2026-11-25T23:42",
+   "expected": "23:06",
    "finding": "",
-   "deployed_at": "2026-11-25T23:42"
+   "id": "18_drow rule charge-01",
+   "question": "every vertical-space emitter with file:line, and a pre-registered prediction for the row-rule charge",
+   "status": "running"
   },
   {
-   "id": "60_tA-01",
-   "class": "60_text_column_right_edge",
    "angle": "A",
-   "question": "ranked fix shortlist from the store, recomputed; top candidate = the right-edge pin",
-   "expected": "00:29",
+   "class": "60_text_column_right_edge",
    "deployed": "00:52",
-   "status": "landed",
-   "finding": "FINDINGS/60-text-column-right-edge-ROOTCAUSE-2110-agentA.md",
    "deployed_at": "2026-11-26T00:52",
-   "landed_at": "2026-11-26T03:31"
-  },
-  {
-   "id": "instB-01",
-   "class": "instruments",
-   "angle": "B",
-   "question": "audit of all 47 verify_google checks for the can-only-pass shape",
-   "expected": "00:35",
-   "deployed": "00:52",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-26T00:52"
-  },
-  {
-   "id": "60_tA-02",
-   "class": "60_text_column_right_edge",
-   "angle": "A",
-   "question": "which emitted construct makes Google compute a different right edge, and what patch fixes it",
-   "expected": "22:00",
-   "deployed": "02:35",
-   "status": "landed",
+   "expected": "00:29",
    "finding": "FINDINGS/60-text-column-right-edge-ROOTCAUSE-2110-agentA.md",
-   "deployed_at": "2026-11-26T02:35",
-   "landed_at": "2026-11-26T03:31"
+   "id": "60_tA-01",
+   "landed_at": "2026-11-26T03:31",
+   "question": "ranked fix shortlist from the store, recomputed; top candidate = the right-edge pin",
+   "status": "landed"
   },
   {
-   "id": "04_cB-01",
-   "class": "04_chars_missing",
    "angle": "B",
-   "question": "does the check open the .docx at all, and what is the minimal instrument fix",
-   "expected": "22:00",
+   "class": "instruments",
+   "deployed": "00:52",
+   "deployed_at": "2026-11-26T00:52",
+   "expected": "00:35",
+   "finding": "",
+   "id": "instB-01",
+   "question": "audit of all 47 verify_google checks for the can-only-pass shape",
+   "status": "running"
+  },
+  {
+   "angle": "A",
+   "class": "60_text_column_right_edge",
    "deployed": "02:35",
-   "status": "landed",
-   "finding": "FINDINGS/04-chars-missing-CHECK-IS-BLIND-TO-TEXTBOXES-2110-agentB.md",
    "deployed_at": "2026-11-26T02:35",
-   "landed_at": "2026-11-26T03:31"
+   "expected": "22:00",
+   "finding": "FINDINGS/60-text-column-right-edge-ROOTCAUSE-2110-agentA.md",
+   "id": "60_tA-02",
+   "landed_at": "2026-11-26T03:31",
+   "question": "which emitted construct makes Google compute a different right edge, and what patch fixes it",
+   "status": "landed"
+  },
+  {
+   "angle": "B",
+   "class": "04_chars_missing",
+   "deployed": "02:35",
+   "deployed_at": "2026-11-26T02:35",
+   "expected": "22:00",
+   "finding": "FINDINGS/04-chars-missing-CHECK-IS-BLIND-TO-TEXTBOXES-2110-agentB.md",
+   "id": "04_cB-01",
+   "landed_at": "2026-11-26T03:31",
+   "question": "does the check open the .docx at all, and what is the minimal instrument fix",
+   "status": "landed"
+  },
+  {
+   "angle": "A",
+   "class": "18_displacement",
+   "deployed": "06:00",
+   "deployed_at": "2026-11-26T06:00",
+   "expected": "06:15",
+   "finding": "FINDINGS/18-displacement-diagnosis-26NOV.md",
+   "id": "18_diag-01",
+   "landed_at": "2026-11-26T06:08",
+   "question": "why does 18_displacement fail, what is the construct, what is the one-document confirmation test",
+   "status": "landed"
+  },
+  {
+   "angle": "A",
+   "class": "t12_word_invention",
+   "deployed": "06:00",
+   "deployed_at": "2026-11-26T06:00",
+   "expected": "06:20",
+   "finding": "FINDINGS/txt-9-failures-diagnosis-26NOV.md",
+   "id": "txt9-01",
+   "landed_at": "2026-11-26T06:10",
+   "question": "why do exactly 9 .txt documents fail, and which of them are check artefacts rather than engine defects",
+   "status": "landed"
   }
  ],
  "context": "t12 is fixed: the unit is the character, not the token. txt corpus 199 -> 202 of 213 clean, 5 newly clean, 0 of 213 newly failing, landed as 23d0b1db. The screen.py 'soffice hang' is closed as a finding: it is the scipy fallback in edt(), not soffice - with scipy present a 23-document screen finishes in 190 s. Two instrument defects found and NOT fixed: _ensure_scipy() spends up to 220 s of a 280 s budget and only warns; p2w.py:1112 imports scipy.ndimage inside a try/except so colour_share/tone_share become None and coloured_px 0 on a scipy-less pod, silently blinding every colour or tone judgement.",
@@ -633,8 +657,8 @@
  ],
  "plan": "",
  "run": {
-  "started": "04:27",
   "ended": null,
-  "ended_how": null
+  "ended_how": null,
+  "started": "04:27"
  }
 }
