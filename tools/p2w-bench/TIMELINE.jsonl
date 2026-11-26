@@ -7014,3 +7014,6 @@
 {"t": 1795674128.5134149, "ist": "11:52:08", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795674128.874754, "ist": "11:52:08", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795674130.7733333, "ist": "11:52:10", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795674158.188812, "ist": "11:52:38", "ev": "beat", "d": "relay: autoEm 1.2207 test on the negative control"}
+{"t": 1795674186.7392824, "ist": "11:53:06", "ev": "beat", "d": "relay: autoEm made the negative control PASS, testing the positive control"}
+{"t": 1795674214.612838, "ist": "11:53:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
