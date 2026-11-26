@@ -1,39 +1,65 @@
-Nothing is stopped at the close of this pass, and that answer took three reads: classify and fix were both stopped in the middle of it, and both cleared without me. The durable fact is the .docx axis, still flat at 59.
+# P2W Watchdog - Run Report
 
-## The picture, at the read this report was generated from
+**26 Nov 2026 · 09:24 IST**
 
-measure-google is done, 213 of 213, 0.5 h. matrix is done, 213 of 213, 2.4 h. classify is superseded at 0.1 h. fix is moving, 2 attempt(s) in the last 3 h, 0.1 h. txt is moving, 205 clean and 8 failing, 0.1 h. health.py --stalled exits zero.
+> Nothing is stopped.
 
-The pass opened with nothing stopped, then classify went stopped because the Google measurement completed under it, then fix went stopped on a silent claim. By the third read the classifier had written a fresh class table and the relay had released the slot and landed a .txt fix. None of that needed me, and the record in BLOCKERS.md says so rather than claiming I cleared it.
+## Stages
 
-## The trend
 
-The row was appended, then amended twice, because the pipeline moved under it both times: the Google measurement completed mid-pass, and then the relay's .txt change landed. It now reads docx open 59 to 59, no change. txt failing 9 to 8, down one. google 213 to 208, down 5. google clean 42 to 42, no change.
+| stage | state | progress | age |
+|:--|:--|--:|--:|
+| measure-google | moving | 67 of 213 | 0.5 h |
+| matrix | done | 213 of 213 | 0.2 h |
+| classify | waiting |  | 2.9 h |
+| fix | moving | 3 attempt(s) in 3 h | 0.9 h |
+| txt | moving | 205 clean, 8 failing | 2.8 h |
 
-I read the tables rather than the report: RANKING.csv holds 59 documents above the share threshold, and the txt table holds 8 with a failed check. Both are current, and both are what the tools print.
+## Trend
 
-## STEP 5 fires, and the answer is the gate
+| | 2026-11-25 | 2026-11-26 | |
+|:--|--:|--:|:--|
+| .docx open | 59 | **59** | no change |
+| .txt failing | 9 | **8** | -1 |
+| Google measured | 213 | **208** | -5 |
+| Google clean | 42 | **42** | no change |
 
-The earlier pass left itself a test: STEP 5 fires only if google clean is flat too, or if RANKING.csv is older than the engine it measures. google clean is 42 to 42, so the first condition holds, on top of docx open reading 59 on six consecutive rows. Both flat columns carry 2 attempt(s) in the last 3 h and 0 kept beside them.
+## What this pass did
 
-The decision is that the approach is wrong, not the class. The evidence is the 05:28 relay row: regress.py --check refuses on an unmeasured engine, a corpus re-score costs 4 slices and 11 min, and a revert costs the same again, so an engine change is measured, reverted and never lands inside a slot. That is why nothing is kept whichever class the fixer picks, and it is not a statement about any one class.
+* Read health.py, health.py --stalled, stage.py, progress.py, round.py --phase and status.py.
+* **The fix slot was held by a dead run** - released with round.py --release-fixer --force. See BLOCKERS.md.
 
-Today's own success is the counter-example that proves the repair. The change that landed was a .txt change whose .docx output was unchanged, so it needed no corpus re-score, and one document moved from failing to clean. The gate is not impassable; it is priced per change, and it charges a full re-score to changes that cannot move a document.
+## What was stopped, and what this pass did about it
 
-What replaces it: a scope keyed on the documents a change can actually move, so a patch whose .docx output is byte-identical on every probe does not pay a full corpus re-score before it can land. That is the repair the 05:25 row names. I did not implement it, because regress.py and the verifiers are on the do-not-touch list and the scope rule is the fixer's to change with a measurement.
+The read this pass opened on found fix stopped: 3 attempt(s) in 3 h, age 0.9 h, on a run still marked
+running that had not beaconed and was holding the fix slot. Every other row was healthy - measure-google
+moving at 67 of 213, matrix done, classify waiting because the measurement it groups is still incomplete,
+txt moving at 205 clean and 8 failing.
 
-What would overturn this: one engine change that lands and moves docx open, which would show the gate is passable for engine work too and the class was the problem after all.
+The second read, taken before this report was written, found the same claim past the fixer's stale window
+and still held, with no attempt recorded against it and no engine change since it was taken. A window that
+has passed and freed nothing is a dead run, so the slot was released with round.py --release-fixer --force
+and the reason went into BLOCKERS.md. The read taken after that release is the one this report is
+generated from, which is why it now says nothing is stopped.
 
-## The two stops that cleared themselves
+## The flat .docx axis, decided again on today's evidence
 
-classify read stopped at 9.8 h against a 6 h threshold, because the class table was older than the Google results it groups. It then read superseded once a fresh table was written. The classifier cron fired on its own.
+.docx open reads 59 in every committed row of the trend including today's, and google clean is 42 to 42,
+so that axis has not moved in more than a day. Nothing was parked. The class is not what is failing: the
+gate charges a full corpus re-score to every change, so a change is measured, reverted and never lands.
+What replaces it is a scope keyed on the documents a change can actually move. Today's evidence
+strengthens that rather than reopening it - the .txt axis moved, 9 to 8, on a change whose .docx output
+was unchanged and which therefore needed no re-score. Overturned by: one engine change that lands and
+moves .docx open.
 
-fix read stopped on a run still marked running with no beacon. The claim stood down inside its own stale window, the slot was released, and a new run took it and made attempts. I did not force a release at any point: a second run beside one that may still be alive is the thing the claim exists to prevent.
+## The instrument, and the one thing this pass could not do
 
-## No cron tool in this pass
+Google measured reads 208, which looks like documents lost against the corpus of 213. It is not:
+measure-google is mid-pass at 67 of 213, so the 208 is a settled count from a measurement still being
+rewritten. The number to read is google clean, and it is flat.
 
-This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation. That is a missing tool, not a decision for a person. No cron was recreated, so there is no new id to record, and nothing here claims the platform was checked.
+No cron was recreated, paused or resumed, because this pass has no cron tool at all. It cannot read
+next_fire_at, cannot read a run list, and cannot see a cron left paused - so a cron that is enabled but
+not firing stays invisible to it. That is written into BLOCKERS.md as a missing tool, with the exact
+calls it would have made, and not as a decision for a person to make.
 
-The calls I would have made and did not: cron with action list; cron with action runs and the classifier and fixer ids from HEALTH-BRIEF's table for any stopped stage; then pause and resume in the same pass for a stale next\_fire\_at, never leaving one paused; then delete and create with the same name, schedule and prompt if a run were still running past an hour with ended\_at null.
-
-Phase is fix. The rotation has docx on 44\_header\_footer and txt on t12\_word\_invention, and 18\_displacement stays parked, because parking a class would be the wrong repair while the gate is what is pricing the work.

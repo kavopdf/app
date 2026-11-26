@@ -1,8 +1,8 @@
 {
  "started": "08:27",
  "started_ts": 1795661874.4352477,
- "ended": null,
- "ended_ts": null,
+ "ended": "09:23",
+ "ended_ts": 1795665195.097131,
  "attempts": 0,
  "kept": 0,
  "agents": [

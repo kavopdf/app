@@ -6826,3 +6826,24 @@
 {"t": 1795664654.871282, "ist": "09:14:14", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795664655.1890197, "ist": "09:14:15", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795664655.6651309, "ist": "09:14:15", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795664974.2533457, "ist": "09:19:34", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665011.3987298, "ist": "09:20:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665011.5920377, "ist": "09:20:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665054.8747072, "ist": "09:20:54", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665057.99481, "ist": "09:20:57", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665099.8250787, "ist": "09:21:39", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665100.0501528, "ist": "09:21:40", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665145.996361, "ist": "09:22:25", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665192.1984363, "ist": "09:23:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795665194.1888778, "ist": "09:23:14", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795665194.3666716, "ist": "09:23:14", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795665194.5143523, "ist": "09:23:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795665195.0963988, "ist": "09:23:15", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795665282.3578935, "ist": "09:24:42", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665319.2852373, "ist": "09:25:19", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665319.4827702, "ist": "09:25:19", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665356.283243, "ist": "09:25:56", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665363.8564928, "ist": "09:26:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665400.0446386, "ist": "09:26:40", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665400.196529, "ist": "09:26:40", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795665436.8560646, "ist": "09:27:16", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
