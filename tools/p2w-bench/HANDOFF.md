@@ -9,19 +9,30 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | - |
-| ended | 15:13 |
-| how it ended | forced |
+| started | 15:24 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.
+
+## Agents deployed and not yet accounted for
+
+| id | class | angle | question | deployed | expected | status | finding |
+|---|---|---|---|---|---|---|---|
+| R-01 | general-purpose: is the .docx writer deterministic? | byte-identity of two conversions of the same PDF | two runs of ConvertOne on one PDF - identical bytes? | 14:22 | deterministic | landed | FINDINGS determinism: NON-DETERMINISTIC (metadata only) - every differing byte is the ZIP entry mtime (ZipEntry defaults to System.currentTimeMillis(), no setTime anywhere); zero XML parts differ across 18 documents; normalising the ZIP time fields makes the files bit-identical |
+| R-02 | Explore: page-break construct audit on the 8 largest worst_dy documents | what makes a page break land in the wrong place | explicit break or renderer flow? | 15:10 | an explicit break | landed | FINDINGS/18-displacement-PAGE-BREAK-IS-UNEARNED-26NOV-relay.md - blocks at 97% of usable height with ~25 pt slack, explicit <w:br type=page>, every row atLeast+cantSplit, no tblHeader; row growth eats the slack and the renderer breaks first |
+
+A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
+that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
 - `15:12` attempt 88 on 18_displacement -> lead
 - `15:12` attempt 89 on 18_displacement -> lead
+- `15:46` attempt 90 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 

@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-26 12:16
+# Fixer report - 2026-11-26 15:46
 
 ```
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 12:16 → 15:13 IST · 2h 56m**
+**26 Nov 2026 · slot 15:46 → running IST · 1 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 8 vs ATTEMPTS.json history 5; subagents: 2 deployed vs no FINDINGS file for R-01 |
-| Document-moves this run | **0** — 8 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - run window: RUN.json says this run began at 15:46 vs TIMELINE.jsonl records the claim at 15:24, so the window was reset and the duration is short |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+40.32%** — mean 6.15 → 3.67 |
 | Regressions | **none** |
@@ -26,19 +26,53 @@
 | Not scored - page count did not match | **6** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (47 still open), not a new class |
+| Working on | `-` - taken from the pending list (47 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 13:11 | **lead** | 0/None | guarded pgMar page-top patch: 213/213 converted on the patched engine, regress says no document worse than baseline, refused only on the table stamp; the corpus re-score is 73 s/doc = 4.3 h, which no |
-| 13:35 | **reverted** | 0/212 | txt-meta-annotation patch applied, corpus built (213/213, 1.4 min) and fully re-measured (212/212 in 6 calls); gate refused on 1 docx regression 600_reviewed_invoice_with_annotations 54.30 -> 62.46. T |
-| 14:59 | **lead** | 0/None | No engine change. Refuted three standing assumptions on 207 committed Google results: (1) attribution=table-row predicts nothing in Google - med_dy slope vs docx_table_rows -0.108, r2=0.00; worst_dy 0 |
-| 15:12 | **lead** | 0/None | Page-scale family diagnosed from the emitted XML (no Drive call): every source page is a hand-built block placed at 97% of the 16838-twip usable height with ~25 pt slack, ended by an explicit <w:br w: |
-| 15:12 | **lead** | 0/None | Line-scale family (27 docs with a docx on the pod): med_dy = -5.17 + 0.765*median_font_size_pt, n=27, r2=0.20; family spans -3.1..+4.2 pt, median 1.2 pt, worst_dy median 4.5 pt - i.e. it fails on tail |
+| 15:46 | **lead** | 0/None | row-count lead restored: worst_dy~docx_table_rows slope 2.188 r2=0.423 n=207 from gverify (DISP-TABLE google cols are stale, 32/130 disagree up to 96.70pt); p2w.fitreserve 96->300 byte-identical on th |
 
 ## Why nothing moved, in this run's own words
+
+> > The class was `18_displacement` (113 of 207 documents fail it) and the run kept no engine change,
+> > because the premise every earlier patch was built on turned out to be wrong in a way that could be
+> > measured in four minutes and had been carried for a day.
+> >
+> > The 15:12 run closed by telling the next run not to touch rows: "worst displacement has a slope of
+> > 0.518 pt/row at r² = 0.01". That number does not reproduce. On `benchmarks/gverify/*.json`, which is
+> > the only committed source that reproduces the 113-of-207 failure count, worst displacement against
+> > `docx_table_rows` is **2.188 pt/row at r² = 0.423 over 207 documents** - the second strongest single
+> > predictor in the corpus after source page count. The 0.518/0.01 figure appears in no subset I could
+> > build. The reason is an instrument defect, measured here: `benchmarks/DISP-TABLE.csv`'s Google columns
+> > are a stale measurement - 32 of 130 `worst_dy` values disagree with `gverify/` by more than 0.5 pt, up
+> > to 96.70 pt, and 20 of 213 `google_fail_18` flags disagree. A run that fits on the CSV, or on a join
+> > that mixes the two, measures an engine that no longer exists.
+> >
+> > With the lead restored, the obvious mechanism was tested and did not hold: the 15:12 story was that a
+> > sheet is left with ~25 pt of slack, row growth eats it, and the renderer breaks before the writer's
+> > explicit break. If that were true the engine's own fit reserve (`p2w.fitreserve`, 96 twips by default,
+> > with 300 twips named in the code as measured for `bank-statement-5-pages`) would be the lever. It is
+> > not. Converted the eight largest-displacement documents that have both many rows and several pages
+> > twice, at 96 and at 300 twips: `word/document.xml` is **byte-identical in all eight**, page breaks and
+> > `w:line` totals unchanged. The reserve only fires on a page whose flow comes within 96 twips of the
+> > budget, and the model believes these pages have room to spare - while Google displaces their content
+> > by 70 to 657 pt. The failure is not "the page is slightly over"; it is that the model and the renderer
+> > disagree about how tall the page is, by an amount that scales with row count.
+> >
+> > That is the sharper question this run leaves: the engine charges a ruled row 15 twips (0.75 pt) of
+> > excess in its spacer guard (`DocxWriter.java:6151`, "the quantum the 22 Nov sweep measured"), and the
+> > displacement slope says the rendered excess is about 2.2 pt/row - three times that constant. One probe
+> > document decides it: measure, in Google, the rendered height of one ruled row against its `w:trHeight`
+> > declaration on `324_loan_amortisation_schedule` (246 rows).
+> >
+> > The slot went where the pod goes: a cold pod cost ~28 minutes - `install-gate.sh` killed at 300 s, then
+> > three `pod-prep.sh` corpus slices (53 + 53 + 17 documents, 224 s + 186 s + 88 s) before `regress.py
+> > --check` passed. That left one experiment and the write-up, not four attempts.
+
+### The run before this one said
 
 > Nothing moved because this run spent its first 40 minutes making the pod able to measure at all, and
 > then spent the rest proving that the class it was about to work cannot be worked the way every earlier
@@ -79,11 +113,13 @@
 > That is why no engine change was committed: the next patch has to be chosen against that split, and
 > choosing it blind is what the last five attempts did.
 
+Accounts share 20% of their significant words - a different account (the cut is 50%).
+
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **4.0 h ago** |
+| Measured | **4.5 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -92,20 +128,16 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `R-01` | two runs of ConvertOne on one PDF - identical bytes? | 14:22 | 14:47 | 25 min |
-| `R-02` | explicit break or renderer flow? | 15:10 | 15:19 | 9 min |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 12:16 → 15:13 · 2h 56m |
+| Slot window | 15:46 → running · 1 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 70 |
-| Longest silence | **27.9 min** — from 14:14:50, after `lastmessage.py: running a tool for its numbers` |
-| Silences over 2 min | 19 |
+| Tool beats | 6 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -113,12 +145,7 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **2 min** | `#` |
-| fix - diagnose and change the engine | **24 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **1h 20m** | `##########` |
-| record - attempt, handoff, class rows | **5 min** | `#` |
-| report - the report and the chain | **21 min** | `###` |
-| other - not attributed to a tool | **35 min** | `#####` |
+| report - the report and the chain | **1 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -131,7 +158,7 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
