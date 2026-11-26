@@ -2,28 +2,24 @@
  "name": "gst-invoice-multipage-item-table",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T05:32:33",
- "passed": 42,
+ "at": "2026-11-26T10:20:21",
+ "passed": 45,
  "total": 47,
  "failed": [
   "18_displacement",
-  "25_invisible_text",
-  "26_text_overlap",
-  "27_text_off_page",
-  "44_header_footer"
+  "26_text_overlap"
  ],
  "displacement": {
-  "med_dy": -52.1,
-  "worst_dy": 168.3,
+  "med_dy": -2.3,
+  "worst_dy": 7.5,
   "med_dx": 0.2,
   "bad_pages": [
    0,
    1,
-   2,
-   3
+   2
   ],
   "runs_matched": 373
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795685403"
 }
