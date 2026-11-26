@@ -1,10 +1,17 @@
 {
  "agents": [],
- "attempts": 1,
- "docs_improved": 0,
+ "attempts": 2,
+ "docs_improved": 1,
  "ended": null,
  "ended_ts": null,
- "kept": 0,
+ "kept": 1,
  "started": "05:57",
- "started_ts": 1795652834.9540026
+ "started_ts": 1795652834.9540026,
+ "class": "t02_position",
+ "counted": [
+  [
+   "t02_position",
+   1
+  ]
+ ]
 }
