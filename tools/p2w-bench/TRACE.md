@@ -6,7 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 23 Nov 05:01 | fixer | build-engine | engine built in 36s |
 | 23 Nov 05:09 | fixer | attempt | 00_page_count -> lead (0/23 moved) |
 | 23 Nov 05:29 | baseline | attempt | 18_displacement -> lead (0/? moved) |
 | 23 Nov 05:58 | fixer | claim | fixer claimed the slot |
@@ -406,3 +405,4 @@
 | 26 Nov 19:31 | fixer | build-engine | started |
 | 26 Nov 19:31 | fixer | build-engine | engine built in 46s |
 | 26 Nov 19:42 | fixer | attempt | 18_displacement -> lead (0/? moved) |
+| 26 Nov 20:35 | fixer | attempt | t09_page_furniture -> lead (0/? moved) |

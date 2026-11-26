@@ -7555,3 +7555,9 @@
 {"t": 1795705535.8053207, "ist": "20:35:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795705536.1034148, "ist": "20:35:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795705547.2823107, "ist": "20:35:47", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795705550.0215147, "ist": "20:35:50", "ev": "attempt", "d": "t09_page_furniture -> lead"}
+{"t": 1795705550.154106, "ist": "20:35:50", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795705550.2519655, "ist": "20:35:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795705550.8907313, "ist": "20:35:50", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795705559.144724, "ist": "20:35:59", "ev": "beat", "d": "writing findings + report"}
+{"t": 1795706034.7194662, "ist": "20:43:54", "ev": "beat", "d": "clock test"}
