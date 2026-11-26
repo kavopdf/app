@@ -59,7 +59,7 @@ document,applicable,passed,failed,abstained,failed_ids
 331_pid_diagram,7,7,0,0,
 332_bom_on_drawing,8,8,0,0,
 333_datasheet_spec_tables,7,7,0,0,
-334_patent_document,7,6,1,0,t02_position
+334_patent_document,7,7,0,0,
 335_msds_safety_data_sheet,7,7,0,0,
 33_sans_nondefault_body,9,9,0,0,
 340_bill_of_lading,7,7,0,0,
@@ -97,7 +97,7 @@ document,applicable,passed,failed,abstained,failed_ids
 392_statistical_console_output,7,7,0,0,
 393_spectrum_peak_table,7,7,0,0,
 394_map_with_legend,7,7,0,0,
-39_small_caps_letter_spacing,9,7,2,0,t01_word_accuracy t08_line_order
+39_small_caps_letter_spacing,9,8,1,0,t01_word_accuracy
 400_comic_page_speech_bubbles,7,7,0,0,
 401_trifold_brochure,7,7,0,0,
 402_calendar_month_grid,7,7,0,0,
