@@ -2608,3 +2608,36 @@ prefix is not. Two agents, two files, each carrying its own id.
 
 This is not a naming preference. It is the difference between a run that can find an agent's work and one
 that has to guess which of forty findings files came from which of two agents.
+
+## BEFORE YOUR REPORT: WRITE /tmp/why-nothing-moved.md, IN YOUR OWN WORDS
+
+Every other section of your report is numbers checked against a second file. This one is not, and it
+cannot be: it asks what you believe, and no ledger holds that. So it carries **no numbers** - the numbers
+are in the tables above it and they are checked - and you write it yourself.
+
+Most runs end with nothing moved. A reader who sees that needs to know which of four very different
+problems they are looking at, because every other section makes them look identical:
+
+- the class is genuinely hard, and more attempts on it are worth making
+- the gate is refusing you, and the gate is the work
+- the measurement does not fit the slot, and the plan is wrong rather than the patch
+- you do not understand your own blocker yet
+
+Answer these, in plain sentences, before you run `lastmessage.py`:
+
+1. **Why did nothing move this run?** Not which check failed - the mechanism that stopped a document
+   from going clean.
+2. **What did you do about it, and what will you do differently?** If the answer is "the same thing
+   again", say that, and say why repeating it is not waste.
+3. **What would have to be true for the next run to move a document?** One sentence, and it must be
+   something the next run can act on.
+
+Write it to `/tmp/why-nothing-moved.md`. Plain text or markdown; it is rendered as a quote under
+"## Why nothing moved, in this run's own words".
+
+**Do not put numbers in it.** A number here is unverifiable by construction, and every other number in
+this report is checked against a second source. If a number matters, it belongs in the tables.
+
+**If you leave the file unwritten the report says so, in the section, as a gap.** That is not a
+punishment and it is not hidden: a run that cannot say why it moved nothing has told the reader something
+real, and it is better said than omitted.

@@ -1563,6 +1563,42 @@ def main(argv):
                      % (x["at"], x["outcome"], x["moved"], x["total"], why[:300]))
         L.append("")
 
+    # WHY NOTHING MOVED, IN THE FIXER'S OWN WORDS.
+    #
+    # Every other row in this report is a number checked against a second file. This one is not, and it
+    # cannot be: it asks what the run believes, which no ledger holds. So it carries NO NUMBERS - the
+    # numbers are in the tables above and they are checked - and it is written by the run itself into
+    # /tmp/why-nothing-moved.md before the report is produced.
+    #
+    # It exists because the honest reading of most runs is "nothing moved", and a table cannot say why.
+    # A reader who sees no document move needs to know whether that is the class being hard, the gate
+    # refusing, the measurement not fitting, or the run not understanding its own blocker - four
+    # different problems with four different answers, and they look identical in every other section.
+    #
+    # An absent file is printed as a gap rather than skipped. A section that silently disappears is how
+    # a report starts looking complete while missing the one thing that explains it.
+    _why = "/tmp/why-nothing-moved.md"
+    L.append("## Why nothing moved, in this run's own words")
+    L.append("")
+    if os.path.exists(_why):
+        try:
+            _wt = open(_why, encoding="utf-8").read().strip()
+        except Exception as _e:
+            _wt = ""
+            L.append("*(the file exists but could not be read: %s)*" % type(_e).__name__)
+            L.append("")
+        if _wt:
+            # Indented as a quote so a reader can tell the run's own reasoning from the checked tables
+            # above it. Nothing here is validated: it is the run's account, and it is labelled as one.
+            for _ln in _wt.splitlines():
+                L.append(("> " + _ln) if _ln.strip() else ">")
+            L.append("")
+    else:
+        L.append("*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so "
+                 "the only answer to \"why did nothing move\" is the table above - and a table of "
+                 "attempts is not a diagnosis. That absence is itself the finding.)*")
+        L.append("")
+
     tx = txt()
     if tx.get("available"):
         L.append("## The txt")
