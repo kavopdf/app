@@ -411,3 +411,5 @@
 | 26 Nov 12:03 | fixer | claim | fixer claimed the slot |
 | 26 Nov 13:11 | fixer | attempt | 18_displacement -> lead (0/? moved) |
 | 26 Nov 13:06 | baseline | claim | baseline claimed the slot |
+| 26 Nov 14:18 | fixer | claim | fixer claimed the slot |
+| 26 Nov 14:59 | fixer | attempt | 18_displacement -> lead (0/? moved) |
