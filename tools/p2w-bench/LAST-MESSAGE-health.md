@@ -2,7 +2,7 @@ Two stages read stopped, and neither is a mystery: classify is overdue on a tabl
 
 ## The picture
 
-health.py --stalled exits non-zero and names classify and fix. measure-google is done, 213 of 213, 0.3 h. matrix is done, 213 of 213, 2.2 h. classify is stopped at 9.8 h against a 6 h threshold. fix is stopped, 2 attempt(s) in the last 3 h, 0.9 h. txt is moving, 204 clean and 9 failing, 4.6 h.
+health.py --stalled exits non-zero and names classify and fix. measure-google is done, 213 of 213, 0.4 h. matrix is done, 213 of 213, 2.3 h. classify is stopped at 9.8 h against a 6 h threshold. fix is stopped, 1 attempt(s) in the last 3 h, 1.0 h. txt is moving, 204 clean and 9 failing, 4.6 h.
 
 The first read of this pass said nothing was stopped, and that was true of the reading: classify read waiting while the Google measurement it depends on was incomplete, and fix had a live beacon. Both changed while I was writing, which is why this report carries a second read rather than the first.
 
@@ -14,7 +14,7 @@ I read the tables rather than the report: RANKING.csv holds 59 documents above t
 
 ## STEP 5 fires, and the answer is the gate
 
-The earlier pass left itself a test: STEP 5 fires only if google clean is flat too, or if RANKING.csv is older than the engine it measures. google clean is 42 to 42, so the first condition now holds, on top of docx open reading 59 on six consecutive rows. Both flat columns carry 2 attempt(s) in the last 3 h and 0 kept beside them.
+The earlier pass left itself a test: STEP 5 fires only if google clean is flat too, or if RANKING.csv is older than the engine it measures. google clean is 42 to 42, so the first condition now holds, on top of docx open reading 59 on six consecutive rows. Both flat columns carry 1 attempt(s) in the last 3 h and 0 kept beside them.
 
 The decision is that the approach is wrong, not the class. The evidence is the 05:28 relay row in BLOCKERS.md: regress.py --check refuses on an unmeasured engine, a corpus re-score costs 4 slices and 11 min, and a revert costs the same again, so a change is measured, reverted and never lands inside a slot. That is why nothing is kept whichever class the fixer picks.
 

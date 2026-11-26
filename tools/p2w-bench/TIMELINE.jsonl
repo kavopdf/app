@@ -5881,6 +5881,15 @@
 {"t": 1795588799.8116999, "ist": "12:09:59", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795588800.3639576, "ist": "12:10:00", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795588802.815211, "ist": "12:10:02", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795589018.3452907, "ist": "12:13:38", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795589018.5962148, "ist": "12:13:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795589018.7547593, "ist": "12:13:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795589022.1305528, "ist": "12:13:42", "ev": "beat", "d": "relay: claimed, reading charter"}
+{"t": 1795589336.0980198, "ist": "12:18:56", "ev": "beat", "d": "relay: pod-prep artifacts warm, installing hook"}
+{"t": 1795589593.2828844, "ist": "12:23:13", "ev": "beat", "d": "relay: reading last run + gaps"}
+{"t": 1795589599.399223, "ist": "12:23:19", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795591056.4841328, "ist": "12:47:36", "ev": "beat", "d": "relay: p2w.py profile patch applied, testing real class prerender"}
+{"t": 1795591064.4680169, "ist": "12:47:44", "ev": "beat", "d": "relay: running screen on content-present-partly-displaced (real class, patched)"}
 {"t": 1795591068.1812687, "ist": "12:47:48", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795591069.8657782, "ist": "12:47:49", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795591070.2717478, "ist": "12:47:50", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
@@ -5901,44 +5910,12 @@
 {"t": 1795591332.7613099, "ist": "12:52:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795591332.9564524, "ist": "12:52:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795591333.2332466, "ist": "12:52:13", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795591374.296949, "ist": "12:52:54", "ev": "beat", "d": "relay: screen call 2 - does the resume progress?"}
+{"t": 1795591668.0709648, "ist": "12:57:48", "ev": "beat", "d": "relay: screen call 3, unbuffered to log"}
 {"t": 1795591903.6079667, "ist": "13:01:43", "ev": "beat", "d": "claimed slot, reading charter"}
 {"t": 1795591917.4242437, "ist": "13:01:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795591918.8113575, "ist": "13:01:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795591923.3843868, "ist": "13:02:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795593433.6713777, "ist": "13:27:13", "ev": "beat", "d": "agent returned: row-height patch is one line, 2278 atLeast rows in 143 docs; now measuring it myself"}
-{"t": 1795593461.4858255, "ist": "13:27:41", "ev": "beat", "d": "applying the one-line trHeight exact change, then rebuilding the engine"}
-{"t": 1795593544.4669259, "ist": "13:29:04", "ev": "beat", "d": "engine built with trHeight=exact; converting 40 row-dense documents to test for clipping"}
-{"t": 1795593819.2510335, "ist": "13:33:39", "ev": "beat", "d": "30 row-dense docs converted with exact; rendering to PDF to test for clipping"}
-{"t": 1795595009.3424087, "ist": "13:53:29", "ev": "beat", "d": "engine change committed to tree; gate wants a re-measure - building the corpus for regress.py --check"}
-{"t": 1795595246.930803, "ist": "13:57:26", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795595493.2020545, "ist": "14:01:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795595495.7994854, "ist": "14:01:35", "ev": "attempt", "d": "18_displacement -> lead"}
-{"t": 1795595495.9281704, "ist": "14:01:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795595496.0213556, "ist": "14:01:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795595496.6458013, "ist": "14:01:36", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795595523.0359285, "ist": "14:02:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795595524.708672, "ist": "14:02:04", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795595525.1662965, "ist": "14:02:05", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795595526.9459345, "ist": "14:02:06", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795595533.5888247, "ist": "14:02:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795595535.6223633, "ist": "14:02:15", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795595536.0967348, "ist": "14:02:16", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795595537.9241025, "ist": "14:02:17", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795595542.2208998, "ist": "14:02:22", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795595543.9768229, "ist": "14:02:23", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795595544.4598923, "ist": "14:02:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795595546.7028751, "ist": "14:02:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795589018.3452907, "ist": "12:13:38", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1795589018.5962148, "ist": "12:13:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795589018.7547593, "ist": "12:13:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795589022.1305528, "ist": "12:13:42", "ev": "beat", "d": "relay: claimed, reading charter"}
-{"t": 1795589336.0980198, "ist": "12:18:56", "ev": "beat", "d": "relay: pod-prep artifacts warm, installing hook"}
-{"t": 1795589593.2828844, "ist": "12:23:13", "ev": "beat", "d": "relay: reading last run + gaps"}
-{"t": 1795589599.399223, "ist": "12:23:19", "ev": "beat", "d": "gaps.py: reading the timeline"}
-{"t": 1795591056.4841328, "ist": "12:47:36", "ev": "beat", "d": "relay: p2w.py profile patch applied, testing real class prerender"}
-{"t": 1795591064.4680169, "ist": "12:47:44", "ev": "beat", "d": "relay: running screen on content-present-partly-displaced (real class, patched)"}
-{"t": 1795591374.296949, "ist": "12:52:54", "ev": "beat", "d": "relay: screen call 2 - does the resume progress?"}
-{"t": 1795591668.0709648, "ist": "12:57:48", "ev": "beat", "d": "relay: screen call 3, unbuffered to log"}
 {"t": 1795592056.0220573, "ist": "13:04:16", "ev": "beat", "d": "relay: stack-dumping the stall"}
 {"t": 1795592223.6771865, "ist": "13:07:03", "ev": "beat", "d": "relay: scipy missing is the stall - installing and measuring"}
 {"t": 1795592349.307629, "ist": "13:09:09", "ev": "beat", "d": "relay: verifying scipy guard, then class screen"}
@@ -6048,6 +6025,7 @@
 {"t": 1795593428.009408, "ist": "13:27:08", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795593431.6142848, "ist": "13:27:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795593433.4761424, "ist": "13:27:13", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795593433.6713777, "ist": "13:27:13", "ev": "beat", "d": "agent returned: row-height patch is one line, 2278 atLeast rows in 143 docs; now measuring it myself"}
 {"t": 1795593433.8341866, "ist": "13:27:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795593435.5195794, "ist": "13:27:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795593439.476252, "ist": "13:27:19", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
@@ -6062,6 +6040,7 @@
 {"t": 1795593457.4938464, "ist": "13:27:37", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795593458.117342, "ist": "13:27:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795593460.030542, "ist": "13:27:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795593461.4858255, "ist": "13:27:41", "ev": "beat", "d": "applying the one-line trHeight exact change, then rebuilding the engine"}
 {"t": 1795593463.4977207, "ist": "13:27:43", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795593465.5625944, "ist": "13:27:45", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795593465.9197044, "ist": "13:27:45", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
@@ -6094,6 +6073,27 @@
 {"t": 1795593532.9404542, "ist": "13:28:52", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795593533.3739467, "ist": "13:28:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795593535.0185068, "ist": "13:28:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795593544.4669259, "ist": "13:29:04", "ev": "beat", "d": "engine built with trHeight=exact; converting 40 row-dense documents to test for clipping"}
+{"t": 1795593819.2510335, "ist": "13:33:39", "ev": "beat", "d": "30 row-dense docs converted with exact; rendering to PDF to test for clipping"}
+{"t": 1795595009.3424087, "ist": "13:53:29", "ev": "beat", "d": "engine change committed to tree; gate wants a re-measure - building the corpus for regress.py --check"}
+{"t": 1795595246.930803, "ist": "13:57:26", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795595493.2020545, "ist": "14:01:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795595495.7994854, "ist": "14:01:35", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795595495.9281704, "ist": "14:01:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795595496.0213556, "ist": "14:01:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795595496.6458013, "ist": "14:01:36", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795595523.0359285, "ist": "14:02:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795595524.708672, "ist": "14:02:04", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795595525.1662965, "ist": "14:02:05", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795595526.9459345, "ist": "14:02:06", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795595533.5888247, "ist": "14:02:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795595535.6223633, "ist": "14:02:15", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795595536.0967348, "ist": "14:02:16", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795595537.9241025, "ist": "14:02:17", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795595542.2208998, "ist": "14:02:22", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795595543.9768229, "ist": "14:02:23", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795595544.4598923, "ist": "14:02:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795595546.7028751, "ist": "14:02:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795595904.0315447, "ist": "14:08:24", "ev": "claim", "d": "baseline claimed the slot"}
 {"t": 1795596440.3208663, "ist": "14:17:20", "ev": "beat", "d": "relay: cloned, about to read"}
 {"t": 1795596465.909515, "ist": "14:17:45", "ev": "claim", "d": "fixer claimed the slot"}
@@ -6172,21 +6172,21 @@
 {"t": 1795606626.010291, "ist": "17:07:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795606626.1393075, "ist": "17:07:06", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795606626.8505414, "ist": "17:07:06", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795607659.045518, "ist": "17:24:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795608083.0591884, "ist": "17:31:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795608230.9300318, "ist": "17:33:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795608262.760135, "ist": "17:34:22", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795608335.321282, "ist": "17:35:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795608341.2494745, "ist": "17:35:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795607214.4990911, "ist": "17:16:54", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795607214.6966755, "ist": "17:16:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795607214.787992, "ist": "17:16:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795607218.8598778, "ist": "17:16:58", "ev": "beat", "d": "relay: claimed, prep corpus"}
 {"t": 1795607228.757202, "ist": "17:17:08", "ev": "beat", "d": "relay: corpus slice"}
 {"t": 1795607535.3634746, "ist": "17:22:15", "ev": "beat", "d": "relay: corpus slice 2"}
+{"t": 1795607659.045518, "ist": "17:24:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795607835.3447914, "ist": "17:27:15", "ev": "beat", "d": "relay: corpus slice 3"}
+{"t": 1795608083.0591884, "ist": "17:31:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795608096.8010423, "ist": "17:31:36", "ev": "beat", "d": "relay: corpus slice 4"}
+{"t": 1795608230.9300318, "ist": "17:33:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795608262.760135, "ist": "17:34:22", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795608283.4928997, "ist": "17:34:43", "ev": "beat", "d": "relay: corpus slice 4"}
+{"t": 1795608335.321282, "ist": "17:35:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795608341.2494745, "ist": "17:35:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795608477.1555657, "ist": "17:37:57", "ev": "beat", "d": "relay: corpus final slice"}
 {"t": 1795608610.9329672, "ist": "17:40:10", "ev": "beat", "d": "gaps.py: reading the timeline"}
 {"t": 1795608625.8181632, "ist": "17:40:25", "ev": "beat", "d": "pending.py: reading the pending gate"}
@@ -6248,6 +6248,7 @@
 {"t": 1795614099.2225938, "ist": "19:11:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795614100.0833042, "ist": "19:11:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795614108.2303338, "ist": "19:11:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795614260.293878, "ist": "19:14:20", "ev": "claim", "d": "baseline claimed the slot"}
 {"t": 1795617161.3713894, "ist": "20:02:41", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795617161.7023828, "ist": "20:02:41", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795617161.9308634, "ist": "20:02:41", "ev": "beat", "d": "pending.py: reading the pending gate"}
@@ -6256,6 +6257,15 @@
 {"t": 1795618053.2997427, "ist": "20:17:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795618060.7855825, "ist": "20:17:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795618062.5548966, "ist": "20:17:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795618163.8066196, "ist": "20:19:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795618166.97734, "ist": "20:19:26", "ev": "attempt", "d": "t12_word_invention -> lead"}
+{"t": 1795618167.146893, "ist": "20:19:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795618167.2601771, "ist": "20:19:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795618168.05215, "ist": "20:19:28", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795618218.7554917, "ist": "20:20:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795618222.4668999, "ist": "20:20:22", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795618222.6000876, "ist": "20:20:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795618222.7120597, "ist": "20:20:22", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795618693.8397822, "ist": "20:28:13", "ev": "beat", "d": "rowsnap patch applied, compiling engine"}
 {"t": 1795619032.6357296, "ist": "20:33:52", "ev": "beat", "d": "google round-trip: 320 before vs after"}
 {"t": 1795619165.0830724, "ist": "20:36:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
@@ -6311,16 +6321,6 @@
 {"t": 1795619421.7669132, "ist": "20:40:21", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795619422.702678, "ist": "20:40:22", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795619427.5480607, "ist": "20:40:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795618163.8066196, "ist": "20:19:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795618166.97734, "ist": "20:19:26", "ev": "attempt", "d": "t12_word_invention -> lead"}
-{"t": 1795618167.146893, "ist": "20:19:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795618167.2601771, "ist": "20:19:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795618168.05215, "ist": "20:19:28", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795618218.7554917, "ist": "20:20:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795618222.4668999, "ist": "20:20:22", "ev": "release", "d": "fixer released (forced)"}
-{"t": 1795618222.6000876, "ist": "20:20:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795618222.7120597, "ist": "20:20:22", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795614260.293878, "ist": "19:14:20", "ev": "claim", "d": "baseline claimed the slot"}
 {"t": 1795619462.7696187, "ist": "20:41:02", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795619463.171937, "ist": "20:41:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795619463.4700313, "ist": "20:41:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
@@ -6601,23 +6601,11 @@
 {"t": 1795639540.0940285, "ist": "02:15:40", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795639540.4606512, "ist": "02:15:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795639542.3209684, "ist": "02:15:42", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795639542.786013, "ist": "02:15:42", "ev": "claim", "d": "baseline claimed the slot"}
 {"t": 1795639550.9716194, "ist": "02:15:50", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795639552.923114, "ist": "02:15:52", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795639553.2803626, "ist": "02:15:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795639555.331139, "ist": "02:15:55", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795639542.786013, "ist": "02:15:42", "ev": "claim", "d": "baseline claimed the slot"}
-{"t": 1795642902.5123053, "ist": "03:11:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795642903.0044274, "ist": "03:11:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795642903.5160294, "ist": "03:11:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795642904.053651, "ist": "03:11:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795642911.2194452, "ist": "03:11:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795642911.8098888, "ist": "03:11:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795642912.3876996, "ist": "03:11:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795642913.0152345, "ist": "03:11:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795643030.1295645, "ist": "03:13:50", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795643065.7108674, "ist": "03:14:25", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795643065.9072814, "ist": "03:14:25", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795643100.9795582, "ist": "03:15:00", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795639996.992856, "ist": "02:23:16", "ev": "beat", "d": "heartbeat before any claim: relay: prep warm, reading brief"}
 {"t": 1795640323.4304578, "ist": "02:28:43", "ev": "beat", "d": "gaps.py: reading the timeline"}
 {"t": 1795640660.2745607, "ist": "02:34:20", "ev": "beat", "d": "pending.py: reading the pending gate"}
@@ -6637,6 +6625,18 @@
 {"t": 1795641560.0194857, "ist": "02:49:20", "ev": "beat", "d": "converting corpus on the pgMar engine (160 to go)"}
 {"t": 1795642201.668906, "ist": "03:00:01", "ev": "beat", "d": "measuring 212 on the pgMar engine"}
 {"t": 1795642763.797554, "ist": "03:09:23", "ev": "beat", "d": "measuring (84/212) on the pgMar engine"}
+{"t": 1795642902.5123053, "ist": "03:11:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795642903.0044274, "ist": "03:11:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795642903.5160294, "ist": "03:11:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795642904.053651, "ist": "03:11:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795642911.2194452, "ist": "03:11:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795642911.8098888, "ist": "03:11:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795642912.3876996, "ist": "03:11:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795642913.0152345, "ist": "03:11:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795643030.1295645, "ist": "03:13:50", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795643065.7108674, "ist": "03:14:25", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795643065.9072814, "ist": "03:14:25", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795643100.9795582, "ist": "03:15:00", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795643924.0576782, "ist": "03:28:44", "ev": "beat", "d": "212/212 measured; running the gate"}
 {"t": 1795644060.132333, "ist": "03:31:00", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795644062.3450055, "ist": "03:31:02", "ev": "beat", "d": "attempt.py: recording an attempt"}
@@ -6692,9 +6692,12 @@
 {"t": 1795651482.2733073, "ist": "05:34:42", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795651482.6017554, "ist": "05:34:42", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795651484.2693148, "ist": "05:34:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795653288.8710709, "ist": "06:04:48", "ev": "beat", "d": "pod warm, checking corpus conversion state"}
+{"t": 1795653293.6702397, "ist": "06:04:53", "ev": "beat", "d": "corpus slice: 64 to go"}
 {"t": 1795653557.665815, "ist": "06:09:17", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795653600.8678825, "ist": "06:10:00", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795653601.065988, "ist": "06:10:01", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795653613.8532984, "ist": "06:10:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795653639.1598458, "ist": "06:10:39", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795653961.759694, "ist": "06:16:01", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795654003.3491085, "ist": "06:16:43", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
@@ -6712,16 +6715,13 @@
 {"t": 1795654597.8122811, "ist": "06:26:37", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795654598.0154579, "ist": "06:26:38", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795654638.4962058, "ist": "06:27:18", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795654658.0244522, "ist": "06:27:38", "ev": "beat", "d": "measuring txt t02 baseline on 334/74/39"}
+{"t": 1795654680.475882, "ist": "06:28:00", "ev": "beat", "d": "full txt rescore with patched instrument (213 docs)"}
+{"t": 1795654743.1308494, "ist": "06:29:03", "ev": "beat", "d": "txt_rank --rescore (213 sequential)"}
 {"t": 1795654762.5954123, "ist": "06:29:22", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795654802.5866594, "ist": "06:30:02", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795654802.760514, "ist": "06:30:02", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795654843.1891108, "ist": "06:30:43", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795653288.8710709, "ist": "06:04:48", "ev": "beat", "d": "pod warm, checking corpus conversion state"}
-{"t": 1795653293.6702397, "ist": "06:04:53", "ev": "beat", "d": "corpus slice: 64 to go"}
-{"t": 1795653613.8532984, "ist": "06:10:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795654658.0244522, "ist": "06:27:38", "ev": "beat", "d": "measuring txt t02 baseline on 334/74/39"}
-{"t": 1795654680.475882, "ist": "06:28:00", "ev": "beat", "d": "full txt rescore with patched instrument (213 docs)"}
-{"t": 1795654743.1308494, "ist": "06:29:03", "ev": "beat", "d": "txt_rank --rescore (213 sequential)"}
 {"t": 1795654952.5942693, "ist": "06:32:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795654954.1316144, "ist": "06:32:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795655004.6271849, "ist": "06:33:24", "ev": "beat", "d": "writing report"}
@@ -6729,6 +6729,7 @@
 {"t": 1795655026.6706662, "ist": "06:33:46", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795655027.005954, "ist": "06:33:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795655028.7827668, "ist": "06:33:48", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795655035.756329, "ist": "06:33:55", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795655056.4622097, "ist": "06:34:16", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795655058.2597582, "ist": "06:34:18", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795655058.6035886, "ist": "06:34:18", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
@@ -6737,3 +6738,6 @@
 {"t": 1795655068.0000901, "ist": "06:34:28", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795655068.3783426, "ist": "06:34:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795655070.230971, "ist": "06:34:30", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795655081.9805648, "ist": "06:34:41", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795655082.1654963, "ist": "06:34:42", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795655125.511656, "ist": "06:35:25", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
