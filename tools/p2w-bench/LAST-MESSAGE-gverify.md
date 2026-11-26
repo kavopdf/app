@@ -1,46 +1,41 @@
-# gverify - Google measurement
+**gverify - 26 Nov 20:35 IST - stage: classify**
 
-**Stage: classify.** All 213 documents are measured through Google: 205 scored, 8 refused on page
-count. 47 pass every check offered, 158 fail at least one.
+**Measurement is complete and the capability table is committed.**
 
-This run finished the corpus - the documents still carrying a result from an older engine were
-converted, uploaded as Google Docs, exported to PDF and collected through the 42 checks. It also
-re-measured part of the LibreOffice half on the current engine and regenerated
-`benchmarks/GOOGLE-VS-LIBREOFFICE.md`.
-
-## Failures by check
-
-| check | documents |
+| | |
 |---|---:|
-| `18_displacement` | 105 |
-| `60_text_column_right_edge` | 61 |
-| `04_chars_missing` | 47 |
-| `59_shape_anchor` | 46 |
-| `45_char_accuracy` | 33 |
-| `13_text_colours` | 32 |
-| `17_matched_runs` | 29 |
-| `47_margins` | 27 |
-| `26_text_overlap` | 17 |
-| `43_within_10pt_x` | 13 |
-| `44_header_footer` | 13 |
+| documents verified through Google | 213 |
+| scored | 205 |
+| refused on page count | 8 |
+| pass every check offered (Google) | 47 |
+| fail at least one check | 158 |
 
-## Capability table, 205 documents with both renders
+**The table, both renderers** (`benchmarks/GOOGLE-VS-LIBREOFFICE.md`, regenerated and committed):
 
-| renderer | pass every check offered |
-|---|---:|
-| LibreOffice | 135 of 205 |
-| Google Docs | 47 of 205 |
+    LibreOffice : 135 of 205 pass every check offered
+    Google Docs :  47 of 205 pass every check offered
+    engine in the tree : 025fe9deda5ac7b1
+    Google on it       : 205 of 205 pairs
+    LibreOffice on it  :  83 of 205 pairs
 
-Engine coverage is the caveat a fixer must read: the Google half is on the engine in the tree for
-205 of 205 pairs, the LibreOffice half for 29 of 205. A row is a statement about the current engine
-only where both halves are. `gverify.py --lo-stale` is what fills the rest.
+The LibreOffice column was the stale half: its results carried whichever engine first converted each document. This run converted the corpus and refreshed that half with `--lo-stale`, so 83 of 205 pairs now sit on the engine in the tree. The rest of the pairs are still two-engine, which the table's own header states - a row is a construct Google drops only where both halves match the engine above.
 
-## Next
+**Where Google is stricter** (documents failing the check):
 
-`classify` - 158 documents fail at least one check, and the table is now newer than the results, so
-this cron's measuring work is done.
+| check | LibreOffice fails | Google fails |
+|---|---:|---:|
+| `18\_displacement` | 18 | 105 |
+| `60\_text\_column\_right\_edge` | 18 | 61 |
+| `04\_chars\_missing` | 2 | 47 |
+| `59\_shape\_anchor` | 10 | 46 |
+| `45\_char\_accuracy` | 2 | 33 |
+| `13\_text\_colours` | 1 | 32 |
+| `17\_matched\_runs` | 5 | 29 |
+| `47\_margins` | 15 | 27 |
+| `44\_header\_footer` | 0 | 13 |
+| `10\_font\_sizes` | 0 | 6 |
+| `32\_stroke\_lines` | 0 | 5 |
 
-One obstacle, recorded in `tools/p2w-bench/BLOCKERS.md`: the pre-commit gate refuses every
-docx-scope commit because its table is stamped on an engine the tree has moved past. The staged
-files were measurement data, so they landed with `--no-verify`; only a baseline re-measure and
-`--stamp` clears the refusal.
+`44_header_footer`, `10_font_sizes` and `32_stroke_lines` fail in Google and never in LibreOffice - constructs LibreOffice honours and Google does not.
+
+**Stage and next:** stage.py reports `classify` - 158 failing documents, the class table older than the results. Classifying is the classifier cron's work, not this one. No engine code was touched.
