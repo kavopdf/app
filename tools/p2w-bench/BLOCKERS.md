@@ -1076,3 +1076,31 @@ because it is still true and nothing in the repository can see the cron platform
 | 12:10 | STEP 4 D, the fixer slot | whether the slot is held by a dead run | `ROUND.json`: `fixer_started` 06:33, `fixer_last_beat` 06:23, 8 attempt(s) in 3 h, and the newest commits are a claim and a report from the run that took it | **not needed** | nothing. The claim is live and the work behind it is recent, so `round.py --release-fixer --force` was not run. **Overturned by:** the same claim still held with no beat and no attempt once its stale window has passed |
 | 12:10 | the trend row's Google column | the committed row says 208 measured, the data now says 207 | `progress.py` printed both the committed row and the diff against yesterday | yes - understood, not "fixed" | nothing. The row is one behind a measurement still being rewritten; the number to read is `google clean`, 42, and it is flat. No past row was edited |
 | 12:10 | STEP 5, the flat `.docx open` column | `docx open` reads 59 in every committed row including today's, unchanged, while the fixer works | read today's rows above, the trend table and `ROUND.json` | decided earlier today, and it stands | **No class parked.** The gate charges a full corpus re-score to every change, so changes are measured, reverted and never land. **What replaces it:** a scope keyed on the documents a change can actually move. Today's evidence is that the `.txt` axis moved 9 to 8 on a change whose `.docx` output was unchanged. **Overturned by:** one engine change that lands and moves `docx open` |
+
+## The commit gate refuses every commit on a fresh pod, before any change is made
+
+**26 Nov 2026, relay slot 17:12.** `regress.py --check` exits REFUSED on an untouched clone:
+
+    docx: no document worse than baseline
+    txt : not re-measured - the tree is the engine the table was measured on (a4d8fca469bba636)
+    REFUSED. This commit would land a regression or an unmeasured engine.
+
+`measure_gate.py` names the cause: `RANKING.csv` was measured on docx engine `a4de7df896875a39`, and
+this pod's tree fingerprints `7e0de1abdeb221ae` — NOT READY. The tree fingerprint is not the engine
+commit; a fresh pod rebuilds the engine and the fingerprint moves, so the corpus must be re-measured on
+every pod before the gate will pass a commit.
+
+The re-measure is pod-local and does not fit one pod: `pod-prep.sh` step 8 converts the corpus in
+240-second slices and reported **165 of 213** documents still to convert on this pod, i.e. about three
+more slices after the ~20 minutes pod-prep already takes for corpus, JDK, libs and compile.
+`install-gate.sh` runs that same step before it writes `.git/hooks/pre-commit`, so on a fresh pod the
+hook is never installed and commits land unguarded — `b1a934f7` (two FINDINGS files, no engine code)
+landed that way this run.
+
+Two things follow, and neither is a fix this run could land:
+
+1. Either the tree fingerprint must stop moving between pods (it should be a function of the engine
+   sources, not of the build), or the gate must be told which engine the corpus was measured on and
+   accept that as measured.
+2. Until then, no run can commit an engine change at all, and a run that reports "the gate refused" is
+   reporting this, not a defect in its own work.
