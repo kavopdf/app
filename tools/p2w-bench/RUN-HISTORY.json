@@ -437,5 +437,19 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "--he-01"
+  ],
+  "attempts": 2,
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "started": "18:57",
+  "started_ts": 1795699676.784448,
+  "class": "18_displacement",
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
