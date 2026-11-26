@@ -13,8 +13,10 @@
       }
     ]
   },
+  "fixer_doing": "probes deleted; gathering report numbers",
+  "fixer_doing_since": 1795668212.8668554,
   "fixer_engine_at_claim": "11e0e4fc",
-  "fixer_last_beat": 1795660422.2051935,
+  "fixer_last_beat": 1795668212.8668563,
   "fixer_started": 1795667141.8721247,
   "history": [
     {
