@@ -2,7 +2,7 @@
  "name": "352_certificate_ornate_border",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-25T23:16:28",
+ "at": "2026-11-26T00:26:00",
  "passed": 37,
  "total": 42,
  "failed": [
@@ -19,6 +19,6 @@
   "bad_pages": [],
   "runs_matched": 12
  },
- "engine": "d85db0a9822ddb54",
- "checks": "375669-1795647084"
+ "engine": "981ff1fa35e2cf67",
+ "checks": "375669-1795650942"
 }
