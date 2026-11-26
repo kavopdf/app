@@ -2,7 +2,7 @@
  "name": "12_stamp_across_page_break",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T03:13:45",
+ "at": "2026-11-26T11:14:57",
  "passed": 40,
  "total": 42,
  "failed": [
@@ -10,12 +10,12 @@
   "27_text_off_page"
  ],
  "displacement": {
-  "med_dy": 0.1,
+  "med_dy": 1.2,
   "worst_dy": 2.6,
   "med_dx": -0.1,
   "bad_pages": [],
   "runs_matched": 48
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795661945"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795690267"
 }

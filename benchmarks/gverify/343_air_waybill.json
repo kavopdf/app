@@ -2,7 +2,7 @@
  "name": "343_air_waybill",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T04:16:24",
+ "at": "2026-11-26T11:17:18",
  "passed": 40,
  "total": 42,
  "failed": [
@@ -16,6 +16,6 @@
   "bad_pages": [],
   "runs_matched": 39
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795665232"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795690267"
 }
