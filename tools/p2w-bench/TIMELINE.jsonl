@@ -7021,3 +7021,7 @@
 {"t": 1795674218.9927273, "ist": "11:53:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795674219.0902312, "ist": "11:53:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795674219.7049751, "ist": "11:53:39", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795674250.6391535, "ist": "11:54:10", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795674252.6771765, "ist": "11:54:12", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795674253.0618532, "ist": "11:54:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795674255.0816698, "ist": "11:54:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
