@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/302_radiology_report.pdf",
-  "render": "/tmp/lo-one/302_radiology_report.pdf",
+  "render": "/scratch/tmp/lo-one-s3ost82a/302_radiology_report.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "a4d8fca469bba636",
+  "engine": "025fe9deda5ac7b1",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -251,5 +251,5 @@
   },
   "document": "302_radiology_report",
   "source_file": "/scratch/work/p2w/corpus/302_radiology_report.pdf",
-  "render_file": "/tmp/lo-one/302_radiology_report.pdf"
+  "render_file": "/scratch/tmp/lo-one-s3ost82a/302_radiology_report.pdf"
 }
