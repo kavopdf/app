@@ -8108,3 +8108,45 @@
 {"t": 1795726587.5640914, "ist": "02:26:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795726587.680688, "ist": "02:26:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795726588.132406, "ist": "02:26:28", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795727043.2734241, "ist": "02:34:03", "ev": "beat", "d": "heartbeat before any claim: measure-google: planning batch of 60"}
+{"t": 1795727338.0369768, "ist": "02:38:58", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795727339.3262937, "ist": "02:38:59", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795727340.344211, "ist": "02:39:00", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795727341.0315945, "ist": "02:39:01", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795727341.5430887, "ist": "02:39:01", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795727341.6878083, "ist": "02:39:01", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795727341.851888, "ist": "02:39:01", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795727342.045569, "ist": "02:39:02", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
+{"t": 1795727519.1529498, "ist": "02:41:59", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795727519.2941186, "ist": "02:41:59", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795727519.4516382, "ist": "02:41:59", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795727519.5982354, "ist": "02:41:59", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795727519.8260827, "ist": "02:41:59", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795727519.9785638, "ist": "02:41:59", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795727520.1403148, "ist": "02:42:00", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795727520.291987, "ist": "02:42:00", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
+{"t": 1795727782.661306, "ist": "02:46:22", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795727782.8230822, "ist": "02:46:22", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795727782.9846601, "ist": "02:46:22", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795727783.151334, "ist": "02:46:23", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795727783.3349843, "ist": "02:46:23", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795727783.5237992, "ist": "02:46:23", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795727783.6755598, "ist": "02:46:23", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795727783.8695397, "ist": "02:46:23", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
+{"t": 1795727807.1468174, "ist": "02:46:47", "ev": "beat", "d": "heartbeat before any claim: measure-google: corpus ready (213 docx), planning 60"}
+{"t": 1795728565.9480875, "ist": "02:59:25", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728567.0584002, "ist": "02:59:27", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728567.3754578, "ist": "02:59:27", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728567.7712843, "ist": "02:59:27", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728568.2366195, "ist": "02:59:28", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728569.346413, "ist": "02:59:29", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728569.659218, "ist": "02:59:29", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728570.1520433, "ist": "02:59:30", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728584.080259, "ist": "02:59:44", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728585.223825, "ist": "02:59:45", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728585.5457304, "ist": "02:59:45", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728585.9471314, "ist": "02:59:45", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728586.3600223, "ist": "02:59:46", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728587.5499177, "ist": "02:59:47", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728587.9215672, "ist": "02:59:47", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795728588.345623, "ist": "02:59:48", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
