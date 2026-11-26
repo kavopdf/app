@@ -1,46 +1,50 @@
-# Google verify - run report
+**gverify — Google pass complete: 213 of 213 measured**
 
-The Google half of the corpus moved from 60 to 140 of 213 documents this run. Every document was uploaded to the pipeline's own Drive folder, converted on upload, exported back as a PDF and scored by the 42 checks against its source. The results are committed and pushed.
+The measurement is finished. Every document in the corpus now has a Google result, and the stage has
+moved off `measure-google` for the first time.
 
-## Where the measurement stands
-
-| | |
-|:--|--:|
-| Corpus | 213 documents |
-| Measured through Google | 140 |
-| Scored | 135 |
-| Pass every check offered | 40 |
-| Fail at least one | 95 |
-| Refused - page count did not match | 5 |
-
-A refusal is a recorded outcome, not a pass: Google reflowed those documents onto a different page count, so no score is claimed for them.
-
-## What fails, by check
-
-| check | documents failing |
+| | count |
 |---|---:|
-| `18_displacement` | 55 |
-| `60_text_column_right_edge` | 38 |
-| `59_shape_anchor` | 36 |
-| `04_chars_missing` | 34 |
-| `13_text_colours` | 23 |
-| `47_margins` | 20 |
-| `45_char_accuracy` | 20 |
-| `17_matched_runs` | 17 |
-| `35_rotation` | 12 |
-| `43_within_10pt_x` | 9 |
+| documents in the corpus | 213 |
+| verified through Google | 213 |
+| scored | 208 |
+| refused (page count) | 5 |
+| pass every check offered | 42 |
+| fail at least one | 166 |
 
-The head of this table has not moved: displacement, the right edge of a text column and shape anchoring are still the three constructs that cost the most documents in Google, and all three are constructs LibreOffice honours and Google reflows.
+Refused is not a pass: the 5 page-count refusals are counted separately, never as verified.
 
-## The two renderers, same engine
+**The five checks that cost the most documents**
+
+| check | Google fails | LibreOffice fails |
+|---|---:|---:|
+| `18\_displacement` | 119 | 21 |
+| `60\_text\_column\_right\_edge` | 62 | 19 |
+| `04\_chars\_missing` | 55 | 3 |
+| `59\_shape\_anchor` | 49 | 11 |
+| `45\_char\_accuracy` | 34 | 3 |
+
+`18\_displacement` alone costs 119 documents, and LibreOffice costs 21 on the same 208 documents with
+both renders. That gap is the pass working: the check is not broken, the renderer is.
+
+**The capability table is written and committed**
+
+`benchmarks/GOOGLE-VS-LIBREOFFICE.md` is regenerated from all results, not edited by hand. On the 208
+documents that have both renders:
 
 | renderer | pass every check offered |
 |---|---:|
-| LibreOffice | 135 of 208 |
-| Google Docs | 47 of 208 |
+| LibreOffice | 135 |
+| Google Docs | 42 |
 
-The capability matrix covers 208 documents. On the same source, the same .docx and the same instrument, Google is stricter on almost every check that matters and identical on the ones the engine already gets right - which is the whole reason this pass exists.
+The construct classes it names — Google drops what LibreOffice honours — come from the same run, with
+`18\_displacement`, `04\_chars\_missing` and `60\_text\_column\_right\_edge` the widest of them.
 
-## Stage and what is next
+**Stage and what is next**
 
-The stage is `measure-google`. Next is to measure 20 more through Google. Nothing in the engine was changed: this run only produced the table the fixer acts on.
+`stage.py` now reports `classify`: the results exist and the class table is older than them. Grouping
+the 166 failing documents into classes is the classifier cron's stage, not this one. Measuring is done,
+so this cron stops here.
+
+Note on the batch size: the run measured in batches of ten and was not cut off at any point, so the
+60-document ceiling was never the constraint — the upload step was, exactly as the brief says.
