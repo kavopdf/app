@@ -1798,7 +1798,7 @@ def main():
             print(f"  {x['share1']:6.1f}%@1px {x['share10']:6.1f}%@10px max {x['max_pt']:8.2f}pt "
                   f"txt {x['text_recall']:6.2f}% {x['signature']:14} {x['doc'][:-5][:38]}")
         return 0
-    end=time.time()+a.budget; os.makedirs(ROOT,exist_ok=True)
+    os.makedirs(ROOT,exist_ok=True)
     # scipy is not a nicety. edt() falls back to a 400-step dilation ladder without it,
     # and that ladder is exact but about ten times slower - the 16 Nov fixer measured three
     # single-page documents going from >290 s each to 28 s total once scipy was present. On
@@ -1837,6 +1837,13 @@ def main():
     _invalidate_if_engine_changed()
     if corpus()<100: log("ABORT: corpus"); return 2
     if not engine(): log("ABORT: engine"); return 2
+    # THE BUDGET STARTS WHEN THE WORK STARTS, NOT WHEN THE PROCESS DOES.
+    # Measured 26 Nov: --budget 60 ran past 260 s and produced no scoring output, because `end` was
+    # computed before the instrument check and that check can install scipy with a 220 s timeout. A
+    # budget of 60 s could be entirely consumed by setup, after which the loop starts nothing and
+    # reports an empty pass - which reads exactly like a corpus that needs 4.3 hours.
+    # Setup is not work on the corpus, so it no longer spends the corpus budget.
+    end=time.time()+a.budget
     # CONVERSION AND MEASUREMENT MUST NOT SHARE ONE DEADLINE.
     #
     # Measured 24 Nov, three consecutive 245/110/110 s chunks on this pod: every one ended
