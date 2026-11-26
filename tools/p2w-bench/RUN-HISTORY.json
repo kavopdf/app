@@ -539,5 +539,16 @@
   "window_for_claim": 1795726447.8183894,
   "class": "18_displacement",
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "03:01",
+  "started_ts": 1795728699.3948748,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]

@@ -36,6 +36,32 @@
   recorded: 2026-11-17 19:00
 
 
+## 18_displacement — a ruled table row is 0.75 pt taller in Google than in LibreOffice
+
+- CONFIRMED (measured, engine change still owed) - Google lays a row that carries a horizontal
+  rule at `trHeight + 0.75 pt`; LibreOffice lays it at `trHeight`. No value of `trHeight` and no
+  value of `hRule` produces the same row height in both, so the sub-class cannot be closed by
+  tuning the row height: the horizontal rules must leave the table.
+  evidence: 27 Nov 2026 fixer, FINDINGS/18-displacement-RULED-ROW-PITCH-IS-GOOGLE-ONLY-27NOV-fixer.md.
+  `303_discharge_summary` fails 18_displacement and nothing else; its last table row's four cells
+  read dy = +2.80 exactly, and 2.80 = 4 rows x 0.70. Row baseline pitch, same .docx: source 15.00,
+  LibreOffice 15.00, Google export 15.75 (`w:trHeight w:val="300" hRule="atLeast"`, tblBorders
+  sz=3 = 0.375 pt, tblCellMar all 0). Eight variants in one probe document, both renderers
+  (`tools/p2w-bench/probe-rowpitch.py`): no borders -> 15.00/15.00; all six borders -> 15.00/15.75;
+  trHeight 285 with all six -> 14.25/15.00; `hRule="exact"` -> identical to atLeast; moving the
+  rule from `tblBorders/insideH` to `tcBorders/bottom` -> still 15.75. The only ruled variant that
+  reads 15.00 in Google is the one with no horizontal rule between rows.
+  Scope: 4 of the 9 engine-current documents that fail only this check (303, 320, 325, 402 all
+  carry insideH). The other five (16, 362, 36, 403, 31) have no ruled rows and are still
+  unexplained - this is a sub-class, not the class.
+  Consequence for the proxy: every attempt that lowered trHeight to fix Google made LibreOffice
+  worse by the same 0.75 pt, and regress.py gates on LibreOffice. That is why 98 attempts have
+  not closed it, and it is a property of the sub-class, not of any one patch.
+  next: emit a ruled table's horizontal rules outside trHeight accounting (zero-height ruled
+  paragraphs between rows, or line shapes), then prove 303 reads 15.00 pitch in BOTH renderers.
+  recorded: 2026-11-27 03:55
+
+
 ## content-missing-partly-replaced — the nine-page account-opening form class
 
 - CONFIRMED - Every Run in a text box carried the raw `Tf` operand as its point size, not the

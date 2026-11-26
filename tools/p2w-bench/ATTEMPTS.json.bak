@@ -300,20 +300,9 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 97,
+  "attempts": 98,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-26 10:13",
-    "changed": {
-     "files": [],
-     "last_engine_commit": "engine: spend a refused page gap into w:before instead of w:line, and charge the 0.75pt ro"
-    },
-    "moved": 0,
-    "outcome": "lead",
-    "reason": "row-height lever measured in 4 Google renders: trHeight/hRule are not read, w:line is a one-way floor; the ladder plan the last report handed over is not implementable",
-    "total": null
-   },
    {
     "at": "2026-11-26 10:22",
     "changed": {
@@ -522,6 +511,17 @@
     "outcome": "lead",
     "reason": "single-line cell w:before+w:line is 32-77 tw short of its own w:trHeight and Google lays the cell: 362_price_list_dense 41/42->42/42 and 16_right_aligned_amounts_txtpos 41/42->42/42 in Google by raisi",
     "total": null
+   },
+   {
+    "at": "2026-11-27 02:25",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "gate: restore DocxWriter to 9f0a8207, the engine both tables were measured on"
+    },
+    "moved": null,
+    "outcome": "lead",
+    "reason": "single-line cell w:before+w:line is 32-77 tw short of its own w:trHeight and Google lays the cell: 362_price_list_dense 41/42->42/42 and 16_right_aligned_amounts_txtpos 41/42->42/42 in Google by raisi",
+    "total": null
    }
   ],
   "last": null,
@@ -612,6 +612,7 @@
    "lead",
    "lead",
    "reverted",
+   "lead",
    "lead",
    "lead",
    "lead",
@@ -726,6 +727,7 @@
    "three arms of the table-gap spacer room guard measured first-hand in Google on 7 documents (42 renders). FULL clears 403_crossword_puzzle 41/42 -> 42/42 at med_dy -0.6 but drives worst_dy to 29-34 pt on three bills; HALF puts the median at -0.1/-0.1/+0.8 on those bills and reduces worst_dy on six of seven, and completes no document. Engine left at HEAD. Residual after HALF is the tail clause, not the median - a different mechanism. See FINDINGS/18-displacement-SPACER-ROOM-THREE-ARMS-26NOV-fixer.md",
    "aa496ebe re-measured across 208 of 212: newsletter 0.20->86.30, 600 54.30->62.46, but itr-computation 42.33->9.10 - a 33pt regression, so the engine stays unstamped and the gate stays closed",
    "Guarded page-top margin measured on its whole population: 40 of 41 documents, 0 worse, 1 better (itr 42.33->40.83, page count 1), 38 unchanged. Not landed: the table must be re-measured on the new engine (35 min). The '33-point itr win' at 9.10 was a 2-page render of a 1-page document.",
+   "single-line cell w:before+w:line is 32-77 tw short of its own w:trHeight and Google lays the cell: 362_price_list_dense 41/42->42/42 and 16_right_aligned_amounts_txtpos 41/42->42/42 in Google by raising w:before alone, predicted before the render and confirmed by the full 42-check set; not landed because the engine change needs the 212-doc table re-measured",
    "single-line cell w:before+w:line is 32-77 tw short of its own w:trHeight and Google lays the cell: 362_price_list_dense 41/42->42/42 and 16_right_aligned_amounts_txtpos 41/42->42/42 in Google by raising w:before alone, predicted before the render and confirmed by the full 42-check set; not landed because the engine change needs the 212-doc table re-measured"
   ],
   "requeues": 0,
