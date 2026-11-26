@@ -1,34 +1,26 @@
-# P2W Google Verify - Run Report
+**gverify — stage `classify`. The capability table is regenerated, is now a true same-engine pair, and is committed. Nothing left to measure.**
 
-**26 Nov 2026 · 12:57 IST · stage classify**
+`stage.py` reports `classify`: `213` documents, `213` measured through Google (`207` scored, `6` refused), `165` failing. The next action belongs to the classifier cron — group those `165` failing documents into classes.
 
-> 207 of 213 measured in Google, 6 refused on page count. Google passes every check on 42; LibreOffice on 135 of the same 207.
+What this run added. The table's header had been admitting that the LibreOffice column was measured on an older engine — the Google half moved with every engine commit and the LibreOffice half never could, so the "where they disagree" section described a construct only for the pairs that happened to match. This run rebuilt the corpus and re-measured the LibreOffice side, and the table now says **LibreOffice on it: 207 of 207 pairs**, against **Google on it: 207 of 207 pairs**, engine `a4d8fca469bba636`. Every row below is a real pair.
 
-This run closed the Google side: the documents still without a render were built from HEAD, converted in Drive, exported and scored, and both result sets plus the capability table are committed. The LibreOffice column still trails the engine on many pairs, so the table's own engine-coverage note is the honest reading guide until that backlog is filled.
+| | LibreOffice | Google Docs |
+|---|---:|---:|
+| pass every check offered | 135 of 207 | 42 of 207 |
 
-| checks applied | **42, 44, 47 (mixed - a document is clean only against its own set)** |
-| measured against the current set | **72 of 207** |
-## Measured
+Top failing checks, from `gverify.py --report` and `gverify.py --matrix`:
 
-| | |
-|:--|--:|
-| scored | **207** |
-| refused on page count | **6** |
-| clean in Google | **42** |
-| passes in LibreOffice (proxy, not the renderer the user opens) | **135** |
+| check | LibreOffice fails | Google fails |
+|---|---:|---:|
+| `18\_displacement` | 20 | 113 |
+| `60\_text\_column\_right\_edge` | 18 | 62 |
+| `04\_chars\_missing` | 2 | 54 |
+| `59\_shape\_anchor` | 11 | 49 |
+| `45\_char\_accuracy` | 2 | 33 |
+| `13\_text\_colours` | 1 | 32 |
+| `17\_matched\_runs` | 5 | 30 |
+| `47\_margins` | 15 | 27 |
 
-## Checks Google fails and LibreOffice does not
+The six refused documents are still refused on page count — a refused document is not a pass, and they are not counted in the `207`.
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `18\_displacement` | **113** | 20 |
-| `04\_chars\_missing` | **54** | 2 |
-| `60\_text\_column\_right\_edge` | **62** | 18 |
-| `59\_shape\_anchor` | **49** | 11 |
-| `13\_text\_colours` | **32** | 1 |
-| `45\_char\_accuracy` | **33** | 2 |
-| `17\_matched\_runs` | **30** | 5 |
-| `44\_header\_footer` | **18** | 0 |
-
-The first row is the class to take: `18\_displacement`, 113 documents in Google against 20 in LibreOffice.
-
+Committed and pushed: `benchmarks/gverify-lo/` (both halves on the engine in the tree) and `benchmarks/GOOGLE-VS-LIBREOFFICE.md`. The commit gate passed on the way in — nothing got worse in either format, and the table matches this engine. No engine code was touched; no document was classified; no fix was attempted.
