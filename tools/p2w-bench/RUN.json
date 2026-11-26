@@ -1,11 +1,12 @@
 {
  "agents": [],
- "attempts": 1,
+ "attempts": 2,
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
  "started": "12:16",
  "started_ts": 1795675615.8847563,
- "window_for_claim": 1795675615.8847563
+ "window_for_claim": 1795675615.8847563,
+ "class": "t12_word_invention"
 }
