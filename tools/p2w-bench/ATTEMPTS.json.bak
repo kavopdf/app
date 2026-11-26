@@ -1952,7 +1952,7 @@
   "status": "OPEN"
  },
  "t02_position": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": null,
   "history": [
    {
@@ -1968,20 +1968,33 @@
     "outcome": "partial",
     "reason": "uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all",
     "total": 5
+   },
+   {
+    "at": "2026-11-26 06:32",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "Revert \"engine: page-top gap moves from w:before to w:pgMar w:top (18_displacement constru"
+    },
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "txt instrument: t02 ruler fitted by leverage-weighted least squares instead of a median that a (28,5) rounding cluster outvoted; t08 keyed on the baseline instead of the bbox top. 334_patent_document ",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "462353f",
+  "last_engine": "11e0e4fc",
   "last_moved": 1,
   "last_total": 5,
   "outcomes": [
    "error",
-   "partial"
+   "partial",
+   "kept"
   ],
-  "reason": "uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all 213 (word/document.xml), so the change is txt-only by measurement. scope.py gained the method entry that made the commit possible.",
+  "reason": "txt instrument: t02 ruler fitted by leverage-weighted least squares instead of a median that a (28,5) rounding cluster outvoted; t08 keyed on the baseline instead of the bbox top. 334_patent_document 69%->100%. 213 rescored twice independently: 204->205 clean, 8 failing, 0 newly failing. docx hash b2fce93d unchanged.",
   "reasons": [
    "the two-line claim in FINDINGS/47_margins-TXT-HALF-IS-T02-1055-f1x.md is refuted as a two-format fix, before any engine change: flippedPage reaches only buildPara (PdfToWord:3677), lineX is read only by TxtWriter (:5342-5345), and 47_margins already passes on all five t02 documents in benchmarks/gverify-lo. The third line as written deletes the only guard protecting 15_stamp_on_scanned_page (100% rotated glyphs at 9 deg, pageTurn does not catch it); if it is retried use 'if (g.dirx > -0.5f) return false;'. Root cause written, no document moved.",
-   "uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all 213 (word/document.xml), so the change is txt-only by measurement. scope.py gained the method entry that made the commit possible."
+   "uprightIfPageIsUpsideDown patch landed: one-page-rotated-180-degrees t02_position FAIL->PASS, 213 of 213 .txt converted+scored, 190 clean (was 189), 0 newly failing. .docx proved byte-identical on all 213 (word/document.xml), so the change is txt-only by measurement. scope.py gained the method entry that made the commit possible.",
+   "txt instrument: t02 ruler fitted by leverage-weighted least squares instead of a median that a (28,5) rounding cluster outvoted; t08 keyed on the baseline instead of the bbox top. 334_patent_document 69%->100%. 213 rescored twice independently: 204->205 clean, 8 failing, 0 newly failing. docx hash b2fce93d unchanged."
   ],
   "requeues": 0,
   "status": "OPEN"
