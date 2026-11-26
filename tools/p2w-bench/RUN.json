@@ -1,13 +1,14 @@
 {
- "started_ts": 1795711842.6294234,
- "started": "22:20",
+ "started_ts": 1795717572.9702141,
+ "started": "23:56",
+ "window_for_claim": 1795717572.9702141,
  "ended_ts": null,
  "ended": null,
- "class": "",
  "attempts": 0,
  "kept": 0,
- "docs_improved": 0,
- "agents": [],
- "obstacles_cleared": 0,
- "needs_human": 0
+ "agents": [
+  "aa49newsletter content-loss root cause-01",
+  "gateratchet floor vs engine match-01"
+ ],
+ "docs_improved": 0
 }
