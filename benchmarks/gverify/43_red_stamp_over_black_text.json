@@ -2,7 +2,7 @@
  "name": "43_red_stamp_over_black_text",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T13:22:58",
+ "at": "2026-11-26T21:26:12",
  "passed": 38,
  "total": 42,
  "failed": [
@@ -18,6 +18,6 @@
   "bad_pages": [],
   "runs_matched": 23
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795697520"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795726746"
 }

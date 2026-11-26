@@ -1164,3 +1164,28 @@ does not stop the work, so nothing was deleted or recreated on a guess.
 **Still open from 26 Nov, unchanged:** the docx ratchet stamp is stale (`ENGINE CHANGED (docx)`), so any
 commit whose scope is docx is refused until a baseline run re-measures and `--stamp`s it. This pass
 staged only state and measurement files, no engine source.
+
+## 27 Nov 00:20 IST - gverify: four documents worse in Google on the engine in the tree
+
+The Google measurement of sixty documents completed (68 -> 128 of 213 carry a current-engine Google
+result) and the commit gate refused four of them:
+
+    document                          committed   measured on a4d8fca469bba636   checks now failing
+    324_loan_amortisation_schedule    2 failing   3 failing                      27_text_off_page, 59_shape_anchor
+    412_page_labels_roman             0 failing   2 failing                      18_displacement, 27_text_off_page
+    416_many_tiny_pages               0 failing   2 failing                      18_displacement, 27_text_off_page
+    417_rotate180_and_mirrored        0 failing   4 failing                      04_chars_missing, 17_matched_runs, 18_displacement, 27_text_off_page
+
+The committed numbers for these four were measured on engine 025fe9deda5ac7b1 between 11:15 and 13:22
+on 26 Nov. The measurement in this run is on a4d8fca469bba636, the engine in the tree. The check stamp
+is the same size before and after (375669), so this is not check-code inflation: it is the engine
+change in the release commit moving Google's layout, and Google is the renderer the user opens.
+
+Evidence that would overturn it: a re-measurement of the same four documents on a4d8fca469bba636 that
+comes back at or below the committed failure counts, or a demonstrated defect in the four
+`--collect` renders. Nothing here changes engine code; this pass measures only.
+
+What was done: the four measured results are held out of the commit (the gate has no override and none
+was used), the other fifty-six landed, and the four keep their stale committed values so the next
+`--plan` picks them up again. They will keep being re-measured and refused until the regression is
+fixed, which is the gate working rather than a wall to route around.
