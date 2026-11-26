@@ -8097,3 +8097,5 @@
 {"t": 1795726525.7302277, "ist": "02:25:25", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795726526.1221225, "ist": "02:25:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795726528.1591868, "ist": "02:25:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795726556.2962947, "ist": "02:25:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795726558.002159, "ist": "02:25:58", "ev": "beat", "d": "attempt.py: recording an attempt"}
