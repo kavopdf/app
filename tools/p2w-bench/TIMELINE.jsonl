@@ -7111,3 +7111,31 @@
 {"t": 1795674825.879237, "ist": "12:03:45", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795674826.2753575, "ist": "12:03:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795674828.299319, "ist": "12:03:48", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795675931.1448421, "ist": "12:22:11", "ev": "beat", "d": "relay: install-gate timed out, inspecting"}
+{"t": 1795675935.501816, "ist": "12:22:15", "ev": "beat", "d": "relay: pod-prep in slices"}
+{"t": 1795676003.9951653, "ist": "12:23:23", "ev": "beat", "d": "relay: hook installed, corpus-slice next"}
+{"t": 1795676010.6414804, "ist": "12:23:30", "ev": "beat", "d": "relay: reading last report + diagnostics"}
+{"t": 1795676013.8402648, "ist": "12:23:33", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795676016.6710377, "ist": "12:23:36", "ev": "beat", "d": "relay: reading numbers"}
+{"t": 1795676023.298722, "ist": "12:23:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795676024.613349, "ist": "12:23:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795676026.1794496, "ist": "12:23:46", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795676027.7189903, "ist": "12:23:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795676032.8511434, "ist": "12:23:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795676641.029297, "ist": "12:34:01", "ev": "beat", "d": "relay: sizing the autoflow+autoEm corpus build"}
+{"t": 1795676925.07243, "ist": "12:38:45", "ev": "beat", "d": "relay: gate is the work - checking measure_gate"}
+{"t": 1795676959.7586613, "ist": "12:39:19", "ev": "beat", "d": "relay: timing a p2w corpus slice"}
+{"t": 1795677163.802719, "ist": "12:42:43", "ev": "beat", "d": "relay: soffice gives no render - testing the renderer"}
+{"t": 1795677214.20344, "ist": "12:43:34", "ev": "beat", "d": "relay: building corpus 78->213 (slices)"}
+{"t": 1795677502.4112902, "ist": "12:48:22", "ev": "beat", "d": "relay: corpus build slice 2"}
+{"t": 1795677592.5740697, "ist": "12:49:52", "ev": "beat", "d": "relay: re-scoring docx table (slice 1)"}
+{"t": 1795677882.8802295, "ist": "12:54:42", "ev": "beat", "d": "relay: re-scoring docx table (slice 2)"}
+{"t": 1795678170.9687982, "ist": "12:59:30", "ev": "beat", "d": "relay: re-scoring docx table (slice 3)"}
+{"t": 1795678458.938449, "ist": "13:04:18", "ev": "beat", "d": "relay: re-scoring docx table (slice 4)"}
+{"t": 1795678747.035173, "ist": "13:09:07", "ev": "beat", "d": "relay: re-scoring docx table (slice 5)"}
+{"t": 1795679034.7888727, "ist": "13:13:54", "ev": "beat", "d": "relay: re-scoring docx table (final slice)"}
+{"t": 1795679322.1630359, "ist": "13:18:42", "ev": "beat", "d": "relay: final 3 docs + txt re-score"}
+{"t": 1795679529.3642302, "ist": "13:22:09", "ev": "beat", "d": "relay: rendering the last 3 by hand"}
+{"t": 1795679853.2896414, "ist": "13:27:33", "ev": "beat", "d": "relay: gate.py to write STATE.json"}
+{"t": 1795680306.630303, "ist": "13:35:06", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795680309.9624398, "ist": "13:35:09", "ev": "beat", "d": "attempt.py: recording an attempt"}

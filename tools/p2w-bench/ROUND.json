@@ -17,8 +17,10 @@
       }
     ]
   },
+  "fixer_doing": "relay: gate.py to write STATE.json",
+  "fixer_doing_since": 1795679853.2902584,
   "fixer_engine_at_claim": "9f0a8207",
-  "fixer_last_beat": 1795674186.7396524,
+  "fixer_last_beat": 1795679853.2902594,
   "fixer_started": 1795675615.8847563,
   "history": [
     {
