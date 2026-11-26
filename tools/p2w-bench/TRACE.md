@@ -6,17 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 23 Nov 03:49 | fixer | build-engine | engine unchanged, compile skipped |
-| 23 Nov 03:54 | fixer | build-engine | started |
-| 23 Nov 03:54 | fixer | build-engine | engine unchanged, compile skipped |
-| 23 Nov 03:59 | fixer | build-engine | started |
-| 23 Nov 03:59 | fixer | build-engine | engine unchanged, compile skipped |
-| 23 Nov 04:04 | fixer | build-engine | started |
-| 23 Nov 04:04 | fixer | build-engine | engine unchanged, compile skipped |
-| 23 Nov 04:08 | fixer | attempt | 18_displacement -> lead (0/? moved) |
-| 23 Nov 04:09 | fixer | attempt | 18_displacement -> kept (1/? moved) |
-| 23 Nov 04:56 | fixer | claim | fixer claimed the slot |
-| 23 Nov 05:00 | fixer | build-engine | started |
 | 23 Nov 05:01 | fixer | build-engine | engine built in 36s |
 | 23 Nov 05:09 | fixer | attempt | 00_page_count -> lead (0/23 moved) |
 | 23 Nov 05:29 | baseline | attempt | 18_displacement -> lead (0/? moved) |
@@ -406,3 +395,14 @@
 | 26 Nov 15:48 | fixer | attempt | 18_displacement -> lead (0/? moved) |
 | 26 Nov 17:12 | fixer | claim | fixer claimed the slot |
 | 26 Nov 17:39 | fixer | attempt | 44_header_footer -> lead (0/? moved) |
+| 26 Nov 19:14 | fixer | build-engine | started |
+| 26 Nov 19:15 | fixer | build-engine | engine built in 40s |
+| 26 Nov 19:17 | fixer | build-engine | started |
+| 26 Nov 19:18 | fixer | build-engine | engine built in 38s |
+| 26 Nov 19:20 | fixer | build-engine | started |
+| 26 Nov 19:21 | fixer | build-engine | engine built in 37s |
+| 26 Nov 19:23 | fixer | build-engine | started |
+| 26 Nov 19:24 | fixer | build-engine | engine built in 40s |
+| 26 Nov 19:31 | fixer | build-engine | started |
+| 26 Nov 19:31 | fixer | build-engine | engine built in 46s |
+| 26 Nov 19:42 | fixer | attempt | 18_displacement -> lead (0/? moved) |
