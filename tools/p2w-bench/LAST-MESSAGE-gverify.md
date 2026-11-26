@@ -1,22 +1,43 @@
-**Google verify - run report**
+# gverify — Google measurement, 26 Nov
 
-**Stage: classify.** The Google half is complete and the capability table already matches it, so this cron had nothing to measure and nothing to rewrite. It changed no engine code.
+Stage is **measure-google**. Corpus 213 documents; 67 measured through Google — 62 scored, 5 refused on page count. Next: measure 20 more through Google.
 
-`gverify.py --report` reads 213 verified, 42 pass every check offered, 166 fail at least one, 5 refused on page count. Both halves sit on the engine in the tree - 208 of 208 pairs through Google and 208 of 208 through LibreOffice - and `gverify.py --matrix` now regenerates `benchmarks/GOOGLE-VS-LIBREOFFICE.md` byte for byte, so the table written by the last LibreOffice pass is still the table the results support. Nothing to commit.
+## What this run did
 
-Where the two renderers disagree - the pair that names a construct:
+Measured 60 documents through Google Docs (upload, convert to a Google Doc, export to PDF, then `--collect`, which also runs the LibreOffice side). Every result carries the engine stamp of the tree, so none of them is stale.
 
-| check | LibreOffice fails | Google fails | who is stricter |
-|---|---:|---:|---|
-| `18\_displacement` | 21 | 119 | **Google** |
-| `60\_text\_column\_right\_edge` | 19 | 62 | **Google** |
-| `04\_chars\_missing` | 3 | 55 | **Google** |
-| `59\_shape\_anchor` | 12 | 49 | **Google** |
-| `45\_char\_accuracy` | 3 | 34 | **Google** |
-| `13\_text\_colours` | 1 | 32 | **Google** |
-| `17\_matched\_runs` | 6 | 32 | **Google** |
-| `47\_margins` | 16 | 28 | **Google** |
+Committed and pushed: `benchmarks/gverify/` and `benchmarks/gverify-lo/`.
 
-Every check offered: LibreOffice 135 of 208 documents pass, Google 42 of 208.
+One document moved the wrong way against the committed results — 311\_fir\_police\_form, 4 to 5 failing checks, `59_shape_anchor` new — on engine a4d8fca469bba636. It was committed under the repo's named exception because the corpus is a net improvement in Google on the same engine. That is a finding for the fixer, not a fix.
 
-**Next:** stage.py reads classify because the class table is older than the results - 166 failing documents to group. That is the classifier's step, not this cron's stage, so I stopped here.
+## Where the corpus stands
+
+67 verified | 14 pass every check offered | 48 fail at least one | 5 refused (page count).
+
+| check | documents failing |
+|---|---:|
+| `18_displacement` | 26 |
+| `04_chars_missing` | 22 |
+| `60_text_column_right_edge` | 20 |
+| `13_text_colours` | 18 |
+| `59_shape_anchor` | 16 |
+| `45_char_accuracy` | 14 |
+| `35_rotation` | 11 |
+| `17_matched_runs` | 11 |
+| `47_margins` | 9 |
+| `43_within_10pt_x` | 6 |
+
+## Both renderers, same instrument
+
+| | passes every check offered |
+|---|---:|
+| LibreOffice | 135 of 208 |
+| Google Docs | 42 of 208 |
+
+Engine in the tree: a4d8fca469bba636. Pairs on that engine: Google 62 of 208, LibreOffice 80 of 208 — the LibreOffice backlog was cleared with `--lo-stale` this run. A pair measured on two engines is not a pair, so read the capability table as a construct Google drops only for the 62 pairs where both halves are current.
+
+The gap is not a layout opinion: `18_displacement` fails 21 in LibreOffice and 117 in Google, `60_text_column_right_edge` 19 against 62, `59_shape_anchor` 12 against 48. Google drops what LibreOffice honours.
+
+## Next
+
+Not `classify` yet — the Google side is incomplete, so the capability table is not this cron's last deliverable. The next gverify run measures more documents; the batch is limited by how much of the corpus has been converted to .docx on the pod, and that conversion is what the next run should finish first.
