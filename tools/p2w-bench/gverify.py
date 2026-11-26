@@ -15,7 +15,17 @@ run rebuilt the loop by hand. This is that driver.
 WHY IT IS SPLIT THIS WAY. Three of the four steps are Drive API calls and a plain script cannot make
 them - VERIFY-GOOGLE.md says so - so the caller does them:
 
-    a. upload(path=<stage output>, tool_slug="GOOGLEDRIVE_CREATE_FILE", toolkit="googledrive")
+    a. cp <stage output> /scratch/output/<probe>.docx          # MANDATORY - see below
+       upload(path="/scratch/output/<probe>.docx",
+              tool_slug="GOOGLEDRIVE_CREATE_FILE", toolkit="googledrive")
+
+       WHY THE COPY. The platform `upload` tool only stages a file that is already saved, and the only
+       saved locations are /scratch/output, /scratch/input, /scratch/saved and /scratch/downloads.
+       --stage writes under /scratch/work/p2w/gverify/stage, which `upload` refuses BEFORE any Drive
+       call - and the refusal surfaces as the Drive tool's 403 "file key does not belong to this
+       project or session". Three runs read that 403 as a missing permission and gave up on the
+       Google after-side. It is a path rule. Measured 26 Nov 2026, end to end on one document:
+       FINDINGS/GOOGLE-LOOP-UNBLOCKED-COPY-TO-OUTPUT-FIRST-26NOV-fixer.md.
     b. GOOGLEDRIVE_CREATE_FILE(name=..., mimeType="application/vnd.google-apps.document",
                                parents=[<folder>], file_to_upload={name,mimetype,s3key})
     c. GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE(fileId=<id>, mimeType="application/pdf")
