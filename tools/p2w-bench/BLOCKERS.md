@@ -1258,3 +1258,19 @@ saying measure-google with sixteen to go and the classify stage cannot open.
 Evidence that would overturn it: a re-measurement of any of the sixteen on a4d8fca469bba636 that comes
 back at or below its committed count, or a demonstrated defect in its `--collect` render. Nothing in
 this pass changed engine code; this pass measures only.
+
+## 27 Nov 05:00 UTC - gverify: all sixteen re-measured on a4d8fca, every count reproduced
+
+The 03:35 entry's sixteen held-back documents were re-measured this pass, every one of them through
+Google on the engine in the tree (a4d8fca469bba636), and every count came back identical to that
+entry's right-hand column - 412_page_labels_roman 0 -> 2, 417_rotate180_and_mirrored 0 -> 4,
+bank-statement-5-pages 1 -> 5, and the rest. The gate refused all sixteen again for the same reason.
+
+That is the evidence the 03:35 entry said would settle it, and it settles it against the reverted
+engine: the sixteen are not a flaky instrument and not check-code drift, they are the restored engine
+measured against verdicts of the engine HEAD reverted. Nothing was overridden; the sixteen stay out of
+the commit and stage.py therefore still prints measure-google with sixteen to go.
+
+Also this pass: the LibreOffice half was refreshed with `--lo-stale` onto the current engine, 71 of 205
+pairs now, from 0. That backlog is not finished - the rest is picked up by the next pass, and the table
+prints its own coverage so no row is read as a statement about HEAD until its pair is on it.
