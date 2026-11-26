@@ -7986,3 +7986,27 @@
 {"t": 1795722192.9912941, "ist": "01:13:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795722193.072985, "ist": "01:13:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795722193.4806643, "ist": "01:13:13", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795721906.7019532, "ist": "01:08:26", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795721906.914677, "ist": "01:08:26", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795721907.0682602, "ist": "01:08:27", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795721907.247561, "ist": "01:08:27", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795721907.4224675, "ist": "01:08:27", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795721907.5903428, "ist": "01:08:27", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795721907.7560031, "ist": "01:08:27", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795721907.9559977, "ist": "01:08:27", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795722171.1420944, "ist": "01:12:51", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795722172.3381257, "ist": "01:12:52", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795722173.4530249, "ist": "01:12:53", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795722173.6309104, "ist": "01:12:53", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795722173.7856562, "ist": "01:12:53", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795722173.9542797, "ist": "01:12:53", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795722174.1298413, "ist": "01:12:54", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795722174.2860785, "ist": "01:12:54", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795722483.2344375, "ist": "01:18:03", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795722485.0612712, "ist": "01:18:05", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795722486.578042, "ist": "01:18:06", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795722488.223267, "ist": "01:18:08", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795722518.0682404, "ist": "01:18:38", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795722518.2612867, "ist": "01:18:38", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795722518.4317908, "ist": "01:18:38", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795722518.5996659, "ist": "01:18:38", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}

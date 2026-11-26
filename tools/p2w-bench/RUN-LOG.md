@@ -200,3 +200,4 @@
 | 27 Nov 01:05 | fixer | attempt none -> lead (0/? moved) |
 | 27 Nov 01:05 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 27 Nov 01:13 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 27 Nov 01:44 | baseline | .txt refresh in fix phase - corpus rebuilt, 213 re-scored, 0 moved (205 clean, 8 failing) |
