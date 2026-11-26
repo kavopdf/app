@@ -2,7 +2,7 @@
  "name": "302_radiology_report",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-25T22:23:29",
+ "at": "2026-11-26T00:07:05",
  "passed": 41,
  "total": 42,
  "failed": [
@@ -15,6 +15,6 @@
   "bad_pages": [],
   "runs_matched": 33
  },
- "engine": "d85db0a9822ddb54",
- "checks": "375669-1795643901"
+ "engine": "981ff1fa35e2cf67",
+ "checks": "375669-1795650942"
 }
