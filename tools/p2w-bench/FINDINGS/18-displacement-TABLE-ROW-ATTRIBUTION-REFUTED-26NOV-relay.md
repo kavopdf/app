@@ -96,3 +96,26 @@ standard error large enough for r² = 0.00; a real accumulator would give r² we
 
 Reproduce with `/scratch/work/an18.py` (reads `benchmarks/gverify/*.json` + `benchmarks/DISP-TABLE.csv`;
 writes nothing).
+
+## The tail has a size, and the size sorts the class
+
+`worst_dy` is in points, and a page is about 792 pt. Splitting the 113 failers by the size of their
+worst run:
+
+| family | rule | n | median runs_matched | median med_dy |
+|:--|:--|--:|--:|--:|
+| page-scale | `worst_dy > 100` | **17** | 121 | −7.4 pt |
+| block-scale | `9 < worst_dy <= 100` | **38** | — | — |
+| line-scale | `worst_dy <= 9` | **58** | 71 | — |
+
+The page-scale 17 are long multipage documents and **not one of them fails `00_page_count`**: the page
+count is right, but a run on a later page is a tenth to eight-tenths of a page away from where the
+source puts it. That is a page-break landing in the wrong place inside a correct page count, and it is
+measured in pages, not in the points every existing displacement attempt has been chasing. The worst
+of them: `very-long-single-column-table` 656.7 pt, `table-across-page-break-repeated-header` 401.3,
+`324_loan_amortisation_schedule` 357.8, `bank-statement-5-pages` 355.4.
+
+The line-scale 58 are the only ones a line-box construct can reach at all, and they are the ones whose
+median run is *not* moving. Work order this implies: the 58 line-scale documents are where a line
+construct is testable; the 17 page-scale documents need a page-break construct and no line-box change
+will touch them.
