@@ -17,9 +17,11 @@
       }
     ]
   },
+  "fixer_doing": "gate install timed out, checking phase",
+  "fixer_doing_since": 1795699672.4006507,
   "fixer_engine_at_claim": "aa496ebe",
   "fixer_last_beat": 1795695169.8879442,
-  "fixer_started": 1795697011.7361243,
+  "fixer_started": 1795699676.7821307,
   "history": [
     {
       "at": "2026-11-12 09:46",
