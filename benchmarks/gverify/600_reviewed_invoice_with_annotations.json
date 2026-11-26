@@ -2,7 +2,7 @@
  "name": "600_reviewed_invoice_with_annotations",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T00:36:34",
+ "at": "2026-11-26T05:25:41",
  "passed": 37,
  "total": 44,
  "failed": [
@@ -23,6 +23,6 @@
   ],
   "runs_matched": 56
  },
- "engine": "981ff1fa35e2cf67",
- "checks": "375669-1795650942"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795669043"
 }
