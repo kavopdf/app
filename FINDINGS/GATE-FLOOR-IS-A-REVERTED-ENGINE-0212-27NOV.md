@@ -62,15 +62,26 @@ being stale; any patch moves the fingerprint and the gate then refuses for a sec
 
 It **is** a table that must be re-measured on the tree and re-stamped as one act.
 
-## The obstacle to re-measuring it here
+## CORRECTED 02:24 - the harness IS in the repository, and my first draft said it was not
 
-The pixel metric in `RANKING.csv` (`share1/2/3/5/10`) is produced by a harness that is **not in this
-repository**: `pixbatch.py` imports `sys.path.insert(0, "/scratch/work/vv2/tools/p2w-bench")`, and no
-script under `tools/` computes `share5` (checked: `grep -rln share5 tools/ --include=*.py` returns
-nothing outside `tools/p2w-bench/`, and every hit there *reads* the CSV). On this pod
-`/scratch/work/vv2` does not exist. So a run cannot re-measure the pixel table at all — which is the
-mechanical reason the corrected table from `978e9cef` was never committed, and why this has now
-blocked four consecutive slots.
+My first draft of this section claimed no in-repo script computes `share5`, on the strength of
+`grep -rln share5 tools/`. That grep was scoped to `tools/` and never looked at `benchmarks/`.
+**`benchmarks/p2w.py` is the harness** (`--budget N` measures a resumable slice, `--status` reports,
+`--force` rebuilds after an engine change). The claim was wrong and is retracted here rather than
+deleted, because a run that reads it needs to know the earlier one got it wrong.
+
+What is true instead, and it is a smaller point: the measurement cache is **per pod**. On this pod
+`benchmarks/p2w.py --status` reads `measured 0/212, remaining 212` after the corpus was fully built
+(213/213 docx), so a re-measurement is 212 documents in budgeted passes, not a lookup. `978e9cef`
+did exactly that - "corpus re-measured on the tree 212/212" - and its numbers were clear: newsletter
+**0.20**, `39_small_caps_letter_spacing` **0.70**, `350_question_paper` **0.11**, all at or better than
+the 15 Nov baseline. Its corrected table was never committed, so the stale row survived it.
+
+That same run recorded the one refusal that a corrected table does NOT clear, and it is the real
+decision the next run faces: `itr-computation-with-slab-table` measures **9.10 on the committed table
+and 42.33 on the tree**, so a table honest about this engine trades newsletter 86.10 and 600 8.16 for
+itr 33.23. That is an engine question (does `9f0a8207` regress itr?), not a bookkeeping one, and it
+must be settled before the table is rewritten.
 
 ## What would unblock it, in order of cost
 
