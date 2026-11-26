@@ -97,3 +97,27 @@ pitch, and `auto` (`-Dp2w.lineRule=autoflow`) is the only construct that escapes
 Consequence for the class: the `72_bank_statement` over-correction (median +1.1 -> +3.51) is the thing to
 explain - a size dependence, `AUTO_LINE_EM = 1.15` being the substitute face's ratio rather than the
 document's, or the page-first compensation - not a reason to abandon `autoflow`.
+
+## 6. `-Dp2w.autoEm=1.2207` - the substitute face's real ratio - makes one document CLEAN
+
+The `auto` box is `AUTO_LINE_EM = 1.15` em of the face Google substitutes. The 07:56 finding measured that
+substitution: the engine's paragraphs carry no `w:rFonts`, Google substitutes Calibri -> Carlito at
+**r = 1.220709**. So the box the engine asks for is 5.8 % short of the box Google draws. Two Google exports,
+same build, `-Dp2w.lineRule=autoflow -Dp2w.autoEm=1.2207`:
+
+| document | exact (default) | autoflow 1.15 | autoflow 1.2207 |
+|:--|--:|--:|--:|
+| `72_bank_statement_no_rules_right_amounts` | 41/42, med +1.1, worst 4.8 | 41/42, med +3.51, worst 8.44, 52/80 out | **42/42 PASS**, med +0.21, worst 3.44, **2/80 out** |
+| `electricity-bill` | 46/47, med -7.18, 113/125 out | 46/47, med +0.08, 26/125 out | 46/47, med -1.47, 41/125 out |
+
+**`72_bank_statement_no_rules_right_amounts` passes every applicable Google check on this construct.** That
+is a document going clean in the class `classpick.py --leverage` ranks first.
+
+It is **not landed**. The flags are runtime properties; landing it means changing `LINE_MODE`'s default and
+`AUTO_LINE_EM`'s default, and no document may get worse - which needs the whole corpus rebuilt and re-measured
+on the new defaults (`corpus-convert.py --force`, then `regress.py --check`, then a `gverify` pass). That was
+more than the slot had left, and a global construct change without it is exactly what rule 3 forbids.
+
+**The next run's first act:** build the corpus with `-Dp2w.lineRule=autoflow -Dp2w.autoEm=1.2207`, run
+`regress.py --check`, and if nothing gets worse in the LibreOffice proxy, commit the default and let the
+`:20 gverify` cron re-measure. The two controls above say what should happen on the documents it reaches.

@@ -7017,3 +7017,7 @@
 {"t": 1795674158.188812, "ist": "11:52:38", "ev": "beat", "d": "relay: autoEm 1.2207 test on the negative control"}
 {"t": 1795674186.7392824, "ist": "11:53:06", "ev": "beat", "d": "relay: autoEm made the negative control PASS, testing the positive control"}
 {"t": 1795674214.612838, "ist": "11:53:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795674218.8147216, "ist": "11:53:38", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795674218.9927273, "ist": "11:53:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795674219.0902312, "ist": "11:53:39", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795674219.7049751, "ist": "11:53:39", "ev": "beat", "d": "classrow.py: refreshing the class file"}
