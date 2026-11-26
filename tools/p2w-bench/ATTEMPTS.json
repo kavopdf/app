@@ -2057,7 +2057,7 @@
   "status": "OPEN"
  },
  "t12_word_invention": {
-  "attempts": 9,
+  "attempts": 10,
   "first_seen": null,
   "history": [
    {
@@ -2146,12 +2146,23 @@
     "outcome": "lead",
     "reason": "annotation /Contents hoist patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) reproduced on one engine: 600 txt 7/8 -> 8/8 PASS, t12 83 chars -> 0, paragraphs 14 -> 12; corpus-changed --record pr",
     "total": null
+   },
+   {
+    "at": "2026-11-26 05:33",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: page-top gap moves from w:before to w:pgMar w:top (18_displacement construct 2)"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "annotation-meta patch: 600 txt FAIL(t12 83) -> PASS, docx word/document.xml byte-identical on 600/041122/601; gate refuses because the docx table needs a 212-doc re-score that p2w.py cannot finish in ",
+    "total": 213
    }
   ],
   "last": null,
-  "last_engine": "4c4bbc03",
-  "last_moved": 5,
-  "last_total": 8,
+  "last_engine": "b6bfcb7b",
+  "last_moved": 0,
+  "last_total": 213,
   "outcomes": [
    "reverted",
    "reverted",
@@ -2161,9 +2172,10 @@
    "kept",
    "kept",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "annotation /Contents hoist patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) reproduced on one engine: 600 txt 7/8 -> 8/8 PASS, t12 83 chars -> 0, paragraphs 14 -> 12; corpus-changed --record proves 1 of 213 docx moved. NOT LANDED: docx share5 51.68 -> 38.97 because the two hoisted paragraphs sat at the top and removing them reflows the body. Before column is the 13:47 row on engine 9e2b3e4d, so drift is inside that -12.71. See FINDINGS/ANNOTATION-PATCH-FIXES-TXT-BUT-COSTS-DOCX-25NOV-relay.md",
+  "reason": "annotation-meta patch: 600 txt FAIL(t12 83) -> PASS, docx word/document.xml byte-identical on 600/041122/601; gate refuses because the docx table needs a 212-doc re-score that p2w.py cannot finish in a slot (24 then 18 measured, remaining rose 188->194)",
   "reasons": [
    "claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furniture duplication, hyphenation join, symbol decode, dropped glyph fallback) and attack the largest group. No engine change until the census names one.",
    "NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_invoice_with_annotations are the six review ANNOTATIONS, which page.get_text() does not read and the engine does (measured: 'confirmed' absent from get_text(), present in the annotation stream). 12_stamp_across_page_break is duplication across the break - KUNIGAL is drawn once on page 1 and arrives twice - which is t09's question. 311_fir_police_form is cell welding: 60067 and Mobile are two drawn lines in one cell and arrive as '60067Mobile'. 77_arabic_rtl_document is RTL order, 05_round_company_seal_curved_text is single letters from a curve, 39_small_caps_letter_spacing is letter-spaced caps. And THREE OF THE TWELVE ARE THE INSTRUMENT'S OWN ARTIFACT: the PDF text layer carries U+0000 as a zero-width cell separator, _words splits on \\S+ so NUL is not whitespace and glues to the token beside it ('\\x00\\x00\\x00PHOTOGRAPH', 'DisagreeStrongly\\x00disagree', '0.8412,\\x00Adjusted'), and _strip_punct does not strip NUL - so the clean token the writer emitted is counted as invented. Replacing U+0000 with a space on the source side clears 391_survey_questionnaire_grid, 392_statistical_console_output and 406_passport_mrz_page and BREAKS NO DOCUMENT (0 of the 205 passing). Not edited into verify_txt.py: the verifier is the instrument. FINDINGS/t12-is-five-faults-and-three-are-the-instrument-1925.md.",
@@ -2173,7 +2185,8 @@
    "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failing. txt corpus 199 -> 202 of 213.",
    "t12 compared a token multiset across two different tokenisers; 51 of 55 invented tokens were word-boundary artefacts. Unit is now the non-space character multiset. 5 newly clean, 0 of 213 newly failing. txt corpus 199 -> 202 of 213.",
    "annotation /Contents hoist has a second, unguarded door in PdfToWord.pageText(): the annotationRuns loop lacks the drawnByAppearance(apDrawn, ...) guard its sibling form-value loop has. Measured 600_reviewed_invoice_with_annotations verify_txt t12 invented chars 83 -> 30, paragraphs 14 -> 13, verdict still FAIL; residual 30 chars are the /FreeText comment's own words, so the guard does not reach a /FreeText appearance. Patch moves the engine fingerprint and zeroes no document, so it is saved in tools/p2w-bench/patches/ with its numbers. Finding: FINDINGS/annotation-contents-hoist-guard-25NOV-relay.md",
-   "annotation /Contents hoist patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) reproduced on one engine: 600 txt 7/8 -> 8/8 PASS, t12 83 chars -> 0, paragraphs 14 -> 12; corpus-changed --record proves 1 of 213 docx moved. NOT LANDED: docx share5 51.68 -> 38.97 because the two hoisted paragraphs sat at the top and removing them reflows the body. Before column is the 13:47 row on engine 9e2b3e4d, so drift is inside that -12.71. See FINDINGS/ANNOTATION-PATCH-FIXES-TXT-BUT-COSTS-DOCX-25NOV-relay.md"
+   "annotation /Contents hoist patch (PATCHES/600-annotation-runs-subtype-25NOV.patch) reproduced on one engine: 600 txt 7/8 -> 8/8 PASS, t12 83 chars -> 0, paragraphs 14 -> 12; corpus-changed --record proves 1 of 213 docx moved. NOT LANDED: docx share5 51.68 -> 38.97 because the two hoisted paragraphs sat at the top and removing them reflows the body. Before column is the 13:47 row on engine 9e2b3e4d, so drift is inside that -12.71. See FINDINGS/ANNOTATION-PATCH-FIXES-TXT-BUT-COSTS-DOCX-25NOV-relay.md",
+   "annotation-meta patch: 600 txt FAIL(t12 83) -> PASS, docx word/document.xml byte-identical on 600/041122/601; gate refuses because the docx table needs a 212-doc re-score that p2w.py cannot finish in a slot (24 then 18 measured, remaining rose 188->194)"
   ],
   "requeues": 0,
   "status": "OPEN"

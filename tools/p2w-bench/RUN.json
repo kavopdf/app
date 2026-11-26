@@ -1,15 +1,13 @@
 {
- "agents": [
-  "60_tA-02",
-  "04_cB-01"
- ],
- "attempts": 2,
+ "agents": [],
+ "attempts": 1,
+ "class": "",
  "docs_improved": 0,
- "ended": "03:32",
- "ended_ts": 1795644178.3065317,
+ "ended": null,
+ "ended_ts": null,
  "kept": 0,
- "started": "02:28",
- "started_ts": 1795640328.482224,
- "window_for_claim": 1795640328.482224,
- "class": "18_displacement"
+ "needs_human": 0,
+ "obstacles_cleared": 0,
+ "started": "04:27",
+ "started_ts": 1795647478.0071018
 }
