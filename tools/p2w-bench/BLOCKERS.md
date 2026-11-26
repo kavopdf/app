@@ -960,3 +960,19 @@ is not optional when the first one says a stage is `moving` towards `done`.
 | 06:26 | the second read, taken before committing the report | **`fix` went from moving to stopped inside this pass**, with the note that a run is still marked running and has not beaconed. `classify` was already stopped, so two of the five rows now read stopped | `health.py`, `health.py --stalled` (exit 1, naming both), `status.py` (verdict SILENT, claim still inside the fixer's stale window), `round.py --phase` (fix) | **no, and none is needed** | the claim stands down on its own when its window runs out and the next fixer slot takes the work, so `round.py --release-fixer --force` was NOT run - releasing a claim that may still be alive would put a second run into the engine beside it. Overturned by: the same claim still in `ROUND.json` after its window has passed, which would mean it is not expiring and must be forced |
 
 **What this pass learned about itself.** The 06:03 read said nothing was stopped and the 06:20 read said one stage was; both were true of the moment they were taken, and the pipeline moved twice underneath a single pass. A verdict written from one read and shipped ten minutes later can be stale, so the report this pass sends is generated from a read taken immediately before it was written, not from the read that opened it. The generator prints the ages it was given, so a reader can see which read they came from.
+
+---
+
+## 2026-11-26 06:38 IST — watchdog: both stops cleared themselves before the report was sent, and the .txt axis moved
+
+**This supersedes the "two stages stopped" framing of the 06:26 section above, from the same pass.**
+
+| time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
+|---|---|---|---|---|---|
+| 06:38 | the third read, taken before sending | nothing. `health.py --stalled` exits 0 and reads "nothing is stopped": classify is `superseded` at a fresh table, fix is `moving` with the slot released and reclaimed, txt is `moving` at 205 clean and 8 failing | `health.py`, `health.py --stalled`, `progress.py --amend`, `round.py --phase` | not needed | nothing. Both stops cleared inside their own windows without a forced release or a cron call, which is the mechanism working rather than a decision anyone made |
+| 06:38 | STEP 5, restated against today's own result | the .docx axis is still flat at 59, but the .txt axis moved: the change the relay landed today was a verifier change whose .docx output was unchanged, so it needed no corpus re-score and it moved one document | read the relay report commit `e0e085b3` and the 05:28 row beside it | **decided - unchanged, and now better evidenced** | the gate is not impassable, it is priced per change: it charges a full re-score to changes that cannot move a document. That is the strongest evidence yet for the scope-keyed repair in the 06:20 row. Nothing is parked. Overturned by: one engine change that lands and moves docx open |
+
+**What this pass is worth.** Three reads in one pass, two stages that went stopped and cleared themselves, one
+day's row amended twice, and a report generated from the last read rather than the first. The lesson is not
+that the watchdog was needed - it is that a single read at the top of a pass would have shipped a verdict
+about two dead stages that were, by the time anyone read it, alive.
