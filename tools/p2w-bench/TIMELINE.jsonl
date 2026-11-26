@@ -7469,3 +7469,4 @@
 {"t": 1795697329.4879477, "ist": "18:18:49", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795697329.7394183, "ist": "18:18:49", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795697417.089976, "ist": "18:20:17", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795699672.400112, "ist": "18:57:52", "ev": "beat", "d": "gate install timed out, checking phase"}
