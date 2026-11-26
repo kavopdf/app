@@ -2,25 +2,23 @@
  "name": "form16-part-b",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T05:29:36",
- "passed": 43,
+ "at": "2026-11-26T14:17:39",
+ "passed": 45,
  "total": 47,
  "failed": [
-  "04_chars_missing",
   "18_displacement",
-  "27_text_off_page",
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": -5.6,
-  "worst_dy": 155.6,
+  "med_dy": 3.6,
+  "worst_dy": 10.5,
   "med_dx": 0.3,
   "bad_pages": [
    0,
    1
   ],
-  "runs_matched": 113
+  "runs_matched": 114
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795701041"
 }

@@ -2,7 +2,7 @@
  "name": "table-inside-two-column-page",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T07:27:08",
+ "at": "2026-11-26T14:20:29",
  "passed": 46,
  "total": 47,
  "failed": [
@@ -10,13 +10,13 @@
  ],
  "displacement": {
   "med_dy": 8.0,
-  "worst_dy": 73.5,
+  "worst_dy": 18.5,
   "med_dx": -0.5,
   "bad_pages": [
    0
   ],
   "runs_matched": 64
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795677235"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795701041"
 }

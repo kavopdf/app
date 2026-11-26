@@ -2,7 +2,7 @@
  "name": "bus-timetable-station-left-times-right",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T05:29:13",
+ "at": "2026-11-26T14:17:18",
  "passed": 41,
  "total": 42,
  "failed": [
@@ -17,6 +17,6 @@
   ],
   "runs_matched": 177
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795701041"
 }

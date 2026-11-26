@@ -1,25 +1,19 @@
 {
  "name": "itr-computation-with-slab-table",
- "status": "ok",
- "rc": 1,
- "at": "2026-11-26T05:32:47",
- "passed": 43,
- "total": 47,
- "failed": [
-  "18_displacement",
-  "26_text_overlap",
-  "32_stroke_lines",
-  "63_table_rows"
+ "status": "page_count_refused",
+ "pages": 2,
+ "want": 1,
+ "at": "2026-11-26T14:18:03",
+ "extra_pages": [
+  {
+   "page": 2,
+   "words": 6,
+   "chars": 39,
+   "drawings": 6,
+   "images": 2
+  }
  ],
- "displacement": {
-  "med_dy": -12.8,
-  "worst_dy": 105.0,
-  "med_dx": 0.0,
-  "bad_pages": [
-   0
-  ],
-  "runs_matched": 114
- },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "export": "itr-computation-with-slab-table.refused.pdf",
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795701041"
 }

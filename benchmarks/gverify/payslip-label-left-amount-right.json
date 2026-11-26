@@ -2,7 +2,7 @@
  "name": "payslip-label-left-amount-right",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T07:26:19",
+ "at": "2026-11-26T14:19:18",
  "passed": 39,
  "total": 42,
  "failed": [
@@ -19,6 +19,6 @@
   ],
   "runs_matched": 93
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795677235"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795701041"
 }

@@ -2,20 +2,18 @@
  "name": "mutual-fund-statement",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T07:25:59",
- "passed": 41,
+ "at": "2026-11-26T14:18:54",
+ "passed": 43,
  "total": 47,
  "failed": [
   "18_displacement",
-  "25_invisible_text",
-  "27_text_off_page",
   "59_shape_anchor",
   "60_text_column_right_edge",
   "66_table_cell_width"
  ],
  "displacement": {
-  "med_dy": 0.2,
-  "worst_dy": 121.6,
+  "med_dy": 2.4,
+  "worst_dy": 9.5,
   "med_dx": 0.3,
   "bad_pages": [
    0,
@@ -23,6 +21,6 @@
   ],
   "runs_matched": 256
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795677235"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795701041"
 }

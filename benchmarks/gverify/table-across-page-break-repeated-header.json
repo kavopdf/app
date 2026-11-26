@@ -2,26 +2,23 @@
  "name": "table-across-page-break-repeated-header",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T07:27:05",
- "passed": 43,
+ "at": "2026-11-26T14:20:24",
+ "passed": 46,
  "total": 47,
  "failed": [
-  "04_chars_missing",
-  "18_displacement",
-  "27_text_off_page",
-  "60_text_column_right_edge"
+  "18_displacement"
  ],
  "displacement": {
-  "med_dy": -33.5,
-  "worst_dy": 401.3,
+  "med_dy": 1.6,
+  "worst_dy": 10.8,
   "med_dx": 0.3,
   "bad_pages": [
    0,
    1,
    2
   ],
-  "runs_matched": 466
+  "runs_matched": 468
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795677235"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795701041"
 }

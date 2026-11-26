@@ -2,28 +2,27 @@
  "name": "academic-paper-ieee-2col-abstract",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T05:27:48",
- "passed": 39,
+ "at": "2026-11-26T14:16:09",
+ "passed": 40,
  "total": 47,
  "failed": [
   "04_chars_missing",
   "17_matched_runs",
   "18_displacement",
-  "27_text_off_page",
   "44_header_footer",
   "45_char_accuracy",
   "47_margins",
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": -56.1,
-  "worst_dy": 60.5,
-  "med_dx": -0.2,
+  "med_dy": -0.2,
+  "worst_dy": 3.6,
+  "med_dx": -0.3,
   "bad_pages": [
    1
   ],
-  "runs_matched": 81
+  "runs_matched": 82
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795701041"
 }

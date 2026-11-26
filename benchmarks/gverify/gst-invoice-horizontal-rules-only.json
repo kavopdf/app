@@ -2,7 +2,7 @@
  "name": "gst-invoice-horizontal-rules-only",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T05:32:26",
+ "at": "2026-11-26T14:17:48",
  "passed": 36,
  "total": 42,
  "failed": [
@@ -22,6 +22,6 @@
   ],
   "runs_matched": 80
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795701041"
 }
