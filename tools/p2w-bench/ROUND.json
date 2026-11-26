@@ -17,8 +17,10 @@
       }
     ]
   },
+  "fixer_doing": "measuring the 21 missing glyphs: docx vs txt",
+  "fixer_doing_since": 1795705516.1410317,
   "fixer_engine_at_claim": "aa496ebe",
-  "fixer_last_beat": 1795702320.2316628,
+  "fixer_last_beat": 1795705516.1410327,
   "fixer_started": 1795703390.7332628,
   "history": [
     {

@@ -7534,3 +7534,24 @@
 {"t": 1795702518.7780256, "ist": "19:45:18", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795702518.8872983, "ist": "19:45:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795702519.3632026, "ist": "19:45:19", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795703432.287631, "ist": "20:00:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795703433.0669916, "ist": "20:00:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795703433.7520041, "ist": "20:00:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795703434.3950324, "ist": "20:00:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795703436.6106486, "ist": "20:00:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795703437.847278, "ist": "20:00:37", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795703440.3736732, "ist": "20:00:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795704728.1607046, "ist": "20:22:08", "ev": "beat", "d": "pod-prep: corpus+engine build"}
+{"t": 1795705125.0541666, "ist": "20:28:45", "ev": "beat", "d": "pod-prep: corpus+engine build"}
+{"t": 1795705379.6169558, "ist": "20:32:59", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795705382.8702846, "ist": "20:33:02", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795705405.0322633, "ist": "20:33:25", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795705405.52542, "ist": "20:33:25", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795705405.8587058, "ist": "20:33:25", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795705406.1466134, "ist": "20:33:26", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795705406.4645817, "ist": "20:33:26", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795705406.6670587, "ist": "20:33:26", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795705516.140463, "ist": "20:35:16", "ev": "beat", "d": "measuring the 21 missing glyphs: docx vs txt"}
+{"t": 1795705535.8053207, "ist": "20:35:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795705536.1034148, "ist": "20:35:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795705547.2823107, "ist": "20:35:47", "ev": "beat", "d": "attempt.py: recording an attempt"}
