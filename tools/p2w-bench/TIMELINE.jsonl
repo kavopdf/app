@@ -7470,3 +7470,21 @@
 {"t": 1795697329.7394183, "ist": "18:18:49", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795697417.089976, "ist": "18:20:17", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795699672.400112, "ist": "18:57:52", "ev": "beat", "d": "gate install timed out, checking phase"}
+{"t": 1795699703.5683208, "ist": "18:58:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795699711.0991454, "ist": "18:58:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795700683.672981, "ist": "19:14:43", "ev": "beat", "d": "building patched engine"}
+{"t": 1795700751.7596905, "ist": "19:15:51", "ev": "beat", "d": "staging patched 403 to Drive for the Google measurement"}
+{"t": 1795700852.755761, "ist": "19:17:32", "ev": "beat", "d": "building HEAD engine for the honest before"}
+{"t": 1795701024.3668683, "ist": "19:20:24", "ev": "beat", "d": "diagnostic: full-spend variant on 403"}
+{"t": 1795701219.707232, "ist": "19:23:39", "ev": "beat", "d": "half-remainder variant build"}
+{"t": 1795701406.9372003, "ist": "19:26:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795701660.8186526, "ist": "19:31:00", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795701661.0311632, "ist": "19:31:01", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795701661.2077286, "ist": "19:31:01", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795701661.3793821, "ist": "19:31:01", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795701661.5572908, "ist": "19:31:01", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795701661.7435505, "ist": "19:31:01", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795701661.9216084, "ist": "19:31:01", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795701662.126876, "ist": "19:31:02", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795702319.3526378, "ist": "19:41:59", "ev": "beat", "d": "corpus-slice: 6 of 14 converted"}
+{"t": 1795702320.2309296, "ist": "19:42:00", "ev": "beat", "d": "corpus-slice: 12 of 14 converted"}
