@@ -3,11 +3,12 @@
   "18_dA-02",
   "18_dB-01"
  ],
- "attempts": 1,
+ "attempts": 2,
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
  "started": "07:31",
- "started_ts": 1795658515.2211144
+ "started_ts": 1795658515.2211144,
+ "class": "18_displacement"
 }
