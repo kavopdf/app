@@ -239,6 +239,54 @@ def self_check():
     except Exception as _e:
         out.append(("self-check", "the attempts check raised " + _e.__class__.__name__ + ": " + str(_e)[:60], "it did not run, so it cannot vouch for anything"))
 
+    # 2b. A KEPT CHANGE IN GIT WITH NO KEPT RECORD IN THE LEDGER IS AN IMPROVEMENT NOBODY WILL FIND AGAIN.
+    #
+    # Measured 26 Nov on the 15:10 run: it landed aa496eb, moved the page-top gap from w:before into
+    # w:pgMar w:top, and the Google renders went 42/47 -> 46/47 and 42/47 -> 45/47 - the first real
+    # document movement in days. ATTEMPTS.json held no kept record for it at all: 18_displacement's
+    # history for the whole day is lead/moved=0, and the class stands PARKED. The next run reads the
+    # ledger, sees a parked class that never moved anything, and has no way to know the fix exists.
+    #
+    # The fix is not to write the ledger by hand - a number nobody can check is what this whole day was
+    # about. The fix is to say the two sources disagree, every run, until someone records it properly.
+    try:
+        import subprocess as _sp2
+        _rr0 = _json(RUN, {})
+        _lo = float(_rr0.get("started_ts") or 0)
+        if _lo:
+            _lg = _sp2.run(["git", "log", "--since=@%d" % int(_lo), "--pretty=%s", "--no-merges"],
+                           cwd=ROOT, capture_output=True, text=True, timeout=30)
+            _book = ("state:", "report:", "claim", "release:", "gverify:", "attempt:", "baseline:",
+                     "round:", "handoff:", "pending:", "classrow:", "measure:", "relay:", "corpus:")
+            _code = [m for m in (_lg.stdout or "").splitlines()
+                     if m.strip() and not m.strip().lower().startswith(_book)]
+            _kept = 0
+            try:
+                _ap = json.load(open(os.path.join(HERE, "ATTEMPTS.json"), encoding="utf-8"))
+                for _row in _ap.values():
+                    if not isinstance(_row, dict):
+                        continue
+                    for _x in (_row.get("history") or []):
+                        if _x.get("outcome") != "kept":
+                            continue
+                        try:
+                            _ts = time.mktime(time.strptime(str(_x.get("at") or ""),
+                                                            "%Y-%m-%d %H:%M")) - 19800
+                        except Exception:
+                            continue
+                        if _ts >= _lo - 60:
+                            _kept += 1
+            except Exception:
+                _kept = -1
+            if _code and _kept == 0:
+                out.append(("kept change", "%d code commit(s) in this window, first: %s"
+                            % (len(_code), _code[0][:48]),
+                            "ATTEMPTS.json has no kept record in the window - the next run will read the "
+                            "class as parked and never find this change"))
+    except Exception as _e:
+        out.append(("self-check", "the kept-change check raised " + _e.__class__.__name__ + ": " + str(_e)[:60],
+                    "it is not known whether a landed change was recorded"))
+
     # 3. the .txt table's own size against the corpus it claims to cover.
     try:
         _tr = t.get("scored")
@@ -1273,7 +1321,20 @@ def main(argv):
     co = corpus()
     tr = this_run()
     h = _json(HANDOFF, {})
+    # A WINDOW RESET MUST NOT BLANK THE CLASS. Measured 26 Nov: three claims landed in one slot - baseline
+    # at 15:07, a fixer at 15:10, another at 15:50 - and the last one reset RUN.json, so this_run() said
+    # present=False and the row printed "Working on -" while RUN.json.class held 18_displacement the whole
+    # time. The class is data on the run record; the window is a guess about which run the record belongs
+    # to. Print the data and say the window is in doubt, rather than a dash over a field that has an answer.
     working = tr.get("class") if tr.get("present") else "-"
+    if working in ("", "-", None):
+        try:
+            _rr = _json(RUN, {})
+            if _rr.get("class"):
+                working = "%s *(RUN.json began %s - the window was reset, so this may be another run's " \
+                          "class)*" % (_rr["class"], _rr.get("started") or "?")
+        except Exception:
+            pass
 
     # WHICH CRON IS THIS REPORT FOR, AND THEREFORE WHICH SECTIONS BELONG IN IT.
     #
@@ -1662,12 +1723,19 @@ def main(argv):
             _raw = _sp.run(["git", "show", "HEAD:tools/p2w-bench/LAST-MESSAGE.md"], cwd=HERE,
                            capture_output=True, text=True, timeout=20)
             if _raw.returncode == 0 and _raw.stdout:
-                _sec = _raw.stdout.split("## Why nothing moved", 1)
+                # THE HEADING MOVES WITH THE RUN, THE SECTION DOES NOT. "Why nothing moved" is right for a
+                # run that moved nothing; the 15:10 run landed a real fix and wrote "What happened, in this
+                # run's own words" instead, which is a better heading and would have made this comparison
+                # silently find nothing. Match the invariant part - "in this run's own words" - and fall
+                # back to the older wording, so a run that renames its section is still compared.
+                _sec = _raw.stdout.split("in this run's own words", 1)
+                if len(_sec) == 1:
+                    _sec = _raw.stdout.split("## Why nothing moved", 1)
                 if len(_sec) == 2:
                     _body = _sec[1]
                     _cut = _body.find("\n## ")
                     _body = _body[:_cut] if _cut != -1 else _body
-                    # drop the rest of the heading itself - the split leaves ", in this run's own words"
+                    # drop whatever is left of the heading line itself
                     _body = _body.split("\n", 1)[1] if "\n" in _body else ""
                     _prev = _body.strip()
         except Exception:
