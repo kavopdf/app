@@ -451,5 +451,17 @@
   "started_ts": 1795699676.784448,
   "class": "18_displacement",
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started_ts": 1795705550.0220017,
+  "started": "20:35",
+  "window_for_claim": 1795705550.0220017,
+  "ended_ts": null,
+  "ended": "(never)",
+  "attempts": 1,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
