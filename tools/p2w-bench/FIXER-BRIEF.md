@@ -2476,3 +2476,48 @@ Every one of them was a tool saying something untrue about a measurement that wa
 
 **A gate that is wrong is worse than a gate that is strict**, because the strict one tells you what to fix
 and the wrong one tells you to stand aside.
+
+## PROVEN CONSTRUCTS — MEASURED THROUGH GOOGLE'S OWN RENDER, 26 NOV
+
+Five hand-built documents were round-tripped through Drive (upload -> Google Doc -> PDF export) and read
+back out of Google's export. The engine was not involved. These are facts, not opinions, and they settle
+what to do about the 47 documents that carry `<w:txbxContent>`.
+
+**1. Google honours `<a:xfrm rot>`.** Two identical anchored shapes, one with `rot="900000"` (15 degrees),
+one without: the export shows the first tilted and the second horizontal. Rotation can live in the
+attribute. Today the engine bakes it into per-character positions — `01_stamp_rotated_15deg_upright`
+carries 99 positioned characters and no `rot` attribute at all, which is why its angle is wrong.
+
+**2. Google rasterises the shape anyway.** Both shapes in that test came back as images with no text in
+the text layer. `rot` fixes the angle, never the characters.
+
+**3. Flow text keeps its characters AND lands exactly.** A paragraph at `w:ind w:left="3000"` +
+`w:spacing w:before="2400"` came back in the text layer at x = 206.7 pt, which is margin 56.7 + indent
+150.0 to the decimal.
+
+**4. A borderless positional table keeps its characters AND lands exactly.** `w:tblInd w:w="3000"`, every
+border `w:val="none"`, zero cell margins, exact row heights. Text in the text layer at x = 206.7 pt, no
+visible borders, no shading. This is the construct for text that must sit at an arbitrary point.
+
+**5. Google keeps an image at its source resolution.** 192x57 px and 600x180 px, both placed in the same
+2.00 inch box, both come back unchanged — 96 dpi and 300 dpi effective. Nothing is re-sampled. A stamp
+rasterised at 300 dpi stays 300 dpi and does not pixelate on zoom.
+
+### What to do with that
+
+    stamps (20 boxes across 18 docs)        keep the shape. Put the angle in a:xfrm rot and rasterise at
+                                            300 dpi. Do not try to make a stamp flow text.
+
+    form fields and columns (987 boxes)     the shape is the wrong emitter, not the wrong idea. A
+    across 29 docs                          borderless positional table does the same job - arbitrary x
+                                            from tblInd plus cell width, arbitrary y from exact row
+                                            heights - and Google renders it as text.
+
+### Before you touch anything
+
+The checks already see this. All 47 textbox documents fail at least one check today, and
+`04_chars_missing` alone catches 43 of them. So the detection is not the gap — the fix is. Do not add a
+check for "text inside a shape"; it is there.
+
+Go one document at a time. Change the construct, run the regression, read the Google verdict, then the
+next one. 1007 boxes across 47 documents will not survive being changed in one pass.
