@@ -2,7 +2,7 @@
  "name": "382_architecture_diagram",
  "status": "ok",
  "rc": 0,
- "at": "2026-11-26T04:19:24",
+ "at": "2026-11-26T13:19:07",
  "passed": 42,
  "total": 42,
  "failed": [],
@@ -13,6 +13,6 @@
   "bad_pages": [],
   "runs_matched": 29
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795665232"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795697520"
 }

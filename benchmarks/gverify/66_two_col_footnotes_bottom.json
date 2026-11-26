@@ -2,7 +2,7 @@
  "name": "66_two_col_footnotes_bottom",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T05:26:28",
+ "at": "2026-11-26T13:24:35",
  "passed": 37,
  "total": 42,
  "failed": [
@@ -19,6 +19,6 @@
   "bad_pages": [],
   "runs_matched": 23
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795697520"
 }

@@ -2,25 +2,19 @@
  "name": "602_bookmarked_annual_report",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T05:25:56",
- "passed": 38,
+ "at": "2026-11-26T13:24:15",
+ "passed": 41,
  "total": 42,
  "failed": [
-  "04_chars_missing",
-  "18_displacement",
-  "27_text_off_page",
   "52_outline"
  ],
  "displacement": {
-  "med_dy": -67.6,
-  "worst_dy": 142.6,
+  "med_dy": 1.9,
+  "worst_dy": 2.8,
   "med_dx": -0.5,
-  "bad_pages": [
-   1,
-   2
-  ],
-  "runs_matched": 24
+  "bad_pages": [],
+  "runs_matched": 25
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795697520"
 }

@@ -1,24 +1,18 @@
 {
  "name": "57_centred_title_page_left_body_pages",
  "status": "ok",
- "rc": 1,
- "at": "2026-11-26T05:25:20",
- "passed": 39,
+ "rc": 0,
+ "at": "2026-11-26T13:23:55",
+ "passed": 42,
  "total": 42,
- "failed": [
-  "18_displacement",
-  "27_text_off_page",
-  "44_header_footer"
- ],
+ "failed": [],
  "displacement": {
-  "med_dy": -34.1,
-  "worst_dy": 69.4,
+  "med_dy": 0.9,
+  "worst_dy": 2.3,
   "med_dx": -0.1,
-  "bad_pages": [
-   1
-  ],
+  "bad_pages": [],
   "runs_matched": 30
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795697520"
 }

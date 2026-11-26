@@ -2,7 +2,7 @@
  "name": "65_two_col_full_width_figure_caption",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T05:26:23",
+ "at": "2026-11-26T13:24:32",
  "passed": 35,
  "total": 42,
  "failed": [
@@ -21,6 +21,6 @@
   "bad_pages": [],
   "runs_matched": 22
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795669043"
+ "engine": "025fe9deda5ac7b1",
+ "checks": "375669-1795697520"
 }
