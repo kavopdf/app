@@ -502,30 +502,20 @@
     "total": null
    },
    {
-    "at": "26 Nov 08:27",
-    "moved": null,
-    "outcome": "lead",
-    "pending_moved": 37,
-    "reason": "measured on a dirty tree - not credited; commit and re-record",
-    "total": null
-   },
-   {
-    "at": "2026-11-26 08:27",
+    "at": "2026-11-26 08:24",
     "changed": {
-     "files": [
-      "DocxWriter.java"
-     ],
-     "last_engine_commit": "give the fixer the five proven constructs, with the measurement behind each"
+     "files": [],
+     "last_engine_commit": "engine: spend a refused page gap into w:before instead of w:line, and charge the 0.75pt ro"
     },
-    "moved": 0,
+    "moved": 1,
     "outcome": "lead",
-    "reason": "refused table spacer delivers 22.9% of its declared gap (Google charges w:line exact at 2.74663*max(L/240,0.06) pt, not L/20); refused branch patched to spend the room it has as w:before, floored at t",
-    "total": null
+    "reason": "spacer->w:before clamp + ruled-only row excess; Google med_dy -13.0->+1.1 on 72_bank, still 41/42; residual is Google's 0.75pt row rung (+0.25/row over 18 rows = +3.5pt)",
+    "total": 25
    }
   ],
   "last": null,
-  "last_engine": "d058042+62f136f52b",
-  "last_moved": 0,
+  "last_engine": "22d57483",
+  "last_moved": 1,
   "last_total": 25,
   "outcomes": [
    "reverted",
@@ -611,7 +601,7 @@
   "pending_moved": 37,
   "ratchet_at": "23 Nov 04:09",
   "ratchet_docs": 212,
-  "reason": "refused table spacer delivers 22.9% of its declared gap (Google charges w:line exact at 2.74663*max(L/240,0.06) pt, not L/20); refused branch patched to spend the room it has as w:before, floored at the old charge. 37 of 62 spacer documents gain up to +51.04 pt, 24 unchanged, 1 lost 0.258 pt, floor corrected to -0.0085 pt worst case. FINDINGS/18_displacement-REFUSED-SPACER-PARTIAL-SPEND-083900-a7c2.md. Not committed: a docx change that moves 37 documents needs the full Google re-measure, and the slot ran out.",
+  "reason": "spacer->w:before clamp + ruled-only row excess; Google med_dy -13.0->+1.1 on 72_bank, still 41/42; residual is Google's 0.75pt row rung (+0.25/row over 18 rows = +3.5pt)",
   "reasons": [
    "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 pt mark, Google does not implement lineRule=exact and buys a fraction of it. Applied it (w:before=spacerTw, w:line=1) and measured bank-statement-5-pages through Drive: GOOGLE 40/47 -> 36/47, WORSE, and 27_text_off_page went 0 -> 12 as the extra space overflowed the page. LibreOffice unchanged at 47/47. The reason it cannot work: the spacer is NOT where the 57 pt comes from. Counted in the emitted docx, bank-statement-5-pages carries 9 spacers totalling 81.0 pt across 5 pages, max 16.2 pt - at most 16 pt per page against a measured uniform upward shift of 56.9-57.1 pt on pages 1-4. Forcing the full gap in therefore adds space the page never had and pushes rows off it.",
    "ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 pt - the paper's top edge), while LibreOffice places it at 56.80. The engine emits exactly that construct: bank-statement-5-pages carries w:before=1103 twips (55.15 pt) on the first paragraph of each page, and the measured Google dy on its pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Same number. The probe also found the construct Google DOES honour at a page top: a 1x1 table row with w:trHeight hRule=exact, 55.83 pt of 55.15 asked, exact in LibreOffice. Ruled out with numbers: the table-spacer paragraph (at most 16.2 pt per page against a 57 pt shift, and moving its gap into w:before took Google 40/47 -> 36/47, LO unchanged - reverted), w:line exact (LO honours it, so it cannot split the two renderers), auto line boxes (face-dependent in both). Next run: emit the page-first gap as a trHeight-exact table row and set that paragraph's w:before to 0. FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md has the probe table.",
@@ -687,8 +677,7 @@
    "gap-carrier rule (page-top w:before -> 1x1 exact row) measured live in Google on 4 documents: page-top drop confirmed (bank5 42->46/47, worst_dy 355.5->36.0), 68 spacer 114.3->2.7, but no document becomes clean; residual is a +7-9pt over-delivery. atLeast->exact refuted again. patch not committed: mobile-bill worst_dy 10.0->33.8 and no clean document to buy it with. FINDINGS/18-displacement-GAP-CARRIER-25NOV-relay.md",
    "pgMar-top patch re-measured end to end: Google +9 check-instances on 5 documents, 416_many_tiny_pages 40/42 -> 42/42 CLEAN, LibreOffice identity 212/212, zero new failures. Not committed: gate refuses on a PRE-EXISTING regression (newsletter-3col-header-footer share5 0.2 -> 86.3) introduced by a commit already on main, which this patch cannot cause (exact identity in the docx). Next run: root-cause that regression first, then land the patch with it.",
    "pgMar-top patch committed (b6bfcb7b). Full corpus re-measured on the patched engine: RANKING.csv byte-identical, 212 of 212 unchanged, 0 worse - the LibreOffice proxy is blind to this construct by construction. Emitted .docx confirmed carrying the gap in w:pgMar w:top (1103/1790/1390/230/1040 tw on the five sampled docs; HEAD wrote 0). Google-side movement (9 check-instances, 1 doc clean on 5 docs) was the 01:25 run's live measurement of the same construct; not re-measured here.",
-   "pgMar-top regression root-caused as a DOUBLING on 401 (body opens with w:tbl, page-first paragraph sits in a cell, margin added on top of an untouched w:before); two guards make 401+601 byte-identical and leave 416/412 intact; regress over 213 converted docs: no document worse, refused only on the unmeasured engine - a 213-doc re-measure does not fit the slot",
-   "refused table spacer delivers 22.9% of its declared gap (Google charges w:line exact at 2.74663*max(L/240,0.06) pt, not L/20); refused branch patched to spend the room it has as w:before, floored at the old charge. 37 of 62 spacer documents gain up to +51.04 pt, 24 unchanged, 1 lost 0.258 pt, floor corrected to -0.0085 pt worst case. FINDINGS/18_displacement-REFUSED-SPACER-PARTIAL-SPEND-083900-a7c2.md. Not committed: a docx change that moves 37 documents needs the full Google re-measure, and the slot ran out."
+   "spacer->w:before clamp + ruled-only row excess; Google med_dy -13.0->+1.1 on 72_bank, still 41/42; residual is Google's 0.75pt row rung (+0.25/row over 18 rows = +3.5pt)"
   ],
   "requeues": 0,
   "status": "PARKED"
@@ -696,6 +685,7 @@
  "20_within_10pt (+4)": {
   "attempts": 14,
   "first_seen": 1794489760.0651093,
+  "history": [],
   "last": 1794539752.1972165,
   "outcomes": [
    "reverted",
@@ -1146,6 +1136,7 @@
  "53_embedded_faces": {
   "attempts": 1,
   "first_seen": 1794543907.188078,
+  "history": [],
   "last": 1794543907.1880815,
   "outcomes": [
    "error"

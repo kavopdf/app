@@ -500,4 +500,4 @@
 {"_list": "notes", "_entry": {"at": "04:24", "text": "agent deployed: 25_invisible_text / invisible-text-blind - is the check blind after the 24 Nov sheet filter, and can it fail again"}}
 {"_list": "agents", "_entry": {"angle": "", "class": "band sweep: footband 0.80 zeroes 69 and spares 330_cad; 26_text_overlap=11 at both 0.80 and 0.0", "deployed": "03:21", "deployed_at": "2026-11-25T03:21", "expected": "", "finding": "", "id": "band-01", "question": "", "status": "running"}}
 {"_list": "agents", "_entry": {"angle": "invisible-text-blind", "class": "25_invisible_text", "deployed": "04:24", "deployed_at": "2026-11-25T04:24", "expected": "22:05", "finding": "FINDINGS/25_iinvisible-text-blind-25NOV.md", "id": "25_iinvisible-text-blind-01", "landed_at": "2026-11-25T04:24", "question": "is the check blind after the 24 Nov sheet filter, and can it fail again", "status": "landed"}}
-{"_list": "notes", "_entry": {"at": "05:45", "text": "attempt 62 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "04:24", "text": "agent landed: 25_invisible_text / invisible-text-blind -> FINDINGS/invisible-text-blind-25_invisible_text-25NOV.md"}}
