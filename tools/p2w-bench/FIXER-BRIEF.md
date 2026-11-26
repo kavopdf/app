@@ -2563,3 +2563,27 @@ makes dark mode composite correctly.
 
 Do not add a check for "white fill". There is none. Do not chase `w:background` — it is gone and it was
 the cause of the earlier round of this same bug.
+
+## TWO THINGS TWO CONSECUTIVE REPORTS PAID FOR. DO NOT PAY FOR THEM AGAIN.
+
+**`delegate_task` with `background=true` RETURNS INLINE in a scheduled run.** There is nobody to answer
+later, so the call blocks until the agent finishes. Measured 26 Nov: one agent held the slot for **38.7
+minutes**, which was the run's longest silence, and a watchdog released the claim while it was still
+working. Deploying a second agent would have blocked for another twenty and left nothing for the engine.
+
+So: **beacon immediately before `delegate_task`, assume it blocks, and decide whether one agent that lands
+a law is worth more than the engine work it displaces.** One agent that lands beats two that return after
+the slot is gone.
+
+**The corpus conversion loop now beacons.** `corpus-slice.py` calls `round.py --heartbeat` every six
+documents - about 27 seconds at 4.5 s a document - because both 26 Nov reports named this silence as the
+cause of a released claim ("beats once and then goes quiet for four minutes at a time" and "longest silence
+38.7 min - converting corpus slices"). If you add another loop that can run for minutes, give it the same
+treatment: `from corpus-slice import beat` or the same subprocess call. A run that is working must be able
+to say so.
+
+**`regress.py --check` hanging is usually the corpus, not the check.** Measured 26 Nov: `git commit` hung
+over 180 s twice and a direct `regress.py --check` ran 4 m 21 s with 13 s of user time and produced
+nothing. The cause was `corpus-slice.py` inside it converting a corpus that was 115 documents short.
+Running `corpus-slice.py` on its own finished the remaining 18 in 132 s and the gate then passed in 25.8 s.
+Before you report a blocked gate, run the slice yourself and see whether the corpus is short.

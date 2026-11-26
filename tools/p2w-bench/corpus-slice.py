@@ -32,6 +32,27 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
+
+def beat(doing):
+    """Say the run is alive from inside a loop that can go minutes without printing anything.
+
+    Two consecutive relay reports named this exact silence as the reason a watchdog released the claim:
+    "pod-prep.sh's conversion step beats once and then goes quiet for four minutes at a time, four times
+    over" and "Longest silence 38.7 min - from 08:35:19, after heartbeat before any claim: gverify:
+    converting corpus slices". A conversion costs about 4.5 s a document here, so a beat every few
+    documents is under half a minute of silence, well inside any window.
+
+    round.py --heartbeat exists for precisely this: a run doing a long ratchet looked identical to a run
+    that had died. Every failure is swallowed - a beat that cannot be written must never cost a
+    conversion, and a conversion is the thing this process is for.
+    """
+    try:
+        import subprocess
+        subprocess.run([sys.executable, os.path.join(HERE, "round.py"), "--heartbeat", "--doing", doing],
+                       timeout=10, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+
 import importlib.util
 
 # The module name must be REGISTERED in sys.modules, not just executed: convert_one is shipped to
@@ -154,6 +175,9 @@ def main(argv):
     with cf.ProcessPoolExecutor(max_workers=a.jobs) as ex:
         for name, good, secs, msg in ex.map(cc.convert_one, work,
                                             chunksize=max(1, len(batch) // a.jobs)):
+            _done = ok + bad + 1
+            if _done % 6 == 0:
+                beat("corpus-slice: %d of %d converted" % (_done, len(batch)))
             if good:
                 ok += 1
             else:
