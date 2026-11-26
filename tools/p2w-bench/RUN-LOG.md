@@ -199,3 +199,4 @@
 | 26 Nov 22:20 | fixer | slot claimed - fixer running |
 | 27 Nov 01:05 | fixer | attempt none -> lead (0/? moved) |
 | 27 Nov 01:05 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 27 Nov 01:13 | fixer | slot FORCED released - see INCIDENTS.md for why |

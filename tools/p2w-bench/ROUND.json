@@ -17,11 +17,9 @@
       }
     ]
   },
-  "fixer_doing": "relay: writing the report",
-  "fixer_doing_since": 1795722062.234994,
   "fixer_engine_at_claim": "aa496ebe",
   "fixer_last_beat": 1795722062.2349946,
-  "fixer_started": 1795718982.8511744,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",

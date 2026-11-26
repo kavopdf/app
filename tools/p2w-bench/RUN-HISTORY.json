@@ -490,5 +490,19 @@
   "window_for_claim": 1795717572.9702141,
   "class": "none",
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "00:19",
+  "started_ts": 1795718982.8522816,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [
+   "triaA-01",
+   "ssimB-01"
+  ],
+  "docs_improved": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
