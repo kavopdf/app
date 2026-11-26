@@ -1,46 +1,39 @@
-# Fixer report - 2026-11-26 04:27
+# Fixer report - 2026-11-26 05:57
 
 ```
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 04:27 → running IST · 1h 06m**
+**26 Nov 2026 · slot 05:57 → running IST · 12 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
-| Check-instances passing | **3018** of 3256 (92.7%) on 73 documents |
-| Check-instances still failing | **238** |
-| Kept attempts vs documents clean | **15** classes with a kept attempt, **52** documents clean - a kept attempt is progress inside a class, not a finished document |
+| Check-instances passing | **8538** of 9105 (93.8%) on 208 documents |
+| Check-instances still failing | **567** |
+| Kept attempts vs documents clean | **15** classes with a kept attempt, **47** documents clean - a kept attempt is progress inside a class, not a finished document |
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1 |
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+40.32%** — mean 6.15 → 3.67 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **7** of the **73** re-measured on this engine - **135** of the 208 scored are still on an older engine, and **40** of those were clean on the engine they were measured with |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **3** run(s) for the 135 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **42** of the **208** re-measured on this engine - **0** of the 208 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **5** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `t12_word_invention` - taken from the pending list (28 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `t12_word_invention` by hand instead |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 05:33 | **lead** | 0/213 | annotation-meta patch: 600 txt FAIL(t12 83) -> PASS, docx word/document.xml byte-identical on 600/041122/601; gate refuses because the docx table needs a 212-doc re-score that p2w.py cannot finish in |
+| Working on | `-` - taken from the pending list (25 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.3 h ago** |
+| Measured | **18 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **204** (95.8%) |
 | Failing at least one check | **9** |
@@ -55,11 +48,10 @@
 
 | | |
 |:--|:--|
-| Slot window | 04:27 → running · 1h 06m |
+| Slot window | 05:57 → running · 12 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 1 |
-| Longest silence | **38.0 min** — from 04:29:30, after `heartbeat before any claim: reverted engine rebuilt, corpus reconverte` |
-| Silences over 2 min | 2 |
+| Tool beats | 2 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -67,7 +59,7 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **1h 05m** | `######################` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |

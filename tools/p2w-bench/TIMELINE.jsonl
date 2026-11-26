@@ -6716,3 +6716,9 @@
 {"t": 1795654802.5866594, "ist": "06:30:02", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795654802.760514, "ist": "06:30:02", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795654843.1891108, "ist": "06:30:43", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795653288.8710709, "ist": "06:04:48", "ev": "beat", "d": "pod warm, checking corpus conversion state"}
+{"t": 1795653293.6702397, "ist": "06:04:53", "ev": "beat", "d": "corpus slice: 64 to go"}
+{"t": 1795653613.8532984, "ist": "06:10:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795654658.0244522, "ist": "06:27:38", "ev": "beat", "d": "measuring txt t02 baseline on 334/74/39"}
+{"t": 1795654680.475882, "ist": "06:28:00", "ev": "beat", "d": "full txt rescore with patched instrument (213 docs)"}
+{"t": 1795654743.1308494, "ist": "06:29:03", "ev": "beat", "d": "txt_rank --rescore (213 sequential)"}

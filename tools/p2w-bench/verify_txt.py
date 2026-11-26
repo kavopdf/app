@@ -870,7 +870,20 @@ def _src_pages(path):
                 for _a, _b in subs:
                     if _a in t:
                         t = t.replace(_a, _b)
-                lines.append({"text": t.strip(), "x": x0, "y": y0,
+                # THE BASELINE, BECAUSE THE BBOX TOP IS NOT A VERTICAL POSITION.
+                # Measured 26 Nov on 39_small_caps_letter_spacing: the page draws its title
+                # twice on ONE baseline - a 1 pt white invisible duplicate at y0 = 65.11 and
+                # the 15 pt letter-spaced one at y0 = 52.64. The bbox top of a 15 pt caps line
+                # sits 12.5 pt above a 1 pt line that shares its baseline, so keying on it
+                # invents a top-to-bottom relation between two pieces of one visual line and
+                # the check reported 21 of 22 in order. Keyed on the baseline the same
+                # predicate reports 22 of 22, with no other change.
+                _by = y0
+                if ln.get("spans"):
+                    _org = [sp["origin"][1] for sp in ln["spans"] if "origin" in sp]
+                    if _org:
+                        _by = max(_org)
+                lines.append({"text": t.strip(), "x": x0, "y": y0, "by": _by,
                               "right": x1, "size": ln["spans"][0]["size"]
                               if ln.get("spans") else 10.0,
                               # A line drawn on a slanted or vertical baseline has no
@@ -976,10 +989,31 @@ def _ruler(runs, lines):
         key = t.strip()
         if by_text.get(key):
             pairs.append((x, by_text[key].pop(0)))
-    ratios = sorted(x / col for x, col in pairs if col > 0)
-    if not ratios:
+    pos = [(x, col) for x, col in pairs if col > 0]
+    if not pos:
         return None, pairs
-    return ratios[len(ratios) // 2], pairs
+    ratios = sorted(x / col for x, col in pos)
+    med = ratios[len(ratios) // 2]
+    # THE MEDIAN IS NOT A FIT, AND IT CAN BE OUTVOTED BY A ROUNDING ARTEFACT.
+    # Measured 26 Nov on 334_patent_document: 22 of 32 pairs are (x=28.0, col=5) - the body
+    # margin, where round(28/5.1) = 5 inflates the ratio to 5.60 - and the other 10 are the
+    # real ruler, 5.00-5.13. The median returns 5.600, the writer used 5.100, and the check
+    # charged the document 69 % for its own estimator's error. At mid=5.100 all 32 pairs fit.
+    # So the fit is the leverage-weighted least-squares slope through the origin,
+    # mid = sum(x*col)/sum(col*col): a pair at column 60 is 144x the evidence of one at
+    # column 5, which is the right weighting when the error is rounding of x/mid.
+    # The fit is used only where it is a plausible character width AND does not contradict
+    # the median outright; otherwise the median stands, so a degenerate pair set cannot
+    # move the ruler into nonsense. Falsifiability unchanged: a .txt with randomised indents
+    # destroys the linear relation, so the share falls and the document still fails - this is
+    # an estimator fix, not a tolerance change.
+    den = sum(col * col for x, col in pos)
+    num = sum(x * col for x, col in pos)
+    if den > 0:
+        ls = num / den
+        if POS_MID_MIN <= ls <= POS_MID_MAX and 0.5 * med <= ls <= 2.0 * med:
+            return ls, pairs
+    return med, pairs
 
 
 def _furniture_key(text):
@@ -1193,7 +1227,7 @@ def compare(src_pdf, txt_path):
         # is not merely quiet), and a .txt in paint order that passed before now fails.
         # The ground truth is the reader's order: page by page, top to bottom.
         for ln in sorted((l for l in pg["lines"] if l.get("upright", True)),
-                         key=lambda l: (round(l["y"], 1), l["x"])):
+                         key=lambda l: (round(l.get("by", l["y"]), 1), l["x"])):
             src_seq.append(ln)
     txt_seq = [(ln.strip(), _column(ln)) for ln in lines]
     # The COLUMN is what decides which pairs are comparable, not just what identifies a

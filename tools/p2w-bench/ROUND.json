@@ -13,8 +13,10 @@
       }
     ]
   },
+  "fixer_doing": "txt_rank --rescore (213 sequential)",
+  "fixer_doing_since": 1795654743.1523776,
   "fixer_engine_at_claim": "85b8735f",
-  "fixer_last_beat": 1795634062.864022,
+  "fixer_last_beat": 1795654743.1523788,
   "fixer_started": 1795652834.952799,
   "history": [
     {
