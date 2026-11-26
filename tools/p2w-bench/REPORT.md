@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 11:50 → running IST · 3 min**
+**26 Nov 2026 · slot 11:50 → running IST · 8 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -42,7 +42,7 @@
 
 | | |
 |:--|:--|
-| Measured | **9 min ago** |
+| Measured | **14 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -57,10 +57,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 11:50 → running · 3 min |
+| Slot window | 11:50 → running · 8 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
 | Tool beats | 12 |
-| Silences over 2 min | 0 |
+| Longest silence | **4.1 min** — from 11:54:15, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -68,9 +69,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **0 min** | `#####` |
-| report - the report and the chain | **2 min** | `############` |
-| other - not attributed to a tool | **1 min** | `######` |
+| record - attempt, handoff, class rows | **0 min** | `##` |
+| report - the report and the chain | **6 min** | `#################` |
+| other - not attributed to a tool | **1 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |

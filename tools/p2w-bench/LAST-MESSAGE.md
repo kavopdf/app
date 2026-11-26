@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 11:50 → running IST · 3 min**
+**26 Nov 2026 · slot 11:50 → running IST · 8 min**
 
 > One document went clean in Google on an unlanded construct (`72_bank_statement`, 41/42 -> 42/42). Nothing was committed to the engine: the corpus has not been measured on the new defaults, and rule 3 forbids landing it blind.
 
@@ -39,7 +39,7 @@
 
 | | |
 |:--|:--|
-| Measured | **9 min ago** |
+| Measured | **14 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -54,10 +54,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 11:50 → running · 3 min |
+| Slot window | 11:50 → running · 8 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
 | Tool beats | 12 |
-| Silences over 2 min | 0 |
+| Longest silence | **4.1 min** — from 11:54:15, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -65,9 +66,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **0 min** | `#####` |
-| report - the report and the chain | **2 min** | `############` |
-| other - not attributed to a tool | **1 min** | `######` |
+| record - attempt, handoff, class rows | **0 min** | `##` |
+| report - the report and the chain | **6 min** | `#################` |
+| other - not attributed to a tool | **1 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -90,23 +91,25 @@ Read `FINDINGS/18-displacement-PAGEFIRST-DEAD-CODE-AND-AUTOFLOW-1200-relay.md` f
 | `72_bank_statement_no_rules_right_amounts` | 41/42, med +1.1 | 41/42, med +3.51, 52/80 runs out | **42/42 PASS**, med +0.21, 2/80 out |
 | `electricity-bill` | 46/47, med -7.18, 113/125 out | 46/47, med +0.08, 26/125 out | 46/47, med -1.47, 41/125 out |
 
-1. **Land it properly, first thing:** build the corpus with `-Dp2w.lineRule=autoflow -Dp2w.autoEm=1.2207`, run `regress.py --check`, and if nothing gets worse in the LibreOffice proxy, make those the defaults and let the `:20 gverify` cron re-measure. That is the whole first act of the next slot - the construct is measured, only the corpus pass is missing.
-2. **Do not re-run the page-top lever on this class.** All **23** documents whose only failing check is `18_displacement` are **single-page** (PyMuPDF over the corpus PDFs), so `TOPGAP_ROW` and the page-break `w:before` drop are byte-inert on every one of them - verified: `document.xml` of a flag-on and flag-off build is identical.
-3. **The `L' = 12L/K` exact-box transform is arithmetically impossible** - keeping the advance constant needs `before' = before - 3.3695 L`, negative for every line in the corpus. `auto` is the only construct that escapes Google's exact-line charge; that is why the two flags above are the lever and not a rescaling of `w:line`.
-4. `spacing()`'s `pageFirst` was dead code in every build - both flow call sites passed `ctx.newPage` after clearing it, so `autoflow` had never been a fair experiment until this run's patch (`patches/PATCH-pagefirst-autoflow-1200-relay.patch`, inert at the default `exact`).
+1. **Land it properly, first thing:** build the corpus with `-Dp2w.lineRule=autoflow -Dp2w.autoEm=1.2207`, run `regress.py --check`, and if nothing gets worse in the LibreOffice proxy make those the defaults, then let the `:20 gverify` cron re-measure. The construct is measured; only the corpus pass is missing.
+2. **Then the table, not the line.** Under that construct the 41 runs still failing on `electricity-bill` are 37 table-cell runs at 7.20 pt explained to +-0.11 pt by `dy(row i) = dy(caption) - 2.96 + i*0.652` - a table-entry offset of -3.0 pt (identical at both tables) and a +0.652 pt/row pitch inflation (19.07 pt rendered against 18.4 pt source). The 4 page-furniture runs (header +5.4, footer -3.37) are a second construct, and the check counts bad PAGES, so both must go before the document turns green.
+3. **Do not re-run the page-top lever on this class.** All **23** documents whose only failing check is `18_displacement` are **single-page** (PyMuPDF over the corpus PDFs), so `TOPGAP_ROW` and the page-break `w:before` drop are byte-inert on every one of them.
+4. **The `L' = 12L/K` exact-box transform is arithmetically impossible** - keeping the advance constant needs `before' = before - 3.3695 L`, negative for every line in the corpus. `auto` is the only construct that escapes Google's exact-line charge.
+5. `spacing()`'s `pageFirst` was dead code in every build; the patch is at `patches/PATCH-pagefirst-autoflow-1200-relay.patch` and is inert at the default `exact`.
 
 ## Subagents
 
-Two, at the start. One mapped the engine's spacing construct - `spacing()` :149, the `ctx.newPage` state (:819, cleared at :3800 and :4722), the table spacer emitter :6055-6185 - and returned the line numbers and patch shapes this run used. The second returned the same content and was not needed.
+Two. The first mapped the engine's spacing construct - `spacing()` :149, the `ctx.newPage` state (:819, cleared at :3800 and :4722), the table spacer emitter :6055-6185 - and returned the line numbers and patch shapes this run used. The second classified the 41 residual runs on the positive control: 10 distinct lines, 37 of them table cells at 7.20 pt, a two-parameter table defect (entry -3.0 pt, pitch +0.652 pt/row) plus 4 page-furniture runs. Both landed in FINDINGS.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 11:50 → running · 3 min |
+| Slot window | 11:50 → running · 8 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
 | Tool beats | 12 |
-| Silences over 2 min | 0 |
+| Longest silence | **4.1 min** — from 11:54:15, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -114,6 +117,6 @@ Two, at the start. One mapped the engine's spacing construct - `spacing()` :149,
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **0 min** | `#####` |
-| report - the report and the chain | **2 min** | `############` |
-| other - not attributed to a tool | **1 min** | `######` |
+| record - attempt, handoff, class rows | **0 min** | `##` |
+| report - the report and the chain | **6 min** | `#################` |
+| other - not attributed to a tool | **1 min** | `###` |
