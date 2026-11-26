@@ -121,3 +121,25 @@ more than the slot had left, and a global construct change without it is exactly
 **The next run's first act:** build the corpus with `-Dp2w.lineRule=autoflow -Dp2w.autoEm=1.2207`, run
 `regress.py --check`, and if nothing gets worse in the LibreOffice proxy, commit the default and let the
 `:20 gverify` cron re-measure. The two controls above say what should happen on the documents it reaches.
+
+## 7. What is left on `electricity-bill` under the new construct - it is a table, not a line
+
+Measured by a read-only subagent on the same pair (`dy.py`, `electricity-bill` autoflow+1.2207):
+
+     page 0: n=125 n_out=41 min=-5.23 p25=-2.72 med=-1.47 p75=-0.05 max=+5.51 span=10.74
+     FIT dy = -1.23 +0.00082*y   rms_resid=2.07 pt
+
+The 41 failing runs are **10 distinct text lines** - dy is constant within a line to 0.01 pt - and **37 of
+the 41 are table-cell text at 7.20 pt**, in two table blocks. Inside each table:
+
+    dy(row i) = dy(caption) - 2.96 + i * 0.652        (all 18 rows reproduced to +-0.11 pt)
+
+i.e. a **table-entry offset of about -3.0 pt, the same value at both tables** (-3.06, -3.05), plus a
+**pitch inflation of +0.652 pt/row** (render 19.07 pt against a uniform 18.4 pt source pitch, +3.6 %).
+The middle rows of both tables pass; the top of each table fails high and the bottom of the second fails low
+once the drift has accumulated. The remaining 4 runs are page furniture pulled toward the page centre
+(running header +5.4 pt, footer -3.37 pt) - a second, much smaller construct.
+
+**Consequence:** the next fix on this document is one engine change in the table block (row pitch / entry
+gap), not a per-run model. And fixing tables alone will not clear the check: `18_displacement` counts bad
+PAGES, so the 4 furniture runs keep the page red until they are fixed too.
