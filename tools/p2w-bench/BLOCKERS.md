@@ -1104,3 +1104,27 @@ Two things follow, and neither is a fix this run could land:
    accept that as measured.
 2. Until then, no run can commit an engine change at all, and a run that reports "the gate refused" is
    reporting this, not a defect in its own work.
+
+---
+
+## 2026-11-26 18:12 IST — watchdog: nothing stopped, and this pass has no `cron` tool
+
+**This pass has no `cron` tool in its tool list.** One `tool_search` for cron returned only unrelated
+integration operations, and the declared tool list carries no cron operation, so the platform half of the
+watchdog did not run and this pass did not pretend it did. In plain words: **this watchdog has no cron
+tool, so a paused or zombie cron cannot be moved by automation.** The exact calls it would have made,
+against the ids in HEALTH-BRIEF's table and not from memory:
+
+    cron(action="list")                                          # status and next_fire_at for every cron
+    cron(action="runs", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")    # fixer, :50
+    cron(action="runs", cron_id="01M7Y6DSBB2KBYAREFVMHYAB4D")    # fixer relay, :10
+
+That is a missing tool, not a decision anyone has to make.
+
+| time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
+|---|---|---|---|---|---|
+| 18:12 | STEP 1 and STEP 2 | nothing. `health.py --stalled` exits 0 and reads "nothing is stopped": measure-google moving at 88 of 213 with an age of 1.4 h, matrix done at 213 of 213, classify waiting behind the incomplete measurement, fix moving at 3 attempt(s) in 3 h, txt moving at 205 clean and 8 failing | `health.py`, `health.py --json`, `health.py --stalled`, `progress.py`, `progress.py --json`, `round.py --phase` (fix) | not needed | nothing. Today's trend row was already committed by an earlier pass; `progress.py` appended nothing, so there was nothing to commit for STEP 2 |
+| 18:12 | the falling Google count | `measure-google` reads 88 of 213 where the committed row says 208 measured - it looks like results were lost | listed `benchmarks/gverify/` by mtime: the newest result files were written at 18:08, and the newest commits are `gverify: 80 documents measured through Google (48 -> 88 verified)` and its run report | yes - understood, not "fixed" | nothing. A re-measurement pass is in flight and writes results document by document, so the count is mid-flight, not lost. **Overturned by:** the same low count with no result file written for over the 4 h threshold |
+| 18:12 | STEP 4 C, the reopen path | the phase is `fix`, not a finished phase with documents still failing | `round.py --phase` | not applicable | nothing. `round.py --reopen` was not run because its guard is about a done phase and this is not one |
+| 18:12 | STEP 4 D, the fixer slot | whether the slot is held by a dead run | `git log`: the newest commit is `release: fixer frees the slot`, and `health.py` shows the fix stage moving at an age of 0.6 h | **not needed** | nothing. The slot is free and the work behind it is recent, so `round.py --release-fixer --force` was not run |
+| 18:12 | STEP 5, the flat `.docx open` column | `docx open` reads 59 in the committed row and 59 the row before it - unchanged, while the fixer works | read the trend table and `ROUND.json` | decided earlier today, and it stands | **No class parked.** The gate charges a full corpus re-score to every change, so changes are measured, reverted and never land; the recorded replacement is a scope keyed on the documents a change can move. The `.txt` axis moved 9 to 8 today, so the pipeline is producing something even where `.docx` is flat. **Overturned by:** one engine change that lands and moves `docx open` |
