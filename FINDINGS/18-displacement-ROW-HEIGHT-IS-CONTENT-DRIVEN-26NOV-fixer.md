@@ -91,3 +91,96 @@ be measured and are named `probe-*` so the next run can delete them).
 Reproduce: stage `320_balance_sheet_statutory`, edit `word/document.xml`, upload, convert, export, then
 compare `fitz` line bboxes against `p2w/corpus/320_balance_sheet_statutory.pdf`. The three numbers to
 match are 14.00 (page), 15.00 (Google, base), 20.74 (Google, `w:line`=280).
+
+---
+
+# CORRECTION, SAME RUN, SAME DOCUMENT: `w:trHeight` **is** read, and distributing the ladder residue fixes the ramp
+
+The section above concludes that the row height cannot be declared. **That conclusion is wrong and this
+section replaces it.** It was drawn from a probe that could not discriminate, which is the same mistake
+the 25 Nov falsification made, and finding it twice in one day is the useful part of this run.
+
+## What the first half of the run got wrong
+
+Probe A (`hRule="exact"`) showed Google ignores `hRule`. That much stands. But it says nothing about
+`w:trHeight w:val`, and the 25 Nov test that supposedly settled it declared **292 twips = 14.60 pt**:
+
+    laid = 0.75 * ( round(14.60 / 0.75) + 1 ) = 0.75 * ( 19 + 1 ) = 15.00   <- the same rung as 280
+
+The snap was a no-op. It landed on the rung the engine was already on, so "no change" was the only
+possible result, and the conclusion drawn from it — *"the declaration is a floor and the content
+absorbs it"* — is not supported.
+
+## The discriminating probe: three `w:trHeight` values in one render
+
+One document, one render, the 21 rows split into three groups with different declarations, everything
+else fixed. Prediction stated before running: if the declaration is read, 300 -> 15.75 and 260 -> 13.50.
+
+| declared `w:trHeight` | predicted laid | **measured laid** |
+|--:|--:|--:|
+| 300 tw (15.00 pt) | 15.75 | **15.75** |
+| 280 tw (14.00 pt) | 15.00 | **15.00** |
+| 260 tw (13.00 pt) | 13.50 | **13.50** |
+
+Three for three. `w:trHeight w:val` **is** read, and it is read through the ruled-table law exactly.
+
+## The consequence: 14.00 pt is unreachable, but the *ramp* is not
+
+The page's pitch is 14.00 pt and Google's grid is 0.75 pt, so no single declaration lands on 14.00
+(14.00 / 0.75 = 18.67). The reachable rungs are 13.50 and 14.25. Declaring every row at one of them still
+ramps — 0.25 pt or 0.50 pt per row, accumulating across 21 rows.
+
+**The residue does not have to accumulate.** Each row may pick its own rung, so a run of rows can average
+the page's pitch exactly: two rows at 14.25 and one at 13.50 give 42.00 pt for three rows, which is
+14.00 pt per row to the hundredth. Greedy per row: `laid = nearest 0.75 multiple to (page edge - laid so
+far)`, declare `w:val = (laid - 0.75) * 20`.
+
+## Measured, one document, Google, against the corpus PDF
+
+`320_balance_sheet_statutory`, the same 13 table rows, y-difference to the corpus PDF's own baselines:
+
+| row | corpus y | base dy | **residue dy** |
+|--:|--:|--:|--:|
+| 4 | 106.05 | +0.30 | **-0.45** |
+| 6 | 134.05 | +2.30 | **-0.70** |
+| 8 | 162.05 | +4.30 | **-0.95** |
+| 10 | 190.05 | +6.30 | **-0.45** |
+| 12 | 218.05 | +8.30 | **-0.70** |
+| 14 | 246.05 | +10.30 | **-0.95** |
+| 17 | 288.05 | +13.30 | **-0.95** |
+
+    med_dy   +10.30  ->  -0.70      (the check's tolerance is 1.5 pt)
+    every row within +/-0.95 pt, and the error does not grow with row number
+
+The ramp is gone. **This is the first measured fix for `18_displacement`'s table-row tail** — the check
+priced at 54 clean documents — and it is a change to the declared number, not to the layout.
+
+## What the next run has to build, and what it must not break
+
+`DocxWriter` writes the row at `w:trHeight w:val=rowHeightTw w:hRule="atLeast"` (the content-table
+writer, ~line 6631). The change is to choose `rowHeightTw` from the cumulative tracker rather than from
+the row's own extent:
+
+    cumLaidPt  per table, reset at the table's first row
+    target     = the page's own cumulative row edge for this row (t.rowEdge / rowEdge[r+1] already exist
+                 in that scope, in points)
+    laid       = nearest multiple of 0.75 to (target - cumLaidPt), at least 0.75
+    declare    = laid - 0.75  (a value whose rung is `laid`; any value in [laid-1.125, laid-0.375] works)
+    cumLaidPt += laid
+
+Three things it must not do, each of which is a way this can lose documents:
+
+1. **It must only apply where the table is ruled** — the `+1` rung belongs to `w:insideH single`. The
+   unruled branch lays `0.75 * round(D/0.75)` with no `+1`, so the same declaration lands one rung
+   lower there. The 26 Nov 09:27 subagent's law has both branches; use it.
+2. **It must not lower a row below its content.** `hRule="atLeast"` means content wins, so a row whose
+   text needs more than the rung silently reverts to content height and the tracker then over-corrects
+   the next row. Clamp: never declare less than the content, and when the clamp fires, do not credit the
+   tracker with a laid height that did not happen.
+3. **`writtenRowsTw` is charged from the same number** (see the budget note at ~line 6548). The page
+   budget must keep being charged what the renderer lays, not what was declared, or every following
+   block moves by the difference — which is the whole point of the change and also its whole risk.
+
+Prove it on `320_balance_sheet_statutory` (med_dy +10.30 -> -0.70 already demonstrated by hand) and on
+`16_right_aligned_amounts_txtpos` (recorded -3.95 pt) before writing it for the class, then run the
+whole corpus through Google. The probe `.docx` files are in `/scratch/output/probe-*.docx`.
