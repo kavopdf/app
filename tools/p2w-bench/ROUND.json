@@ -17,8 +17,10 @@
       }
     ]
   },
+  "fixer_doing": "corpus-slice: 48 of 53 converted",
+  "fixer_doing_since": 1795730299.3850012,
   "fixer_engine_at_claim": "ee5a00d6",
-  "fixer_last_beat": 1795726450.1835358,
+  "fixer_last_beat": 1795730299.385002,
   "fixer_started": 1795728699.3937721,
   "history": [
     {
