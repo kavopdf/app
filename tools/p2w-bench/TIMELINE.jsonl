@@ -7654,3 +7654,4 @@
 {"t": 1795709927.2981114, "ist": "21:48:47", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795709928.17065, "ist": "21:48:48", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795709932.778096, "ist": "21:48:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795704007.562391, "ist": "20:10:07", "ev": "claim", "d": "baseline claimed the slot"}
