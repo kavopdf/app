@@ -1,86 +1,19 @@
-# Two Google round-trips that settle how to fix the textbox problem
 
-Engine untouched. Two hand-built .docx, uploaded, converted to a Google Doc and exported to PDF.
+## Test 3 — does Google re-sample an embedded image, or keep its resolution?
 
-## Test 1 — does Google honour `<a:xfrm rot>` on an anchored shape?
+One document, two PNGs of the same text, both placed in a 2.00 inch box:
 
-One document, two identical shapes, same text. The first carries `rot="900000"` (15 degrees) on its
-`<a:xfrm>`; the second carries no rotation attribute at all.
+    96 dpi source   192 x 57 px
+    300 dpi source  600 x 180 px
 
-Result, read from Google's own PDF export:
+After the Google Doc round-trip, read out of Google's own PDF export:
 
-    images on page: 2
-    "ROTATED TEXT" appears in the text layer: NO
+    image 0: 192x57 px    placed at 144.0 x 43.5 pt  (2.00 inch)  =  96 dpi effective
+    image 1: 600x180 px   placed at 144.0 x 43.5 pt  (2.00 inch)  = 300 dpi effective
 
-The rendered page shows the first shape's text **tilted 15 degrees** and the second **horizontal**.
+**Google keeps both at their source resolution and neither is re-sampled.** A 300 dpi stamp stays a
+300 dpi stamp after import, so zooming into it does not pixelate — the pixels are there. A 96 dpi stamp
+stays 96 dpi and pixelates exactly as it did before.
 
-So: **Google honours `a:xfrm rot`.** Rotation can be carried by the attribute instead of by
-positioning every character by hand — which is what the engine does today, and why
-`01_stamp_rotated_15deg_upright` carries 99 individually positioned characters and no `rot` at all.
-
-But: **both shapes were rasterised anyway.** The rotation attribute does not save the text. A shape is
-a shape.
-
-## Test 2 — does flow text with indent + spacing survive as text, and land where asked?
-
-One document, two runs of the same size:
-
-    FLOW  a paragraph with <w:ind w:left="3000"/> and <w:spacing w:before="2400"/>
-    BOX   an anchored shape at an absolute offset, holding the same text
-
-Result, read from Google's own PDF export:
-
-    images on page: 1
-    FLOWTEXT   in text layer: YES   x = 206.7 pt
-    BOXTEXT    in text layer: NO
-
-And the x is not approximate. Left margin 1134 twips = 56.7 pt; indent 3000 twips = 150 pt;
-56.7 + 150 = **206.7 pt**. Google placed it at **206.7 pt**.
-
-So: **flow text keeps its characters AND lands exactly on the computed position.** A textbox trades
-both away for the ability to overlap.
-
-## What this settles
-
-| problem | cause | fix | status |
-|---|---|---|---|
-| text turns into an image | text lives inside `<wps:txbx>` in an anchored shape | move it to flow text, position with `w:ind` + `w:spacing` | **proven** |
-| white patches over content | the rasterised shape flattens onto white and covers what is under it | falls out of the same fix | **proven by construction** |
-| stamp rotation wrong | rotation is baked into 99 per-character positions, no `rot` attribute | put `rot` on `<a:xfrm>` | **proven** |
-| stamp pixelated | it is a raster, so it pixelates when zoomed | native resolution / 300+ dpi, or flow text where it can be text | not tested |
-
-## What it does NOT settle
-
-Whether every one of the 47 textbox documents can be expressed as flow text. A stamp must sit on top
-of body text, and flow text cannot overlap — so a stamp whose position genuinely collides with body
-content cannot be flow text. That is the one case where the shape has to stay, and there the fix is
-`rot` for the angle and resolution for the pixels, not removal.
-
-## Reproduce
-
-    /scratch/work/rottest/rot-test.docx    -> Google Doc -> PDF
-    /scratch/work/flowtest/flow-test.docx  -> Google Doc -> PDF
-
-Both were built by hand in this session; the engine was not modified and was not involved.
-
-## How many textboxes there actually are
-
-Measured on the 213 corpus documents, `word/document.xml` read directly:
-
-    47 documents carry <w:txbxContent>     1007 text boxes in total
-
-      1-2   (stamp-like)   18 documents      20 boxes
-      3-10                 11 documents      51 boxes
-      11-50                13 documents     382 boxes
-      51+   (form-like)     5 documents     554 boxes
-
-    behindDoc="1" present in: 47 of 47 documents
-
-The distribution is what decides the fix, not the construct alone. Twenty boxes across eighteen
-documents are stamps — one shape each, and flow text plus `a:xfrm rot` can plausibly replace them.
-Nine hundred and eighty-seven boxes across twenty-nine documents are form fields and column layouts,
-scattered across the page; flow text cannot express those, because it cannot overlap and cannot be
-placed at an arbitrary point without pushing everything after it down.
-
-So the honest split is: eighteen documents are fixable by removing the shape, twenty-nine are not, and
-for those the fix has to be the angle (proven) and the resolution (untested), not the removal.
+So the pixelation half of the stamp problem is not a Google behaviour to work around. It is a source
+choice: rasterise the stamp at 300 dpi and Google will carry it.
