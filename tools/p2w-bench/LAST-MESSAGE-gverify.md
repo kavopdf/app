@@ -1,43 +1,46 @@
-# gverify — Google measurement, 26 Nov
+# Google verify - 26 Nov, 09:23 IST
 
-Stage is **measure-google**. Corpus 213 documents; 67 measured through Google — 62 scored, 5 refused on page count. Next: measure 20 more through Google.
+**Stage `measure-google`.** 127 of 213 documents now carry a Google result on the tree's engine. The next step is 20 more.
 
-## What this run did
+This run measured the next batch through Google Docs, collected every verdict, and committed the results.
 
-Measured 60 documents through Google Docs (upload, convert to a Google Doc, export to PDF, then `--collect`, which also runs the LibreOffice side). Every result carries the engine stamp of the tree, so none of them is stale.
+| what | count |
+|:--|--:|
+| verified | 127 |
+| scored | 122 |
+| pass every check offered | 28 |
+| fail at least one | 94 |
+| refused on page count | 5 |
 
-Committed and pushed: `benchmarks/gverify/` and `benchmarks/gverify-lo/`.
+A refused document is not a pass: those 5 reflowed onto a different page count and are counted separately, not scored.
 
-One document moved the wrong way against the committed results — 311\_fir\_police\_form, 4 to 5 failing checks, `59_shape_anchor` new — on engine a4d8fca469bba636. It was committed under the repo's named exception because the corpus is a net improvement in Google on the same engine. That is a finding for the fixer, not a fix.
+## Which check costs what
 
-## Where the corpus stands
+| check | documents failing in Google |
+|:--|--:|
+| `18\_displacement` | 52 |
+| `60\_text\_column\_right\_edge` | 37 |
+| `04\_chars\_missing` | 34 |
+| `59\_shape\_anchor` | 33 |
+| `13\_text\_colours` | 23 |
+| `47\_margins` | 19 |
+| `45\_char\_accuracy` | 19 |
 
-67 verified | 14 pass every check offered | 48 fail at least one | 5 refused (page count).
+The first row is still the class to take: `18\_displacement`, 52 of the 122 scored documents.
 
-| check | documents failing |
-|---|---:|
-| `18_displacement` | 26 |
-| `04_chars_missing` | 22 |
-| `60_text_column_right_edge` | 20 |
-| `13_text_colours` | 18 |
-| `59_shape_anchor` | 16 |
-| `45_char_accuracy` | 14 |
-| `35_rotation` | 11 |
-| `17_matched_runs` | 11 |
-| `47_margins` | 9 |
-| `43_within_10pt_x` | 6 |
+## The capability table
 
-## Both renderers, same instrument
+| renderer | pass every check offered |
+|:--|--:|
+| Google Docs - the renderer the user opens | 42 of 208 |
+| LibreOffice - local proxy | 135 of 208 |
 
-| | passes every check offered |
-|---|---:|
-| LibreOffice | 135 of 208 |
-| Google Docs | 42 of 208 |
+Only 80 of those 208 pairs have both halves measured on the tree's engine, so read the gap as a direction, not a per-document verdict.
 
-Engine in the tree: a4d8fca469bba636. Pairs on that engine: Google 62 of 208, LibreOffice 80 of 208 — the LibreOffice backlog was cleared with `--lo-stale` this run. A pair measured on two engines is not a pair, so read the capability table as a construct Google drops only for the 62 pairs where both halves are current.
+## The one thing that needed a decision
 
-The gap is not a layout opinion: `18_displacement` fails 21 in LibreOffice and 117 in Google, `60_text_column_right_edge` 19 against 62, `59_shape_anchor` 12 against 48. Google drops what LibreOffice honours.
+The commit gate refused the batch on `390\_wide\_data\_appendix`: it fails 4 checks where the committed result failed 3, and that committed result was measured on an older engine. Re-running the verifier on the same export reproduced it, so it is not a flake - on this engine the document loses `59\_shape\_anchor` while its displacement improves. Two other documents improved, so the corpus is net better by 2, and it landed under the tool's own named opt-in, `P2W_ACCEPT_WORSE`, which is granted only when the corpus improves in Google. It is written into `BLOCKERS.md` for the fixer; nothing else was waived.
 
-## Next
+## What is next
 
-Not `classify` yet — the Google side is incomplete, so the capability table is not this cron's last deliverable. The next gverify run measures more documents; the batch is limited by how much of the corpus has been converted to .docx on the pod, and that conversion is what the next run should finish first.
+`measure-google` again: 20 more documents through Google. Nothing in the engine was touched by this run.
