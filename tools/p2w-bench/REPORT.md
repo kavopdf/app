@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 12:16 → running IST · 2h 54m**
+**26 Nov 2026 · slot 12:16 → 15:13 IST · 2h 56m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3 |
-| Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 8 vs ATTEMPTS.json history 5; subagents: 2 deployed vs no FINDINGS file for R-01 |
+| Document-moves this run | **0** — 8 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+40.32%** — mean 6.15 → 3.67 |
 | Regressions | **none** |
@@ -35,6 +35,8 @@
 | 13:11 | **lead** | 0/None | guarded pgMar page-top patch: 213/213 converted on the patched engine, regress says no document worse than baseline, refused only on the table stamp; the corpus re-score is 73 s/doc = 4.3 h, which no |
 | 13:35 | **reverted** | 0/212 | txt-meta-annotation patch applied, corpus built (213/213, 1.4 min) and fully re-measured (212/212 in 6 calls); gate refused on 1 docx regression 600_reviewed_invoice_with_annotations 54.30 -> 62.46. T |
 | 14:59 | **lead** | 0/None | No engine change. Refuted three standing assumptions on 207 committed Google results: (1) attribution=table-row predicts nothing in Google - med_dy slope vs docx_table_rows -0.108, r2=0.00; worst_dy 0 |
+| 15:12 | **lead** | 0/None | Page-scale family diagnosed from the emitted XML (no Drive call): every source page is a hand-built block placed at 97% of the 16838-twip usable height with ~25 pt slack, ended by an explicit <w:br w: |
+| 15:12 | **lead** | 0/None | Line-scale family (27 docs with a docx on the pod): med_dy = -5.17 + 0.765*median_font_size_pt, n=27, r2=0.20; family spans -3.1..+4.2 pt, median 1.2 pt, worst_dy median 4.5 pt - i.e. it fails on tail |
 
 ## Why nothing moved, in this run's own words
 
@@ -117,8 +119,50 @@
 >
 > That is why no engine change was committed: the next patch has to be chosen against that split, and
 > choosing it blind is what the last five attempts did.
+>
+>
+> Nothing moved because this run spent its first 40 minutes making the pod able to measure at all, and
+> then spent the rest proving that the class it was about to work cannot be worked the way every earlier
+> run has worked it.
+>
+> The pod cost is real and worth stating: `install-gate.sh` was killed at 300 s because `pod-prep.sh`
+> fetches 213 corpus PDFs, a JDK and four jars and then compiles the engine, and none of that is cached
+> on a cold pod. Re-running it four times finished the corpus; the gate then passed first time
+> (`regress.py --check` silent, `measure_gate.py` READY, engine a4de7df896875a39). So the gate was never
+> the obstacle this run - the cold pod was, and that is a known, priced 25-30 minutes.
+>
+> The class was `18_displacement`: 113 of 207 documents fail it, and `classpick.py --leverage` values it
+> at 51.9 CLEAN documents, five times the next check. The obvious theory was sitting in the repo as a
+> column: `benchmarks/DISP-TABLE.csv` labels 75 documents `attribution=table-row`, i.e. rows growing
+> slightly and the drift accumulating down the page. It has never been tested against a Google render -
+> its `google_per_row_growth_pt` column is empty for all 213 rows.
+>
+> It is false. On the 207 committed Google results, median displacement has a *negative* slope against
+> table row count (-0.108, r² = 0.00) and worst displacement has a slope of 0.518 pt/row at r² = 0.01.
+> Nine rows or nineteen, the page is displaced by the same amount. The row counts themselves were
+> re-derived from the `.docx` files to make sure the join was not the fault: 76 of 76 agree.
+>
+> Two more standing assumptions fell with it. There is no corpus-wide page constant - the 23 documents
+> that fail this check and nothing else span 18.4 pt in both directions (sd 4.37), so the page-origin
+> pairing the 10:54 slot recommended would have been 23 different answers, not one. And the class is not
+> one defect: 82 of the 113 are systematically displaced (|med_dy| >= 1.5 pt), 31 are not displaced at
+> all (worst_dy median 5.0 pt, med_dy under 1.5) and fail only the check's third clause, a single run
+> twice its tolerance out.
+>
+> What is left is a real lead, and it is a different shape from everything tried so far. The tail grows
+> with document length (worst_dy = 13.55 + 0.287 x runs_matched, r² = 0.31) while the median line does
+> not move at all (r² = 0.05). Sorted by the size of the worst run, 17 documents are a fifth to four
+> fifths of a *page* out, and not one of them fails `00_page_count` - the page count is right and the
+> content on a later page is in the wrong place. No line-box construct reaches those. The 58 line-scale
+> documents are the only ones a line construct is testable on, and they are exactly the ones whose
+> median is already correct.
+>
+> That is why no engine change was committed: the next patch has to be chosen against that split, and
+> choosing it blind is what the last five attempts did.
+>
+> Accounts share 100% of their significant words - **the same blocker, named twice** (the cut is 50%).
 
-Accounts share 100% of their significant words - **the same blocker, named twice** (the cut is 50%).
+Accounts share 94% of their significant words - **the same blocker, named twice** (the cut is 50%).
 
 ## The txt
 
@@ -133,15 +177,18 @@ Accounts share 100% of their significant words - **the same blocker, named twice
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `R-01` | two runs of ConvertOne on one PDF - identical bytes? | 14:22 | 14:47 | 25 min |
+| `R-02` | explicit break or renderer flow? | 15:10 | 15:19 | 9 min |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 12:16 → running · 2h 54m |
+| Slot window | 12:16 → 15:13 · 2h 56m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 53 |
+| Tool beats | 70 |
 | Longest silence | **27.9 min** — from 14:14:50, after `lastmessage.py: running a tool for its numbers` |
 | Silences over 2 min | 19 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -154,7 +201,7 @@ Accounts share 100% of their significant words - **the same blocker, named twice
 | setup - claim, housekeeping, reading the gate | **2 min** | `#` |
 | fix - diagnose and change the engine | **24 min** | `###` |
 | measure or build - a conversion, screen or compile writes no beacon | **1h 20m** | `##########` |
-| record - attempt, handoff, class rows | **4 min** | `#` |
+| record - attempt, handoff, class rows | **5 min** | `#` |
 | report - the report and the chain | **21 min** | `###` |
 | other - not attributed to a tool | **35 min** | `#####` |
 ## Best results this round
@@ -166,6 +213,10 @@ Accounts share 100% of their significant words - **the same blocker, named twice
 | `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
 | `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
 | `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+
+## Next run
+
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

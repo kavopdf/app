@@ -1,10 +1,17 @@
 {
- "agents": [],
+ "agents": [
+  {
+   "id": "R-01"
+  },
+  {
+   "id": "R-02"
+  }
+ ],
  "attempts": 8,
  "class": "18_displacement",
  "docs_improved": 0,
- "ended": null,
- "ended_ts": null,
+ "ended": "15:13",
+ "ended_ts": 1795686188.0875034,
  "kept": 0,
  "started": "12:16",
  "started_ts": 1795675615.8847563,
