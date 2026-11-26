@@ -406,3 +406,4 @@
 | 26 Nov 19:31 | fixer | build-engine | engine built in 46s |
 | 26 Nov 19:42 | fixer | attempt | 18_displacement -> lead (0/? moved) |
 | 26 Nov 20:35 | fixer | attempt | t09_page_furniture -> lead (0/? moved) |
+| 26 Nov 20:10 | baseline | claim | baseline claimed the slot |
