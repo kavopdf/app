@@ -1578,6 +1578,7 @@ def main(argv):
     # An absent file is printed as a gap rather than skipped. A section that silently disappears is how
     # a report starts looking complete while missing the one thing that explains it.
     _why = "/tmp/why-nothing-moved.md"
+    _wt = ""          # defined for every branch: the comparison below reads it even when the file is absent
     L.append("## Why nothing moved, in this run's own words")
     L.append("")
     if os.path.exists(_why):
@@ -1597,6 +1598,59 @@ def main(argv):
         L.append("*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so "
                  "the only answer to \"why did nothing move\" is the table above - and a table of "
                  "attempts is not a diagnosis. That absence is itself the finding.)*")
+        L.append("")
+
+    # THE RUN BEFORE THIS ONE, BESIDE IT. One account of "why nothing moved" cannot be told apart from a
+    # well-written story: an account that reads like thinking and one that is thinking are the same
+    # twenty lines of prose. Two accounts can be. If this run and the last name the same blocker and
+    # neither moved a document, the run is repeating itself, and that is a fact about the pair rather
+    # than an opinion about either.
+    #
+    # Read from git, not from a new file: the previous run's section is exactly what it published, in the
+    # LAST-MESSAGE.md it committed. Nothing is written here, so a report can be re-run as often as a run
+    # likes without changing the tree and tripping the claim gate.
+    try:
+        import subprocess as _sp
+        _prev = ""
+        try:
+            _raw = _sp.run(["git", "show", "HEAD:tools/p2w-bench/LAST-MESSAGE.md"], cwd=HERE,
+                           capture_output=True, text=True, timeout=20)
+            if _raw.returncode == 0 and _raw.stdout:
+                _sec = _raw.stdout.split("## Why nothing moved", 1)
+                if len(_sec) == 2:
+                    _body = _sec[1]
+                    _cut = _body.find("\n## ")
+                    _body = _body[:_cut] if _cut != -1 else _body
+                    # drop the rest of the heading itself - the split leaves ", in this run's own words"
+                    _body = _body.split("\n", 1)[1] if "\n" in _body else ""
+                    _prev = _body.strip()
+        except Exception:
+            _prev = ""
+        if _prev:
+            L.append("### The run before this one said")
+            L.append("")
+            for _ln in _prev.splitlines():
+                _ln = _ln.strip()
+                if _ln.startswith(">"):
+                    _ln = _ln.lstrip(">").strip()
+                if _ln.startswith("*(") or _ln.startswith("###"):
+                    continue
+                L.append(("> " + _ln) if _ln else ">")
+            L.append("")
+            # A WORD-OVERLAP SCORE, NOT A VERDICT. Content words of five letters or more, lowercased, and
+            # the share the two accounts have in common. It is a number, so it is computed rather than
+            # written, and the threshold is printed with it so a reader can disagree with the cut.
+            def _words(t):
+                return set(w for w in re.findall(r"[a-z]{5,}", t.lower()))
+            _a, _b = _words(_wt or ""), _words(_prev)
+            if _a and _b:
+                _j = len(_a & _b) / float(len(_a | _b))
+                L.append("Accounts share %.0f%% of their significant words - %s (the cut is 50%%)."
+                         % (_j * 100, "**the same blocker, named twice**" if _j >= 0.50
+                            else "a different account"))
+                L.append("")
+    except Exception as _e:
+        L.append("*(the previous run's account could not be read: %s)*" % type(_e).__name__)
         L.append("")
 
     tx = txt()
