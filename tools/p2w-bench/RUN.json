@@ -6,6 +6,8 @@
  "ended": "20:46",
  "attempts": 1,
  "kept": 0,
- "agents": [],
+ "agents": [
+  "t09_A-01"
+ ],
  "docs_improved": 0
 }
