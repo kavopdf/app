@@ -233,3 +233,23 @@ Two things to expect and not be surprised by:
 2. **The corpus cache is mid-rebuild.** 53 of 213 documents were converted by the patched engine before
    the revert; the stamp still reads `a4d8fca469bba636`. The next run's first gate call will rebuild the
    corpus (about 16 minutes in 240 s slices) — that is the tool doing the right thing, not a fault.
+
+## The reading that matters most: the drift was masking an 18 pt flow error
+
+The three lines at the foot of the page, in order, base -> build:
+
+| line | corpus y | base dy | build dy |
+|:--|--:|--:|--:|
+| `As per our report of even date attached.` | 746.19 | +17.97 | **-0.03** |
+| `For R. Iyer & Associates, Chartered Accountants` | 758.19 | +16.51 | **-1.49** |
+| `Sd/-  CA R. Iyer, Partner (M.No. 214471)` | 776.57 | **-0.16** | -18.16 |
+
+The first two follow the table and they were 18 pt LOW in the base and are exact in the build. The third
+did not follow them: the engine writes it with its own `w:before`, and in the base that number was 18 pt
+too small **and the row ramp put it back**. Two errors cancelled on one line, and the check's
+`worst_dy` on this document has been reading the cancellation, not the page.
+
+So the order of work is the reverse of what the ramp implies: **the flow after this table is 18 pt short
+and must be fixed FIRST.** Until it is, any row-height fix moves the third line to -18.16 and the document
+fails on `worst_dy` anyway. The row ladder is real, measured, and ready (the algorithm above); it is
+blocked behind a flow error that has been invisible because the ramp was covering it.
