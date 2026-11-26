@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/363_warranty_card.pdf",
-  "render": "/scratch/work/lo-pdf/363_warranty_card.pdf",
+  "render": "/tmp/lo-one/363_warranty_card.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "18_displacement"
   ],
-  "engine": "5beb8b9d",
+  "engine": "981ff1fa35e2cf67",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,7 +52,16 @@
     "18_displacement": {
       "source": 0,
       "render": 1,
-      "ok": false
+      "ok": false,
+      "detail": {
+        "med_dy": -0.2,
+        "worst_dy": 3.7,
+        "med_dx": 0.1,
+        "bad_pages": [
+          0
+        ],
+        "runs_matched": 30
+      }
     },
     "23_line_pitch": {
       "source": 14.0,
@@ -246,5 +255,5 @@
   },
   "document": "363_warranty_card",
   "source_file": "/scratch/work/p2w/corpus/363_warranty_card.pdf",
-  "render_file": "/scratch/work/lo-pdf/363_warranty_card.pdf"
+  "render_file": "/tmp/lo-one/363_warranty_card.pdf"
 }

@@ -1,12 +1,14 @@
 {
   "source": "/scratch/work/p2w/corpus/newsletter-3col-header-footer.pdf",
   "render": "/tmp/lo-one/newsletter-3col-header-footer.pdf",
-  "passed": 41,
+  "passed": 39,
   "total": 42,
   "failed": [
-    "18_displacement"
+    "18_displacement",
+    "26_text_overlap",
+    "59_shape_anchor"
   ],
-  "engine": "b7699196",
+  "engine": "981ff1fa35e2cf67",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,7 +57,7 @@
       "ok": false,
       "detail": {
         "med_dy": -0.2,
-        "worst_dy": 6.5,
+        "worst_dy": 28.4,
         "med_dx": 0.1,
         "bad_pages": [
           0
@@ -75,8 +77,13 @@
     },
     "26_text_overlap": {
       "source": 0,
-      "render": 0,
-      "ok": true
+      "render": 4,
+      "ok": false,
+      "detail": {
+        "wrap": 0,
+        "line_on_line": 4,
+        "anchored": 0
+      }
     },
     "27_text_off_page": {
       "source": 0,
@@ -231,8 +238,8 @@
     },
     "59_shape_anchor": {
       "source": 9,
-      "render": 9,
-      "ok": true
+      "render": 5,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 0,

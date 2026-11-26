@@ -1,14 +1,15 @@
 {
   "source": "/scratch/work/p2w/corpus/text-held-twice-shadow-text.pdf",
   "render": "/tmp/lo-one/text-held-twice-shadow-text.pdf",
-  "passed": 44,
+  "passed": 43,
   "total": 47,
   "failed": [
     "13_text_colours",
     "18_displacement",
+    "25_invisible_text",
     "60_text_column_right_edge"
   ],
-  "engine": "b7699196",
+  "engine": "981ff1fa35e2cf67",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -72,9 +73,9 @@
       "ok": true
     },
     "25_invisible_text": {
-      "source": 0,
-      "render": 0,
-      "ok": true
+      "source": 8,
+      "render": 12,
+      "ok": false
     },
     "26_text_overlap": {
       "source": 12,

@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/383_api_docs_page.pdf",
-  "render": "/scratch/work/lo-pdf/383_api_docs_page.pdf",
+  "render": "/tmp/lo-one/383_api_docs_page.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "66_table_cell_width"
   ],
-  "engine": "5beb8b9d",
+  "engine": "981ff1fa35e2cf67",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,7 +52,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": -0.2,
+        "worst_dy": 0.5,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 58
+      }
     },
     "23_line_pitch": {
       "source": 14.0,
@@ -271,5 +278,5 @@
   },
   "document": "383_api_docs_page",
   "source_file": "/scratch/work/p2w/corpus/383_api_docs_page.pdf",
-  "render_file": "/scratch/work/lo-pdf/383_api_docs_page.pdf"
+  "render_file": "/tmp/lo-one/383_api_docs_page.pdf"
 }

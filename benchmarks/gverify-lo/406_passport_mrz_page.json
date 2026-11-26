@@ -7,7 +7,7 @@
     "18_displacement",
     "59_shape_anchor"
   ],
-  "engine": "5beb8b9d",
+  "engine": "981ff1fa35e2cf67",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -53,7 +53,16 @@
     "18_displacement": {
       "source": 0,
       "render": 1,
-      "ok": false
+      "ok": false,
+      "detail": {
+        "med_dy": -0.3,
+        "worst_dy": 3.4,
+        "med_dx": 0.1,
+        "bad_pages": [
+          0
+        ],
+        "runs_matched": 31
+      }
     },
     "23_line_pitch": {
       "source": 11.8,

@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/381_incident_report_timeline.pdf",
-  "render": "/scratch/work/lo-pdf/381_incident_report_timeline.pdf",
+  "render": "/tmp/lo-one/381_incident_report_timeline.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "5beb8b9d",
+  "engine": "981ff1fa35e2cf67",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -50,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 0.1,
+        "worst_dy": 0.5,
+        "med_dx": 0.5,
+        "bad_pages": [],
+        "runs_matched": 65
+      }
     },
     "23_line_pitch": {
       "source": 15.0,
@@ -269,5 +276,5 @@
   },
   "document": "381_incident_report_timeline",
   "source_file": "/scratch/work/p2w/corpus/381_incident_report_timeline.pdf",
-  "render_file": "/scratch/work/lo-pdf/381_incident_report_timeline.pdf"
+  "render_file": "/tmp/lo-one/381_incident_report_timeline.pdf"
 }

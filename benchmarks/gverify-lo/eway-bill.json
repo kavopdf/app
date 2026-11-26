@@ -4,7 +4,7 @@
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "b7699196",
+  "engine": "981ff1fa35e2cf67",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -65,8 +65,8 @@
       "ok": true
     },
     "25_invisible_text": {
-      "source": 2,
-      "render": 2,
+      "source": 0,
+      "render": 0,
       "ok": true
     },
     "26_text_overlap": {

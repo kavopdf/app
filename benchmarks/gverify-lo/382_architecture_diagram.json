@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/382_architecture_diagram.pdf",
-  "render": "/scratch/work/lo-pdf/382_architecture_diagram.pdf",
+  "render": "/tmp/lo-one/382_architecture_diagram.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "5beb8b9d",
+  "engine": "981ff1fa35e2cf67",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -50,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": -0.2,
+        "worst_dy": 1.2,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 29
+      }
     },
     "23_line_pitch": {
       "source": 80.0,
@@ -244,5 +251,5 @@
   },
   "document": "382_architecture_diagram",
   "source_file": "/scratch/work/p2w/corpus/382_architecture_diagram.pdf",
-  "render_file": "/scratch/work/lo-pdf/382_architecture_diagram.pdf"
+  "render_file": "/tmp/lo-one/382_architecture_diagram.pdf"
 }

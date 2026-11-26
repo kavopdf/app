@@ -7,6 +7,7 @@
     "43_within_10pt_x",
     "47_margins"
   ],
+  "engine": "981ff1fa35e2cf67",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,7 +53,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": -0.2,
+        "worst_dy": 1.2,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 54
+      }
     },
     "23_line_pitch": {
       "source": 12.9,
@@ -234,6 +242,20 @@
       "source": 0,
       "render": 0,
       "ok": true
+    }
+  },
+  "detail": {
+    "47_margins": {
+      "worst_median_pt": 0.1,
+      "worst_unregistered": 9,
+      "margin_bad": [],
+      "indent_bad": [
+        {
+          "page": 1,
+          "unregistered": 9,
+          "worst_pt": 18.3
+        }
+      ]
     }
   },
   "document": "magazine-2col-pullquote-spanning",

@@ -193,6 +193,20 @@ Google results every run.
 `--collect` now runs both sides automatically for every new document, so this stage only ever fills a
 backlog — never a fresh document.
 
+**A RESULT ON AN OLDER ENGINE IS ALSO A BACKLOG, AND UNTIL 26 NOV NOTHING COULD FILL IT.** `collect_lo()`
+writes one result per document and refused to write it again, so the LibreOffice column kept the engine
+that first converted each document while the Google column moved with every engine commit. Measured
+26 Nov: 0 of 208 pairs carried the engine in the tree, under a header that said "same engine". The
+tool that clears it:
+
+    python3 tools/p2w-bench/gverify.py --lo-stale 40   # re-measure up to 40 stale documents
+    python3 tools/p2w-bench/gverify.py --matrix | head -14   # both halves' engine coverage
+
+`--lo-stale` computes its work list from the stamps, skips what is already on the engine in the tree,
+writes each result as it lands and retries a lost conversion serially, so a run cut off at 34 of 208
+loses nothing. Four workers lose roughly 1 document in 25 to soffice contention; the serial retry is
+what makes the count trustworthy. On this pod it measured 213 documents in seven passes.
+
 ## STAGE `classify` and after — write the table, then stop
 
 When `stage.py` reports `classify`, this cron's measuring work is finished. Regenerate the capability

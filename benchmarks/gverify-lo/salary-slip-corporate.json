@@ -7,7 +7,7 @@
     "18_displacement",
     "53_embedded_faces"
   ],
-  "engine": "b7699196",
+  "engine": "981ff1fa35e2cf67",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -70,7 +70,7 @@
       "ok": true
     },
     "25_invisible_text": {
-      "source": 0,
+      "source": 1,
       "render": 0,
       "ok": true
     },

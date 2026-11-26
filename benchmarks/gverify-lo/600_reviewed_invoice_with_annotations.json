@@ -12,7 +12,7 @@
     "59_shape_anchor",
     "62_table_columns"
   ],
-  "engine": "98be7c3c",
+  "engine": "981ff1fa35e2cf67",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -58,7 +58,16 @@
     "18_displacement": {
       "source": 0,
       "render": 1,
-      "ok": false
+      "ok": false,
+      "detail": {
+        "med_dy": 105.2,
+        "worst_dy": 127.9,
+        "med_dx": 0.7,
+        "bad_pages": [
+          0
+        ],
+        "runs_matched": 56
+      }
     },
     "23_line_pitch": {
       "source": 16.0,

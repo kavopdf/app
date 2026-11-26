@@ -6,7 +6,7 @@
   "failed": [
     "40_link_targets"
   ],
-  "engine": "5beb8b9d",
+  "engine": "981ff1fa35e2cf67",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,7 +52,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 0.9,
+        "worst_dy": 1.3,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 25
+      }
     },
     "23_line_pitch": {
       "source": 22.0,

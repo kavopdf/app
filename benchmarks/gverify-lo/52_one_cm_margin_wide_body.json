@@ -4,7 +4,7 @@
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "98be7c3c",
+  "engine": "981ff1fa35e2cf67",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -50,7 +50,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 0.8,
+        "worst_dy": 1.5,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 38
+      }
     },
     "23_line_pitch": {
       "source": 17.0,

@@ -6,7 +6,7 @@
   "failed": [
     "35_rotation"
   ],
-  "engine": "5beb8b9d",
+  "engine": "981ff1fa35e2cf67",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,7 +52,14 @@
     "18_displacement": {
       "source": 0,
       "render": 0,
-      "ok": true
+      "ok": true,
+      "detail": {
+        "med_dy": 0.9,
+        "worst_dy": 11.6,
+        "med_dx": 0.1,
+        "bad_pages": [],
+        "runs_matched": 26
+      }
     },
     "23_line_pitch": {
       "source": 14.5,

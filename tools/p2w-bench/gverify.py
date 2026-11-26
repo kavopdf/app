@@ -182,6 +182,19 @@ def _engine_now():
         return ""
 
 
+def _same_engine(e, now):
+    """Is `e` the engine `now`? The stamp's length is not the same everywhere - see `_done()`.
+
+    A 16-character sha of the engine sources is what verify_google.py writes today; results written
+    before 25 Nov carry a 7- or 8-character git abbreviation of the same tree, and an abbreviation is
+    a prefix of nothing, so the two are compared only when one is a prefix of the other. An empty
+    stamp is never a match: nobody can say which engine wrote it.
+    """
+    if not e or not now:
+        return False
+    return e == now or now.startswith(e) or e.startswith(now)
+
+
 def _done():
     """Documents whose Google result is a measurement OF THE CURRENT ENGINE.
 
@@ -487,7 +500,7 @@ _LO_REPO = os.path.normpath(os.path.join(HERE, "..", "..", "benchmarks", "gverif
 LORES = _LO_REPO if os.path.isdir(_LO_REPO) and os.listdir(_LO_REPO) else _LO_WORK
 
 
-def collect_lo(name):
+def collect_lo(name, force=False):
     """The SAME 42 checks against the LibreOffice render, so every document carries both numbers.
 
     The whole reason this pipeline exists is that the two renderers disagree, and a corpus measured by
@@ -495,6 +508,14 @@ def collect_lo(name):
     shows - on the first 50 documents, LibreOffice passed 23 and Google passed 7 - so the pair is what
     a fixer needs: "Google fails this and LibreOffice does not" is the sentence that names a construct
     Google drops. Measuring them in the same pass means the pair is never half-collected.
+
+    FORCE RE-MEASURES A DOCUMENT THAT ALREADY HAS A RESULT, and until 26 Nov nothing could. The guard
+    below returned "already have it" for ever, so the LibreOffice half kept the stamp of whichever
+    engine first converted each document while the Google half was re-measured on every engine move:
+    measured 26 Nov, 0 of 208 pairs carried the engine in the tree, and every capability table printed
+    since 23 Nov has been a two-engine table under a header that said "same engine". `--lo-stale` is
+    the caller that uses this flag; a plain `--lo` keeps the old behaviour, because a matrix-stage run
+    filling a hole must not re-render 213 documents to fill one.
     """
     src = os.path.join(CORPUS, name + ".pdf")
     docx = os.path.join(OUT, name + ".docx")
@@ -502,7 +523,7 @@ def collect_lo(name):
         return "missing source or docx"
     os.makedirs(LORES, exist_ok=True)
     out_json = os.path.join(LORES, name + ".json")
-    if os.path.exists(out_json):
+    if os.path.exists(out_json) and not force:
         return "already have it"
     tmpdir = "/tmp/lo-one"
     os.makedirs(tmpdir, exist_ok=True)
@@ -554,6 +575,89 @@ def _write(name, rec):
         json.dump(rec, f, indent=1)
 
 
+def lo_stale(limit=40):
+    """Re-measure the LibreOffice half of documents whose result is not on the engine in the tree.
+
+    WHY THIS EXISTS. `collect_lo` writes one result per document and then refuses to write it again,
+    so the LibreOffice column of the capability table has been frozen at the engine that first
+    converted each document while the Google column moved with every engine commit. Measured 26 Nov
+    2026: 0 of 208 pairs carried the engine in the tree, and `--matrix` printed "same engine" over
+    them. The matrix stage could not fix it either - it fills documents that have NO LibreOffice
+    result, and by count there were none - so nothing in the pipeline could ever refresh this half.
+
+    THE WORK LIST IS COMPUTED, NOT PASSED. A document is stale when its LibreOffice json carries no
+    stamp or a stamp that is not the engine in the tree, which is the same rule `_done()` applies to
+    the Google side. Documents with no result at all are included, so this also fills holes.
+
+    RESUMABLE BY CONSTRUCTION. Each document's json is written as it lands and a later call skips it,
+    so a run cut off at 34 of 208 loses nothing and the next run plans the rest.
+    """
+    now = _engine_now()
+    names = _names()
+    todo = []
+    for n in names:
+        if not os.path.exists(os.path.join(OUT, n + ".docx")):
+            continue
+        p = os.path.join(LORES, n + ".json")
+        if os.path.exists(p):
+            try:
+                d = json.load(open(p, encoding="utf-8"))
+            except Exception:
+                d = {}
+            if _same_engine(d.get("engine"), now):
+                continue
+        todo.append(n)
+    batch = todo[:limit] if limit and limit > 0 else todo
+    print("engine in tree : %s" % (now or "unknown"))
+    print("LibreOffice on it : %d of %d documents" % (len(names) - len(todo), len(names)))
+    print("re-measuring %d of %d stale, into %s" % (len(batch), len(todo), LORES))
+    if not batch:
+        return 0
+    import concurrent.futures as cf
+
+    def _landed(n):
+        # A FILE ON DISK IS NOT A MEASUREMENT, again: four concurrent soffice instances lose the odd
+        # conversion, and collect_lo then returns without writing while the OLD json stays in place.
+        # Counting that as done is how this refresh first reported "0 still stale" over 13 documents
+        # that had not moved. The stamp is the only thing that answers it.
+        try:
+            d = json.load(open(os.path.join(LORES, n + ".json"), encoding="utf-8"))
+        except Exception:
+            return False
+        return _same_engine(d.get("engine"), now)
+
+    done = failed = 0
+    retry = []
+    with cf.ThreadPoolExecutor(max_workers=4) as ex:
+        futs = {ex.submit(collect_lo, n, True): n for n in batch}
+        for f in cf.as_completed(futs):
+            n = futs[f]
+            try:
+                r = f.result()
+            except Exception as e:
+                r = "error: %s" % e
+            if _landed(n):
+                done += 1
+            else:
+                retry.append((n, r))
+    # ONE AT A TIME, because a lost conversion is a contention failure and retrying it the same way
+    # loses it the same way. Measured 26 Nov: 9 of 213 documents failed under four workers and all 9
+    # landed when run alone.
+    for n, r in retry:
+        try:
+            r = collect_lo(n, True)
+        except Exception as e:
+            r = "error: %s" % e
+        if _landed(n):
+            done += 1
+        else:
+            failed += 1
+            print("  FAILED %-40s %s" % (n[:40], r))
+    left = len(todo) - done
+    print("measured %d, failed %d, %d still stale" % (done, failed, left))
+    return 0
+
+
 def matrix():
     """The capability table: every check, both renderers, from the results on disk.
 
@@ -566,9 +670,11 @@ def matrix():
     if not os.path.isdir(RES):
         print("no Google results yet")
         return 2
+    now = _engine_now()
     names = [f[:-5] for f in sorted(os.listdir(RES)) if f.endswith(".json")]
     gf, lf = Counter(), Counter()
     both = gpass = lpass = 0
+    g_on = l_on = 0
     for n in names:
         g = json.load(open(os.path.join(RES, n + ".json"), encoding="utf-8"))
         if g.get("status") == "page_count_refused":
@@ -578,6 +684,16 @@ def matrix():
             continue
         l = json.load(open(lo_path, encoding="utf-8"))
         both += 1
+        # WHICH ENGINE EACH HALF WAS MEASURED ON, because a pair on two engines is not a pair.
+        # The header used to say "same engine" for every table ever printed, and on 23 and 26 Nov
+        # that was false: the LibreOffice half is written once per document by collect_lo() and is
+        # never re-measured, so it keeps the stamp of the engine that first converted that document
+        # while the Google half is re-measured on every engine move. A reader who took a row as a
+        # statement about HEAD was reading two engines as one.
+        if _same_engine(g.get("engine"), now):
+            g_on += 1
+        if _same_engine(l.get("engine"), now):
+            l_on += 1
         gg = set(g.get("failed") or [])
         ll = {k for k, v in (l.get("checks") or {}).items() if v.get("ok") is False}
         for c in gg: gf[c] += 1
@@ -587,15 +703,28 @@ def matrix():
     if not both:
         print("no document has both renders yet")
         return 2
-    print("# Google Docs vs LibreOffice - the 42 checks, %d documents, same engine\n" % both)
-    print("Same source PDF, same .docx, same instrument. Only the renderer differs.\n")
+    print("# Google Docs vs LibreOffice - the 42 checks, %d documents\n" % both)
+    print("Same source PDF, same instrument. Only the renderer differs.\n")
     print("    LibreOffice : %d of %d pass every check offered" % (lpass, both))
     print("    Google Docs : %d of %d pass every check offered\n" % (gpass, both))
+    print("## Which engine each half was measured on\n")
+    print("    engine in the tree : %s" % (now or "unknown"))
+    print("    Google on it       : %d of %d pairs" % (g_on, both))
+    print("    LibreOffice on it  : %d of %d pairs" % (l_on, both))
+    print()
+    if l_on < both:
+        print("A pair whose two halves were measured on two engines is not a pair: the LibreOffice")
+        print("column describes the .docx an older engine wrote. Read a row as a construct Google")
+        print("drops only for the %d pairs where both halves are on the engine above.\n" % min(g_on, l_on))
     print("## Where they disagree\n")
     print("| check | LibreOffice fails | Google fails | who is stricter |")
     print("|---|---:|---:|---|")
     allc = set(gf) | set(lf)
-    for c in sorted(allc, key=lambda x: -(gf[x] - lf[x])):
+    # THE ORDER IS PART OF THE FILE. Ties on (Google - LibreOffice) were broken by set iteration
+    # order, which is not the same twice, so a regenerated table differed textually from the one it
+    # replaced on every run while every number in it was identical (found 24 Nov). Sorted by the gap,
+    # then by Google's count, then by name: the same results now print the same bytes.
+    for c in sorted(allc, key=lambda x: (-(gf[x] - lf[x]), -gf[x], x)):
         a, b = lf[c], gf[c]
         if a == 0 and b == 0:
             continue
@@ -605,7 +734,7 @@ def matrix():
     only_g = [c for c in allc if gf[c] > 0 and lf[c] == 0]
     print("## Constructs LibreOffice honours and Google does not\n")
     if only_g:
-        for c in sorted(only_g, key=lambda x: -gf[x]):
+        for c in sorted(only_g, key=lambda x: (-gf[x], x)):
             print("* `%s` - %d documents" % (c, gf[c]))
     else:
         print("_None: every check Google fails, LibreOffice fails too._")
@@ -613,7 +742,7 @@ def matrix():
     only_l = [c for c in allc if lf[c] > 0 and gf[c] == 0]
     if only_l:
         print("## Constructs Google honours and LibreOffice does not\n")
-        for c in sorted(only_l, key=lambda x: -lf[x]):
+        for c in sorted(only_l, key=lambda x: (-lf[x], x)):
             print("* `%s` - %d documents" % (c, lf[c]))
         print()
     return 0
@@ -656,6 +785,10 @@ def main(argv):
     ap.add_argument("--stage")
     ap.add_argument("--collect", nargs=2)
     ap.add_argument("--lo", help="measure the LibreOffice side of one document")
+    ap.add_argument("--lo-stale", type=int, const=40, nargs="?", default=None,
+                    help="re-measure the LibreOffice side of up to N documents whose result is not "
+                         "on the engine in the tree (default 40). Resumable: a run that finishes "
+                         "fewer keeps every result it wrote.")
     ap.add_argument("--matrix", action="store_true")
     ap.add_argument("--report", action="store_true")
     a = ap.parse_args(argv)
@@ -681,6 +814,8 @@ def main(argv):
     if a.lo:
         print(collect_lo(a.lo))
         return 0
+    if a.lo_stale is not None:
+        return lo_stale(a.lo_stale)
     if a.matrix:  return matrix()
     if a.report:  return report()
     ap.print_help()
