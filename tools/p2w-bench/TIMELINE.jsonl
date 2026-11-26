@@ -6971,3 +6971,12 @@
 {"t": 1795673709.7909732, "ist": "11:45:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795673711.681452, "ist": "11:45:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795673885.3906496, "ist": "11:48:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795673888.7783093, "ist": "11:48:08", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795673888.8979, "ist": "11:48:08", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795673889.000057, "ist": "11:48:09", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795673889.6641378, "ist": "11:48:09", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795673910.0418742, "ist": "11:48:30", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795673910.2445805, "ist": "11:48:30", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795673910.3233798, "ist": "11:48:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795673917.1550083, "ist": "11:48:37", "ev": "beat", "d": "relay: autoflow falsifier on 72_bank_statement, uploading to Google"}
+{"t": 1795673941.3860018, "ist": "11:49:01", "ev": "beat", "d": "attempt.py: recording an attempt"}

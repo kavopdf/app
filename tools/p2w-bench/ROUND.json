@@ -11,8 +11,10 @@
       }
     ]
   },
-  "fixer_engine_at_claim": "11e0e4fc",
-  "fixer_last_beat": 1795673415.558749,
+  "fixer_doing": "relay: autoflow falsifier on 72_bank_statement, uploading to Google",
+  "fixer_doing_since": 1795673917.1553874,
+  "fixer_engine_at_claim": "9f0a8207",
+  "fixer_last_beat": 1795673917.155388,
   "fixer_started": 1795673896.057776,
   "history": [
     {

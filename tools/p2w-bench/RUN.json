@@ -1,13 +1,13 @@
 {
- "agents": [
-  "18_dA-05"
- ],
- "attempts": 2,
+ "agents": [],
+ "attempts": 1,
+ "class": "",
  "docs_improved": 0,
- "ended": "11:44",
- "ended_ts": 1795673683.887932,
+ "ended": null,
+ "ended_ts": null,
  "kept": 0,
- "started": "10:54",
- "started_ts": 1795670662.0,
- "window_for_claim": 1795673299.4308386
+ "needs_human": 0,
+ "obstacles_cleared": 0,
+ "started": "11:48",
+ "started_ts": 1795673910.7670603
 }
