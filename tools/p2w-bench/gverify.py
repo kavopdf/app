@@ -504,7 +504,13 @@ def collect(name, url):
     return 0
 
 
-SOFFICE = "/usr/lib/libreoffice/program/soffice.bin"
+# THE WRAPPER FIRST, THE BINARY LAST. Measured 26 Nov: /usr/lib/libreoffice/program/soffice.bin exits 81
+# with no stdout, no stderr and no file written, while /usr/bin/soffice converts the same document to PDF in
+# the same second. The wrapper is what prepares the environment the binary needs; calling the binary directly
+# is why two gverify.py --lo calls returned "soffice produced nothing" with nothing to diagnose from.
+SOFFICE_CANDIDATES = ["/usr/bin/soffice", "/usr/bin/libreoffice",
+                      "/usr/lib/libreoffice/program/soffice.bin"]
+SOFFICE = next((p for p in SOFFICE_CANDIDATES if os.path.exists(p)), "soffice")
 _LO_WORK = "/scratch/work/p2w/lo-res"
 _LO_REPO = os.path.normpath(os.path.join(HERE, "..", "..", "benchmarks", "gverify-lo"))
 LORES = _LO_REPO if os.path.isdir(_LO_REPO) and os.listdir(_LO_REPO) else _LO_WORK
@@ -535,14 +541,25 @@ def collect_lo(name, force=False):
     out_json = os.path.join(LORES, name + ".json")
     if os.path.exists(out_json) and not force:
         return "already have it"
-    tmpdir = "/tmp/lo-one"
-    os.makedirs(tmpdir, exist_ok=True)
+    # A SHARED OUTPUT DIRECTORY AND A SHARED LIBREOFFICE PROFILE ARE WHY THIS FAILED WITH NO REASON.
+    # Measured 26 Nov: two gverify.py --lo calls returned "soffice produced nothing" and the caller had
+    # nothing to go on, because the return code was never read. A fixed /tmp/lo-one means a second
+    # instance writes over the first one's file, and two soffice processes sharing the default
+    # UserInstallation profile refuse to start at all. Each call now gets its own directory and its own
+    # profile, and a failure carries the exit code and the last line soffice printed.
+    import tempfile
+    tmpdir = tempfile.mkdtemp(prefix="lo-one-")
+    profile = tempfile.mkdtemp(prefix="lo-prof-")
     exe = SOFFICE if os.path.exists(SOFFICE) else "soffice"
-    r = subprocess.run([exe, "--headless", "--norestore", "--convert-to", "pdf",
-                        "--outdir", tmpdir, docx], capture_output=True, text=True, timeout=180)
+    r = subprocess.run([exe, "--headless", "--norestore",
+                        "-env:UserInstallation=file://" + profile,
+                        "--convert-to", "pdf", "--outdir", tmpdir, docx],
+                       capture_output=True, text=True, timeout=180)
     pdf = os.path.join(tmpdir, name + ".pdf")
     if not os.path.exists(pdf):
-        return "soffice produced nothing"
+        _why = (r.stderr or r.stdout or "").strip().splitlines()
+        return "soffice produced nothing (exit %s: %s)" % (
+            r.returncode, (_why[-1][:120] if _why else "no output"))
     subprocess.run([sys.executable, os.path.join(HERE, "verify_google.py"),
                     src, pdf, "--docx", docx, "--json", out_json],
                    capture_output=True, text=True, timeout=180)
@@ -550,6 +567,12 @@ def collect_lo(name, force=False):
         os.remove(pdf)
     except OSError:
         pass
+    import shutil
+    for _d in (tmpdir, profile):
+        try:
+            shutil.rmtree(_d, ignore_errors=True)
+        except Exception:
+            pass
     if not os.path.exists(out_json):
         return "verify_google produced nothing"
     d = json.load(open(out_json, encoding="utf-8"))
