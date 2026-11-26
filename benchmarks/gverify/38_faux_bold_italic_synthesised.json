@@ -2,7 +2,7 @@
  "name": "38_faux_bold_italic_synthesised",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T13:19:13",
+ "at": "2026-11-26T18:11:57",
  "passed": 40,
  "total": 42,
  "failed": [
@@ -16,6 +16,6 @@
   "bad_pages": [],
   "runs_matched": 44
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795697520"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795715685"
 }

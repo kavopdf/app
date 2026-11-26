@@ -2,7 +2,7 @@
  "name": "39_small_caps_letter_spacing",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T13:19:39",
+ "at": "2026-11-26T18:11:57",
  "passed": 39,
  "total": 42,
  "failed": [
@@ -11,12 +11,12 @@
   "47_margins"
  ],
  "displacement": {
-  "med_dy": 1.6,
-  "worst_dy": 2.1,
+  "med_dy": 1.2,
+  "worst_dy": 1.7,
   "med_dx": -3.2,
   "bad_pages": [],
   "runs_matched": 74
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795697520"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795715685"
 }
