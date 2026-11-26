@@ -8078,3 +8078,9 @@
 {"t": 1795726068.9209554, "ist": "02:17:48", "ev": "beat", "d": "gate open, picking class"}
 {"t": 1795726069.2579176, "ist": "02:17:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795726071.689033, "ist": "02:17:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795726133.3812795, "ist": "02:18:53", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795726133.529588, "ist": "02:18:53", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795726133.6179538, "ist": "02:18:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795726154.9957063, "ist": "02:19:14", "ev": "beat", "d": "staging 5 one-away docs for Google"}
+{"t": 1795726443.8491402, "ist": "02:24:03", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795726445.487805, "ist": "02:24:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
