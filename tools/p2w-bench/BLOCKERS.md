@@ -1189,3 +1189,32 @@ What was done: the four measured results are held out of the commit (the gate ha
 was used), the other fifty-six landed, and the four keep their stale committed values so the next
 `--plan` picks them up again. They will keep being re-measured and refused until the regression is
 fixed, which is the gate working rather than a wall to route around.
+
+---
+
+## 2026-11-27 03:15 IST — watchdog: nothing stopped; no `cron` tool; today's trend row disagrees with the live tables
+
+**This pass has no `cron` tool in its tool list.** The declared list carries no cron operation and one
+`tool_search` for one returned only unrelated integration operations (Hugging Face jobs, Drive listings),
+so the platform half of the watchdog did not run and this pass did not pretend it did. In plain words:
+**this watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation.** The exact
+calls it would have made, against the ids in HEALTH-BRIEF's table and not from memory:
+
+    cron(action="list")                                          # status and next_fire_at for every cron
+    cron(action="runs", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")    # fixer, :50
+    cron(action="runs", cron_id="01M7Y6DSBB2KBYAREFVMHYAB4D")    # fixer relay, :10
+
+That is a missing tool, not a decision anyone has to make. Nothing was deleted or recreated on a guess:
+the relay pair is the reason a wedged :50 run does not stop the work.
+
+| time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
+|---|---|---|---|---|---|
+| 03:15 | STEP 1 | nothing. `health.py --stalled` exits 0 and reads "nothing is stopped": measure-google moving, matrix done at 213 of 213, classify waiting behind the incomplete measurement, fix moving at 6 attempt(s) in 3 h, txt moving at 205 clean and 8 failing | `health.py`, `health.py --stalled` | not needed | nothing |
+| 03:15 | STEP 2, the trend | `progress.py` refused a second row for today, and `cronreport.py` flagged the committed row as stale against the live tables: the row reads docx open 60, the tables read 59 | read `progress.py --json` and `progress.py --amend`; the amend rewrites today's row and was already used at 00:10 today, and its own docstring says once per day is right | no, not again today | nothing broken. The row stands as amended at 00:10 and the difference is named here instead. **What it means:** the live tables read 59, the same as 25 Nov, so the +1 the committed row shows is the mid-day measurement, not a document that regressed |
+| 03:15 | STEP 4 C, the reopen path | the phase is `fix`, not a finished phase with documents still failing | `round.py --phase` | not applicable | nothing. `round.py --reopen` was not run: its guard is about a done phase and this is not one |
+| 03:15 | STEP 4 D, the fixer slot | whether the slot is held by a dead run | `health.py` shows fix moving at an age of 0.7 h with 6 attempt(s) in 3 h, and the newest commits are live claims | not needed | nothing. `round.py --release-fixer --force` was not run |
+| 03:15 | STEP 5, is anything flat for over a day | `docx open` is flat: 59 on 25 Nov and 59 in the live tables now | read the trend table and the live tables | decided in the 26 Nov pass and it stands | **No class parked.** The .txt axis keeps falling (9 to 8) and Google clean keeps rising (42 to 47), so the pipeline is producing even where .docx is flat. **Overturned by:** three more rows with docx open unchanged and google clean unchanged together |
+
+**Still open from 26 Nov, unchanged:** the docx ratchet stamp is stale (`ENGINE CHANGED (docx)`), so any
+commit whose scope is docx is refused until a baseline run re-measures and `--stamp`s it. This pass
+staged only this file and the run's own message, no engine source.

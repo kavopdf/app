@@ -1,32 +1,35 @@
 # P2W Watchdog - Run Report
 
-**23 Nov 2026 · 06:09 IST**
+**27 Nov 2026 · 03:08 IST**
 
-> **2 stage(s) stopped: classify, txt**
+> Nothing is stopped.
 
-Nothing was moved by this pass, and each reason is written into BLOCKERS.md rather than acted on. The fix stage is live, so no slot was released and none was forced. The round is in `fix`, so there was nothing to reopen. The two red rows belong to the classifier and the baseline, and this run holds no cron tool to reach either of them - the exact calls are named in BLOCKERS.md. The `.txt` half has now stood still for longer than a day; the standing decision on it is unchanged, and the engine documents it names still need a fixer slot that picks a `.txt` class.
+This pass found every stage that can run either moving or done, so nothing was paused, released or reopened, and the fixer slot is held by a live claim. The committed trend row and the live tables disagree in one column, and the tool that writes the row allows a single correction a day which an earlier pass already used, so the row stands as written and the difference is recorded in BLOCKERS.md instead of being rewritten. This run holds no cron tool, so the platform half of the check - a paused cron, a stale fire time, a zombie run - could not be run at all; the exact calls are named in BLOCKERS.md.
 
 ## Stages
 
+> **Today's row is stale** - docx_open: committed row says 60, the data says 59. The trend below is the committed row; the data has moved.
+
+
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | done | 213 of 213 | 1.4 h |
-| matrix | done | 213 of 213 | 1.4 h |
-| classify | **stopped** |  | 7.3 h |
-| fix | moving |  | 0.7 h |
-| txt | **stopped** | 197 clean, 16 failing | 31.5 h |
+| measure-google | moving | 124 of 213 | 0.2 h |
+| matrix | done | 213 of 213 | 4.5 h |
+| classify | waiting |  | 0.7 h |
+| fix | moving | 6 attempt(s) in 3 h | 0.7 h |
+| txt | moving | 205 clean, 8 failing | 0.1 h |
 
 ## Trend
 
-| | 2026-11-22 | 2026-11-23 | |
+| | 2026-11-25 | 2026-11-26 | |
 |:--|--:|--:|:--|
-| .docx open | 59 | **59** | no change |
-| .txt failing | 16 | **16** | no change |
-| Google measured | 192 | **190** | -2 |
-| Google clean | 23 | **28** | +5 |
+| .docx open | 59 | **60** | +1 |
+| .txt failing | 9 | **8** | -1 |
+| Google measured | 213 | **205** | -8 |
+| Google clean | 42 | **47** | +5 |
 
 ## What this pass did
 
 * Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
-* **A stage is stopped** - see BLOCKERS.md.
+* Nothing needed moving.
 
