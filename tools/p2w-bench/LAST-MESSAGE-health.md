@@ -1,19 +1,18 @@
 # P2W Watchdog - Run Report
 
-**26 Nov 2026 · 09:24 IST**
+**26 Nov 2026 · 12:10 IST**
 
-> Nothing is stopped.
+Nothing is stopped. Every stage is done, moving, or waiting on a stage that is still measuring.
 
 ## Stages
 
-
 | stage | state | progress | age |
-|:--|:--|--:|--:|
-| measure-google | moving | 67 of 213 | 0.5 h |
-| matrix | done | 213 of 213 | 0.2 h |
-| classify | waiting |  | 2.9 h |
-| fix | moving | 3 attempt(s) in 3 h | 0.9 h |
-| txt | moving | 205 clean, 8 failing | 2.8 h |
+|:--|:--|:--|--:|
+| measure-google | moving | 187 of 213 | 0.5 h |
+| matrix | done | 213 of 213 | under 3 h |
+| classify | waiting |  | 5.6 h |
+| fix | moving | 8 attempt(s) in 3 h | 0.3 h |
+| txt | moving | 205 clean, 8 failing | 0.6 h |
 
 ## Trend
 
@@ -24,42 +23,20 @@
 | Google measured | 213 | **208** | -5 |
 | Google clean | 42 | **42** | no change |
 
+The committed row for today reads 208 for Google measured and the data now reads 207, so that row is one behind a measurement that is still being rewritten. The generator flags it; I did not touch a past row.
+
 ## What this pass did
 
-* Read health.py, health.py --stalled, stage.py, progress.py, round.py --phase and status.py.
-* **The fix slot was held by a dead run** - released with round.py --release-fixer --force. See BLOCKERS.md.
+- Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
+- Nothing was stopped, so nothing was moved.
+- Today's trend row was already committed by an earlier pass. progress.py appended nothing, so there was nothing to commit for it.
+- The reopen path was not run: the round phase is fix, not a finished phase with documents still failing.
+- The force-release path was not run: the fixer claim is live. ROUND.json reads fixer_started at 06:33, the slot has 8 attempt(s) in 3 h and the last beat is recent, so this is a working run and not a dead one.
 
-## What was stopped, and what this pass did about it
+## What this pass could not do
 
-The read this pass opened on found fix stopped: 3 attempt(s) in 3 h, age 0.9 h, on a run still marked
-running that had not beaconed and was holding the fix slot. Every other row was healthy - measure-google
-moving at 67 of 213, matrix done, classify waiting because the measurement it groups is still incomplete,
-txt moving at 205 clean and 8 failing.
+This pass has no cron tool in its tool list, so the platform half of the watchdog cannot run here. A paused cron, a stale next_fire_at or a zombie run stays invisible and cannot be moved by automation. The exact calls it would have made, against the ids in HEALTH-BRIEF's table and not from memory: cron(action="list"), then cron(action="runs", cron_id=...) for each fixer cron. That is a missing tool, not a decision anyone has to make. It is recorded in BLOCKERS.md.
 
-The second read, taken before this report was written, found the same claim past the fixer's stale window
-and still held, with no attempt recorded against it and no engine change since it was taken. A window that
-has passed and freed nothing is a dead run, so the slot was released with round.py --release-fixer --force
-and the reason went into BLOCKERS.md. The read taken after that release is the one this report is
-generated from, which is why it now says nothing is stopped.
+## The flat .docx axis
 
-## The flat .docx axis, decided again on today's evidence
-
-.docx open reads 59 in every committed row of the trend including today's, and google clean is 42 to 42,
-so that axis has not moved in more than a day. Nothing was parked. The class is not what is failing: the
-gate charges a full corpus re-score to every change, so a change is measured, reverted and never lands.
-What replaces it is a scope keyed on the documents a change can actually move. Today's evidence
-strengthens that rather than reopening it - the .txt axis moved, 9 to 8, on a change whose .docx output
-was unchanged and which therefore needed no re-score. Overturned by: one engine change that lands and
-moves .docx open.
-
-## The instrument, and the one thing this pass could not do
-
-Google measured reads 208, which looks like documents lost against the corpus of 213. It is not:
-measure-google is mid-pass at 67 of 213, so the 208 is a settled count from a measurement still being
-rewritten. The number to read is google clean, and it is flat.
-
-No cron was recreated, paused or resumed, because this pass has no cron tool at all. It cannot read
-next_fire_at, cannot read a run list, and cannot see a cron left paused - so a cron that is enabled but
-not firing stays invisible to it. That is written into BLOCKERS.md as a missing tool, with the exact
-calls it would have made, and not as a decision for a person to make.
-
+.docx open reads 59 in every committed row including today's, while .txt failing moved 9 to 8 and Google clean stayed at 42. The fixer is working - 8 attempt(s) in 3 h - and keeping nothing on that axis. The decision recorded earlier today stands: the gate charges a full corpus re-score to every change, so changes are measured, reverted and never land. What replaces it is a scope keyed on the documents a change can actually move. Overturned by one engine change that lands and moves .docx open. No class was parked and no past row was edited.

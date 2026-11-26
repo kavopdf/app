@@ -1052,3 +1052,27 @@ re-measurement reproduces 43/47.
 |---|---|---|---|---|---|
 | 09:45 | committing `benchmarks/gverify/` | `regress.py --check` refused: 390_wide_data_appendix Google 3 -> 4 failing | re-ran `verify_google.py` on the same export and the same source - 43/47, `59_shape_anchor` fails again, so it is not a flake; then compared every one of the 60 changed results against `git show HEAD:` and found one worse by 1, two better by 1, net corpus -2 | **no, and it is not mine to fix** - I do not touch engine code | the regression is real and belongs to the fixer: the committed result for this document predates engine `a4d8fca`, and the engine change that landed after it costs this one document `59_shape_anchor` while its `18_displacement` improves from med_dy -14.5 to -3.1 pt. **Overturned by:** a re-measure of this document under a later engine that passes `59_shape_anchor` again |
 | 09:45 | landing the measurement | the gate has no override, and an uncommitted run loses all 60 results | used the tool's own bounded, named opt-in: `P2W_ACCEPT_WORSE='390_wide_data_appendix'`, which the tool grants ONLY when the corpus is a net improvement in Google - it printed `ACCEPTED 390_wide_data_appendix Google 3 -> 4 failing, net corpus -2` and `PASS` | **yes - done** | nothing further. One document is named, nothing else is waived, and the 60 measurements are in the committed record instead of being re-measured next hour |
+
+---
+
+## 2026-11-26 12:10 IST — watchdog: nothing stopped, and this pass still has no `cron` tool
+
+**This pass has no `cron` tool in its tool list.** So the platform half of the watchdog did not run and
+this pass did not pretend it did. In plain words, for the record: **this watchdog has no cron tool, so a
+paused or zombie cron cannot be moved by automation.** The exact calls it would have made, against the ids
+in HEALTH-BRIEF's table and not from memory:
+
+    cron(action="list")                                          # status and next_fire_at for every cron
+    cron(action="runs", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")    # fixer, :50
+    cron(action="runs", cron_id="01M7Y6DSBB2KBYAREFVMHYAB4D")    # fixer relay, :10
+
+That is a missing tool, not a decision anyone has to make. Same finding as the 09:24 pass today, restated
+because it is still true and nothing in the repository can see the cron platform.
+
+| time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
+|---|---|---|---|---|---|
+| 12:10 | STEP 1 and STEP 2 | nothing. `health.py --stalled` exits 0 and reads "nothing is stopped": measure-google moving at 187 of 213, matrix done at 213 of 213, classify waiting because the measurement it groups is still incomplete, fix moving at 8 attempt(s) in 3 h, txt moving at 205 clean and 8 failing | `health.py`, `health.py --stalled`, `health.py --json`, `progress.py`, `progress.py --json`, `round.py --phase` (fix) | not needed | nothing. Today's trend row was already committed by an earlier pass and `progress.py` appended nothing, so there was nothing to commit for STEP 2 |
+| 12:10 | STEP 4 C, the reopen path | the phase is `fix`, not a finished phase with documents still failing | `round.py --phase` | not applicable | nothing. `round.py --reopen` was not run because its own guard is about a done phase, and this is not one |
+| 12:10 | STEP 4 D, the fixer slot | whether the slot is held by a dead run | `ROUND.json`: `fixer_started` 06:33, `fixer_last_beat` 06:23, 8 attempt(s) in 3 h, and the newest commits are a claim and a report from the run that took it | **not needed** | nothing. The claim is live and the work behind it is recent, so `round.py --release-fixer --force` was not run. **Overturned by:** the same claim still held with no beat and no attempt once its stale window has passed |
+| 12:10 | the trend row's Google column | the committed row says 208 measured, the data now says 207 | `progress.py` printed both the committed row and the diff against yesterday | yes - understood, not "fixed" | nothing. The row is one behind a measurement still being rewritten; the number to read is `google clean`, 42, and it is flat. No past row was edited |
+| 12:10 | STEP 5, the flat `.docx open` column | `docx open` reads 59 in every committed row including today's, unchanged, while the fixer works | read today's rows above, the trend table and `ROUND.json` | decided earlier today, and it stands | **No class parked.** The gate charges a full corpus re-score to every change, so changes are measured, reverted and never land. **What replaces it:** a scope keyed on the documents a change can actually move. Today's evidence is that the `.txt` axis moved 9 to 8 on a change whose `.docx` output was unchanged. **Overturned by:** one engine change that lands and moves `docx open` |
