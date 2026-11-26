@@ -1,129 +1,127 @@
 {
- "baseline_started": 1795660855.0744302,
- "classifier_started": 0,
- "fixer": {
-  "agents": [
-   {
-    "deployed": "2026-11-26T10:54+05:30",
-    "id": "A1",
-    "name": "18_displacement engine fix",
-    "result": "115 of 213 documents fail 18_displacement; 25 fail it alone. Proposed a 1x1 borderless w:tbl with w:trHeight exact as the gap carrier; measured Google BEFORE (68_journal med_dy -114.3, 412_page_labels_roman med_dy -59.0) but could not measure AFTER - its Drive upload 403'd on the staging path, which is the wall this run then removed. Report: FINDINGS via /scratch/input/18-displacement-report.md."
-   }
-  ]
- },
- "fixer_doing": "writing the report",
- "fixer_doing_since": 1795673415.5587482,
- "fixer_engine_at_claim": "11e0e4fc",
- "fixer_last_beat": 1795673415.558749,
- "fixer_started": 1795673299.4308386,
- "history": [
-  {
-   "at": "2026-11-12 09:46",
-   "phase": "measure",
-   "round": 1
+  "baseline_started": 1795660855.0744302,
+  "classifier_started": 0,
+  "fixer": {
+    "agents": [
+      {
+        "deployed": "2026-11-26T10:54+05:30",
+        "id": "A1",
+        "name": "18_displacement engine fix",
+        "result": "115 of 213 documents fail 18_displacement; 25 fail it alone. Proposed a 1x1 borderless w:tbl with w:trHeight exact as the gap carrier; measured Google BEFORE (68_journal med_dy -114.3, 412_page_labels_roman med_dy -59.0) but could not measure AFTER - its Drive upload 403'd on the staging path, which is the wall this run then removed. Report: FINDINGS via /scratch/input/18-displacement-report.md."
+      }
+    ]
   },
-  {
-   "at": "2026-11-12 09:56",
-   "phase": "classify",
-   "round": 1
-  },
-  {
-   "at": "13 Nov 10:26",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "2026-11-13 10:27",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "13 Nov 10:28",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "2026-11-13 11:11",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "2026-11-13 11:24",
-   "phase": "classify",
-   "round": 1
-  },
-  {
-   "at": "15 Nov 18:43",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "15 Nov 18:43",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "2026-11-16 06:42",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "2026-11-16 07:47",
-   "phase": "classify",
-   "round": 1
-  },
-  {
-   "at": "17 Nov 21:30",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "2026-11-17 23:41",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "2026-11-17 23:44",
-   "phase": "classify",
-   "round": 1
-  },
-  {
-   "at": "22 Nov 18:11",
-   "phase": "measure",
-   "round": 1,
-   "why": "docx table stamped 6c6cf642e13b7ed2, live engine 226f7f2df3013ad7 - re-measure before fixing (watchdog 18:11)"
-  },
-  {
-   "at": "2026-11-22 20:03",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "22 Nov 20:11",
-   "phase": "measure",
-   "round": 1,
-   "why": "engine changed - re-measure before fixing"
-  },
-  {
-   "at": "2026-11-22 21:52",
-   "phase": "measure",
-   "round": 1
-  },
-  {
-   "at": "2026-11-22 22:52",
-   "phase": "classify",
-   "round": 1
-  }
- ],
- "phase": "fix",
- "round": 1,
- "rounds_total": 3,
- "session_start": "18:00",
- "session_start_ts": 1795005004.0,
- "started": 1794327166
+  "fixer_engine_at_claim": "11e0e4fc",
+  "fixer_last_beat": 1795673415.558749,
+  "fixer_started": 0,
+  "history": [
+    {
+      "at": "2026-11-12 09:46",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "2026-11-12 09:56",
+      "phase": "classify",
+      "round": 1
+    },
+    {
+      "at": "13 Nov 10:26",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-13 10:27",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "13 Nov 10:28",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-13 11:11",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "2026-11-13 11:24",
+      "phase": "classify",
+      "round": 1
+    },
+    {
+      "at": "15 Nov 18:43",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "15 Nov 18:43",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-16 06:42",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "2026-11-16 07:47",
+      "phase": "classify",
+      "round": 1
+    },
+    {
+      "at": "17 Nov 21:30",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-17 23:41",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "2026-11-17 23:44",
+      "phase": "classify",
+      "round": 1
+    },
+    {
+      "at": "22 Nov 18:11",
+      "phase": "measure",
+      "round": 1,
+      "why": "docx table stamped 6c6cf642e13b7ed2, live engine 226f7f2df3013ad7 - re-measure before fixing (watchdog 18:11)"
+    },
+    {
+      "at": "2026-11-22 20:03",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "22 Nov 20:11",
+      "phase": "measure",
+      "round": 1,
+      "why": "engine changed - re-measure before fixing"
+    },
+    {
+      "at": "2026-11-22 21:52",
+      "phase": "measure",
+      "round": 1
+    },
+    {
+      "at": "2026-11-22 22:52",
+      "phase": "classify",
+      "round": 1
+    }
+  ],
+  "phase": "fix",
+  "round": 1,
+  "rounds_total": 3,
+  "session_start": "18:00",
+  "session_start_ts": 1795005004.0,
+  "started": 1794327166
 }
