@@ -972,7 +972,7 @@
   "status": "PARKED"
  },
  "44_header_footer": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": null,
   "history": [
    {
@@ -988,18 +988,31 @@
     "outcome": "lead",
     "reason": "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1",
     "total": null
+   },
+   {
+    "at": "2026-11-26 17:39",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "18_displacement: the page-top gap moves from w:before into w:pgMar w:top"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "the 44_header_footer lead is closed on both halves: flowFromBox has carried the foot-band guard since 85b8735f and removing it changes no byte of document.xml on 17 documents, and 27/46 already read 9",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "b7699196",
+  "last_engine": "aa496ebe",
   "outcomes": [
+   "lead",
    "lead",
    "lead"
   ],
-  "reason": "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1. Not committed: full-corpus restamp does not fit a slot. Patch in FINDINGS/running-foot-spends-the-gap-1855-fixer.patch. Second site unaddressed: flowFromBox anchors the same oversized gap (55_ and 61_ still carry 4 boxes).",
+  "reason": "the 44_header_footer lead is closed on both halves: flowFromBox has carried the foot-band guard since 85b8735f and removing it changes no byte of document.xml on 17 documents, and 27/46 already read 9/9 in the .txt. The .txt half's only page-furniture failure is t09 on the two Account_Opening_Form documents, 29 owed vs 125 present, re-measured live this run; whether that is a TxtWriter split or a t09 asymmetry is not yet decided",
   "reasons": [
    "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1. Not committed: full-corpus restamp does not fit a slot. Patch in FINDINGS/running-foot-spends-the-gap-1855-fixer.patch. Second site unaddressed: flowFromBox anchors the same oversized gap (55_ and 61_ still carry 4 boxes).",
-   "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1. Not committed: full-corpus restamp does not fit a slot. Patch in FINDINGS/running-foot-spends-the-gap-1855-fixer.patch. Second site unaddressed: flowFromBox anchors the same oversized gap (55_ and 61_ still carry 4 boxes)."
+   "running foot is a row: flowRow anchors it past gapCapTw, Google drops the box text entirely. footBand change measured in Google: 27_two_column_left_short_txtpos 40/42 -> 42/42 PASS, txbx 4->0, pages 1. Not committed: full-corpus restamp does not fit a slot. Patch in FINDINGS/running-foot-spends-the-gap-1855-fixer.patch. Second site unaddressed: flowFromBox anchors the same oversized gap (55_ and 61_ still carry 4 boxes).",
+   "the 44_header_footer lead is closed on both halves: flowFromBox has carried the foot-band guard since 85b8735f and removing it changes no byte of document.xml on 17 documents, and 27/46 already read 9/9 in the .txt. The .txt half's only page-furniture failure is t09 on the two Account_Opening_Form documents, 29 owed vs 125 present, re-measured live this run; whether that is a TxtWriter split or a t09 asymmetry is not yet decided"
   ],
   "requeues": 0,
   "status": "OPEN"

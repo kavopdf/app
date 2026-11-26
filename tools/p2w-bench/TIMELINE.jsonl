@@ -7411,3 +7411,17 @@
 {"t": 1795691958.3143327, "ist": "16:49:18", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795691958.646116, "ist": "16:49:18", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795691959.1034358, "ist": "16:49:19", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795693325.5161965, "ist": "17:12:05", "ev": "beat", "d": "relay: cloned, about to read"}
+{"t": 1795693330.0353372, "ist": "17:12:10", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795693330.202558, "ist": "17:12:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795693330.3499205, "ist": "17:12:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795693579.0562751, "ist": "17:16:19", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795693587.726879, "ist": "17:16:27", "ev": "beat", "d": "relay: pod-prep corpus fetch"}
+{"t": 1795693858.6189578, "ist": "17:20:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795693874.4878225, "ist": "17:21:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795693882.2004273, "ist": "17:21:22", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795693887.6517577, "ist": "17:21:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795693888.210304, "ist": "17:21:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795694834.830043, "ist": "17:37:14", "ev": "beat", "d": "relay: converting the two Account docs for a live t09 check"}
+{"t": 1795694892.018559, "ist": "17:38:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795694944.95009, "ist": "17:39:04", "ev": "beat", "d": "attempt.py: recording an attempt"}
