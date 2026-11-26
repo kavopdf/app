@@ -6699,6 +6699,7 @@
 {"t": 1795653601.065988, "ist": "06:10:01", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795653613.8532984, "ist": "06:10:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795653639.1598458, "ist": "06:10:39", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795653979.62015, "ist": "06:16:19", "ev": "claim", "d": "baseline claimed the slot"}
 {"t": 1795653961.759694, "ist": "06:16:01", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795654003.3491085, "ist": "06:16:43", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795654003.5000412, "ist": "06:16:43", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
