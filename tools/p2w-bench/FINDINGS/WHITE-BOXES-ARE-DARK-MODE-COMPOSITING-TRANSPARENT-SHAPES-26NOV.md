@@ -54,3 +54,25 @@ where one is not needed.
 
 That the dark-mode composite is white for every shape. Only one document was round-tripped here. The
 mechanism fits every measurement, but the corpus-wide count of affected documents was not taken.
+
+## How many documents this touches
+
+Counted across all 213 documents in `word/document.xml`:
+
+    documents with at least one wps shape : 196 of 213   (92 %)
+    total wps shapes across the corpus    : 13157
+    of which carry a textbox              : 1007
+    median shapes per document            : 13
+
+      041122-Account_Opening_Form          2652 shapes   189 textboxes
+      Account_Opening_Form_Fillable_filled 2652 shapes   189 textboxes
+      324_loan_amortisation_schedule       1483 shapes     0 textboxes
+      375_attendance_register               456 shapes     0 textboxes
+      390_wide_data_appendix                400 shapes     0 textboxes
+
+So "almost every document" is the right description and it is not about stamps: 196 of 213 carry a shape,
+and only 47 of them carry a textbox. The other 149 have shapes with no text inside — rules, boxes,
+underlines — and each of those is one more white rectangle in dark mode.
+
+That also explains why the fix cannot be "convert textboxes to tables" alone. 12 150 of the 13 157 shapes
+carry no text at all. Whatever emits them needs to stop emitting a rasterised shape for a line or a rule.
