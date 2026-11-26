@@ -119,3 +119,19 @@ The line-scale 58 are the only ones a line-box construct can reach at all, and t
 median run is *not* moving. Work order this implies: the 58 line-scale documents are where a line
 construct is testable; the 17 page-scale documents need a page-break construct and no line-box change
 will touch them.
+
+## The line-scale family: a small, weakly size-proportional charge
+
+Third measurement, same run. For the 27 line-scale documents (`worst_dy <= 9`) that also have a
+`.docx` on this pod, the median font size was read from `word/document.xml` (`w:sz`, half-points) and
+fitted against `med_dy`:
+
+    med_dy = -5.17 + 0.765 * size_pt     n = 27, r2 = 0.20
+
+The slope is positive and of the order the hairline theory predicts (a charge proportional to size),
+but it explains a fifth of the variance, and the whole family sits between -3.1 and +4.2 pt with a
+median near 1.2 pt — inside or near `clamp(0.35*size, 1.5, 4.5)`. So this family fails on its tail
+runs, not on its median, exactly like the 31 "outlier" documents above, and a size-proportional
+correction is **not** established by this fit: r² = 0.20 is not enough to justify a construct. What
+would settle it: the same fit on at least 60 line-scale documents with a size range that does not
+cluster at 7–9 pt (this pod had 6.8–11.0 pt, mostly 8).
