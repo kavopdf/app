@@ -7,14 +7,14 @@ is unambiguous. `none-identified` means the counts do not point at one cause,
 and that is a real answer - a wrong mechanism sends the fixer after a patch
 that cannot work.
 
-**62 defective documents censused.**
+**63 defective documents censused.**
 
 | signal | documents | total share@5 | worst document |
 |---|---|---|---|
 | rules-not-tables | 1 | 0.1% | 391_survey_questionnaire_grid 0.1%@5 p1 |
 | text-missing | 8 | 25.7% | academic-paper-ieee-2col-abstract 5.7%@5 p2 |
-| annotations-present | 1 | 54.3% | 600_reviewed_invoice_with_annotati 54.3%@5 p1 |
-| none-identified | 52 | 672.7% | 041122-Account_Opening_Form 98.7%@5 p9 |
+| annotations-present | 1 | 62.5% | 600_reviewed_invoice_with_annotati 62.5%@5 p1 |
+| none-identified | 53 | 725.7% | 041122-Account_Opening_Form 98.7%@5 p9 |
 
 ## Where the ink went, in points
 
@@ -24,12 +24,12 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 
 | document | share@5 | dx | dy | explains | still >20pt |
 |---|---|---|---|---|---|
-| 041122-Account_Opening_Form | 98.65 | 38.8 | -36.9 | 1.0 | 70.0% |
+| 041122-Account_Opening_Form | 98.65 | 38.6 | -39.5 | 1.0 | 70.0% |
 | Account_Opening_Form_Fillable_fill | 97.62 | 3.4 | -17.5 | 2.0 | 66.0% |
+| newsletter-3col-header-footer | 86.3 | -30.7 | 114.2 | 0.0 | 17.0% |
 | one-page-rotated-180-degrees | 81.64 | 0.0 | 0.0 | 0.0 | 23.0% |
-| 600_reviewed_invoice_with_annotati | 54.3 | 0.0 | 36.5 | 26.0 | 1.0% |
+| 600_reviewed_invoice_with_annotati | 62.46 | 0.0 | 102.7 | 28.0 | 1.0% |
 | 601_fillable_admission_form | 52.39 | 0.0 | 26.9 | 15.0 | 8.0% |
-| itr-computation-with-slab-table | 42.33 | 0.0 | -0.5 | 1.0 | 0.0% |
 | table-inside-two-column-page | 35.87 | 0.0 | 0.0 | 0.0 | 0.0% |
 | 360_restaurant_menu | 34.43 | 0.0 | 0.0 | 0.0 | 3.0% |
 | text-held-twice-shadow-text | 30.29 | 0.0 | 0.0 | 0.0 | 28.0% |
@@ -39,6 +39,7 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 | 77_arabic_rtl_document | 11.89 | 0.5 | 0.5 | 16.0 | 0.0% |
 | 363_warranty_card | 10.58 | 0.0 | 0.0 | 0.0 | 0.0% |
 | 40_devanagari_shaping_font | 10.48 | 0.5 | 0.5 | 7.0 | 0.0% |
+| itr-computation-with-slab-table | 9.1 | 0.0 | 0.5 | 4.0 | 1.0% |
 | 76_devanagari_table | 7.91 | 0.0 | 0.0 | 0.0 | 0.0% |
 | 75_merged_header_cell_three_column | 7.62 | 0.5 | 0.0 | 0.0 | 0.0% |
 | journal-2col-with-footnotes | 6.34 | 0.0 | 0.0 | 0.0 | 0.0% |
@@ -53,7 +54,6 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 | 14_stamp_chars_positioned_td | 3.89 | 0.0 | 0.0 | 0.0 | 0.0% |
 | 64_newspaper_uneven_columns_ad_box | 3.46 | 0.0 | 1.0 | 3.0 | 0.0% |
 | 406_passport_mrz_page | 3.45 | 0.0 | 0.0 | 0.0 | 0.0% |
-| annual-review-2col-uneven-columns | 3.0 | 0.0 | 0.0 | 0.0 | 0.0% |
 
 
 ## rules-not-tables (1 documents)
@@ -79,17 +79,17 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 
 | document | share@5 | worst page | src img | docx img | src chars | docx chars | src draws | docx cells |
 |---|---|---|---|---|---|---|---|---|
-| 600_reviewed_invoice_with_annotati | 54.3 | 1 | 0 | 0 | 776 | 730 | 23 | 50 |
+| 600_reviewed_invoice_with_annotati | 62.46 | 1 | 0 | 0 | 776 | 831 | 23 | 50 |
 
-## none-identified (52 documents)
+## none-identified (53 documents)
 
 | document | share@5 | worst page | src img | docx img | src chars | docx chars | src draws | docx cells |
 |---|---|---|---|---|---|---|---|---|
 | 041122-Account_Opening_Form | 98.65 | 9 | 1 | 1 | 48837 | 48623 | 2534 | 659 |
 | Account_Opening_Form_Fillable_fill | 97.62 | 7 | 1 | 1 | 48936 | 48702 | 2534 | 659 |
+| newsletter-3col-header-footer | 86.3 | 1 | 0 | 0 | 4531 | 4518 | 6 | 14 |
 | one-page-rotated-180-degrees | 81.64 | 2 | 0 | 0 | 1951 | 1923 | 42 | 59 |
 | 601_fillable_admission_form | 52.39 | 1 | 0 | 0 | 562 | 539 | 13 | 0 |
-| itr-computation-with-slab-table | 42.33 | 1 | 0 | 0 | 2041 | 1881 | 61 | 130 |
 | table-inside-two-column-page | 35.87 | 1 | 0 | 0 | 2522 | 2333 | 15 | 2 |
 | 360_restaurant_menu | 34.43 | 1 | 0 | 0 | 1778 | 2116 | 45 | 82 |
 | text-held-twice-shadow-text | 30.29 | 1 | 0 | 0 | 2165 | 2122 | 16 | 28 |
@@ -99,6 +99,7 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 | 77_arabic_rtl_document | 11.89 | 1 | 0 | 0 | 681 | 647 | 16 | 25 |
 | 363_warranty_card | 10.58 | 1 | 0 | 0 | 1093 | 1067 | 222 | 16 |
 | 40_devanagari_shaping_font | 10.48 | 1 | 0 | 0 | 891 | 865 | 12 | 14 |
+| itr-computation-with-slab-table | 9.1 | 1 | 0 | 0 | 2041 | 1881 | 61 | 130 |
 | 76_devanagari_table | 7.91 | 1 | 0 | 0 | 919 | 876 | 13 | 30 |
 | 75_merged_header_cell_three_column | 7.62 | 1 | 0 | 0 | 743 | 785 | 21 | 48 |
 | journal-2col-with-footnotes | 6.34 | 1 | 0 | 0 | 4346 | 4311 | 2 | 0 |
@@ -109,5 +110,4 @@ layout bug. `moved_gt20` is the share of ink that moved more than 20 pt.
 | table-of-contents-dot-leaders | 4.97 | 1 | 0 | 0 | 3358 | 3304 | 2 | 0 |
 | 33_sans_nondefault_body | 4.49 | 1 | 0 | 0 | 1469 | 1438 | 11 | 18 |
 | 14_stamp_chars_positioned_td | 3.89 | 1 | 0 | 0 | 956 | 873 | 14 | 35 |
-| 64_newspaper_uneven_columns_ad_box | 3.46 | 1 | 0 | 0 | 2597 | 2805 | 7 | 6 |
-| ... 27 more | | | | | | | | |
+| ... 28 more | | | | | | | | |
