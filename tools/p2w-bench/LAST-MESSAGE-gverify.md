@@ -1,32 +1,22 @@
-# P2W Google Verify - Run Report
+**gverify — stage `classify`: both renderers are complete on the engine in the tree, table regenerated, nothing left to commit.**
 
-**26 Nov 2026 · 14:27 IST · stage classify**
+`gverify.py --matrix` regenerates byte-identical to the committed `benchmarks/GOOGLE-VS-LIBREOFFICE.md`, and `benchmarks/gverify-lo/` already holds its partner for every scored document. Measuring work for this cron is finished; no commit was needed because the tree is clean.
 
-> 207 of 213 measured in Google, 6 refused on page count. Google passes every check on 42; LibreOffice on 135 of the same 207.
+| measurement | count |
+|---|---:|
+| verified through Google | 213 |
+| pass every check offered | 42 |
+| fail at least one check | 165 |
+| refused (page count) | 6 |
 
-| checks applied | **42, 44, 47 (mixed - a document is clean only against its own set)** |
-| measured against the current set | **72 of 207** |
-## Measured
+**Capability table** — 207 documents scored in both renderers, LibreOffice 135 of 207 pass, Google 42 of 207 pass. Engine in the tree a4d8fca469bba636: Google on it 207 of 207 pairs, LibreOffice on it 207 of 207 pairs, so no stale half is hiding behind the comparison.
 
-| | |
-|:--|--:|
-| scored | **207** |
-| refused on page count | **6** |
-| clean in Google | **42** |
-| passes in LibreOffice (proxy, not the renderer the user opens) | **135** |
+| top failing check | Google fails |
+|---|---:|
+| `18\_displacement` | 113 |
+| `60\_text\_column\_right\_edge` | 62 |
+| `04\_chars\_missing` | 54 |
+| `59\_shape\_anchor` | 49 |
+| `45\_char\_accuracy` | 33 |
 
-## Checks Google fails and LibreOffice does not
-
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `18\_displacement` | **113** | 20 |
-| `04\_chars\_missing` | **54** | 2 |
-| `60\_text\_column\_right\_edge` | **62** | 18 |
-| `59\_shape\_anchor` | **49** | 11 |
-| `13\_text\_colours` | **32** | 1 |
-| `45\_char\_accuracy` | **33** | 2 |
-| `17\_matched\_runs` | **30** | 5 |
-| `44\_header\_footer` | **18** | 0 |
-
-The first row is the class to take: `18\_displacement`, 113 documents in Google against 20 in LibreOffice.
-
+**Next** — `stage.py` reads `classify`, 165 failing documents, because `benchmarks/DEFECT-CLASSES-GOOGLE.md` predates the newest results. That file is written by `classify_google.py` and belongs to the classifier cron; per the brief this cron regenerates the capability table and stops there. No engine code touched.
