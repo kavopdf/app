@@ -7600,3 +7600,7 @@
 {"t": 1795707937.35501, "ist": "21:15:37", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795707937.8073673, "ist": "21:15:37", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795707938.4433274, "ist": "21:15:38", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795708348.1632047, "ist": "21:22:28", "ev": "beat", "d": "relay: hook installed, checking regress"}
+{"t": 1795708645.236733, "ist": "21:27:25", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795709234.268325, "ist": "21:37:14", "ev": "beat", "d": "relay: 2 agents returned; completing corpus so the gate can run"}
+{"t": 1795709480.2979767, "ist": "21:41:20", "ev": "beat", "d": "attempt.py: recording an attempt"}

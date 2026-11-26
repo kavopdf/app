@@ -17,8 +17,10 @@
       }
     ]
   },
+  "fixer_doing": "relay: 2 agents returned; completing corpus so the gate can run",
+  "fixer_doing_since": 1795709234.270324,
   "fixer_engine_at_claim": "aa496ebe",
-  "fixer_last_beat": 1795706034.7198548,
+  "fixer_last_beat": 1795709234.2703247,
   "fixer_started": 1795708028.8398414,
   "history": [
     {
