@@ -1,5 +1,67 @@
 {
- "plan": "",
+ "agents": [
+  {
+   "angle": "byte-identity of two conversions of the same PDF",
+   "class": "general-purpose: is the .docx writer deterministic?",
+   "deployed": "14:22",
+   "deployed_at": "2026-11-26T14:22",
+   "expected": "deterministic",
+   "finding": "FINDINGS determinism: NON-DETERMINISTIC (metadata only) - every differing byte is the ZIP entry mtime (ZipEntry defaults to System.currentTimeMillis(), no setTime anywhere); zero XML parts differ across 18 documents; normalising the ZIP time fields makes the files bit-identical",
+   "id": "R-01",
+   "landed_at": "2026-11-26T14:47",
+   "question": "two runs of ConvertOne on one PDF - identical bytes?",
+   "status": "landed"
+  },
+  {
+   "angle": "what makes a page break land in the wrong place",
+   "class": "Explore: page-break construct audit on the 8 largest worst_dy documents",
+   "deployed": "15:10",
+   "deployed_at": "2026-11-26T15:10",
+   "expected": "an explicit break",
+   "finding": "FINDINGS/18-displacement-PAGE-BREAK-IS-UNEARNED-26NOV-relay.md - blocks at 97% of usable height with ~25 pt slack, explicit <w:br type=page>, every row atLeast+cantSplit, no tblHeader; row growth eats the slack and the renderer breaks first",
+   "id": "R-02",
+   "landed_at": "2026-11-26T15:19",
+   "question": "explicit break or renderer flow?",
+   "status": "landed"
+  },
+  {
+   "angle": "A",
+   "class": "18_displacement",
+   "deployed": "16:18",
+   "deployed_at": "2026-11-26T16:18",
+   "expected": "15:10",
+   "finding": "FINDINGS/18-displacement-PAGE-SCALE-IS-THE-DROPPED-PAGE-TOP-26NOV-explore.md",
+   "id": "18_dA-01",
+   "landed_at": "2026-11-26T16:18",
+   "question": "page-scale half: is the page-top gap the dropped w:before, and what does pgMar w:top do to it",
+   "status": "landed"
+  },
+  {
+   "angle": "B",
+   "class": "18_displacement",
+   "deployed": "16:18",
+   "deployed_at": "2026-11-26T16:18",
+   "expected": "15:28",
+   "finding": "FINDINGS/18-displacement-SINGLE-PAGE-SPACER-MEASURED-26NOV-explore.md",
+   "id": "18_dB-01",
+   "landed_at": "2026-11-26T16:18",
+   "question": "single-page half: is the exact-line spacer charged proportionally by Google",
+   "status": "landed"
+  }
+ ],
+ "history": [
+  {
+   "at": "15:13",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "15:48",
+   "how": "forced",
+   "plan": ""
+  }
+ ],
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.",
  "notes": [
   {
    "at": "15:12",
@@ -18,48 +80,10 @@
    "text": "attempt 91 on 18_displacement -> lead"
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.",
- "agents": [
-  {
-   "id": "R-01",
-   "class": "general-purpose: is the .docx writer deterministic?",
-   "deployed": "14:22",
-   "deployed_at": "2026-11-26T14:22",
-   "status": "landed",
-   "angle": "byte-identity of two conversions of the same PDF",
-   "question": "two runs of ConvertOne on one PDF - identical bytes?",
-   "expected": "deterministic",
-   "finding": "FINDINGS determinism: NON-DETERMINISTIC (metadata only) - every differing byte is the ZIP entry mtime (ZipEntry defaults to System.currentTimeMillis(), no setTime anywhere); zero XML parts differ across 18 documents; normalising the ZIP time fields makes the files bit-identical",
-   "landed_at": "2026-11-26T14:47"
-  },
-  {
-   "id": "R-02",
-   "class": "Explore: page-break construct audit on the 8 largest worst_dy documents",
-   "deployed": "15:10",
-   "deployed_at": "2026-11-26T15:10",
-   "status": "landed",
-   "angle": "what makes a page break land in the wrong place",
-   "question": "explicit break or renderer flow?",
-   "expected": "an explicit break",
-   "finding": "FINDINGS/18-displacement-PAGE-BREAK-IS-UNEARNED-26NOV-relay.md - blocks at 97% of usable height with ~25 pt slack, explicit <w:br type=page>, every row atLeast+cantSplit, no tblHeader; row growth eats the slack and the renderer breaks first",
-   "landed_at": "2026-11-26T15:19"
-  }
- ],
+ "plan": "",
  "run": {
-  "started": "15:24",
   "ended": "15:48",
-  "ended_how": "forced"
- },
- "history": [
-  {
-   "at": "15:13",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "15:48",
-   "how": "forced",
-   "plan": ""
-  }
- ]
+  "ended_how": "forced",
+  "started": "15:24"
+ }
 }
