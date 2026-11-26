@@ -67,3 +67,42 @@ on raising the residual box to `1.38*size`.
 3. `hRule="atLeast"` rows are present on nine of the ten (0-29 rows each). 31_times has none and 403
    has seven, so the row floor is not sufficient either, but 320/325 - the only two with a real
    magnitude - carry 21 and 12 of them. That is where the next measurement should start.
+
+## The residual on 31_times is ONE page-level constant of 2.65 pt, not 29 constructs
+
+Measured directly, per run, source PDF against the Google export of the same document
+(`/scratch/downloads/composio/probe-31.pdf`, 29 runs paired by text on page 0):
+
+    n = 29   mean dy = +2.649 pt   sd = 0.712   min 1.39   max 3.59
+
+and it does not scale with the type:
+
+    size  8.0 -> +2.50    9.0 -> +3.42   10.0 -> +3.10
+    size 10.5 -> +2.63   11.0 -> +1.98   12.0 -> +2.15
+
+A per-line construct would grow down the page and would scale with the em. This does neither: every
+run on the page is low by about the same 2.6 pt, whatever its size. **It is one constant at the top of
+the page, not a defect in any line.**
+
+It also means the document is closer to CLEAN than the verdict reads. `18_displacement`'s tolerance is
+`clamp(0.35*size, 1.5, 4.5)` pt - 3.5 pt at 10 pt - and three runs read 3.55-3.59. **31_times fails by
+0.09 pt**, on a page whose whole flow is 2.65 pt low.
+
+### The test the next run should make
+
+Find the constant. Three candidates, in the order I would test them:
+
+1. **the page's own top edge** - compare `page.rect` of the source PDF and of the Google export. A
+   cropbox/mediabox origin difference of 2.6 pt would shift every run on the page and nothing else,
+   and it would be identical across documents.
+2. **the first paragraph's box** - `w:before="1230"` (61.5 pt) plus a `w:line="13"` exact box on a
+   12 pt heading. Google charges that box `0.069 * 12 = 0.828` pt where the engine's model charges
+   0.65 pt; that is 0.18 pt, so it is not the whole 2.65, but it is the only page-top term.
+3. **`LINE_BASE`** - the engine places a baseline at `before + LINE_BASE * box`. If Google's baseline
+   fraction for the substituted face is not `LINE_BASE`, the error is `(LINE_BASE - google) * box`,
+   which WOULD scale with size. The measurement above says it does not scale, so this is the least
+   likely of the three and should be tested last.
+
+Whichever it is, it is worth more than one document: a constant that shifts every run on a page is
+charged by `18_displacement` and `43_within_10pt_x` on every document that has it, and 8 of the ten
+solo documents are inside +/-3 pt at the median, which is the same signature.

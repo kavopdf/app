@@ -1,5 +1,5 @@
 {
-  "baseline_started": 1795671902.9850981,
+  "baseline_started": 1795660855.0744302,
   "classifier_started": 0,
   "fixer": {
     "agents": [
@@ -13,9 +13,11 @@
       }
     ]
   },
+  "fixer_doing": "pod-prep: converting corpus slice 3",
+  "fixer_doing_since": 1795672669.7381835,
   "fixer_engine_at_claim": "11e0e4fc",
-  "fixer_last_beat": 1795668709.0277457,
-  "fixer_started": 1795672208.8184438,
+  "fixer_last_beat": 1795672669.7381845,
+  "fixer_started": 1795670690.7319434,
   "history": [
     {
       "at": "2026-11-12 09:46",

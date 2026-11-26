@@ -6906,3 +6906,11 @@
 {"t": 1795668913.849914, "ist": "10:25:13", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795668914.2856169, "ist": "10:25:14", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795668916.3365052, "ist": "10:25:16", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795671003.9832468, "ist": "11:00:03", "ev": "beat", "d": "install-gate timed out, running report+clock"}
+{"t": 1795671010.468927, "ist": "11:00:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795671011.3654068, "ist": "11:00:11", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795671013.8512566, "ist": "11:00:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795672202.9694974, "ist": "11:20:02", "ev": "beat", "d": "18_displacement agent done: 25 docs fail only 18"}
+{"t": 1795672267.273081, "ist": "11:21:07", "ev": "beat", "d": "pod-prep: building toolchain"}
+{"t": 1795672483.2537687, "ist": "11:24:43", "ev": "beat", "d": "pod-prep: converting corpus slice 2"}
+{"t": 1795672669.7376032, "ist": "11:27:49", "ev": "beat", "d": "pod-prep: converting corpus slice 3"}

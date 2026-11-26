@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-26 10:13
+# Fixer report - 2026-11-26 10:54
 
 ```
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 10:13 → running IST · 11 min**
+**26 Nov 2026 · slot 10:54 → running IST · 5 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -16,7 +16,7 @@
 | | |
 |:--|:--|
 | Self-check | **every field agrees with its second source** |
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+40.32%** — mean 6.15 → 3.67 |
 | Regressions | **none** |
@@ -27,20 +27,14 @@
 | Not scored - page count did not match | **5** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (48 still open), not a new class |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 10:13 | **lead** | 0/None | row-height lever measured in 4 Google renders: trHeight/hRule are not read, w:line is a one-way floor; the ladder plan the last report handed over is not implementable |
-| 10:22 | **lead** | 0/None | residue fix built and rendered: med_dy +10.30 -> -0.70 on 320 but the block after the table broke to -18.16, so worst_dy 18.16 still fails and no document moves; reverted |
+| Working on | `-` - taken from the pending list (49 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **34 min ago** |
+| Measured | **5 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -55,22 +49,10 @@
 
 | | |
 |:--|:--|
-| Slot window | 10:13 → running · 11 min |
+| Slot window | 10:54 → running · 5 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 14 |
-| Longest silence | **5.7 min** — from 10:15:40, after `engine patch written; compiling` |
-| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `###########` |
-| record - attempt, handoff, class rows | **2 min** | `#####` |
-| report - the report and the chain | **1 min** | `###` |
-| other - not attributed to a tool | **1 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |
