@@ -83,3 +83,32 @@ The gate is not wrong. It is answering the question it was given.
     rot-test.docx   -> Google Doc -> PDF   test 1
     flow-test.docx  -> Google Doc -> PDF   test 2
     dpi-test.docx   -> Google Doc -> PDF   test 3
+
+## Test 5 — does a borderless positional table keep text AND place it exactly?
+
+This is the construct that matters for the 987 form-field boxes, where flow text cannot go.
+
+One document: a borderless table with `w:tblInd w:w="3000"`, all borders `w:val="none"`, zero cell
+margins, a 1200-twip exact spacer row, then a row holding the text — and, for comparison, an anchored
+textbox at the same x.
+
+    images on page: 1
+    TABLETEXT  in text layer: YES   x = 206.7 pt
+    BOXTEXT    in text layer: NO
+
+    expected x = 56.7 pt margin + 150 pt indent = 206.7 pt
+
+The rendered page shows TABLETEXT with **no visible borders at all** and no shading — the table is
+invisible, only its geometry remains.
+
+**So a borderless positional table keeps the text as text and places it exactly, with no visible
+artifact.** Row heights control y, table indent and cell widths control x. That is the construct the
+987 form-field boxes need, and it is proven.
+
+## What this changes
+
+The textbox was never the wrong choice for a form field — it was the wrong *emitter*. A borderless table
+does the same job (arbitrary x, arbitrary y, text stays text) and Google renders it as text.
+
+    stamps (20 boxes, 18 docs)      keep the shape, add a:xfrm rot, rasterise at 300 dpi
+    form fields (987 boxes, 29 docs) replace the shape with a borderless positional table
