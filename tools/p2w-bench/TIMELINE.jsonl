@@ -6980,3 +6980,7 @@
 {"t": 1795673910.3233798, "ist": "11:48:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795673917.1550083, "ist": "11:48:37", "ev": "beat", "d": "relay: autoflow falsifier on 72_bank_statement, uploading to Google"}
 {"t": 1795673941.3860018, "ist": "11:49:01", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795673944.6283946, "ist": "11:49:04", "ev": "attempt", "d": "18_displacement -> reverted"}
+{"t": 1795673944.7391844, "ist": "11:49:04", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795673944.834355, "ist": "11:49:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795673945.397109, "ist": "11:49:05", "ev": "beat", "d": "classrow.py: refreshing the class file"}

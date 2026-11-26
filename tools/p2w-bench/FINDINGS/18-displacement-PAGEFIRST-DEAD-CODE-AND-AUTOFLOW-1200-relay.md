@@ -57,3 +57,27 @@ same order, this reading is wrong and the -7.2 was not the exact-line charge.
 The next attempt should read the 26 failing runs by size and font (`dy.py` prints them) and check
 whether they are one construct - a table row, a `w:before` clamp, or the anchored-box text
 `lineParagraph` puts on its own y.
+
+## 4. THE FALSIFIER FIRED: `autoflow` is not a general lever
+
+Second document, same build, same flag, one Google export - `72_bank_statement_no_rules_right_amounts`:
+
+| | before (stored gverify) | after (autoflow, Google export) |
+|:--|--:|--:|
+| checks | 41/42 | 41/42 |
+| failing | `18_displacement` | `18_displacement` |
+| page 0 median dy | **+1.1 pt** | **+3.51 pt** |
+| worst dy | **4.8 pt** | **8.44 pt** |
+| runs out of tolerance | - | **52 of 80** |
+
+The median moved the WRONG way by 2.4 pt and the worst by 3.6 pt. So the 7.3 pt median improvement on
+`electricity-bill` was not the exact-line charge being corrected in general - it is per document, and
+on this one `autoflow` introduces a positive bias where `exact` had almost none.
+
+**Verdict: `-Dp2w.lineRule=autoflow` is NOT a keeper.** Two documents, opposite signs, neither clean.
+The class's displacement is not one line construct; a global construct change trades one document's
+error for another's, which is why the whole-corpus regression exists.
+
+**What survives and is worth the next run:** the `pageFirst` dead-code fix (inert at the default
+`exact`, a real bug regardless), and the arithmetic that all 23 solo-`18_displacement` documents are
+one page, so no page-top or per-page lever can clear any of them.
