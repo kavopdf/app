@@ -2,7 +2,7 @@
  "name": "36_embedded_subset_font",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T00:26:49",
+ "at": "2026-11-26T04:17:20",
  "passed": 41,
  "total": 42,
  "failed": [
@@ -17,6 +17,6 @@
   ],
   "runs_matched": 29
  },
- "engine": "981ff1fa35e2cf67",
- "checks": "375669-1795650942"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795665232"
 }

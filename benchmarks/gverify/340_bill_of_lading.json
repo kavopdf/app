@@ -2,7 +2,7 @@
  "name": "340_bill_of_lading",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T00:25:34",
+ "at": "2026-11-26T04:14:46",
  "passed": 39,
  "total": 42,
  "failed": [
@@ -11,14 +11,14 @@
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": -25.4,
-  "worst_dy": 28.7,
+  "med_dy": -9.1,
+  "worst_dy": 12.4,
   "med_dx": -0.4,
   "bad_pages": [
    0
   ],
   "runs_matched": 50
  },
- "engine": "981ff1fa35e2cf67",
- "checks": "375669-1795650942"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795665232"
 }

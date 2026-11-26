@@ -1035,3 +1035,18 @@ was still there, and the :50 fixer slot had already fired into it and stood down
 what put the work back on the board rather than leaving it for the relay an hour later. The prior passes
 were right to wait inside the window and this one was right not to wait outside it - the window is the
 line, and the second read is what tells you which side of it you are on.
+
+---
+
+## 2026-11-26 09:45 IST — gverify: the commit gate refused 60 fresh measurements on ONE document, and the tree is net better
+
+**What happened.** The 60-document Google pass was measured and `regress.py --check` refused it: the new
+result for `390_wide_data_appendix` fails four checks where the committed result fails three, and the
+committed result was measured on a DIFFERENT engine (`981ff1fa35e2cf67` against the tree's
+`a4d8fca469bba636`). The document is not a pass anywhere: `59_shape_anchor` is the new failure, and the
+re-measurement reproduces 43/47.
+
+| time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
+|---|---|---|---|---|---|
+| 09:45 | committing `benchmarks/gverify/` | `regress.py --check` refused: 390_wide_data_appendix Google 3 -> 4 failing | re-ran `verify_google.py` on the same export and the same source - 43/47, `59_shape_anchor` fails again, so it is not a flake; then compared every one of the 60 changed results against `git show HEAD:` and found one worse by 1, two better by 1, net corpus -2 | **no, and it is not mine to fix** - I do not touch engine code | the regression is real and belongs to the fixer: the committed result for this document predates engine `a4d8fca`, and the engine change that landed after it costs this one document `59_shape_anchor` while its `18_displacement` improves from med_dy -14.5 to -3.1 pt. **Overturned by:** a re-measure of this document under a later engine that passes `59_shape_anchor` again |
+| 09:45 | landing the measurement | the gate has no override, and an uncommitted run loses all 60 results | used the tool's own bounded, named opt-in: `P2W_ACCEPT_WORSE='390_wide_data_appendix'`, which the tool grants ONLY when the corpus is a net improvement in Google - it printed `ACCEPTED 390_wide_data_appendix Google 3 -> 4 failing, net corpus -2` and `PASS` | **yes - done** | nothing further. One document is named, nothing else is waived, and the 60 measurements are in the committed record instead of being re-measured next hour |
