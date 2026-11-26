@@ -6758,3 +6758,22 @@
 {"t": 1795656699.1874871, "ist": "07:01:39", "ev": "release", "d": "baseline released"}
 {"t": 1795657877.4618864, "ist": "07:21:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795657879.383878, "ist": "07:21:19", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795658509.5249434, "ist": "07:31:49", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795658703.8523827, "ist": "07:35:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795658706.6528742, "ist": "07:35:06", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795660073.3962524, "ist": "07:57:53", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795660073.5253046, "ist": "07:57:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795660074.156311, "ist": "07:57:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795660074.2927535, "ist": "07:57:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795660074.8947701, "ist": "07:57:54", "ev": "beat", "d": "deployed 2 agents (both landed), now implementing the w:line inverse"}
+{"t": 1795660101.3889282, "ist": "07:58:21", "ev": "beat", "d": "pod-prep: fetching corpus + jdk + engine build (may take 2-3 calls)"}
+{"t": 1795660290.0259953, "ist": "08:01:30", "ev": "beat", "d": "pod-prep slice 2: finishing corpus conversion"}
+{"t": 1795660658.7900255, "ist": "08:07:38", "ev": "beat", "d": "engine patched: refused-spacer partial spend; rebuilding"}
+{"t": 1795660918.3892221, "ist": "08:11:58", "ev": "beat", "d": "corpus re-conversion slice 2/4 for the new engine"}
+{"t": 1795661150.9853086, "ist": "08:15:50", "ev": "beat", "d": "corpus re-conversion slice 3/4"}
+{"t": 1795661290.7398808, "ist": "08:18:10", "ev": "beat", "d": "corpus re-conversion slice 3/4"}
+{"t": 1795661573.5671334, "ist": "08:22:53", "ev": "beat", "d": "corpus re-conversion slice 4/4, then measuring"}
+{"t": 1795661716.8577514, "ist": "08:25:16", "ev": "beat", "d": "floor corrected, rebuilding engine to confirm it compiles"}
+{"t": 1795661825.0598109, "ist": "08:27:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795661832.1817477, "ist": "08:27:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795661835.3161845, "ist": "08:27:15", "ev": "beat", "d": "attempt.py: recording an attempt"}

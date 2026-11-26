@@ -1,26 +1,13 @@
 {
  "agents": [
-  {
-   "class": "18_displacement",
-   "id": "18-displacement-diagnosis"
-  },
-  {
-   "class": "t12_word_invention",
-   "id": "txt-9-failures-diagnosis"
-  }
+  "18_dA-02",
+  "18_dB-01"
  ],
- "attempts": 2,
- "class": "t02_position",
- "counted": [
-  [
-   "t02_position",
-   1
-  ]
- ],
- "docs_improved": 1,
- "ended": "06:35",
- "ended_ts": 1795655116.5848963,
- "kept": 1,
- "started": "05:57",
- "started_ts": 1795652834.9540026
+ "attempts": 1,
+ "docs_improved": 0,
+ "ended": null,
+ "ended_ts": null,
+ "kept": 0,
+ "started": "07:31",
+ "started_ts": 1795658515.2211144
 }
