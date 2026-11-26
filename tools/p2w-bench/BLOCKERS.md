@@ -1218,3 +1218,43 @@ the relay pair is the reason a wedged :50 run does not stop the work.
 **Still open from 26 Nov, unchanged:** the docx ratchet stamp is stale (`ENGINE CHANGED (docx)`), so any
 commit whose scope is docx is refused until a baseline run re-measures and `--stamp`s it. This pass
 staged only this file and the run's own message, no engine source.
+
+## 27 Nov 03:35 UTC - gverify: the last sixteen documents cannot land, and they are the same wall
+
+The Google measurement reached 213 of 213 on this run (89 documents measured, 73 results landed). The
+commit gate refused sixteen of them, four of which the 00:20 IST pass already held back:
+
+    document                                committed   measured on a4d8fca469bba636
+    324_loan_amortisation_schedule          2 failing   3 failing
+    412_page_labels_roman                   0 failing   2 failing
+    416_many_tiny_pages                     0 failing   2 failing
+    417_rotate180_and_mirrored              0 failing   4 failing
+    57_centred_title_page_left_body_pages   0 failing   3 failing
+    58_header_rule_footer_rule              0 failing   4 failing
+    602_bookmarked_annual_report            1 failing   4 failing
+    academic-paper-ieee-2col-abstract       7 failing   8 failing
+    balance-sheet-and-profit-loss           2 failing   3 failing
+    bank-statement-5-pages                  1 failing   5 failing
+    form16-part-b                           2 failing   4 failing
+    gst-invoice-multipage-item-table        2 failing   5 failing
+    mutual-fund-statement                   4 failing   6 failing
+    one-page-rotated-180-degrees            5 failing   7 failing
+    table-across-page-break-repeated-header 1 failing   4 failing
+    very-long-single-column-table           2 failing   5 failing
+
+Same cause as the 00:20 entry and now the whole remainder of the corpus: every committed verdict for
+these sixteen was measured on 025fe9deda5ac7b1 (commit aa496ebe, the w:pgMar w:top page-gap change),
+which HEAD's release commit ee5a00d6 reverted. The tree's engine is a4d8fca469bba636, the same engine as
+9f0a8207, so the sixteen are a measurement of the restored engine against verdicts of the reverted one.
+The check stamp is unchanged (375669 both sides), so this is the engine, not check-code inflation, and
+Google is the renderer the user opens.
+
+The gate has no override and none was used: the sixteen results are held out of the commit and keep
+their stale committed values, so the next `--plan` picks them up and they are re-measured and refused
+again until the engine regression is fixed. That is the gate working. What it costs is that the corpus
+cannot report 213 of 213 while it lasts - `stage.py` reads the committed results, so it will keep
+saying measure-google with sixteen to go and the classify stage cannot open.
+
+Evidence that would overturn it: a re-measurement of any of the sixteen on a4d8fca469bba636 that comes
+back at or below its committed count, or a demonstrated defect in its `--collect` render. Nothing in
+this pass changed engine code; this pass measures only.
