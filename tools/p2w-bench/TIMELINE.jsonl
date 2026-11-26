@@ -1,4 +1,4 @@
- 704deabc (claim: fixer takes the slot (25 Nov 06:07) + beacon)
+704deabc (claim: fixer takes the slot (25 Nov 06:07) + beacon)
 {"t": 1795167811.0288882, "ist": "15:13:31", "ev": "beat", "d": "report.py: building the report"}
 {"t": 1795170303.4692028, "ist": "15:55:03", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795170303.4816751, "ist": "15:55:03", "ev": "release", "d": "fixer released (forced)"}
@@ -6758,3 +6758,15 @@
 {"t": 1795656699.1874871, "ist": "07:01:39", "ev": "release", "d": "baseline released"}
 {"t": 1795657877.4618864, "ist": "07:21:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795657879.383878, "ist": "07:21:19", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795657298.1575289, "ist": "07:11:38", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795657298.385635, "ist": "07:11:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795657298.4931543, "ist": "07:11:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795657300.5422804, "ist": "07:11:40", "ev": "beat", "d": "cloned+claimed, reading briefs"}
+{"t": 1795657607.2988198, "ist": "07:16:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795657609.80398, "ist": "07:16:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795658627.1722083, "ist": "07:33:47", "ev": "beat", "d": "probing engine build + google path"}
+{"t": 1795658896.535415, "ist": "07:38:16", "ev": "beat", "d": "google loop works; applying 18_displacement patch"}
+{"t": 1795658969.7437708, "ist": "07:39:29", "ev": "beat", "d": "corpus convert slice 1 for gate"}
+{"t": 1795659282.6293998, "ist": "07:44:42", "ev": "beat", "d": "measuring corpus on new engine (slice 1)"}
+{"t": 1795659857.308625, "ist": "07:54:17", "ev": "beat", "d": "corpus measure slice 3"}
+{"t": 1795660422.2042718, "ist": "08:03:42", "ev": "beat", "d": "corpus measure slice 5 (final)"}

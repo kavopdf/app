@@ -840,6 +840,18 @@ public final class DocxWriter {
          * charge the page's row count, not the one table's.
          */
         int pageRowCount;
+        /**
+         * Rows on this page that belong to a table the page actually RULED.
+         *
+         * <p>The excess the guard charges is the row's own rule: 0.75 pt per row is what a
+         * renderer adds to a declared row height, and a table whose six sides are all
+         * {@code w:val="nil"} draws no rule and keeps its full pitch - the same statement this
+         * file already makes where the row height is written (see the {@code w:trHeight} block
+         * in {@link #table}). Charging it to an unruled table therefore charges the page for a
+         * rule the page does not have, and that charge is what refuses a gap the page had the
+         * room for. See the spacer guard in {@link #table}.
+         */
+        int pageRuledRowCount;
         /** True when this page's own content fits the sheet, so its white space can be spent. */
         boolean spendGaps;
         /**
@@ -1382,6 +1394,7 @@ public final class DocxWriter {
         // emitTable: the gap is only worth spending where the page has room for it.
         ctx.pageInkBottomPt = pageInkBottom(page);
         ctx.pageRowCount = pageRows(page);
+        ctx.pageRuledRowCount = pageRuledRows(page);
         ctx.spacerSplitTw = 0;
         // A page is written more than once by the budget guard; each pass writes its own shapes.
         ctx.shapeCarrier.setLength(0);
@@ -2449,6 +2462,25 @@ public final class DocxWriter {
         int n = 0;
         for (Object o : page.blocks) {
             if (o instanceof PdfToWord.Table) n += ((PdfToWord.Table) o).rows.size();
+        }
+        return n;
+    }
+
+    /**
+     * Rows on this page that belong to a table the page actually ruled.
+     *
+     * <p>An unruled table draws no rule, so it keeps its full pitch and pays no row excess -
+     * the same distinction {@link #table} makes when it writes the row height. Everything else
+     * is {@link #pageRows}.
+     */
+    private static int pageRuledRows(PdfToWord.Page page) {
+        int n = 0;
+        for (Object o : page.blocks) {
+            if (!(o instanceof PdfToWord.Table)) continue;
+            PdfToWord.Table t = (PdfToWord.Table) o;
+            boolean ruled = t.ruled;
+            for (int i = 0; !ruled && i < 6; i++) ruled = t.sideDrawn[i];
+            if (ruled) n += t.rows.size();
         }
         return n;
     }
@@ -6115,20 +6147,36 @@ public final class DocxWriter {
             // emission changes. Every document the guard refuses is byte-identical to the engine
             // before this change.
             int spacerHairTw = 1;
-            int rowExcessTw = 15 * Math.max(0, ctx.pageRowCount);
+            // THE ROW EXCESS IS THE RULE'S, SO ONLY A RULED ROW PAYS IT (see pageRuledRows).
+            int rowExcessTw = 15 * Math.max(0, ctx.pageRuledRowCount);
             int slackTw = ctx.budgetTw - Math.round(ctx.pageInkBottomPt * (float) TWIPS_PER_PT);
-            int roomWantTw = Math.max(0, spacerTw - 20);
+            // How many twips of this gap the page can still hold as real space. The spend is a
+            // CLAMP, not a gate: a page that can hold part of the gap now holds that part.
+            int roomTw = Math.max(0, slackTw - ctx.spacerSplitTw - rowExcessTw);
             int wantTw = Math.max(0, spacerTw - spacerHairTw);
-            boolean spendable = slackTw > 0
-                    && ctx.spacerSplitTw + roomWantTw + rowExcessTw <= slackTw;
-            if (spendable) {
+            int spendTw = Math.min(wantTw, roomTw);
+            // WHAT THE READER IS CHARGED, AND WHY THE GAP MUST GO IN w:before.
+            //
+            // Google lays an exact line box at 2.5873 * max(L/240, 0.06) pt for a declaration of
+            // L/20 pt - 21.6 % of what is asked, so a gap carried by w:line alone is a gap the
+            // reader never draws and every block under the table sits high by 0.784 * G. It
+            // honours w:before 1:1 (measured: 18_displacement-WBEFORE-IS-1TO1-GOOGLE-1005-agentA,
+            // and re-measured on 72_bank_statement_no_rules_right_amounts 26 Nov, where the five
+            // header paragraphs' w:before of 1230/269/587/307/268 twips land at +0.17 to +0.23 pt).
+            // So the compensation for the under-delivery is not a larger number in w:line - no
+            // declaration of w:line can be relied on - it is to move as much of the gap as the
+            // page can hold into the property that is honoured, and leave only the remainder in
+            // w:line. `before + line` still equals spacerTw to the twip, so a reader that honours
+            // both (Word, LibreOffice) lays the identical page and cannot regress; only what
+            // Google draws changes, and it can only grow.
+            if (spendTw > 0) {
                 sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
                         .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"")
-                        .append(wantTw)
+                        .append(spendTw)
                         .append("\" w:after=\"0\" w:line=\"")
-                        .append(Math.min(spacerHairTw, spacerTw))
+                        .append(Math.max(spacerHairTw, spacerTw - spendTw))
                         .append("\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>");
-                ctx.spacerSplitTw += roomWantTw;
+                ctx.spacerSplitTw += spendTw;
             } else {
                 sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
                         .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"")

@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 06:48 → running IST · 31 min**
+**26 Nov 2026 · slot 07:11 → running IST · 5 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -30,7 +30,7 @@
 
 | | |
 |:--|:--|
-| Measured | **40 min ago** |
+| Measured | **5 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -45,11 +45,10 @@
 
 | | |
 |:--|:--|
-| Slot window | 06:48 → running · 31 min |
+| Slot window | 07:11 → running · 5 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 8 |
-| Longest silence | **8.1 min** — from 06:49:12, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 4 |
+| Tool beats | 4 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -57,8 +56,7 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `################` |
-| report - the report and the chain | **8 min** | `######` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -75,57 +73,3 @@ READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-A
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-## The lead this run, in full
-
-`18_displacement` / `w:pgMar w:top`. The patch that moves a page's top gap from the first paragraph's
-`w:before` into the section's `w:pgMar w:top` already had a Google measurement behind it —
-`416_many_tiny_pages` 40/42 → **42/42 CLEAN**, `602_bookmarked_annual_report` 38/42 → 41/42, nine
-check-instances, nothing worse. It was blocked on three documents, not on its idea, so the work was to
-find out why those three moved.
-
-**They moved because the gap is counted twice.** `401_trifold_brochure` emits `w:pgMar w:top="1190"`
-**and** an untouched `w:before="1790"` — 2980 tw where the source has 1790. Its body opens with a
-`w:tbl`, so the sheet's first paragraph lives inside a cell: the table's spacer consumed `ctx.newPage`
-before it was written, `pageFirstBeforeTw()` never fired, and the margin was added on top. That resolves
-the contradiction between the two 26 Nov findings without any claim about either renderer.
-
-Two guards fix it, and both are identities when they fire: `sectionTopTw()` reads **only** the page's
-first block and returns 0 unless that block is a non-pinned paragraph or text box, and the final
-`sectPr` claims the margin only when the emitted body actually opens with `<w:p`. Measured after the
-fix, `401_trifold_brochure` and `601_fillable_admission_form` are **byte-identical** to the unpatched
-engine, while `416` (pgMar 1790 / before 0) and `412_page_labels_roman` (pgMar 1227 / before 0) keep the
-intended move.
-
-All 213 documents were then converted on the patched engine and `regress.py --check` run:
-
-```
-docx: no document worse than baseline
-google-safe : no construct Google ignores has spread
-txt: out of scope - scope.py proved this change cannot move it
-ENGINE CHANGED (docx): table measured on 9e2b3e4d7869ea86, the tree is c3714267bf15e71f
-             An unmeasured change is not a pass. Re-measure, then --stamp.
-```
-
-**Nothing is worse than baseline across the corpus.** The only remaining refusal is that the docx table
-was measured on the previous engine, and a 213-document re-measure is the wall `BLOCKERS.md` already
-records. The change is preserved as
-`patches/18-displacement-PGMAR-TOP-GUARDED-AGAINST-DOUBLING-26NOV.patch`; `app/` is reverted to HEAD.
-
-## The subagent refuted the row-pitch ramp
-
-`16_right_aligned_amounts_txtpos` is not a ramp. Its per-row `dy` is flat at +0.82 pt over 13 rows that
-all declare the same `w:trHeight 380`, and its residual is the refused table-gap spacer (4.65 pt
-declared, ~1.0 pt laid). That takes the best document away from the row-ladder lever and points the same
-way as the lead: the spacer and the page top are the two live constructs. Recorded as a lead, not a
-proof — the Google per-run series was not taken, because the subagent's sandbox had no Drive write path.
-
-## What the next run should do
-
-1. Apply `patches/18-displacement-PGMAR-TOP-GUARDED-AGAINST-DOUBLING-26NOV.patch`, build, and run the
-   corpus re-measure that stamps the docx table. Nothing else stands between it and the gate.
-2. Google-verify `416_many_tiny_pages` (expected CLEAN, untouched by the guard), then
-   `401_trifold_brochure` (expected exactly baseline — the guard makes it byte-identical).
-3. `newsletter-3col-header-footer`, the third refused document, is **unmeasured, not cleared**.
-
-Detail and the per-document numbers: `FINDINGS/18-displacement-PGMAR-TOP-DOUBLING-FOUND-AND-FIXED-GATE-WANTS-REMEASURE-26NOV-relay.md`.
