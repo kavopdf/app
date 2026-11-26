@@ -2521,3 +2521,45 @@ check for "text inside a shape"; it is there.
 
 Go one document at a time. Change the construct, run the regression, read the Google verdict, then the
 next one. 1007 boxes across 47 documents will not survive being changed in one pass.
+
+## THE WHITE BOXES ARE NOT A COLOUR PROBLEM. READ THIS BEFORE CHASING THEM AGAIN.
+
+Every white fill construct was counted across all 213 documents and all of them are zero: `w:shd
+fill=auto`, `w:shd fill=FFFFFF`, `highlight white`, `schemeClr bg1`, `srgbClr FFFFFF`, VML
+`fillcolor="white"`, `w:background`, `pgBorders`, `pBdr`. The fills that do exist are all dark —
+000000, 2A2076, C9C9C9, 231F20, 111111. Nothing in the docx paints white.
+
+The shape rasterises to a **transparent** image. Checked on a real round-trip of
+`03_stamp_vertical_90deg`: 22 images on page 1 and the stamp shape (661x332) carries SMask 28 — it is
+transparent, and the PDF export is clean.
+
+Google Docs **dark mode** inverts the page but composites the transparent image onto **white** instead of
+onto the inverted background. That is the white rectangle, and it is exactly the size of the shape.
+
+    light mode       invisible, white on white
+    dark mode        white box on a black page
+    PDF export       absent — the export never composites onto white
+    white fill       0 hits, because nothing paints white
+
+### The size of it
+
+    196 of 213 documents carry a wps shape   (92 %)
+    13 157 shapes in total, of which only 1 007 carry a textbox
+    median 13 shapes per document
+
+So 12 150 shapes carry no text at all — rules, boxes, underlines — and each one is another white
+rectangle in dark mode. This is why it shows up almost everywhere and is not a stamp problem.
+
+### What to do
+
+Removing the shape removes the image, and removing the image removes the box. There is no attribute that
+makes dark mode composite correctly.
+
+    text that can flow      flow text, w:ind + w:spacing          proven, x = 206.7 pt
+    text at a fixed point   borderless positional table           proven, x = 206.7 pt, no borders
+    a line or a rule        a paragraph or table border, not a shape
+    a stamp                 keep the shape; it will keep the box in dark mode, but a:xfrm rot and
+                            300 dpi at least make light mode and the export correct
+
+Do not add a check for "white fill". There is none. Do not chase `w:background` — it is gone and it was
+the cause of the earlier round of this same bug.
