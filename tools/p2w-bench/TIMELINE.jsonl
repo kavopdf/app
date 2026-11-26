@@ -8026,3 +8026,11 @@
 {"t": 1795724545.799888, "ist": "01:52:25", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795724547.7216692, "ist": "01:52:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795724558.2345057, "ist": "01:52:38", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795724561.512028, "ist": "01:52:41", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795724561.5999641, "ist": "01:52:41", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795724561.692754, "ist": "01:52:41", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795724562.2216012, "ist": "01:52:42", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795724565.0548637, "ist": "01:52:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795724577.6091084, "ist": "01:52:57", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795724577.6972957, "ist": "01:52:57", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795724577.78396, "ist": "01:52:57", "ev": "beat", "d": "pending.py: reading the pending gate"}

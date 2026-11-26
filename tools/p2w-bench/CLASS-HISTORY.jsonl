@@ -233,3 +233,5 @@
 {"at": "2026-11-26 20:35", "attempt": 2, "class": "t09_page_furniture", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-26 22:11", "attempt": 94, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-27 01:05", "attempt": 1, "class": "none", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-27 01:51", "attempt": 95, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
+{"at": "2026-11-27 01:52", "attempt": 96, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}

@@ -1,8 +1,3 @@
-| 23 Nov 13:20 | fixer | slot claimed - fixer running |
-| 23 Nov 14:03 | fixer | attempt 18_displacement -> reverted (0/? moved) |
-| 23 Nov 16:05 | fixer | attempt 00_page_count -> lead (0/? moved) |
-| 23 Nov 16:09 | fixer | attempt 00_page_count -> lead (0/? moved) |
-| 23 Nov 16:10 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 20 Nov 08:52 | fixer | slot claimed - fixer running |
 | 23 Nov 15:02 | fixer | slot claimed - fixer running |
 | 23 Nov 16:35 | fixer | attempt 00_page_count -> partial (2/23 moved) |
@@ -201,3 +196,6 @@
 | 27 Nov 01:05 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 27 Nov 01:13 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 27 Nov 01:44 | baseline | .txt refresh in fix phase - corpus rebuilt, 213 re-scored, 0 moved (205 clean, 8 failing) |
+| 27 Nov 01:51 | fixer | attempt 18_displacement -> lead (0/? moved) |
+| 27 Nov 01:52 | fixer | attempt 18_displacement -> lead (0/? moved) |
+| 27 Nov 01:52 | fixer | slot FORCED released - see INCIDENTS.md for why |
