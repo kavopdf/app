@@ -1,13 +1,10 @@
 {
- "agents": [],
- "attempts": 2,
- "class": "t12_word_invention",
- "docs_improved": 0,
+ "started": "05:57",
+ "started_ts": 1795652834.9540026,
  "ended": null,
  "ended_ts": null,
+ "attempts": 0,
  "kept": 0,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "04:27",
- "started_ts": 1795647478.0071018
+ "agents": [],
+ "docs_improved": 0
 }
