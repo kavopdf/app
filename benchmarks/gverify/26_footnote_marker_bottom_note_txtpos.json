@@ -2,7 +2,7 @@
  "name": "26_footnote_marker_bottom_note_txtpos",
  "status": "ok",
  "rc": 0,
- "at": "2026-11-26T00:06:28",
+ "at": "2026-11-26T03:14:27",
  "passed": 42,
  "total": 42,
  "failed": [],
@@ -13,6 +13,6 @@
   "bad_pages": [],
   "runs_matched": 23
  },
- "engine": "981ff1fa35e2cf67",
- "checks": "375669-1795650942"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795661945"
 }

@@ -2,7 +2,7 @@
  "name": "08_two_overlapping_stamps",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T00:05:11",
+ "at": "2026-11-26T03:13:33",
  "passed": 36,
  "total": 42,
  "failed": [
@@ -22,6 +22,6 @@
   ],
   "runs_matched": 25
  },
- "engine": "981ff1fa35e2cf67",
- "checks": "375669-1795650942"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795661945"
 }

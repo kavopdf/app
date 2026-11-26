@@ -2,25 +2,21 @@
  "name": "04_stamp_180deg_upside_down",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T00:09:35",
- "passed": 37,
+ "at": "2026-11-26T03:13:26",
+ "passed": 39,
  "total": 42,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
-  "18_displacement",
-  "35_rotation",
-  "59_shape_anchor"
+  "35_rotation"
  ],
  "displacement": {
-  "med_dy": -8.9,
-  "worst_dy": 10.8,
+  "med_dy": 0.4,
+  "worst_dy": 1.4,
   "med_dx": -0.4,
-  "bad_pages": [
-   0
-  ],
+  "bad_pages": [],
   "runs_matched": 48
  },
- "engine": "981ff1fa35e2cf67",
- "checks": "375669-1795650942"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795661945"
 }

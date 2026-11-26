@@ -2,7 +2,7 @@
  "name": "13_stamp_non_english",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T00:05:29",
+ "at": "2026-11-26T03:13:48",
  "passed": 35,
  "total": 42,
  "failed": [
@@ -15,14 +15,14 @@
   "59_shape_anchor"
  ],
  "displacement": {
-  "med_dy": -42.4,
-  "worst_dy": 43.5,
+  "med_dy": -20.8,
+  "worst_dy": 22.0,
   "med_dx": -0.4,
   "bad_pages": [
    0
   ],
   "runs_matched": 25
  },
- "engine": "981ff1fa35e2cf67",
- "checks": "375669-1795650942"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795661945"
 }
