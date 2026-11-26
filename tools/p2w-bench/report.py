@@ -1021,10 +1021,28 @@ def txt():
     # txt_gate.py regenerates RANKING-TXT.csv and no cron calls it - step_txt.py and ratchet.py only PRINT
     # the command. So the table can be a day old and still be reported as "213 of 213 scored", which is
     # how a stalled half reads as a healthy one. Measured 24 Nov: written 23 Nov 09:56, reported as current.
+    # THE AGE MUST COME FROM THE DATA, NOT FROM THE FILE. os.path.getmtime answers "when did this file
+    # last get written to disk", and a git checkout, a rebase or a copy resets that to now while the
+    # numbers inside stay hours old. Measured 26 Nov: STATE-TXT.json carried at="2026-11-26 11:20" (2.7 h
+    # old) and the report printed "Measured 0 min ago", because a checkout had touched the file. That is
+    # the same false-current failure this row exists to prevent, so `at` is read first and the mtime is
+    # only the fallback. Both sides go through mktime against the same wall clock, so the sandbox's own
+    # timezone cancels out and the IST stamp needs no offset constant.
+    _txt_age_h = None
     try:
-        _txt_age_h = (time.time() - os.path.getmtime(path)) / 3600.0
+        _st = json.load(open(os.path.join(HERE, "txt", "STATE-TXT.json"), encoding="utf-8"))
+        _at = str(_st.get("at") or "")[:16]
+        if _at:
+            _now_ist = time.gmtime(time.time() + 19800)
+            _txt_age_h = max(0.0, (time.mktime(_now_ist)
+                                   - time.mktime(time.strptime(_at, "%Y-%m-%d %H:%M"))) / 3600.0)
     except Exception:
         _txt_age_h = None
+    if _txt_age_h is None:
+        try:
+            _txt_age_h = (time.time() - os.path.getmtime(path)) / 3600.0
+        except Exception:
+            _txt_age_h = None
     rows = []
     try:
         for r in csv.DictReader(open(path, encoding="utf-8")):
