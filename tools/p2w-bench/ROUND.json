@@ -17,8 +17,10 @@
       }
     ]
   },
+  "fixer_doing": "relay: converting 8 docs under fitreserve=96 and 300",
+  "fixer_doing_since": 1795687988.5387156,
   "fixer_engine_at_claim": "9f0a8207",
-  "fixer_last_beat": 1795679853.2902594,
+  "fixer_last_beat": 1795687988.5387166,
   "fixer_started": 1795686857.0215867,
   "history": [
     {

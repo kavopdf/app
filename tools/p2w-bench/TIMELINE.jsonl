@@ -7302,3 +7302,45 @@
 {"t": 1795686440.2796426, "ist": "15:17:20", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795686440.8798895, "ist": "15:17:20", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795686443.9270532, "ist": "15:17:23", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795686846.682938, "ist": "15:24:06", "ev": "beat", "d": "heartbeat before any claim: relay: install-gate timed out, inspecting"}
+{"t": 1795686862.7140198, "ist": "15:24:22", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795686863.0445302, "ist": "15:24:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795686863.1907017, "ist": "15:24:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795686872.9617193, "ist": "15:24:32", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795686878.5567946, "ist": "15:24:38", "ev": "beat", "d": "relay: fetching corpus (cold pod)"}
+{"t": 1795687093.850576, "ist": "15:28:13", "ev": "beat", "d": "relay: pod-prep pass 2 (jdk/libs/aar/stubs/engine)"}
+{"t": 1795687303.0144453, "ist": "15:31:43", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795687304.8157067, "ist": "15:31:44", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795687320.0554342, "ist": "15:32:00", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795687320.268778, "ist": "15:32:00", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795687320.443101, "ist": "15:32:00", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795687320.6253297, "ist": "15:32:00", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795687320.7861207, "ist": "15:32:00", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795687320.9484131, "ist": "15:32:00", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795687323.6249108, "ist": "15:32:03", "ev": "beat", "d": "relay: corpus conversion slice 2 of 3"}
+{"t": 1795687510.1092184, "ist": "15:35:10", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795687510.3307984, "ist": "15:35:10", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795687510.5082579, "ist": "15:35:10", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795687510.7824748, "ist": "15:35:10", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795687511.024821, "ist": "15:35:11", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795687511.233783, "ist": "15:35:11", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795687511.4878578, "ist": "15:35:11", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795687511.7663436, "ist": "15:35:11", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795687514.1518826, "ist": "15:35:14", "ev": "beat", "d": "relay: corpus conversion slice 3 of 3"}
+{"t": 1795687729.916043, "ist": "15:38:49", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795687731.619297, "ist": "15:38:51", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795687788.1227055, "ist": "15:39:48", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795687788.3813014, "ist": "15:39:48", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795687788.619459, "ist": "15:39:48", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795687788.8635275, "ist": "15:39:48", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795687789.130109, "ist": "15:39:49", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795687789.4337726, "ist": "15:39:49", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795687816.2114172, "ist": "15:40:16", "ev": "beat", "d": "relay: checking corpus conversion state"}
+{"t": 1795687819.577514, "ist": "15:40:19", "ev": "beat", "d": "relay: final 17 corpus documents"}
+{"t": 1795687899.941616, "ist": "15:41:39", "ev": "beat", "d": "corpus-slice: 6 of 17 converted"}
+{"t": 1795687904.6262023, "ist": "15:41:44", "ev": "beat", "d": "corpus-slice: 12 of 17 converted"}
+{"t": 1795687945.0835087, "ist": "15:42:25", "ev": "beat", "d": "relay: reading DocxWriter page-break logic"}
+{"t": 1795687962.657896, "ist": "15:42:42", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795687978.0213897, "ist": "15:42:58", "ev": "beat", "d": "relay: fitreserve experiment on 7 high-row docs"}
+{"t": 1795687988.5379035, "ist": "15:43:08", "ev": "beat", "d": "relay: converting 8 docs under fitreserve=96 and 300"}
+{"t": 1795688185.468679, "ist": "15:46:25", "ev": "beat", "d": "attempt.py: recording an attempt"}
