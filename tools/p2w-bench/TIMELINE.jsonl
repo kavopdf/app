@@ -6722,3 +6722,5 @@
 {"t": 1795654658.0244522, "ist": "06:27:38", "ev": "beat", "d": "measuring txt t02 baseline on 334/74/39"}
 {"t": 1795654680.475882, "ist": "06:28:00", "ev": "beat", "d": "full txt rescore with patched instrument (213 docs)"}
 {"t": 1795654743.1308494, "ist": "06:29:03", "ev": "beat", "d": "txt_rank --rescore (213 sequential)"}
+{"t": 1795654952.5942693, "ist": "06:32:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795654954.1316144, "ist": "06:32:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
