@@ -8084,3 +8084,16 @@
 {"t": 1795726154.9957063, "ist": "02:19:14", "ev": "beat", "d": "staging 5 one-away docs for Google"}
 {"t": 1795726443.8491402, "ist": "02:24:03", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795726445.487805, "ist": "02:24:05", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795726447.817958, "ist": "02:24:07", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795726447.9338396, "ist": "02:24:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795726448.023757, "ist": "02:24:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795726448.5607412, "ist": "02:24:08", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795726450.183121, "ist": "02:24:10", "ev": "beat", "d": "writing the report"}
+{"t": 1795726509.3913147, "ist": "02:25:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795726511.3449793, "ist": "02:25:11", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795726511.7247252, "ist": "02:25:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795726513.7509751, "ist": "02:25:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795726523.820338, "ist": "02:25:23", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795726525.7302277, "ist": "02:25:25", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795726526.1221225, "ist": "02:25:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795726528.1591868, "ist": "02:25:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

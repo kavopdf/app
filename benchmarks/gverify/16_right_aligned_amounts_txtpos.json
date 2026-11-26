@@ -2,7 +2,7 @@
  "name": "16_right_aligned_amounts_txtpos",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T18:10:18",
+ "at": "2026-11-26T20:49:58",
  "passed": 41,
  "total": 42,
  "failed": [
@@ -18,5 +18,5 @@
   "runs_matched": 64
  },
  "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "checks": "375669-1795724644"
 }
