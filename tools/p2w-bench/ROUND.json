@@ -1,5 +1,5 @@
 {
-  "baseline_started": 1795678603.5501776,
+  "baseline_started": 1795660855.0744302,
   "classifier_started": 0,
   "fixer": {
     "agents": [
@@ -17,9 +17,11 @@
       }
     ]
   },
+  "fixer_doing": "re-scoring the corpus on the patched engine (p2w.py)",
+  "fixer_doing_since": 1795678580.6589246,
   "fixer_engine_at_claim": "9f0a8207",
-  "fixer_last_beat": 1795674186.7396524,
-  "fixer_started": 1795675615.8847563,
+  "fixer_last_beat": 1795678580.6589253,
+  "fixer_started": 1795674827.8303525,
   "history": [
     {
       "at": "2026-11-12 09:46",
