@@ -6,30 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 23 Nov 05:29 | baseline | attempt | 18_displacement -> lead (0/? moved) |
-| 23 Nov 05:58 | fixer | claim | fixer claimed the slot |
-| 23 Nov 06:07 | fixer | build-engine | started |
-| 23 Nov 06:08 | fixer | build-engine | engine built in 36s |
-| 23 Nov 06:11 | fixer | attempt | 18_displacement -> lead (0/? moved) |
-| 23 Nov 06:13 | fixer | build-engine | started |
-| 23 Nov 06:13 | fixer | build-engine | engine built in 37s |
-| 23 Nov 06:14 | fixer | build-engine | started |
-| 23 Nov 06:14 | fixer | build-engine | engine built in 36s |
-| 23 Nov 06:15 | fixer | build-engine | started |
-| 23 Nov 06:15 | fixer | build-engine | engine built in 33s |
-| 23 Nov 06:15 | fixer | attempt | 18_displacement -> lead (0/? moved) |
-| 23 Nov 07:36 | fixer | attempt | 18_displacement -> lead (0/? moved) |
-| 23 Nov 07:37 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
-| 23 Nov 08:08 | fixer | build-engine | started |
-| 23 Nov 08:09 | fixer | build-engine | engine built in 36s |
-| 23 Nov 08:10 | fixer | build-engine | started |
-| 23 Nov 08:10 | fixer | build-engine | engine built in 37s |
-| 23 Nov 08:11 | fixer | attempt | 00_page_count -> kept (0/? moved) |
-| 23 Nov 09:11 | fixer | build-engine | started |
-| 23 Nov 09:11 | fixer | build-engine | engine built in 38s |
-| 23 Nov 09:54 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
-| 23 Nov 11:14 | fixer | build-engine | started |
-| 23 Nov 11:15 | fixer | build-engine | engine built in 39s |
 | 23 Nov 11:15 | fixer | build-engine | started |
 | 23 Nov 11:16 | fixer | build-engine | engine built in 44s |
 | 23 Nov 11:28 | fixer | attempt | 00_page_count -> lead (0/? moved) |
@@ -407,3 +383,26 @@
 | 26 Nov 20:35 | fixer | attempt | t09_page_furniture -> lead (0/? moved) |
 | 26 Nov 21:41 | fixer | attempt | 18_displacement -> lead (0/? moved) |
 | 26 Nov 20:10 | baseline | claim | baseline claimed the slot |
+| 26 Nov 22:20 | fixer | claim | fixer claimed the slot |
+| 26 Nov 22:40 | fixer | build-engine | started |
+| 26 Nov 22:40 | fixer | build-engine | engine unchanged, compile skipped |
+| 26 Nov 22:45 | fixer | build-engine | started |
+| 26 Nov 22:45 | fixer | build-engine | engine unchanged, compile skipped |
+| 26 Nov 22:47 | fixer | build-engine | started |
+| 26 Nov 22:47 | fixer | build-engine | engine unchanged, compile skipped |
+| 26 Nov 22:52 | fixer | build-engine | started |
+| 26 Nov 22:52 | fixer | build-engine | engine unchanged, compile skipped |
+| 26 Nov 22:57 | fixer | build-engine | started |
+| 26 Nov 22:57 | fixer | build-engine | engine unchanged, compile skipped |
+| 26 Nov 23:01 | fixer | build-engine | started |
+| 26 Nov 23:01 | fixer | build-engine | engine unchanged, compile skipped |
+| 26 Nov 23:06 | fixer | build-engine | started |
+| 26 Nov 23:06 | fixer | build-engine | engine unchanged, compile skipped |
+| 26 Nov 23:11 | fixer | build-engine | started |
+| 26 Nov 23:11 | fixer | build-engine | engine unchanged, compile skipped |
+| 26 Nov 23:16 | fixer | build-engine | started |
+| 26 Nov 23:16 | fixer | build-engine | engine unchanged, compile skipped |
+| 26 Nov 23:21 | fixer | build-engine | started |
+| 26 Nov 23:21 | fixer | build-engine | engine unchanged, compile skipped |
+| 26 Nov 23:26 | fixer | build-engine | started |
+| 26 Nov 23:26 | fixer | build-engine | engine unchanged, compile skipped |
