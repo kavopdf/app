@@ -7221,3 +7221,5 @@
 {"t": 1795681512.1185608, "ist": "13:55:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795681512.3121972, "ist": "13:55:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795681512.574323, "ist": "13:55:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795680520.8495374, "ist": "13:38:40", "ev": "beat", "d": "heartbeat before any claim: building corpus docx for LibreOffice refresh"}
+{"t": 1795681095.0625792, "ist": "13:48:15", "ev": "beat", "d": "heartbeat before any claim: re-measuring LibreOffice half on current engine"}
