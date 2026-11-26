@@ -2587,3 +2587,24 @@ over 180 s twice and a direct `regress.py --check` ran 4 m 21 s with 13 s of use
 nothing. The cause was `corpus-slice.py` inside it converting a corpus that was 115 documents short.
 Running `corpus-slice.py` on its own finished the remaining 18 in 132 s and the gate then passed in 25.8 s.
 Before you report a blocked gate, run the slice yourself and see whether the corpus is short.
+
+## A SUBAGENT'S FINDINGS FILE MUST CARRY THE AGENT'S ID IN ITS NAME
+
+`report.py`'s self-check compares the ids in `RUN.json`'s `agents` list against the filenames in
+`FINDINGS/`, and it looks for the first twelve characters of each id inside a filename. That is the only
+thing that stops an agent's work from being lost between runs.
+
+Measured 26 Nov, the 11:20 relay run: two agents were deployed, both landed, and the report printed
+
+    Self-check | 1 disagreement - 2 subagents deployed, no FINDINGS file keyed to their ids
+
+The findings were real and were written up - `FINDINGS/18-displacement-PAGEFIRST-DEAD-CODE-AND-AUTOFLOW-
+1200-relay.md` carries both agents' work. But the file is named by class and topic, so nothing in it
+matches an agent id, and the check cannot see it.
+
+**So: put the id in the filename.** If the agent is registered as `18_dA-05`, the file is
+`FINDINGS/18_dA-05-<WHAT-IT-FOUND>-<HHMM>-<who>.md`. Everything after the id is yours to choose; the id
+prefix is not. Two agents, two files, each carrying its own id.
+
+This is not a naming preference. It is the difference between a run that can find an agent's work and one
+that has to guess which of forty findings files came from which of two agents.
