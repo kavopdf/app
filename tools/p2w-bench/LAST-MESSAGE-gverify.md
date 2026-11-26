@@ -1,50 +1,32 @@
-**gverify — Google pass complete: 213 of 213 measured**
+gverify run — 26 Nov 2026
 
-The measurement is finished. Every document in the corpus now has a Google result, and the stage has
-moved off `measure-google` for the first time.
+Stage: classify. 213 measured, 208 scored, 5 refused on page count, 166 failing at least one check.
+LibreOffice passes all 42 on 135 of 208; Google Docs passes all 42 on 42 of 208.
 
-| | count |
-|---|---:|
-| documents in the corpus | 213 |
-| verified through Google | 213 |
-| scored | 208 |
-| refused (page count) | 5 |
-| pass every check offered | 42 |
-| fail at least one | 166 |
-
-Refused is not a pass: the 5 page-count refusals are counted separately, never as verified.
-
-**The five checks that cost the most documents**
-
-| check | Google fails | LibreOffice fails |
+| check | Google | LibreOffice |
 |---|---:|---:|
-| `18\_displacement` | 119 | 21 |
-| `60\_text\_column\_right\_edge` | 62 | 19 |
-| `04\_chars\_missing` | 55 | 3 |
-| `59\_shape\_anchor` | 49 | 11 |
-| `45\_char\_accuracy` | 34 | 3 |
+| 18\_displacement | 119 | 21 |
+| 60\_text\_column\_right\_edge | 62 | 19 |
+| 04\_chars\_missing | 55 | 3 |
+| 59\_shape\_anchor | 49 | 12 |
+| 45\_char\_accuracy | 34 | 3 |
 
-`18\_displacement` alone costs 119 documents, and LibreOffice costs 21 on the same 208 documents with
-both renders. That gap is the pass working: the check is not broken, the renderer is.
+**What this run found.** The capability table was a two-engine table under a header that said "same
+engine": 0 of 208 pairs carried the LibreOffice half on the engine in the tree. The Google half is
+re-measured on every engine move; the LibreOffice half is written once per document and the guard
+returned "already have it" for ever, so no cron could refresh it — the matrix stage fills documents
+with no LibreOffice result, and by count there were none.
 
-**The capability table is written and committed**
+**What it did.** Added the missing path to `gverify.py` — `collect_lo(force)`, a resumable
+`--lo-stale N` that computes its work list from the engine stamps, and a serial retry, because four
+concurrent soffice instances lose the odd conversion and the old json then stays in place looking
+current. Re-measured the LibreOffice half in seven passes: 213 of 213 documents now carry
+981ff1fa35e2cf67, 0 failed. `--matrix` now prints each half's engine coverage instead of asserting
+they match, and its row order is stable across runs.
 
-`benchmarks/GOOGLE-VS-LIBREOFFICE.md` is regenerated from all results, not edited by hand. On the 208
-documents that have both renders:
+The refresh moved three LibreOffice counts by one document each — 25\_invisible\_text, 26\_text\_overlap,
+59\_shape\_anchor — and left the headline where it was. Both halves are now 208 of 208 pairs on the
+engine in the tree, so the next fixer reads a pair rather than a blend.
 
-| renderer | pass every check offered |
-|---|---:|
-| LibreOffice | 135 |
-| Google Docs | 42 |
-
-The construct classes it names — Google drops what LibreOffice honours — come from the same run, with
-`18\_displacement`, `04\_chars\_missing` and `60\_text\_column\_right\_edge` the widest of them.
-
-**Stage and what is next**
-
-`stage.py` now reports `classify`: the results exist and the class table is older than them. Grouping
-the 166 failing documents into classes is the classifier cron's stage, not this one. Measuring is done,
-so this cron stops here.
-
-Note on the batch size: the run measured in batches of ten and was not cut off at any point, so the
-60-document ceiling was never the constraint — the upload step was, exactly as the brief says.
+Next: classify — 166 documents fail at least one check and the class table is older than the results.
+That is the classifier's stage; the measuring side of this cron is finished.
