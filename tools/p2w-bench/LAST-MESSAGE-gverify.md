@@ -1,32 +1,22 @@
-gverify run — 26 Nov 2026
+**Google verify - run report**
 
-Stage: classify. 213 measured, 208 scored, 5 refused on page count, 166 failing at least one check.
-LibreOffice passes all 42 on 135 of 208; Google Docs passes all 42 on 42 of 208.
+**Stage: classify.** The Google half is complete and the capability table already matches it, so this cron had nothing to measure and nothing to rewrite. It changed no engine code.
 
-| check | Google | LibreOffice |
-|---|---:|---:|
-| 18\_displacement | 119 | 21 |
-| 60\_text\_column\_right\_edge | 62 | 19 |
-| 04\_chars\_missing | 55 | 3 |
-| 59\_shape\_anchor | 49 | 12 |
-| 45\_char\_accuracy | 34 | 3 |
+`gverify.py --report` reads 213 verified, 42 pass every check offered, 166 fail at least one, 5 refused on page count. Both halves sit on the engine in the tree - 208 of 208 pairs through Google and 208 of 208 through LibreOffice - and `gverify.py --matrix` now regenerates `benchmarks/GOOGLE-VS-LIBREOFFICE.md` byte for byte, so the table written by the last LibreOffice pass is still the table the results support. Nothing to commit.
 
-**What this run found.** The capability table was a two-engine table under a header that said "same
-engine": 0 of 208 pairs carried the LibreOffice half on the engine in the tree. The Google half is
-re-measured on every engine move; the LibreOffice half is written once per document and the guard
-returned "already have it" for ever, so no cron could refresh it — the matrix stage fills documents
-with no LibreOffice result, and by count there were none.
+Where the two renderers disagree - the pair that names a construct:
 
-**What it did.** Added the missing path to `gverify.py` — `collect_lo(force)`, a resumable
-`--lo-stale N` that computes its work list from the engine stamps, and a serial retry, because four
-concurrent soffice instances lose the odd conversion and the old json then stays in place looking
-current. Re-measured the LibreOffice half in seven passes: 213 of 213 documents now carry
-981ff1fa35e2cf67, 0 failed. `--matrix` now prints each half's engine coverage instead of asserting
-they match, and its row order is stable across runs.
+| check | LibreOffice fails | Google fails | who is stricter |
+|---|---:|---:|---|
+| `18\_displacement` | 21 | 119 | **Google** |
+| `60\_text\_column\_right\_edge` | 19 | 62 | **Google** |
+| `04\_chars\_missing` | 3 | 55 | **Google** |
+| `59\_shape\_anchor` | 12 | 49 | **Google** |
+| `45\_char\_accuracy` | 3 | 34 | **Google** |
+| `13\_text\_colours` | 1 | 32 | **Google** |
+| `17\_matched\_runs` | 6 | 32 | **Google** |
+| `47\_margins` | 16 | 28 | **Google** |
 
-The refresh moved three LibreOffice counts by one document each — 25\_invisible\_text, 26\_text\_overlap,
-59\_shape\_anchor — and left the headline where it was. Both halves are now 208 of 208 pairs on the
-engine in the tree, so the next fixer reads a pair rather than a blend.
+Every check offered: LibreOffice 135 of 208 documents pass, Google 42 of 208.
 
-Next: classify — 166 documents fail at least one check and the class table is older than the results.
-That is the classifier's stage; the measuring side of this cron is finished.
+**Next:** stage.py reads classify because the class table is older than the results - 166 failing documents to group. That is the classifier's step, not this cron's stage, so I stopped here.
