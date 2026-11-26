@@ -511,3 +511,4 @@
 {"_list": "agents", "_entry": {"angle": "ledger", "class": "-", "deployed": "09:36", "deployed_at": "2026-11-25T09:36", "finding": "5 CLOSE / 8 STILL OPEN / 1 REFUSE of the 14; five were closed by the parent run, PENDING 16 -> 10. Also found pending.py:288 counts the MODAL engine, so the '60 documents on an older engine' line is inverted (131 are stale).", "id": "PENDING-ANSWERS-25NOV", "landed": "09:44", "landed_at": "2026-11-25T09:44", "question": "for each of the pending items, is it closeable, and with what evidence", "status": "landed"}}
 {"_list": "notes", "_entry": {"at": "09:25", "text": "attempt 63 on 18_displacement -> lead"}}
 {"_list": "notes", "_entry": {"at": "09:52", "text": "attempt 64 on 18_displacement -> lead (0/213 moved)"}}
+{"_list": "notes", "_entry": {"at": "10:45", "text": "attempt 65 on 18_displacement -> lead (0/14 moved)"}}
