@@ -1,10 +1,10 @@
 # P2W Baseline - Run Report
 
-**25 Nov 2026 · 20:40 IST**
+**26 Nov 2026 · 13:54 IST**
 
-> 154 of 213 documents are at or under 1% share@5px in LibreOffice. The corpus is 40.0% closer to the 15 Nov baseline than it started.
+> 154 of 213 documents are at or under 1% share@5px in LibreOffice. The corpus is 40.6% closer to the 15 Nov baseline than it started.
 
-This run did the non-measure refresh and nothing more, because the phase is `fix` and not `measure`. From an empty corpus it rebuilt the corpus, re-rendered every document through LibreOffice and re-scored the `.txt` half against the current engine and verifier. That re-score reproduced the committed table exactly, so there was no `.txt` change to publish and the round was neither advanced nor ranked; the fix slot was left alone. What the fixer should know: the LibreOffice prerender is the bottleneck and its batches kept coming back empty inside the render budget, so the pass rate is set by retries rather than by comparison work - clearing the stale single-instance IPC lock in `/tmp` before a pass is what unstuck it. The very long multi-page document remains exempt by design and is named in `EXEMPT.json`, not dropped. And `precommit.sh` cannot pass at HEAD: `check-regressions` flags files that later commits deliberately replaced and nobody has waived them, so any commit from this tree needs that looked at first.
+This run was not a measure phase, so it published no new table: it rebuilt the corpus from the release zips, converted every PDF, and re-scored every `.txt` with the current verifier. Nothing moved between clean and failing, so the `.txt` half was already current and there was nothing to commit. One document re-measured deterministically at a worse position score than its published row, with engine sources byte-identical to the published commit; this run did not establish the cause, so it left the published table alone rather than overwrite it with a regression it cannot explain. The conversion loop and the LibreOffice renders write no beacon.
 
 ## Corpus
 
@@ -13,16 +13,16 @@ This run did the non-measure refresh and nothing more, because the phase is `fix
 | Documents | **213** |
 | .docx at or under 1% share@5px (LibreOffice) | **154** |
 | .docx still open | **59** |
-| .txt clean | **204** |
-| .txt failing | **9** |
-| Google measured | **213** of 213 |
+| .txt clean | **205** |
+| .txt failing | **8** |
+| Google measured | **207** of 213 |
 | Google clean | **42** |
 
 ## Against the 15 Nov baseline
 
 | | baseline | now | |
 |:--|--:|--:|:--|
-| mean share@5 | 6.15 | **3.69** | -39.98% |
+| mean share@5 | 6.15 | **3.65** | -40.60% |
 | documents improved at all (any fall) | | **65** | |
 | regressions | | **0** | none |
 

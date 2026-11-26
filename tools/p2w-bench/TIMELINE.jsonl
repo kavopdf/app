@@ -7110,7 +7110,6 @@
 {"t": 1795674825.879237, "ist": "12:03:45", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795674826.2753575, "ist": "12:03:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795674828.299319, "ist": "12:03:48", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-
 {"t": 1795675931.1448421, "ist": "12:22:11", "ev": "beat", "d": "relay: install-gate timed out, inspecting"}
 {"t": 1795675935.501816, "ist": "12:22:15", "ev": "beat", "d": "relay: pod-prep in slices"}
 {"t": 1795676003.9951653, "ist": "12:23:23", "ev": "beat", "d": "relay: hook installed, corpus-slice next"}
@@ -7151,7 +7150,6 @@
 {"t": 1795680344.0248885, "ist": "13:35:44", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795680344.4721336, "ist": "13:35:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795680346.6666865, "ist": "13:35:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-
 {"t": 1795674833.7387364, "ist": "12:03:53", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795674834.1433527, "ist": "12:03:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795674834.529246, "ist": "12:03:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
@@ -7214,4 +7212,12 @@
 {"t": 1795679474.701591, "ist": "13:21:14", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795679476.7432733, "ist": "13:21:16", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795679488.0499544, "ist": "13:21:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-
+{"t": 1795678608.0414913, "ist": "13:06:48", "ev": "claim", "d": "baseline claimed the slot"}
+{"t": 1795681486.811577, "ist": "13:54:46", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795681487.1061788, "ist": "13:54:47", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795681487.3273351, "ist": "13:54:47", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795681487.6272554, "ist": "13:54:47", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795681511.8808875, "ist": "13:55:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795681512.1185608, "ist": "13:55:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795681512.3121972, "ist": "13:55:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795681512.574323, "ist": "13:55:12", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
