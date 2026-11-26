@@ -6770,3 +6770,4 @@
 {"t": 1795659282.6293998, "ist": "07:44:42", "ev": "beat", "d": "measuring corpus on new engine (slice 1)"}
 {"t": 1795659857.308625, "ist": "07:54:17", "ev": "beat", "d": "corpus measure slice 3"}
 {"t": 1795660422.2042718, "ist": "08:03:42", "ev": "beat", "d": "corpus measure slice 5 (final)"}
+{"t": 1795661689.333646, "ist": "08:24:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
