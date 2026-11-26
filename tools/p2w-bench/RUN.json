@@ -5,6 +5,7 @@
  "ended": null,
  "ended_ts": null,
  "kept": 0,
- "started": "09:55",
- "started_ts": 1795667141.8734567
+ "started": "10:13",
+ "started_ts": 1795668227.1366286,
+ "window_for_claim": 1795668227.1366286
 }

@@ -6857,3 +6857,12 @@
 {"t": 1795665539.8393621, "ist": "09:28:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795668212.8662875, "ist": "10:13:32", "ev": "beat", "d": "probes deleted; gathering report numbers"}
 {"t": 1795668224.0417929, "ist": "10:13:44", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795668227.1362598, "ist": "10:13:47", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795668227.2474394, "ist": "10:13:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795668227.3364966, "ist": "10:13:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795668227.904559, "ist": "10:13:47", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795668290.8383174, "ist": "10:14:50", "ev": "beat", "d": "writing up the residue fix"}
+{"t": 1795668340.8414044, "ist": "10:15:40", "ev": "beat", "d": "engine patch written; compiling"}
+{"t": 1795668681.2851353, "ist": "10:21:21", "ev": "beat", "d": "LO check on the patched row emitter"}
+{"t": 1795668709.0262318, "ist": "10:21:49", "ev": "beat", "d": "engine change reverted; writing the addendum"}
+{"t": 1795668735.3028488, "ist": "10:22:15", "ev": "beat", "d": "attempt.py: recording an attempt"}
