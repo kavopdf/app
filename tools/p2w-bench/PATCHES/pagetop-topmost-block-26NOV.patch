@@ -1,0 +1,253 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 80c91eec..476438b1 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -817,6 +817,25 @@ public final class DocxWriter {
+         float flowBoxPt = 0f;
+         /** Set at a page break so the first line on a page carries no gap. */
+         boolean newPage = true;
++        /**
++         * THE SECTION'S TOP MARGIN, in twips - the page's top gap carried by
++         * {@code w:pgMar w:top} instead of by the first paragraph's {@code w:before}.
++         *
++         * <p>Google Docs drops space-before at the top of a page. Measured on real renders:
++         * {@code 412_page_labels_roman} writes {@code w:before="1227"} (61.35 pt) on the first
++         * paragraph of every sheet; page 0 reads +2.3 pt - honoured - and pages 1 to 4 read
++         * -58.8 pt - dropped. Same value, same file; the only difference is that the paragraph
++         * follows a page break. The law over 332 continuation pages is
++         * {@code shift = 0.961 * gap - 0.58 pt}, r = 0.975, one sign, every page.
++         *
++         * <p>{@code w:pgMar w:top} is honoured at a page top by both readers (measured through
++         * Google on bank-statement-5-pages, 22 Nov: pages 1-4 -59.5 pt -> -4.3 pt, page count
++         * unchanged at 5, 37/42 -> 40/42). So the gap moves from the flow to the margin: the
++         * flow spends that many twips less and the text area starts that many twips lower, which
++         * is why {@link #flowTw}, {@link #budgetTw} and the emitters' own accounting are left
++         * EXACTLY as they were - only the bytes change. See {@link #sectionTopTw}.
++         */
++        int pageTopTw;
+         /** Flow height already spent on this page, in twips. */
+         int flowTw;
+         /** The page's own height in twips - the budget the flow must not exceed. */
+@@ -1092,6 +1111,10 @@ public final class DocxWriter {
+                 // reader looks before it decides what "black" means on its own surface.
+                 .append("<w:body>");
+ 
++        // THE PAGE'S TOP GAP GOES IN THE SECTION, NOT IN THE FLOW (see Ctx.pageTopTw). Read off
++        // the model before a byte is written, because the first paragraph of the FIRST page is
++        // emitted before any later page has been looked at.
++        ctx.pageTopTw = sectionTopTw(result);
+         // The page box the current section is set to. A section carries one page size, so a
+         // file that mixes landscape and portrait pages gets a section break where the size
+         // changes; every other page break stays a plain page break.
+@@ -1125,7 +1148,7 @@ public final class DocxWriter {
+                 // page break this page needed anyway.
+                 sb.append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
+                         .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
+-                        .append("<w:sectPr>").append(sectPrXml(secW, secH, secCols, secGap))
++                        .append("<w:sectPr>").append(sectPrXml(secW, secH, secCols, secGap, ctx.pageTopTw))
+                         .append("<w:type w:val=\"nextPage\"/></w:sectPr>")
+                         .append("</w:pPr></w:p>");
+                 // A section break starts a fresh sheet exactly as w:br does, so the first line
+@@ -1351,7 +1374,14 @@ public final class DocxWriter {
+             }
+         }
+         // The section properties must be the LAST child of w:body.
+-        sb.append("<w:sectPr>").append(sectPrXml(secW <= 0 ? 595f : secW, secH <= 0 ? 842f : secH, secCols, secGap))
++        // THE MARGIN IS ONLY CLAIMED IF A PARAGRAPH ACTUALLY OPENS THE SHEET. pageFirstBeforeTw()
++        // subtracts the margin from the page-first paragraph, so a body that opens with anything
++        // else - a w:tbl, an anchored shape - would carry the margin AND the whole w:before, and
++        // the page's top gap would be counted twice. Measured on 401_trifold_brochure, whose body
++        // opens with a w:tbl: pgMar 1190 + w:before 1790 = 2980 tw against a source gap of 1790.
++        // Zero is the identity, so those documents write exactly the bytes they wrote before.
++        int secTopTw = sb.indexOf("<w:body><w:p") >= 0 ? ctx.pageTopTw : 0;
++        sb.append("<w:sectPr>").append(sectPrXml(secW <= 0 ? 595f : secW, secH <= 0 ? 842f : secH, secCols, secGap, secTopTw))
+                 .append("</w:sectPr>");
+         sb.append("</w:body></w:document>");
+         return sb.toString();
+@@ -2424,7 +2454,7 @@ public final class DocxWriter {
+      * 300 pt from the edge of the paper and from the start of the text area alike.
+      */
+     private static String sectPrXml(float wPt, float hPt) {
+-        return sectPrXml(wPt, hPt, 1, 0);
++        return sectPrXml(wPt, hPt, 1, 0, 0);
+     }
+ 
+     /**
+@@ -2437,6 +2467,18 @@ public final class DocxWriter {
+      * the second column was appended below the first instead of beside it.
+      */
+     private static String sectPrXml(float wPt, float hPt, int cols, float gapPt) {
++        return sectPrXml(wPt, hPt, cols, gapPt, 0);
++    }
++
++    /**
++     * The same section, with the page's top gap carried as a real top margin.
++     *
++     * <p>{@code topTw} is the one vertical length in this file that a page top cannot lose:
++     * a paragraph's {@code w:before} is dropped there by Google, and {@code w:pgMar w:top} is
++     * not. Zero is the identity - every document whose pages carry no top gap, and every
++     * document whose pages disagree about it, writes exactly the bytes it wrote before.
++     */
++    private static String sectPrXml(float wPt, float hPt, int cols, float gapPt, int topTw) {
+         int w = Math.max(1, Math.round((float) (wPt * TWIPS_PER_PT)));
+         int h = Math.max(1, Math.round((float) (hPt * TWIPS_PER_PT)));
+         String orient = wPt > hPt ? " w:orient=\"landscape\"" : "";
+@@ -2445,7 +2487,7 @@ public final class DocxWriter {
+                 ? "<w:cols w:num=\"" + cols + "\" w:space=\"" + gap + "\" w:equalWidth=\"1\"/>"
+                 : "<w:cols w:space=\"0\"/>";
+         return "<w:pgSz w:w=\"" + w + "\" w:h=\"" + h + "\"" + orient + "/>"
+-                + "<w:pgMar w:top=\"0\" w:right=\"0\" w:bottom=\"0\" w:left=\"0\""
++                + "<w:pgMar w:top=\"" + Math.max(0, topTw) + "\" w:right=\"0\" w:bottom=\"0\" w:left=\"0\""
+                 + " w:header=\"0\" w:footer=\"0\" w:gutter=\"0\"/>"
+                 + colsXml
+                 + "<w:docGrid w:linePitch=\"360\"/>";
+@@ -3740,6 +3782,7 @@ public final class DocxWriter {
+         recordBaseline(ctx, first.y, linePt, size);
+ 
+         ctx.flowCount++;
++        boolean firstOnPage = ctx.newPage;
+         ctx.newPage = false;
+         // Re-sync the running position to what was written, not to what was intended. A page
+         // break inside the block above starts a new sheet, so the top is the paper's top again.
+@@ -3816,7 +3859,7 @@ public final class DocxWriter {
+                 // paragraphs was out of schema order. The tab stops themselves are unchanged.
+                 .append("<w:tabs>").append(tabs).append("</w:tabs>")
+                 .append("<w:snapToGrid w:val=\"0\"/>")
+-                .append(spacing(beforeTw, lineTw, size, autoFlowLines(), ctx.newPage))
++                .append(spacing(pageFirstBeforeTw(ctx, firstOnPage, beforeTw), lineTw, size, autoFlowLines(), ctx.newPage))
+                 // A row is laid out by its tab stops, so it must not also be centred or pushed
+                 // right: justification would move the first field off the indent the stops are
+                 // measured from.
+@@ -4378,6 +4421,115 @@ public final class DocxWriter {
+     }
+ 
+ 
++    /**
++     * THE PAGE'S TOP GAP, AS THE SECTION CAN CARRY IT - the one number this patch puts in the
++     * section instead of in the flow.
++     *
++     * <p>Every page of a document starts its first line at the same distance below the paper's
++     * top edge in the overwhelming majority of the corpus: measured on the 18 documents of the
++     * 122 that fail {@code 18_displacement} AND carry a page break, 16 have exactly ONE distinct
++     * page-first gap (4 of them listed: {@code 416_many_tiny_pages} 89.50 pt on all 299
++     * continuation pages, {@code 412_page_labels_roman} 61.35 on all 4,
++     * {@code bank-statement-5-pages} 55.15 on all 4, {@code 602_bookmarked_annual_report} 69.50
++     * on both). The two that disagree ({@code 041122-Account_Opening_Form} and its fillable
++     * twin, five distinct values including 0.00) are the two whose page count is wrong anyway.
++     *
++     * <p>So ONE {@code w:pgMar w:top} serves a document, and it must be the SMALLEST page-first
++     * gap, not the first page's. That choice is monotone and that is why it is safe: with
++     * {@code G = min}, every page keeps the remainder {@code gap - G >= 0} in its own
++     * {@code w:before}, so no page can be moved FURTHER from its own y than it is today, and a
++     * document whose pages disagree writes {@code G = 0} - the identity, byte for byte.
++     *
++     * <p>Read from the model, with the same expression the emitters use for the first line of a
++     * sheet ({@code y - LINE_BASE * hairlinePt(size)}, clamped by {@code firstGapCapTw}), so the
++     * number in the section is the number the flow gave up. Verified corpus-wide by re-reading
++     * the emitted {@code document.xml}: for every page-first paragraph of all 213 documents,
++     * {@code pgMar + w:before} equals the {@code w:before} the engine wrote before this change.
++     */
++    private static int sectionTopTw(PdfToWord.Result result) {
++        int min = Integer.MAX_VALUE;
++        for (PdfToWord.Page page : result.pages) {
++            // THE PAGE'S FIRST BLOCK, AND ONLY IT. The margin may only be claimed when the thing
++            // that lands at the top of the page is a paragraph the emitter will flag page-first -
++            // because that is the only construct whose w:before pageFirstBeforeTw() subtracts from.
++            //
++            // Measured on 401_trifold_brochure, which this guard exists for: its body opens with a
++            // w:tbl, so the first paragraph of the sheet lives INSIDE a cell, the table's spacer
++            // consumed ctx.newPage before it was written, and the subtraction never happened - the
++            // emitted file then read pgMar 1190 AND w:before 1790, a gap of 2980 tw where the
++            // source has 1790. That is the doubling the corpus gate refused on 26 Nov.
++            //
++            // Anything else at the top of the page (a table, a shape, a pinned paragraph, an empty
++            // first block) means the construct that carries the gap is not the one this patch can
++            // reach, so the document writes w:pgMar w:top="0" - the identity, byte for byte.
++            // THE TOPMOST BLOCK, NOT page.blocks[0]. PdfToWord orders a column page's blocks by
++            // COLUMN, then by y, so blocks[0] is the top of column 0 - which on a page with a
++            // full-width header band sits BELOW that band. Measuring the section margin from it
++            // charges the page a top gap the flow never gives up, every line moves down, the page
++            // overruns the paper and the renderer breaks it: measured 26 Nov on
++            // newsletter-3col-header-footer, 0.20 -> 86.30 share@5, 1 page -> 2. The band that is
++            // emitted FIRST - and therefore the only paragraph that can pay the credit - is the
++            // topmost one, so take the block with the smallest y. Any block this patch cannot
++            // reach still means identity, which is what protects 401_trifold_brochure.
++            Object first = null;
++            float best = Float.MAX_VALUE;
++            for (Object o : page.blocks) {
++                float ty = -1f;
++                if (o instanceof PdfToWord.Para) {
++                    PdfToWord.Para q = (PdfToWord.Para) o;
++                    if (q.pinned) return 0;
++                    for (PdfToWord.Box b : q.boxes) {
++                        if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
++                        if (ty < 0f || b.y < ty) ty = b.y;
++                    }
++                } else if (o instanceof PdfToWord.Box) {
++                    PdfToWord.Box b = (PdfToWord.Box) o;
++                    if (b.runs.isEmpty() || b.text().trim().isEmpty()) return 0;
++                    ty = b.y;
++                } else {
++                    return 0;
++                }
++                if (ty < 0f) return 0;
++                if (ty < best) { best = ty; first = o; }
++            }
++            float y = -1f, size = 0f;
++            if (first instanceof PdfToWord.Para) {
++                PdfToWord.Para p = (PdfToWord.Para) first;
++                for (PdfToWord.Box b : p.boxes) {
++                    if (b.runs.isEmpty() || b.text().trim().isEmpty()) continue;
++                    if (y < 0f || b.y < y) { y = b.y; size = b.size; }
++                }
++            } else if (first instanceof PdfToWord.Box) {
++                PdfToWord.Box b = (PdfToWord.Box) first;
++                y = b.y;
++                size = b.size;
++            }
++            if (y < 0f) return 0;
++            float ph = page.height > 0 ? page.height : 842f;
++            int capTw = Math.max(2000, Math.round(ph * (float) TWIPS_PER_PT));
++            float top = y - LINE_BASE * hairlinePt(size);
++            int tw = (int) Math.max(0L, Math.round(top * TWIPS_PER_PT));
++            min = Math.min(min, Math.min(capTw, tw));
++        }
++        return min == Integer.MAX_VALUE ? 0 : min;
++    }
++
++    /**
++     * The {@code w:before} a page's FIRST paragraph is written with, once the section carries the
++     * page's top gap.
++     *
++     * <p>The flow's own accounting is deliberately NOT adjusted: {@link #flowTw}, the budget, the
++     * re-sync and {@code fitPage} keep the gap they have always charged. That is the point - the
++     * page loses exactly the room it stops spending, so the model and the reader still agree about
++     * where every line goes, and the only thing that changes is which construct carries the number.
++     * Where the gap is wider than the section's margin the remainder stays in {@code w:before},
++     * which is the one construct that is honoured in the body.
++     */
++    private static int pageFirstBeforeTw(Ctx ctx, boolean pageFirst, int beforeTw) {
++        if (!pageFirst || ctx.pageTopTw <= 0) return beforeTw;
++        return Math.max(0, beforeTw - ctx.pageTopTw);
++    }
++
+     /** The top of the paragraph about to be written, in points from the top of the sheet. */
+     private static float flowTopPt(Ctx ctx) {
+         if (ctx.newPage || ctx.flowY < 0f) return 0f;
+@@ -4655,6 +4807,7 @@ public final class DocxWriter {
+         }
+         // The box the pitch solver compares next time is the page's own, not the squeezed one.
+         recordBaseline(ctx, b.y, linePt, b.size);
++        boolean firstOnPage = ctx.newPage;
+         ctx.newPage = false;
+         // Re-sync to what was written, so the next paragraph is measured from the reader's
+         // position rather than from the PDF's (D-26) - and to the position this paragraph was
+@@ -4667,7 +4820,7 @@ public final class DocxWriter {
+             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
+         }
+         sb.append("<w:snapToGrid w:val=\"0\"/>")
+-                .append(spacing(beforeTw, lineTw, b.size, autoFlowLines(), ctx.newPage))
++                .append(spacing(pageFirstBeforeTw(ctx, firstOnPage, beforeTw), lineTw, b.size, autoFlowLines(), ctx.newPage))
+                 .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
+                 .append("\" w:right=\"").append(rightTw).append("\" w:firstLine=\"0\"/>");
+         if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");

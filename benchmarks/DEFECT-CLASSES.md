@@ -11,10 +11,10 @@ dominates it.
 
 | signature | problem | open | fixed |
 |---|---|---|---|
-| content-loss | content-missing-partly-replaced | 11 | 1 |
+| content-loss | content-missing-partly-replaced | 13 | 1 |
 | content-loss | content-missing-nothing-in-its-place | 6 | 16 |
-| mixed | content-partly-lost-and-displaced | 6 | 4 |
 | mixed | content-partly-lost | 6 | 0 |
+| mixed | content-partly-lost-and-displaced | 4 | 4 |
 | displacement | content-present-partly-displaced | 23 | 0 |
 | displacement | content-present-wholly-displaced | 7 | 2 |
 | clean | none | 0 | 130 |
@@ -70,7 +70,7 @@ only a work queue.
 | 31 | `041122-Account_Opening_Form` | content-missing-partly-replaced | 98.65 | 937.92 | 9 | OPEN | - |
 | 32 | `Account_Opening_Form_Fillable_filled` | content-missing-partly-replaced | 97.62 | 358.08 | 7 | OPEN | - |
 | 33 | `one-page-rotated-180-degrees` | content-missing-partly-replaced | 81.64 | 177.60 | 2 | OPEN | - |
-| 34 | `600_reviewed_invoice_with_annotations` | content-partly-lost-and-displaced | 54.30 | 37.44 | 1 | OPEN | - |
+| 34 | `600_reviewed_invoice_with_annotations` | content-missing-partly-replaced | 62.46 | 62.88 | 1 | OPEN | - |
 | 35 | `601_fillable_admission_form` | content-missing-partly-replaced | 52.39 | 27.84 | 1 | OPEN | - |
 | 36 | `table-inside-two-column-page` | content-present-wholly-displaced | 35.87 | 21.60 | 1 | OPEN | - |
 | 37 | `360_restaurant_menu` | content-missing-partly-replaced | 34.43 | 45.60 | 1 | OPEN | - |
@@ -83,7 +83,7 @@ only a work queue.
 | 44 | `11_stamp_with_signature_image` | content-missing-partly-replaced | 2.77 | 25.92 | 1 | OPEN | - |
 | 45 | `317_rti_response` | content-missing-partly-replaced | 0.65 | 15.84 | 1 | FIXED | share@5 0.65 |
 | 46 | `gst-invoice-with-qr-code` | none | 0.07 | 8.16 | 1 | FIXED | no defect |
-| 47 | `itr-computation-with-slab-table` | content-partly-lost-and-displaced | 42.33 | 15.36 | 1 | OPEN | - |
+| 47 | `itr-computation-with-slab-table` | content-missing-partly-replaced | 9.10 | 53.28 | 1 | OPEN | - |
 | 48 | `table-with-merged-cells` | none | 0.67 | 11.04 | 1 | FIXED | no defect |
 | 49 | `14_stamp_chars_positioned_td` | content-partly-lost-and-displaced | 3.89 | 25.44 | 1 | OPEN | - |
 | 50 | `newspaper-2col-fullwidth-headline` | content-partly-lost-and-displaced | 0.42 | 12.00 | 1 | FIXED | share@5 0.01 |
@@ -128,13 +128,13 @@ only a work queue.
 | 89 | `27_two_column_left_short_txtpos` | content-present-partly-displaced | 1.62 | 7.68 | 1 | OPEN | - |
 | 90 | `392_statistical_console_output` | content-missing-nothing-in-its-place | 1.61 | 4.32 | 1 | OPEN | - |
 | 91 | `70_magazine_drop_cap_photo_caption` | content-present-partly-displaced | 1.16 | 10.56 | 1 | OPEN | - |
-| 92 | `newsletter-3col-header-footer` | none | 0.20 | 5.28 | 1 | FIXED | no defect |
+| 92 | `newsletter-3col-header-footer` | none | 86.30 | 172.80 | 1 | FIXED | no defect |
 | 93 | `34_monospace_document` | none | 0.93 | 4.80 | 1 | FIXED | no defect |
 | 94 | `eway-bill` | none | 0.05 | 4.80 | 1 | FIXED | no defect |
 | 95 | `67_two_col_with_sidebar` | none | 0.80 | 11.52 | 1 | FIXED | no defect |
 | 96 | `28_value_overflows_cell_txtpos` | none | 0.72 | 15.36 | 1 | FIXED | no defect |
 | 97 | `79_inr_indian_digit_grouping_table` | none | 0.74 | 9.12 | 1 | FIXED | no defect |
-| 98 | `39_small_caps_letter_spacing` | none | 0.70 | 4.80 | 1 | FIXED | no defect |
+| 98 | `39_small_caps_letter_spacing` | none | 0.80 | 4.80 | 1 | FIXED | no defect |
 | 99 | `326_itr_computation` | none | 0.63 | 13.92 | 1 | FIXED | no defect |
 | 100 | `344_customs_declaration` | none | 0.61 | 49.92 | 1 | FIXED | no defect |
 | 101 | `table-with-no-header-row` | none | 0.61 | 11.52 | 1 | FIXED | no defect |
@@ -151,7 +151,7 @@ only a work queue.
 | 112 | `05_round_company_seal_curved_text` | none | 0.19 | 5.28 | 1 | FIXED | no defect |
 | 113 | `boq-horizontal-rules-only` | none | 0.13 | 8.64 | 1 | FIXED | no defect |
 | 114 | `08_two_overlapping_stamps` | none | 0.11 | 11.04 | 1 | FIXED | no defect |
-| 115 | `350_question_paper` | none | 0.11 | 16.80 | 1 | FIXED | no defect |
+| 115 | `350_question_paper` | none | 0.12 | 16.80 | 1 | FIXED | no defect |
 | 116 | `391_survey_questionnaire_grid` | none | 0.11 | 4.32 | 1 | FIXED | no defect |
 | 117 | `333_datasheet_spec_tables` | none | 0.07 | 6.24 | 1 | FIXED | no defect |
 | 118 | `340_bill_of_lading` | none | 0.07 | 3.36 | 1 | FIXED | no defect |

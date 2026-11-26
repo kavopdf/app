@@ -1796,6 +1796,34 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "none": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-27 01:05",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "gate: restore DocxWriter to 9f0a8207, the engine both tables were measured on"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "no class worked: re-measured the corpus on the tree (212/212), 0 regressions vs baseline, 153 clean (was 120); gate blocked by a ratchet floor measured on the reverted aa496ebe; topmost-block re-land ",
+    "total": null
+   }
+  ],
+  "last": null,
+  "last_engine": "ee5a00d6",
+  "outcomes": [
+   "lead"
+  ],
+  "reason": "no class worked: re-measured the corpus on the tree (212/212), 0 regressions vs baseline, 153 clean (was 120); gate blocked by a ratchet floor measured on the reverted aa496ebe; topmost-block re-land refuted on 5 docs, nothing moved",
+  "reasons": [
+   "no class worked: re-measured the corpus on the tree (212/212), 0 regressions vs baseline, 153 clean (was 120); gate blocked by a ratchet floor measured on the reverted aa496ebe; topmost-block re-land refuted on 5 docs, nothing moved"
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "single-element-far-out": {
   "attempts": 1,
   "first_seen": null,

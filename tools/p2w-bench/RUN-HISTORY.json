@@ -474,5 +474,21 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "aa49newsletter content-loss root cause-01",
+   "gateratchet floor vs engine match-01"
+  ],
+  "attempts": 2,
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "started": "23:56",
+  "started_ts": 1795717572.9702141,
+  "window_for_claim": 1795717572.9702141,
+  "class": "none",
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
