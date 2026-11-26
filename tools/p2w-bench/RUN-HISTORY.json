@@ -277,5 +277,32 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   {
+    "class": "18_displacement",
+    "id": "18_diag-01"
+   },
+   {
+    "class": "t12_word_invention",
+    "id": "txt9-01"
+   }
+  ],
+  "attempts": 1,
+  "class": "t02_position",
+  "counted": [
+   [
+    "t02_position",
+    1
+   ]
+  ],
+  "docs_improved": 1,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 1,
+  "started": "05:57",
+  "started_ts": 1795652834.9540026,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

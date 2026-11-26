@@ -2,11 +2,11 @@
  "agents": [
   {
    "class": "18_displacement",
-   "id": "18_diag-01"
+   "id": "18-displacement-diagnosis"
   },
   {
    "class": "t12_word_invention",
-   "id": "txt9-01"
+   "id": "txt-9-failures-diagnosis"
   }
  ],
  "attempts": 1,
@@ -18,8 +18,8 @@
   ]
  ],
  "docs_improved": 1,
- "ended": null,
- "ended_ts": null,
+ "ended": "06:35",
+ "ended_ts": 1795655116.5848963,
  "kept": 1,
  "started": "05:57",
  "started_ts": 1795652834.9540026
