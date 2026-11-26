@@ -81,3 +81,19 @@ error for another's, which is why the whole-corpus regression exists.
 **What survives and is worth the next run:** the `pageFirst` dead-code fix (inert at the default
 `exact`, a real bug regardless), and the arithmetic that all 23 solo-`18_displacement` documents are
 one page, so no page-top or per-page lever can clear any of them.
+
+## 5. The `L' = 12L/K` transform is arithmetically impossible - checked, not assumed
+
+The obvious correction for Google's 22.9 % exact-line charge (`FINDINGS/w-line-exact-GOOGLE-CHARGE-075617-f0cc.md`)
+is to declare `L' = 240 L / (20 K) = 4.3695 L` and put the difference in `w:before`. In Word and LibreOffice,
+where `exact` is honoured 1:1, the advance is `before + L`; keeping it constant needs
+
+    before' = before + L - L' = before - 3.3695 L
+
+which is **negative for every line whose pitch is under 4.37 line-heights** - every line in the corpus.
+A box taller than the pitch cannot carry a line. So there is no exact box that makes Google deliver the
+pitch, and `auto` (`-Dp2w.lineRule=autoflow`) is the only construct that escapes the charge.
+
+Consequence for the class: the `72_bank_statement` over-correction (median +1.1 -> +3.51) is the thing to
+explain - a size dependence, `AUTO_LINE_EM = 1.15` being the substitute face's ratio rather than the
+document's, or the page-first compensation - not a reason to abandon `autoflow`.

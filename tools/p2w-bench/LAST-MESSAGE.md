@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 11:49 → running IST · 2 min**
+**26 Nov 2026 · slot 11:49 → running IST · 3 min**
 
 > No change was kept. Three Google renders: one structural finding that redirects the class, and one lever refuted by its own falsifier.
 
@@ -38,7 +38,7 @@
 
 | | |
 |:--|:--|
-| Measured | **6 min ago** |
+| Measured | **7 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -53,7 +53,7 @@
 
 | | |
 |:--|:--|
-| Slot window | 11:49 → running · 2 min |
+| Slot window | 11:49 → running · 3 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
 | Tool beats | 11 |
 | Silences over 2 min | 0 |
@@ -64,9 +64,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| record - attempt, handoff, class rows | **0 min** | `#######` |
-| report - the report and the chain | **0 min** | `########` |
-| other - not attributed to a tool | **0 min** | `#######` |
+| record - attempt, handoff, class rows | **0 min** | `######` |
+| report - the report and the chain | **1 min** | `###########` |
+| other - not attributed to a tool | **0 min** | `######` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -83,8 +83,8 @@ Read `FINDINGS/18-displacement-PAGEFIRST-DEAD-CODE-AND-AUTOFLOW-1200-relay.md` b
 
 1. **The page-top lever cannot reach this class.** All **23** documents whose only failing check is `18_displacement` are **single-page** (measured with PyMuPDF over the corpus PDFs). `TOPGAP_ROW` and the page-break `w:before` drop both act only on pages after the first, so on these they are byte-inert - verified: `document.xml` of a flag-on and a flag-off build of `electricity-bill` is identical. Do not re-run that lever on these 23.
 2. **`autoflow` removes a real constant and is still not a keeper.** On `electricity-bill` the default `exact` construct puts every run 7.18 pt high (median -7.18, 113/125 runs out, a tight -10.4 to -0.1 band - re-rendered in this run, so the stored row reproduces on this tree). `autoflow` moves that median to **+0.08** with 26/125 out. On `72_bank_statement` the same switch moves the median from **+1.1 to +3.51** and the worst from **4.8 to 8.44**. Opposite signs, neither document clean.
-3. **The one lever the evidence points at next:** declare an exact box `L' = 12L/K` with `K = 2.74663` (the Google-proven charge, `FINDINGS/w-line-exact-GOOGLE-CHARGE-075617-f0cc.md`) and put `-(L'-L)/20` into `w:before`. `before + line` is preserved, so Word and LibreOffice see the same advance, while Google's charge for `L'` lands on the intended pitch. This is the correction `autoflow` approximates, without changing the construct LibreOffice honours.
-4. Measure it on `electricity-bill` **and** `72_bank_statement` first - they are now a positive and a negative control for this class, with numbers on file.
+3. **The `L' = 12L/K` transform is arithmetically impossible, and this run checked it.** To make Google's charge on an exact box equal the intended pitch you would declare `L' = 4.3695 L`; keeping the advance constant in Word and LibreOffice then needs `w:before' = before - 3.3695 L`, which is negative for every line whose pitch is under 4.37 line-heights - i.e. every line in the corpus. There is no taller exact box available; `auto` is the only construct that escapes Google's charge. So the 72_bank_statement over-correction (+1.1 to +3.51) is **the thing to explain**, not a reason to abandon the construct.
+4. Next run: measure `autoflow` on **`electricity-bill` and `72_bank_statement`** together and find what differs - size, the `AUTO_LINE_EM` 1.15 substitute-face ratio, or the page-first compensation - before touching any other document. They are now a positive and a negative control, with numbers on file.
 
 **`spacing()`'s `pageFirst` was dead code in every build.** Both flow call sites passed `ctx.newPage` after clearing it, so the first-line compensation never ran - which is why `autoflow` had never been a fair experiment. Patch saved at `patches/PATCH-pagefirst-autoflow-1200-relay.patch`; inert at the default `exact` by construction.
 
