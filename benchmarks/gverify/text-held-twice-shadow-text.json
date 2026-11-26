@@ -2,7 +2,7 @@
  "name": "text-held-twice-shadow-text",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T14:22:38",
+ "at": "2026-11-26T22:43:07",
  "passed": 44,
  "total": 47,
  "failed": [
@@ -17,6 +17,6 @@
   "bad_pages": [],
   "runs_matched": 47
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795701041"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795731016"
 }

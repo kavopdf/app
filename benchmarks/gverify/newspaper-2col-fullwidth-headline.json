@@ -2,7 +2,7 @@
  "name": "newspaper-2col-fullwidth-headline",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T14:19:08",
+ "at": "2026-11-26T22:39:20",
  "passed": 38,
  "total": 42,
  "failed": [
@@ -20,6 +20,6 @@
   ],
   "runs_matched": 61
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795701041"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795731016"
 }

@@ -2,7 +2,7 @@
  "name": "80_gstin_pan_cin_ifsc_table",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T14:15:58",
+ "at": "2026-11-26T22:34:37",
  "passed": 36,
  "total": 42,
  "failed": [
@@ -14,14 +14,14 @@
   "59_shape_anchor"
  ],
  "displacement": {
-  "med_dy": -14.4,
-  "worst_dy": 140.4,
+  "med_dy": -34.6,
+  "worst_dy": 237.1,
   "med_dx": -0.9,
   "bad_pages": [
    0
   ],
-  "runs_matched": 61
+  "runs_matched": 60
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795701041"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795731016"
 }

@@ -2,7 +2,7 @@
  "name": "purchase-order",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T14:19:55",
+ "at": "2026-11-26T22:39:44",
  "passed": 44,
  "total": 47,
  "failed": [
@@ -19,6 +19,6 @@
   ],
   "runs_matched": 106
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795701041"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795731016"
 }

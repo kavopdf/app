@@ -2,7 +2,7 @@
  "name": "report-2col-table-spanning-both-columns",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T14:20:06",
+ "at": "2026-11-26T22:39:49",
  "passed": 46,
  "total": 47,
  "failed": [
@@ -17,6 +17,6 @@
   ],
   "runs_matched": 90
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795701041"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795731016"
 }

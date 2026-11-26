@@ -2,7 +2,7 @@
  "name": "56_table_indented_from_margin",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T13:23:51",
+ "at": "2026-11-26T22:33:27",
  "passed": 39,
  "total": 42,
  "failed": [
@@ -11,14 +11,14 @@
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": -14.0,
-  "worst_dy": 122.0,
+  "med_dy": -35.6,
+  "worst_dy": 143.6,
   "med_dx": -0.1,
   "bad_pages": [
    0
   ],
   "runs_matched": 51
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795697520"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795731016"
 }

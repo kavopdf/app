@@ -2,7 +2,7 @@
  "name": "52_one_cm_margin_wide_body",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T13:23:34",
+ "at": "2026-11-26T22:33:17",
  "passed": 41,
  "total": 42,
  "failed": [
@@ -15,6 +15,6 @@
   "bad_pages": [],
   "runs_matched": 38
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795697520"
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795731016"
 }
