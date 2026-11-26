@@ -7809,3 +7809,173 @@
 {"t": 1795716120.1636658, "ist": "23:32:00", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795716120.6505904, "ist": "23:32:00", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795716122.9859157, "ist": "23:32:02", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795718968.295289, "ist": "00:19:28", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795718968.5489955, "ist": "00:19:28", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795718968.707263, "ist": "00:19:28", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795718968.8816736, "ist": "00:19:28", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795718969.0529156, "ist": "00:19:29", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795718969.237444, "ist": "00:19:29", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795718969.4319673, "ist": "00:19:29", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795718969.588549, "ist": "00:19:29", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795718979.95003, "ist": "00:19:39", "ev": "beat", "d": "relay: install-gate timed out at 300s, checking phase"}
+{"t": 1795719110.6376176, "ist": "00:21:50", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795719606.896493, "ist": "00:30:06", "ev": "beat", "d": "relay: two agents returned; starting pod-prep in slices"}
+{"t": 1795719613.8203797, "ist": "00:30:13", "ev": "beat", "d": "relay: engine compiled; converting corpus slice 1 (can take 280s)"}
+{"t": 1795719803.9933307, "ist": "00:33:23", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795719804.1676292, "ist": "00:33:24", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795719804.3333626, "ist": "00:33:24", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795719804.4904335, "ist": "00:33:24", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795719804.663677, "ist": "00:33:24", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795719804.8502188, "ist": "00:33:24", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795719804.9990566, "ist": "00:33:24", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795719805.163954, "ist": "00:33:25", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795719807.3531895, "ist": "00:33:27", "ev": "beat", "d": "relay: corpus slice 2 of 3 (79 to go)"}
+{"t": 1795719995.9372792, "ist": "00:36:35", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795719998.2275655, "ist": "00:36:38", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795720039.538826, "ist": "00:37:19", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795720039.7316864, "ist": "00:37:19", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795720039.8837936, "ist": "00:37:19", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795720040.062474, "ist": "00:37:20", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795720040.2378695, "ist": "00:37:20", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795720040.4001045, "ist": "00:37:20", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795720042.0400946, "ist": "00:37:22", "ev": "beat", "d": "relay: corpus slice 3 of 3 (26 to go)"}
+{"t": 1795720161.3526034, "ist": "00:39:21", "ev": "beat", "d": "corpus-slice: 6 of 26 converted"}
+{"t": 1795720162.1475987, "ist": "00:39:22", "ev": "beat", "d": "corpus-slice: 12 of 26 converted"}
+{"t": 1795720163.028632, "ist": "00:39:23", "ev": "beat", "d": "corpus-slice: 18 of 26 converted"}
+{"t": 1795720163.7481925, "ist": "00:39:23", "ev": "beat", "d": "corpus-slice: 24 of 26 converted"}
+{"t": 1795720169.8656793, "ist": "00:39:29", "ev": "beat", "d": "relay: corpus complete 213/213; checking gates"}
+{"t": 1795720216.2826843, "ist": "00:40:16", "ev": "beat", "d": "relay: writing findings + testing the gate on a docs-only commit"}
+{"t": 1795720252.7339492, "ist": "00:40:52", "ev": "beat", "d": "relay: measuring the corpus on the restored engine (chunk 1/5) to see if newsletter recovers"}
+{"t": 1795720333.631215, "ist": "00:42:13", "ev": "beat", "d": "p2w.py: scoring 02_stamp_rotated_15deg_uplef (2 in this pass)"}
+{"t": 1795720338.2290382, "ist": "00:42:18", "ev": "beat", "d": "p2w.py: scoring 04_stamp_180deg_upside_down (4 in this pass)"}
+{"t": 1795720342.9031816, "ist": "00:42:22", "ev": "beat", "d": "p2w.py: scoring 06_rect_paid_stamp_red_trans (6 in this pass)"}
+{"t": 1795720347.673841, "ist": "00:42:27", "ev": "beat", "d": "p2w.py: scoring 08_two_overlapping_stamps (8 in this pass)"}
+{"t": 1795720352.4012544, "ist": "00:42:32", "ev": "beat", "d": "p2w.py: scoring 10_stamp_as_image (10 in this pass)"}
+{"t": 1795720357.286084, "ist": "00:42:37", "ev": "beat", "d": "p2w.py: scoring 13_stamp_non_english (12 in this pass)"}
+{"t": 1795720376.961989, "ist": "00:42:56", "ev": "beat", "d": "p2w.py: scoring 15_stamp_on_scanned_page (2 in this pass)"}
+{"t": 1795720382.2642894, "ist": "00:43:02", "ev": "beat", "d": "p2w.py: scoring 17_three_column_widths_txtpo (4 in this pass)"}
+{"t": 1795720386.798224, "ist": "00:43:06", "ev": "beat", "d": "p2w.py: scoring 19_hanging_indent_txtpos (6 in this pass)"}
+{"t": 1795720391.4044929, "ist": "00:43:11", "ev": "beat", "d": "p2w.py: scoring 21_form_labels_x60_values_x3 (8 in this pass)"}
+{"t": 1795720396.0743043, "ist": "00:43:16", "ev": "beat", "d": "p2w.py: scoring 23_timetable_grid_txtpos (10 in this pass)"}
+{"t": 1795720400.5445175, "ist": "00:43:20", "ev": "beat", "d": "p2w.py: scoring 25_signature_block_underscor (12 in this pass)"}
+{"t": 1795720421.6058729, "ist": "00:43:41", "ev": "beat", "d": "p2w.py: scoring 27_two_column_left_short_txt (2 in this pass)"}
+{"t": 1795720426.2577932, "ist": "00:43:46", "ev": "beat", "d": "p2w.py: scoring 29_dot_leaders_txtpos (4 in this pass)"}
+{"t": 1795720431.0057442, "ist": "00:43:51", "ev": "beat", "d": "p2w.py: scoring 301_lab_report_panel (6 in this pass)"}
+{"t": 1795720435.6329992, "ist": "00:43:55", "ev": "beat", "d": "p2w.py: scoring 303_discharge_summary (8 in this pass)"}
+{"t": 1795720440.2504792, "ist": "00:44:00", "ev": "beat", "d": "p2w.py: scoring 305_vaccination_certificate (10 in this pass)"}
+{"t": 1795720444.8921683, "ist": "00:44:04", "ev": "beat", "d": "p2w.py: scoring 30_mixed_font_sizes_one_base (12 in this pass)"}
+{"t": 1795720465.1319256, "ist": "00:44:25", "ev": "beat", "d": "p2w.py: scoring 311_fir_police_form (2 in this pass)"}
+{"t": 1795720469.7751672, "ist": "00:44:29", "ev": "beat", "d": "p2w.py: scoring 313_power_of_attorney (4 in this pass)"}
+{"t": 1795720474.3895912, "ist": "00:44:34", "ev": "beat", "d": "p2w.py: scoring 315_gazette_notification (6 in this pass)"}
+{"t": 1795720479.0351126, "ist": "00:44:39", "ev": "beat", "d": "p2w.py: scoring 317_rti_response (8 in this pass)"}
+{"t": 1795720483.6290786, "ist": "00:44:43", "ev": "beat", "d": "p2w.py: scoring 31_times_body_arial_headings (10 in this pass)"}
+{"t": 1795720488.1893868, "ist": "00:44:48", "ev": "beat", "d": "p2w.py: scoring 321_auditors_report (12 in this pass)"}
+{"t": 1795720509.6700861, "ist": "00:45:09", "ev": "beat", "d": "p2w.py: scoring 323_credit_card_statement (2 in this pass)"}
+{"t": 1795720514.3578117, "ist": "00:45:14", "ev": "beat", "d": "p2w.py: scoring 326_itr_computation (4 in this pass)"}
+{"t": 1795720519.0644946, "ist": "00:45:19", "ev": "beat", "d": "p2w.py: scoring 330_cad_drawing_sheet (6 in this pass)"}
+{"t": 1795720545.2511404, "ist": "00:45:45", "ev": "beat", "d": "relay: measuring corpus chunk 2/4 on the restored engine"}
+{"t": 1795720570.8702374, "ist": "00:46:10", "ev": "beat", "d": "p2w.py: scoring 333_datasheet_spec_tables (2 in this pass)"}
+{"t": 1795720575.586811, "ist": "00:46:15", "ev": "beat", "d": "p2w.py: scoring 335_msds_safety_data_sheet (4 in this pass)"}
+{"t": 1795720580.2760475, "ist": "00:46:20", "ev": "beat", "d": "p2w.py: scoring 340_bill_of_lading (6 in this pass)"}
+{"t": 1795720585.050558, "ist": "00:46:25", "ev": "beat", "d": "p2w.py: scoring 342_packing_list (8 in this pass)"}
+{"t": 1795720589.7040997, "ist": "00:46:29", "ev": "beat", "d": "p2w.py: scoring 344_customs_declaration (10 in this pass)"}
+{"t": 1795720594.3753474, "ist": "00:46:34", "ev": "beat", "d": "p2w.py: scoring 350_question_paper (12 in this pass)"}
+{"t": 1795720617.6640432, "ist": "00:46:57", "ev": "beat", "d": "p2w.py: scoring 352_certificate_ornate_borde (2 in this pass)"}
+{"t": 1795720622.352294, "ist": "00:47:02", "ev": "beat", "d": "p2w.py: scoring 35_four_typefaces_one_page (4 in this pass)"}
+{"t": 1795720626.850136, "ist": "00:47:06", "ev": "beat", "d": "p2w.py: scoring 361_product_catalogue_grid (6 in this pass)"}
+{"t": 1795720631.74995, "ist": "00:47:11", "ev": "beat", "d": "p2w.py: scoring 363_warranty_card (8 in this pass)"}
+{"t": 1795720636.5998154, "ist": "00:47:16", "ev": "beat", "d": "p2w.py: scoring 365_recipe_card (10 in this pass)"}
+{"t": 1795720641.3400028, "ist": "00:47:21", "ev": "beat", "d": "p2w.py: scoring 370_offer_letter (12 in this pass)"}
+{"t": 1795720667.0668154, "ist": "00:47:47", "ev": "beat", "d": "p2w.py: scoring 372_timesheet_grid (2 in this pass)"}
+{"t": 1795720671.6576207, "ist": "00:47:51", "ev": "beat", "d": "p2w.py: scoring 374_org_chart (4 in this pass)"}
+{"t": 1795720676.2803235, "ist": "00:47:56", "ev": "beat", "d": "p2w.py: scoring 37_font_not_embedded_substit (6 in this pass)"}
+{"t": 1795720681.2563329, "ist": "00:48:01", "ev": "beat", "d": "p2w.py: scoring 381_incident_report_timeline (8 in this pass)"}
+{"t": 1795720685.8665242, "ist": "00:48:05", "ev": "beat", "d": "p2w.py: scoring 383_api_docs_page (10 in this pass)"}
+{"t": 1795720690.5900946, "ist": "00:48:10", "ev": "beat", "d": "p2w.py: scoring 390_wide_data_appendix (12 in this pass)"}
+{"t": 1795720711.8344562, "ist": "00:48:31", "ev": "beat", "d": "p2w.py: scoring 392_statistical_console_outp (2 in this pass)"}
+{"t": 1795720716.4014032, "ist": "00:48:36", "ev": "beat", "d": "p2w.py: scoring 394_map_with_legend (4 in this pass)"}
+{"t": 1795720721.1286094, "ist": "00:48:41", "ev": "beat", "d": "p2w.py: scoring 400_comic_page_speech_bubble (6 in this pass)"}
+{"t": 1795720726.1289096, "ist": "00:48:46", "ev": "beat", "d": "p2w.py: scoring 402_calendar_month_grid (8 in this pass)"}
+{"t": 1795720730.7415557, "ist": "00:48:50", "ev": "beat", "d": "p2w.py: scoring 404_sudoku_grid (10 in this pass)"}
+{"t": 1795720735.2709866, "ist": "00:48:55", "ev": "beat", "d": "p2w.py: scoring 406_passport_mrz_page (12 in this pass)"}
+{"t": 1795720754.3355865, "ist": "00:49:14", "ev": "beat", "d": "p2w.py: scoring 40_devanagari_shaping_font (2 in this pass)"}
+{"t": 1795720758.9662628, "ist": "00:49:18", "ev": "beat", "d": "p2w.py: scoring 411_nested_xobject_transform (4 in this pass)"}
+{"t": 1795720763.3485146, "ist": "00:49:23", "ev": "beat", "d": "p2w.py: scoring 414_transparency_softmask (6 in this pass)"}
+{"t": 1795720837.64117, "ist": "00:50:37", "ev": "beat", "d": "relay: measuring corpus chunk 3/4 (109 of 212 done)"}
+{"t": 1795720861.1721904, "ist": "00:51:01", "ev": "beat", "d": "p2w.py: scoring 41_coloured_headings_white_b (2 in this pass)"}
+{"t": 1795720870.6695564, "ist": "00:51:10", "ev": "beat", "d": "p2w.py: scoring 43_red_stamp_over_black_text (4 in this pass)"}
+{"t": 1795720880.3589015, "ist": "00:51:20", "ev": "beat", "d": "p2w.py: scoring 45_coloured_callout_box (6 in this pass)"}
+{"t": 1795720889.9401808, "ist": "00:51:29", "ev": "beat", "d": "p2w.py: scoring 47_grey_body_black_headings (8 in this pass)"}
+{"t": 1795720899.2403648, "ist": "00:51:39", "ev": "beat", "d": "p2w.py: scoring 49_coloured_background_block (10 in this pass)"}
+{"t": 1795720909.2475758, "ist": "00:51:49", "ev": "beat", "d": "p2w.py: scoring 51_two_cm_margins (12 in this pass)"}
+{"t": 1795720935.6040938, "ist": "00:52:15", "ev": "beat", "d": "p2w.py: scoring 53_single_space_body_15_head (2 in this pass)"}
+{"t": 1795720940.56792, "ist": "00:52:20", "ev": "beat", "d": "p2w.py: scoring 55_sidebar_box_beside_body (4 in this pass)"}
+{"t": 1795720945.4539425, "ist": "00:52:25", "ev": "beat", "d": "p2w.py: scoring 600_reviewed_invoice_with_an (6 in this pass)"}
+{"t": 1795720950.4542124, "ist": "00:52:30", "ev": "beat", "d": "p2w.py: scoring 60_page_border (8 in this pass)"}
+{"t": 1795720955.2325957, "ist": "00:52:35", "ev": "beat", "d": "p2w.py: scoring 62_two_col_newsletter_pull_q (10 in this pass)"}
+{"t": 1795720960.2399337, "ist": "00:52:40", "ev": "beat", "d": "p2w.py: scoring 64_newspaper_uneven_columns_ (12 in this pass)"}
+{"t": 1795720980.2906516, "ist": "00:53:00", "ev": "beat", "d": "p2w.py: scoring 66_two_col_footnotes_bottom (2 in this pass)"}
+{"t": 1795720985.1729143, "ist": "00:53:05", "ev": "beat", "d": "p2w.py: scoring 68_journal_wide_table_spanni (4 in this pass)"}
+{"t": 1795720989.9663801, "ist": "00:53:09", "ev": "beat", "d": "p2w.py: scoring 70_magazine_drop_cap_photo_c (6 in this pass)"}
+{"t": 1795720994.794609, "ist": "00:53:14", "ev": "beat", "d": "p2w.py: scoring 72_bank_statement_no_rules_r (8 in this pass)"}
+{"t": 1795720999.567594, "ist": "00:53:19", "ev": "beat", "d": "p2w.py: scoring 74_balance_sheet_indented_su (10 in this pass)"}
+{"t": 1795721004.2341087, "ist": "00:53:24", "ev": "beat", "d": "p2w.py: scoring 76_devanagari_table (12 in this pass)"}
+{"t": 1795721024.5821722, "ist": "00:53:44", "ev": "beat", "d": "p2w.py: scoring 78_mixed_english_devanagari_ (2 in this pass)"}
+{"t": 1795721029.2348988, "ist": "00:53:49", "ev": "beat", "d": "p2w.py: scoring 80_gstin_pan_cin_ifsc_table (4 in this pass)"}
+{"t": 1795721034.0643203, "ist": "00:53:54", "ev": "beat", "d": "p2w.py: scoring admit-card (6 in this pass)"}
+{"t": 1795721038.83981, "ist": "00:53:58", "ev": "beat", "d": "p2w.py: scoring balance-sheet-two-columns-of (8 in this pass)"}
+{"t": 1795721043.6714153, "ist": "00:54:03", "ev": "beat", "d": "p2w.py: scoring boq-horizontal-rules-only (10 in this pass)"}
+{"t": 1795721048.5512826, "ist": "00:54:08", "ev": "beat", "d": "p2w.py: scoring brochure-3col-with-sidebar-b (12 in this pass)"}
+{"t": 1795721069.1585834, "ist": "00:54:29", "ev": "beat", "d": "p2w.py: scoring delivery-challan (2 in this pass)"}
+{"t": 1795721129.8630655, "ist": "00:55:29", "ev": "beat", "d": "relay: measuring corpus chunk 4/4 (159 of 212 done)"}
+{"t": 1795721154.8365958, "ist": "00:55:54", "ev": "beat", "d": "p2w.py: scoring eway-bill (2 in this pass)"}
+{"t": 1795721164.9395788, "ist": "00:56:04", "ev": "beat", "d": "p2w.py: scoring gst-invoice-horizontal-rules (4 in this pass)"}
+{"t": 1795721174.4581747, "ist": "00:56:14", "ev": "beat", "d": "p2w.py: scoring insurance-policy-schedule (6 in this pass)"}
+{"t": 1795721184.4310713, "ist": "00:56:24", "ev": "beat", "d": "p2w.py: scoring itr-computation-with-slab-ta (8 in this pass)"}
+{"t": 1795721194.3395157, "ist": "00:56:34", "ev": "beat", "d": "p2w.py: scoring magazine-2col-pullquote-span (10 in this pass)"}
+{"t": 1795721204.556684, "ist": "00:56:44", "ev": "beat", "d": "p2w.py: scoring marksheet-university-consoli (12 in this pass)"}
+{"t": 1795721227.3399575, "ist": "00:57:07", "ev": "beat", "d": "p2w.py: scoring newsletter-3col-header-foote (2 in this pass)"}
+{"t": 1795721238.2527928, "ist": "00:57:18", "ev": "beat", "d": "p2w.py: scoring payslip-label-left-amount-ri (4 in this pass)"}
+{"t": 1795721248.1508052, "ist": "00:57:28", "ev": "beat", "d": "p2w.py: scoring price-list-2col-dense-right- (6 in this pass)"}
+{"t": 1795721258.15705, "ist": "00:57:38", "ev": "beat", "d": "p2w.py: scoring product-catalogue-code-left- (8 in this pass)"}
+{"t": 1795721264.4541054, "ist": "00:57:44", "ev": "beat", "d": "p2w.py: scoring purchase-order (10 in this pass)"}
+{"t": 1795721269.2335095, "ist": "00:57:49", "ev": "beat", "d": "p2w.py: scoring report-2col-table-spanning-b (12 in this pass)"}
+{"t": 1795721289.4322355, "ist": "00:58:09", "ev": "beat", "d": "p2w.py: scoring salary-slip-factory-wages (2 in this pass)"}
+{"t": 1795721294.2943323, "ist": "00:58:14", "ev": "beat", "d": "p2w.py: scoring table-of-contents-dot-leader (4 in this pass)"}
+{"t": 1795721299.075851, "ist": "00:58:19", "ev": "beat", "d": "p2w.py: scoring table-with-no-header-row (6 in this pass)"}
+{"t": 1795721303.7853243, "ist": "00:58:23", "ev": "beat", "d": "p2w.py: scoring text-held-twice-shadow-text (8 in this pass)"}
+{"t": 1795721308.7443898, "ist": "00:58:28", "ev": "beat", "d": "p2w.py: scoring 12_stamp_across_page_break (10 in this pass)"}
+{"t": 1795721317.006425, "ist": "00:58:37", "ev": "beat", "d": "p2w.py: scoring 57_centred_title_page_left_b (12 in this pass)"}
+{"t": 1795721342.0566225, "ist": "00:59:02", "ev": "beat", "d": "p2w.py: scoring 59_landscape_mixed_portrait (2 in this pass)"}
+{"t": 1795721350.4877217, "ist": "00:59:10", "ev": "beat", "d": "p2w.py: scoring balance-sheet-and-profit-los (4 in this pass)"}
+{"t": 1795721358.899174, "ist": "00:59:18", "ev": "beat", "d": "p2w.py: scoring mutual-fund-statement (6 in this pass)"}
+{"t": 1795721367.4682467, "ist": "00:59:27", "ev": "beat", "d": "p2w.py: scoring 602_bookmarked_annual_report (8 in this pass)"}
+{"t": 1795721421.830676, "ist": "01:00:21", "ev": "beat", "d": "relay: measuring the last 9 documents"}
+{"t": 1795721719.986445, "ist": "01:05:19", "ev": "beat", "d": "relay: last 9 documents; newsletter measured 0.20 share5 on the restored engine"}
+{"t": 1795722062.2346115, "ist": "01:11:02", "ev": "beat", "d": "relay: writing the report"}
+{"t": 1795722082.7316027, "ist": "01:11:22", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722086.355608, "ist": "01:11:26", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795722087.0547822, "ist": "01:11:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722090.6746652, "ist": "01:11:30", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722116.8781676, "ist": "01:11:56", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722118.8709972, "ist": "01:11:58", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795722119.341471, "ist": "01:11:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722121.0719516, "ist": "01:12:01", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722124.2735102, "ist": "01:12:04", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795722124.363346, "ist": "01:12:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795722127.2873018, "ist": "01:12:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795722127.4019213, "ist": "01:12:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795722127.946827, "ist": "01:12:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795722128.0605173, "ist": "01:12:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795722128.6065068, "ist": "01:12:08", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722130.3822868, "ist": "01:12:10", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795722130.7415228, "ist": "01:12:10", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722132.5327406, "ist": "01:12:12", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722139.307843, "ist": "01:12:19", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722141.0958562, "ist": "01:12:21", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795722141.4508991, "ist": "01:12:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722143.241341, "ist": "01:12:23", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722150.5918024, "ist": "01:12:30", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722152.3039076, "ist": "01:12:32", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795722152.660447, "ist": "01:12:32", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795722154.4379516, "ist": "01:12:34", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
