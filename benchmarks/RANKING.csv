@@ -1,7 +1,7 @@
 rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p90_pt,max_pt,text_recall,chars_missing,worst_page,pages,colour_share,coloured_px,tone_share,order_share,font_share
 1,041122-Account_Opening_Form,content-loss,content-missing-partly-replaced,98.72,98.65,98.65,98.65,98.65,477.6,687.84,937.92,99.68,127,9,9,0.00,520621,47.78,79.11,100.00
 2,Account_Opening_Form_Fillable_filled,content-loss,content-missing-partly-replaced,97.9,97.72,97.66,97.62,97.55,138.72,312.0,358.08,99.67,131,7,9,0.00,520618,40.16,78.94,99.77
-3,newsletter-3col-header-footer,content-loss,content-missing-partly-replaced,90.88,87.62,86.76,86.3,86.1,72.48,120.0,172.8,100.0,0,1,1,0.00,288794,15.62,70.21,100.00
+3,newsletter-3col-header-footer,content-loss,content-missing-partly-replaced,90.88,87.62,86.76,0.2,86.1,72.48,120.0,172.8,100.0,0,1,1,0.00,288794,15.62,70.21,100.00
 4,one-page-rotated-180-degrees,content-loss,content-missing-partly-replaced,81.64,81.64,81.64,81.64,81.64,27.84,156.0,177.6,100.0,0,2,2,,0,42.66,91.78,100.00
 5,600_reviewed_invoice_with_annotations,content-loss,content-missing-partly-replaced,73.32,69.97,67.94,62.46,51.68,11.04,48.96,62.88,100.0,0,1,1,68.65,15927,63.01,93.04,100.00
 6,601_fillable_admission_form,content-loss,content-missing-partly-replaced,61.58,57.93,55.92,52.39,44.76,12.0,24.96,27.84,99.58,2,1,1,,0,61.13,96.47,97.65
@@ -14,7 +14,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 13,77_arabic_rtl_document,content-loss,content-missing-partly-replaced,20.3,13.98,12.92,11.89,10.75,5.28,19.2,19.68,100.0,0,1,1,,0,86.40,83.50,100.00
 14,363_warranty_card,displacement,content-present-wholly-displaced,27.14,22.01,18.61,10.58,0.0,2.4,3.84,4.32,100.0,0,1,1,,0,85.04,96.55,100.00
 15,40_devanagari_shaping_font,mixed,content-partly-lost,26.79,16.62,13.5,10.48,7.89,1.92,14.88,24.0,100.0,0,1,1,90.83,1341,81.47,100.00,100.00
-16,itr-computation-with-slab-table,content-loss,content-missing-partly-replaced,44.89,29.28,15.96,9.1,7.4,1.44,11.04,53.28,100.0,0,1,1,,0,88.16,95.50,100.00
+16,itr-computation-with-slab-table,content-loss,content-missing-partly-replaced,44.89,29.28,15.96,42.33,7.4,1.44,11.04,53.28,100.0,0,1,1,,0,88.16,95.50,100.00
 17,76_devanagari_table,mixed,content-partly-lost,14.5,8.9,8.22,7.91,5.53,3.84,14.88,15.36,100.0,0,1,1,100.00,851,89.18,100.00,100.00
 18,75_merged_header_cell_three_columns,mixed,content-partly-lost-and-displaced,29.22,9.06,8.09,7.62,5.08,0.96,14.88,20.16,100.0,0,1,1,70.50,9082,77.22,97.83,100.00
 19,journal-2col-with-footnotes,content-loss,content-missing-partly-replaced,39.39,18.22,11.5,6.34,5.19,0.96,7.68,35.04,100.0,0,1,1,,0,86.89,80.89,100.00
@@ -65,7 +65,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 64,310_court_judgment,clean,none,16.53,6.32,3.33,0.85,0.49,0.96,2.4,14.88,100.0,0,1,1,,0,83.45,100.00,100.00
 65,delivery-challan,clean,none,17.49,4.52,2.21,0.84,0.46,0.96,1.92,12.96,100.0,0,1,1,84.22,4342,92.21,85.93,100.00
 66,67_two_col_with_sidebar,clean,none,9.51,3.78,2.08,0.8,0.54,0.96,2.4,11.52,100.0,0,1,1,89.09,14746,93.56,97.18,100.00
-67,39_small_caps_letter_spacing,clean,none,10.67,6.41,3.98,0.8,0.0,1.44,2.4,4.8,100.0,0,1,1,60.64,1824,86.80,95.42,100.00
+67,39_small_caps_letter_spacing,clean,none,10.67,6.41,3.98,0.7,0.0,1.44,2.4,4.8,100.0,0,1,1,60.64,1824,86.80,95.42,100.00
 68,form16-part-b,clean,none,20.45,6.17,2.83,0.77,0.04,0.96,1.92,5.76,100.0,0,1,2,,0,88.90,93.49,100.00
 69,two-tables-stacked-with-no-gap,clean,none,21.85,6.3,2.84,0.77,0.01,0.96,1.92,5.28,100.0,0,1,1,,0,93.87,100.00,100.00
 70,report-2col-table-spanning-both-columns,clean,none,25.94,7.43,3.28,0.76,0.35,0.96,1.92,12.0,100.0,0,1,1,28.37,645,94.24,78.65,100.00
@@ -105,7 +105,7 @@ rank,document,signature,problem,share1,share2,share3,share5,share10,median_pt,p9
 104,admission-form-labels-left-boxes-right,clean,none,5.41,1.66,0.88,0.21,0.0,0.96,1.92,4.32,100.0,0,1,1,98.59,2199,96.07,93.64,100.00
 105,05_round_company_seal_curved_text,clean,none,3.56,1.06,0.63,0.19,0.01,0.96,2.4,5.28,100.0,0,1,1,66.22,17796,92.46,71.30,100.00
 106,boq-horizontal-rules-only,clean,none,3.99,2.09,0.75,0.13,0.08,1.44,1.92,8.64,100.0,0,1,1,,0,98.12,100.00,100.00
-107,350_question_paper,clean,none,6.82,2.31,0.98,0.12,0.1,0.96,1.92,16.8,100.0,0,1,1,,0,93.85,93.35,100.00
+107,350_question_paper,clean,none,6.82,2.31,0.98,0.11,0.1,0.96,1.92,16.8,100.0,0,1,1,,0,93.85,93.35,100.00
 108,table-with-rotated-header,clean,none,12.51,1.08,0.44,0.12,0.0,0.96,0.96,3.36,100.0,0,1,1,,0,95.83,94.49,100.00
 109,08_two_overlapping_stamps,clean,none,0.6,0.29,0.2,0.11,0.05,0.96,4.32,11.04,100.0,0,1,1,89.44,53238,94.74,94.56,100.00
 110,391_survey_questionnaire_grid,clean,content-missing-nothing-in-its-place,1.24,0.61,0.28,0.11,0.0,0.96,2.4,4.32,99.58,2,1,1,,0,96.61,100.00,100.00
