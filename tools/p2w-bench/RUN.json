@@ -1,5 +1,16 @@
 {
- "agents": [],
+ "agents": [
+  {
+   "id": "5K6VD2QX509EHTJ0N4AJ1RAQKX",
+   "angle": "engine spacing code map - spacing() :149, ctx.newPage :819, cleared :3800/:4722, spacer emitter :6055-6185",
+   "result": "returned the patch shapes and line numbers this run used"
+  },
+  {
+   "id": "4XPVKR9J4N9V4R2CA0ZHN5DGR0",
+   "angle": "residual run analysis on the positive control - 41 failing runs grouped by size and band",
+   "result": "37 of 41 are table cells at 7.20pt: entry -3.0pt, pitch +0.652pt/row"
+  }
+ ],
  "attempts": 2,
  "docs_improved": 0,
  "ended": null,
