@@ -6784,3 +6784,4 @@
 {"t": 1795661733.3852284, "ist": "08:25:33", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795661733.8481903, "ist": "08:25:33", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795661735.8206642, "ist": "08:25:35", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795662319.856034, "ist": "08:35:19", "ev": "beat", "d": "heartbeat before any claim: gverify: converting corpus slices, then measuring 60 through Google"}
