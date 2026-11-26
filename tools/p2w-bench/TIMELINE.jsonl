@@ -7993,3 +7993,12 @@
 {"t": 1795721710.8133178, "ist": "01:05:10", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795721726.009159, "ist": "01:05:26", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795721732.5996728, "ist": "01:05:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795721735.9772968, "ist": "01:05:35", "ev": "attempt", "d": "none -> lead"}
+{"t": 1795721736.1051114, "ist": "01:05:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795721736.2055619, "ist": "01:05:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795721736.7792156, "ist": "01:05:36", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795721740.4793153, "ist": "01:05:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795721743.8268714, "ist": "01:05:43", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795721743.9370894, "ist": "01:05:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795721744.0399106, "ist": "01:05:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795721744.5718937, "ist": "01:05:44", "ev": "killed", "d": "dead claim cleared by force release"}

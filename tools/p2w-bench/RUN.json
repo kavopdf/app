@@ -3,12 +3,13 @@
   "aa49newsletter content-loss root cause-01",
   "gateratchet floor vs engine match-01"
  ],
- "attempts": 1,
+ "attempts": 2,
  "docs_improved": 0,
- "ended": null,
- "ended_ts": null,
+ "ended": "01:05",
+ "ended_ts": 1795721744.5725703,
  "kept": 0,
  "started": "23:56",
  "started_ts": 1795717572.9702141,
- "window_for_claim": 1795717572.9702141
+ "window_for_claim": 1795717572.9702141,
+ "class": "none"
 }
