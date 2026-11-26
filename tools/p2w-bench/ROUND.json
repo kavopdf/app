@@ -17,11 +17,9 @@
       }
     ]
   },
-  "fixer_doing": "census: measuring 41 margin-claiming docs",
-  "fixer_doing_since": 1795725070.690034,
   "fixer_engine_at_claim": "aa496ebe",
   "fixer_last_beat": 1795725070.6900346,
-  "fixer_started": 1795725697.1441557,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
