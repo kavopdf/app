@@ -928,3 +928,35 @@ construction (writeTxt runs after DocxWriter in every caller) and byte-identical
 | 06:03 | reading the class ranking, which a watchdog should not run | `classpick.py` is the fixer's decision tool and it writes state: my two calls flipped `ROTATION.json`'s `next` from txt to docx and rewrote the docx cursor's `since` from 02:34 to 06:06, and appended to `TIMELINE.jsonl` | `git checkout -- tools/p2w-bench/ROTATION.json tools/p2w-bench/TIMELINE.jsonl`, then re-read the file to confirm the committed `since` is 02:34 again | yes - reverted | nothing. Recorded because a rotation cursor moved by the watchdog would have sent the next fixer slot to a class it did not choose |
 
 **What the next fixer slot has in front of it.** The committed rotation has `docx` on `44_header_footer` since 02:34, `txt` on `t12_word_invention` since 2026-11-25 19:11, and `next` on txt. `18_displacement` stays parked since 2026-11-25 21:07 across 122 documents, and its overturn condition - one measured attempt that moves a document under that class on the current engine - can only be met by a fixer slot, because this watchdog may not touch `engine/`.
+
+---
+
+## 2026-11-26 06:20 IST — watchdog: classify went stopped inside this pass, google clean is flat too, and STEP 5 now fires on the gate rather than the class
+
+**This section supersedes the 06:03 section above it, from the same pass.** The picture moved while I was
+writing it: the Google measurement completed between my STEP 1 read and my report, so measure-google went
+from 189 of 213 to 213 of 213, classify went from waiting to stopped, and the Google clean count in the
+day's table settled from a partial reading to 42. Nothing in the 06:03 section was wrong when written; it
+is wrong now, and the correction belongs here rather than as an edit to a record.
+
+| time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
+|---|---|---|---|---|---|
+| 06:20 | STEP 1 again, after the first report refused to stay true | **one stage now reads stopped: `classify`, 9.6 h against a 6 h threshold.** It read `waiting` at 9.4 h when the pass started, which was correct while the measurement it groups was incomplete | `health.py`, `health.py --stalled` (exit 1, naming classify), `health.py --json`, `progress.py --amend`, `progress.py --json`, `status.py` | **not with the tools this pass has** | the classifier cron, hourly at :40. Its table is older than the Google results it must group, so it is overdue rather than misconfigured. A pass with a `cron` tool reads its runs and moves it; this one has none |
+| 06:20 | STEP 2, the row I had already committed | the first row carried a partial reading: `google clean 45` on 208 measured, which the same table reads as 42 once the write settles, so the row I committed overstated the day by 3 | `progress.py --amend`, which is the sanctioned path and writes its own `amended: was ...` note | yes - amended | nothing. The committed row now reads docx open 59, txt failing 9, google 208, google clean 42, with the amend note recording what it replaced. Past rows were not touched |
+| 06:20 | STEP 5, the flat `.docx open` column - **it now fires** | the test the earlier pass left for itself was: fires if `google clean` is flat too, or if `RANKING.csv` is older than the engine it measures. `google clean` is 42 to 42, so the first condition holds, on top of docx open reading 59 for six consecutive rows | read `RANKING.csv` (59 above the share threshold), the txt table (9 with a failed check), `git log` on `RANKING.csv` and on `engine/`, and the 05:28 relay row | **decided - the approach is wrong, not the class** | **No class was parked.** The class is not the thing that is failing: the 05:28 row measured that `regress.py --check` refuses on an unmeasured engine, that a corpus re-score costs 4 slices and 11 min, and that a revert costs the same again, so a change is measured, reverted and never lands inside a slot. That is why 0 are kept whichever class is picked. **What replaces it:** a scope keyed on the documents a change can actually move, so a patch whose .docx output is byte-identical on every probe does not pay a full corpus re-score before it can land - the same repair the 05:25 row names. Not implemented here: `regress.py` and the verifiers are on the do-not-touch list, and the scope rule is the fixer's to change with a measurement. **Overturned by:** one engine change that lands and moves docx open |
+| 06:20 | STEP 4 D, the slot | the fixer claimed at 05:57 and `status.py` reads SILENT, no beacon for eighteen minutes, claim eighteen minutes old | compared the claim age against `round.py`'s stale window for the fixer, 45 min | **no, deliberately** | the claim is inside its window, so `round.py --release-fixer --force` was NOT run. A second run beside one that may still be alive is the one thing the claim exists to prevent. Overturned by: the next pass finding this same claim still in `ROUND.json` |
+
+**The 06:03 section's "nothing stopped" is superseded, and its "STEP 5 does not fire" is superseded.** Both
+were true of the reading they came from and neither is true of the pipeline now. The lesson worth keeping:
+a pass that reads the picture once, then writes for ten minutes, can ship a stale verdict - the second read
+is not optional when the first one says a stage is `moving` towards `done`.
+
+---
+
+## 2026-11-26 06:26 IST — watchdog: fix joined classify as stopped inside the same pass, on a silent claim that expires on its own
+
+| time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |
+|---|---|---|---|---|---|
+| 06:26 | the second read, taken before committing the report | **`fix` went from moving to stopped inside this pass**, with the note that a run is still marked running and has not beaconed. `classify` was already stopped, so two of the five rows now read stopped | `health.py`, `health.py --stalled` (exit 1, naming both), `status.py` (verdict SILENT, claim still inside the fixer's stale window), `round.py --phase` (fix) | **no, and none is needed** | the claim stands down on its own when its window runs out and the next fixer slot takes the work, so `round.py --release-fixer --force` was NOT run - releasing a claim that may still be alive would put a second run into the engine beside it. Overturned by: the same claim still in `ROUND.json` after its window has passed, which would mean it is not expiring and must be forced |
+
+**What this pass learned about itself.** The 06:03 read said nothing was stopped and the 06:20 read said one stage was; both were true of the moment they were taken, and the pipeline moved twice underneath a single pass. A verdict written from one read and shipped ten minutes later can be stale, so the report this pass sends is generated from a read taken immediately before it was written, not from the read that opened it. The generator prints the ages it was given, so a reader can see which read they came from.
