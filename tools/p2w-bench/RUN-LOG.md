@@ -1,5 +1,3 @@
-| 23 Nov 06:15 | fixer | attempt 18_displacement -> lead (0/? moved) |
-| 23 Nov 06:18 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 23 Nov 07:36 | fixer | attempt 18_displacement -> lead (0/? moved) |
 | 23 Nov 08:11 | fixer | attempt 00_page_count -> kept (0/? moved) |
 | 23 Nov 11:28 | fixer | attempt 00_page_count -> lead (0/? moved) |
@@ -199,3 +197,4 @@
 | 26 Nov 19:45 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 26 Nov 20:35 | fixer | attempt t09_page_furniture -> lead (0/? moved) |
 | 26 Nov 20:46 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 26 Nov 22:12 | fixer | attempt 18_displacement -> lead (0/208 moved) |
