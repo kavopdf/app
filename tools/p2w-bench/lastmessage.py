@@ -314,6 +314,43 @@ def _report_json():
 _HHMM = re.compile(r"(\d{1,2}):(\d{2})")
 
 
+def verify_engine_claim(text, data):
+    """A COUNT OF CLEAN DOCUMENTS IS NOT A COUNT OF DOCUMENTS CLEAN ON THIS ENGINE.
+
+    Measured 26 Nov, the 15:46 report: its Fixed - Google row read
+
+        **42** - out of the **207** re-measured on this engine
+
+    Both numbers are real, so verify() passed it: 42 documents are clean and 207 were scored. But only
+    TWO of those 207 had ever been measured on the engine in the tree - 206 were on a4d8fca4 and 5 on
+    d85db0a9 - and neither of the two current ones is clean. The row as written says the opposite of
+    what the store holds, and it says it in a number that checks out.
+
+    report.py already computes the honest version and the run before this one printed it. This refuses a
+    report that replaces it with the flattering one.
+    """
+    out = []
+    try:
+        cur = data.get("google_scored_current")
+        fixed = data.get("google_fixed_current")
+        if cur is None or fixed is None:
+            return out
+        # the row that talks about this engine, wherever the run put it
+        for ln in text.splitlines():
+            if "re-measured on this engine" not in ln and "re-measured on the engine" not in ln:
+                continue
+            nums = re.findall(r"\*\*(\d+)\*\*|(?<![\d.])(\d+)(?![\d.])", ln)
+            flat = [a or b for a, b in nums]
+            if str(cur) not in flat:
+                out.append("the 're-measured on this engine' row does not contain %s, the number of "
+                           "documents actually measured on the engine in this tree (report.py says "
+                           "%s of %s) - a clean count from an older engine is not this engine's"
+                           % (cur, fixed, cur))
+    except Exception as e:
+        out.append("the engine-claim check raised %s" % type(e).__name__)
+    return out
+
+
 def verify_facts(text, data):
     """Compare the report's PROSE against report.py - the timing, the corpus size, the .txt, the agents.
 
@@ -745,7 +782,7 @@ def main(argv):
 
     problems, checked = verify(text)
     data = _report_json()
-    facts = verify_facts(text, data) + verify_sections(text)
+    facts = verify_facts(text, data) + verify_sections(text) + verify_engine_claim(text, data)
     if problems is None:
         print("WARNING: report.py could not be run, so no number in this message was checked "
               "against it. Say so in the report.")
