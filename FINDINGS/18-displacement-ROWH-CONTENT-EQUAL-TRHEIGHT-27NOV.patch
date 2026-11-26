@@ -1,0 +1,41 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 80c91eec..a08654a0 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6543,6 +6543,12 @@ public final class DocxWriter {
+                 rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
+                 rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
+             }
++            // A ROW WHOSE EVERY CELL HOLDS ONE LINE is the only row where the cell's content
++            // is a single line box, so it is the only row where "content == w:trHeight" can be
++            // stated without inventing a line. The row cut at the paper's bottom (rowCapTw) is
++            // a clip, not a pitch, and a wrapped row's box is the line advance - both keep the
++            // pair they had. See the emitter below for why the equality matters.
++            boolean oneLineRow = rowParts == 1 && rowTwHere > 0 && rowCapTw <= 0;
+             // The budget is charged what the renderer will LAY OUT, which is the content plus
+             // the rule - not the content alone. Charging the content alone under-measures every
+             // ruled table by one rule a row, and this is the number the flow after the table is
+@@ -6959,6 +6965,23 @@ public final class DocxWriter {
+                     c += span;
+                     continue;
+                 }
++                // A ONE-LINE ROW'S CONTENT IS THE ROW'S OWN HEIGHT, NOT 0.8 OF IT.
++                //
++                // w:trHeight is written atLeast, and a renderer that lays the CELL rather than
++                // the row collapses every one-line row to before + w:line - 0.2 of the pitch
++                // short - and the rows under it climb by that much each. Making the content
++                // equal the number already written to w:trHeight is the only form that needs no
++                // new number: the row is laid at its declared height whichever rule binds.
++                //
++                // Measured in Google on 362_price_list_dense and 16_right_aligned_amounts_txtpos:
++                // raising w:before to the row's height, and nothing else, took both 41/42 ->
++                // 42/42. The LibreOffice proxy reads it as worse (18_median_dy 64 -> 100), which
++                // is the same collision 18-displacement-ROW-HEIGHT-IS-CONTENT-DRIVEN-26NOV
++                // records: LO honours trHeight, so it was already right there and this moves the
++                // baseline 0.2 of the pitch down inside a row it did not need to move.
++                if (oneLineRow && !cell.isEmpty() && vspan <= 1 && !vCont && cellSz > 0f) {
++                    cellBeforeTw = Math.max(cellBeforeTw, rowHeightTw - cellBoxTw);
++                }
+                 inner.append("</w:tcPr>")
+                         .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
+                         .append("<w:snapToGrid w:val=\"0\"/>")
