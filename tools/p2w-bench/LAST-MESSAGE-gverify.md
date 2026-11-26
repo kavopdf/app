@@ -1,41 +1,64 @@
-**gverify - 26 Nov 20:35 IST - stage: classify**
+# Google verification — 60 documents measured through Google Docs
 
-**Measurement is complete and the capability table is committed.**
+This run took 60 documents end to end: the `.docx` uploaded, converted to a Google Doc, exported as
+Google's own PDF, and scored against the source PDF with the 42 checks. All 60 scored; none refused.
+
+## Where the corpus stands
+
+| | count |
+|---|---:|
+| verified — a Google result on the engine in the tree | 68 |
+| pass every check offered | 18 |
+| fail at least one | 42 |
+| refused (page count) | 8 |
+
+A refused document is not a pass. The 8 are carried as refusals and are not counted in the 18.
+
+## Which check fails how many documents
+
+| check | documents |
+|---|---:|
+| `60\_text\_column\_right\_edge` | 20 |
+| `18\_displacement` | 18 |
+| `04\_chars\_missing` | 13 |
+| `59\_shape\_anchor` | 11 |
+| `47\_margins` | 11 |
+| `13\_text\_colours` | 7 |
+| `45\_char\_accuracy` | 7 |
+| `17\_matched\_runs` | 6 |
+| `43\_within\_10pt\_x` | 5 |
+| `35\_rotation` | 4 |
+| `26\_text\_overlap` | 3 |
+| `44\_header\_footer` | 2 |
+| `05\_chars\_extra` | 1 |
+| `27\_text\_off\_page` | 1 |
+| `10\_font\_sizes` | 1 |
+| `32\_stroke\_lines` | 1 |
+| `23\_line\_pitch` | 1 |
+| `66\_table\_cell\_width` | 1 |
+
+## The capability table
 
 | | |
 |---|---:|
-| documents verified through Google | 213 |
-| scored | 205 |
-| refused on page count | 8 |
-| pass every check offered (Google) | 47 |
-| fail at least one check | 158 |
+| documents in the table | 205 |
+| LibreOffice pass every check offered | 135 |
+| Google Docs pass every check offered | 47 |
+| engine in the tree | `a4d8fca469bba636` |
+| Google measured on that engine | 60 |
+| LibreOffice measured on that engine | 0 |
 
-**The table, both renderers** (`benchmarks/GOOGLE-VS-LIBREOFFICE.md`, regenerated and committed):
+The table cannot yet name a construct. A row is only readable as "Google drops this, LibreOffice
+honours it" when both halves were measured on the same engine, and the LibreOffice half is measured on
+that engine for 0 pairs. That is the matrix stage's work, not this one's.
 
-    LibreOffice : 135 of 205 pass every check offered
-    Google Docs :  47 of 205 pass every check offered
-    engine in the tree : 025fe9deda5ac7b1
-    Google on it       : 205 of 205 pairs
-    LibreOffice on it  :  83 of 205 pairs
+## Stage and what is next
 
-The LibreOffice column was the stale half: its results carried whichever engine first converted each document. This run converted the corpus and refreshed that half with `--lo-stale`, so 83 of 205 pairs now sit on the engine in the tree. The rest of the pairs are still two-engine, which the table's own header states - a row is a construct Google drops only where both halves match the engine above.
+`stage.py` says **measure-google**: corpus of 213 documents, 68 measured through Google, 60 of them
+scored and 8 refused. Next is to measure more through Google.
 
-**Where Google is stricter** (documents failing the check):
-
-| check | LibreOffice fails | Google fails |
-|---|---:|---:|
-| `18\_displacement` | 18 | 105 |
-| `60\_text\_column\_right\_edge` | 18 | 61 |
-| `04\_chars\_missing` | 2 | 47 |
-| `59\_shape\_anchor` | 10 | 46 |
-| `45\_char\_accuracy` | 2 | 33 |
-| `13\_text\_colours` | 1 | 32 |
-| `17\_matched\_runs` | 5 | 29 |
-| `47\_margins` | 15 | 27 |
-| `44\_header\_footer` | 0 | 13 |
-| `10\_font\_sizes` | 0 | 6 |
-| `32\_stroke\_lines` | 0 | 5 |
-
-`44_header_footer`, `10_font_sizes` and `32_stroke_lines` fail in Google and never in LibreOffice - constructs LibreOffice honours and Google does not.
-
-**Stage and next:** stage.py reports `classify` - 158 failing documents, the class table older than the results. Classifying is the classifier cron's work, not this one. No engine code was touched.
+Two things this run changed for the next one. The `.docx` already sitting in Drive were built by an
+older engine, so a re-measure needs the current `.docx` uploaded again — this run did that for all 60
+and the route that works is the platform upload to an `s3key`, then Drive upload, then copy to a Google
+Doc, then export. And the corpus cache is not complete on a fresh pod: this run had to convert a slice
+before it had 60 documents to measure at all.
