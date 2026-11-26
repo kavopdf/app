@@ -67,6 +67,25 @@ ROOT="/scratch/work/p2w"; CORPUS=ROOT+"/corpus"; DOCX=ROOT+"/out"
 # Where this script lives. Needed because the real-world documents travel with the
 # repository beside it, not in the release zips, so the script must find its own tree.
 HERE=os.path.dirname(os.path.abspath(__file__))
+
+
+def beat(doing):
+    """Say the run is alive from inside a loop that can go minutes without printing anything.
+
+    Measured 26 Nov on the 12:16 run: the three longest silences were 27.9, 19.5 and 9.7 minutes, and all
+    three began right after lastmessage.py announced it was "running a tool for its numbers" - that tool
+    is this one. A document costs about 73 s to score and nothing here ever beat, so a 27-minute scoring
+    pass looked exactly like a run that had died.
+
+    round.py --heartbeat exists for this: a live run must be able to say so between attempts. Every
+    failure is swallowed, because a beat that cannot be written must never cost a measurement.
+    """
+    try:
+        subprocess.run([sys.executable, os.path.join(HERE, "..", "tools", "p2w-bench", "round.py"),
+                        "--heartbeat", "--doing", doing],
+                       timeout=10, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
 DIST=ROOT+"/dist2"; CACHE="/scratch/output/_cache"; REPO=ROOT+"/repo"
 # WHICH TREE THE ENGINE IS BUILT FROM - AND WHY IT IS NOT ALWAYS origin/main.
 #
@@ -1625,6 +1644,7 @@ def run(end):
         grp=todo[i:i+CHUNK]
         got=prerender(grp,end)
         if got: log(f"prerender {got} docx in soffice batches of {CHUNK}")
+        _seen = 0
         for b in grp:
             # NEVER START A DOCUMENT YOU CANNOT FINISH. `if time.time()>=end: break` fires only once the
             # deadline has already passed, and measure_doc_chunked is then given max(30, ...) seconds - so a
@@ -1633,6 +1653,9 @@ def run(end):
             if time.time() >= end - 25:
                 break
             if time.time()>=end: break
+            _seen += 1
+            if _seen % 2 == 0:
+                beat("p2w.py: scoring %s (%d in this pass)" % (b[:28], _seen))
             jf=f"{DIST}/{b}.json"
             if os.path.exists(jf): continue
             p=f"{CORPUS}/{b}.pdf"; d=f"{DOCX}/{b}.docx"

@@ -862,13 +862,27 @@ def silences():
         return {"available": False}
 
 
+# THE KEYS ARE TOOL NAMES AND THE BEATS ARE PROSE, SO MOST OF THEM FELL THROUGH.
+#
+# Measured 26 Nov on the 12:16 run: 70 of its 186 beats landed in "other", and the phase table then
+# showed 35 minutes as "not attributed to a tool" - a fifth of a three-hour run with no account. Every
+# one of the 70 was a real beat, and every one was legible: "relay: re-scoring docx table (slice 1)",
+# "relay: corpus build slice 2", "relay: pod-prep in slices", "relay: soffice gives no render". The
+# classifier matched tool FILENAMES, and a run describing its work in its own words never used one.
+#
+# So the keys now carry the verbs the beats are written with. This is not whack-a-mole if the set is
+# the run's real vocabulary rather than one run's: converting, building, scoring, rendering and
+# preparing a pod are the five things a slot does, and each of them has one entry here.
 PHASES = (
-    ("setup",   ("claimed", "archive.py", "housekeeping", "gaps.py", "step.py")),
+    ("setup",   ("claimed", "archive.py", "housekeeping", "gaps.py", "step.py",
+                 "pod-prep", "install-gate", "reading", "inspecting", "sizing", "timing a")),
     ("screen",  ("screen.py",)),
-    ("build",   ("build-engine", "building the engine", "compil")),
-    ("measure", ("p2w.py", "measure", "ratchet", "gate.py", "convert", "census")),
+    ("build",   ("build-engine", "building the engine", "compil", "corpus build",
+                 "building corpus", "corpus-slice", "corpus 78")),
+    ("measure", ("p2w.py", "measure", "ratchet", "gate.py", "convert", "census",
+                 "re-scor", "scoring", "soffice", "render", "export", "upload")),
     ("record",  ("attempt.py", "handoff.py", "classrow.py", "pending.py", "round.py")),
-    ("report",  ("report.py", "chain.py")),
+    ("report",  ("report.py", "chain.py", "lastmessage.py")),
 )
 
 
@@ -944,8 +958,26 @@ def phases():
                  ("record", "record - attempt, handoff, class rows"),
                  ("report", "report - the report and the chain"),
                  ("other", "other - not attributed to a tool")]
-        return [{"phase": label, "min": round(acc[key] / 60.0, 1)}
-                for key, label in named if acc.get(key, 0) >= 30]
+        # WHATEVER STILL FALLS THROUGH IS NAMED, NOT JUST COUNTED. A row that says "other - 35 min" and
+        # stops there is the same shape as a number printed against a thing it does not describe: the
+        # reader cannot tell whether the run was idle, working in a way the table has no word for, or
+        # lying. Three real beat descriptions cost nothing and answer all three.
+        _unclassified = []
+        for k in range(len(rows)):
+            if _phase_of(rows[k].get("d")) == "other":
+                _d = (rows[k].get("d") or "").strip()
+                if _d and _d not in _unclassified:
+                    _unclassified.append(_d)
+        out = []
+        for key, label in named:
+            if acc.get(key, 0) < 30:
+                continue
+            row = {"phase": label, "min": round(acc[key] / 60.0, 1)}
+            if key == "other":
+                row["examples"] = _unclassified[:3]
+                row["unclassified_beats"] = len(_unclassified)
+            out.append(row)
+        return out
     except Exception:
         return []
 
@@ -1790,6 +1822,14 @@ def main(argv):
         for x in ph:
             bar = "#" * max(1, int(round(22 * x["min"] / tot)))
             L.append("| %s | **%s** | `%s` |" % (x["phase"], hhmm(int(x["min"])), bar))
+        for x in ph:
+            if x.get("examples"):
+                L.append("")
+                L.append("The unattributed row is %d distinct beat(s) that matched no phase. They said:"
+                         % x.get("unclassified_beats", 0))
+                L.append("")
+                for _e in x["examples"]:
+                    L.append("- `%s`" % _e[:110])
 
     if best:
         L.append("## Best results this round")
