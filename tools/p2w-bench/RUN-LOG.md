@@ -1,4 +1,7 @@
+
 | 23 Nov 01:33 | fixer | attempt 18_displacement -> lead (0/? moved) |
+
+
 | 23 Nov 01:34 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 23 Nov 02:31 | fixer | attempt 18_displacement -> kept (3/? moved) |
 | 23 Nov 02:33 | fixer | slot FORCED released - see INCIDENTS.md for why |
@@ -197,4 +200,9 @@
 | 26 Nov 11:50 | fixer | attempt 18_displacement -> lead (0/23 moved) |
 | 26 Nov 11:53 | fixer | attempt 18_displacement -> lead (1/23 moved) |
 | 26 Nov 12:00 | fixer | slot FORCED released - see INCIDENTS.md for why |
+
 | 26 Nov 13:35 | fixer | attempt t12_word_invention -> reverted (0/212 moved) |
+
+| 26 Nov 12:03 | fixer | slot claimed - fixer running |
+| 26 Nov 13:11 | fixer | attempt 18_displacement -> lead (0/? moved) |
+
