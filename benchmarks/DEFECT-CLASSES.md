@@ -11,10 +11,10 @@ dominates it.
 
 | signature | problem | open | fixed |
 |---|---|---|---|
-| content-loss | content-missing-partly-replaced | 12 | 1 |
+| content-loss | content-missing-partly-replaced | 11 | 1 |
 | content-loss | content-missing-nothing-in-its-place | 6 | 16 |
+| mixed | content-partly-lost-and-displaced | 6 | 4 |
 | mixed | content-partly-lost | 6 | 0 |
-| mixed | content-partly-lost-and-displaced | 5 | 4 |
 | displacement | content-present-partly-displaced | 23 | 0 |
 | displacement | content-present-wholly-displaced | 7 | 2 |
 | clean | none | 0 | 130 |
@@ -70,7 +70,7 @@ only a work queue.
 | 31 | `041122-Account_Opening_Form` | content-missing-partly-replaced | 98.65 | 937.92 | 9 | OPEN | - |
 | 32 | `Account_Opening_Form_Fillable_filled` | content-missing-partly-replaced | 97.62 | 358.08 | 7 | OPEN | - |
 | 33 | `one-page-rotated-180-degrees` | content-missing-partly-replaced | 81.64 | 177.60 | 2 | OPEN | - |
-| 34 | `600_reviewed_invoice_with_annotations` | content-missing-partly-replaced | 62.46 | 62.88 | 1 | OPEN | - |
+| 34 | `600_reviewed_invoice_with_annotations` | content-partly-lost-and-displaced | 54.30 | 37.44 | 1 | OPEN | - |
 | 35 | `601_fillable_admission_form` | content-missing-partly-replaced | 52.39 | 27.84 | 1 | OPEN | - |
 | 36 | `table-inside-two-column-page` | content-present-wholly-displaced | 35.87 | 21.60 | 1 | OPEN | - |
 | 37 | `360_restaurant_menu` | content-missing-partly-replaced | 34.43 | 45.60 | 1 | OPEN | - |
