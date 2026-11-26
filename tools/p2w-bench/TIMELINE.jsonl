@@ -7233,3 +7233,7 @@
 {"t": 1795682690.2977512, "ist": "14:14:50", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795684365.43255, "ist": "14:42:45", "ev": "gverify", "d": "classify stage: capability table regenerated, byte-identical to the committed one; commit gate installed and passing; corpus converted 213 of 213"}
 {"t": 1795685397.3466651, "ist": "14:59:57", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795685401.658661, "ist": "15:00:01", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795685401.8139212, "ist": "15:00:01", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795685401.92675, "ist": "15:00:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795685402.6051629, "ist": "15:00:02", "ev": "beat", "d": "classrow.py: refreshing the class file"}
