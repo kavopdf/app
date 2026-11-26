@@ -7124,3 +7124,7 @@
 {"t": 1795678580.657451, "ist": "13:06:20", "ev": "beat", "d": "re-scoring the corpus on the patched engine (p2w.py)"}
 {"t": 1795678847.5419328, "ist": "13:10:47", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795678869.1393151, "ist": "13:11:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795678881.000601, "ist": "13:11:21", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795678881.4809573, "ist": "13:11:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795678881.845331, "ist": "13:11:21", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795678885.6875184, "ist": "13:11:25", "ev": "beat", "d": "classrow.py: refreshing the class file"}
