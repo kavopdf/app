@@ -1,13 +1,13 @@
 {
- "started": "00:19",
- "started_ts": 1795718982.8522816,
- "ended": "01:13",
- "ended_ts": 1795722193.4812157,
- "attempts": 0,
- "kept": 0,
  "agents": [
   "triaA-01",
   "ssimB-01"
  ],
- "docs_improved": 0
+ "attempts": 2,
+ "docs_improved": 0,
+ "ended": "01:13",
+ "ended_ts": 1795722193.4812157,
+ "kept": 0,
+ "started": "00:19",
+ "started_ts": 1795718982.8522816
 }
