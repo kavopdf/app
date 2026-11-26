@@ -17,11 +17,11 @@
       }
     ]
   },
-  "fixer_doing": "relay: gate.py to write STATE.json",
+  "fixer_doing": "relay: cloned, about to read",
   "fixer_doing_since": 1795679853.2902584,
   "fixer_engine_at_claim": "9f0a8207",
   "fixer_last_beat": 1795679853.2902594,
-  "fixer_started": 1795680312.437305,
+  "fixer_started": 1795682880.6321304,
   "history": [
     {
       "at": "2026-11-12 09:46",
