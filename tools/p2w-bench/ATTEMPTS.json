@@ -300,7 +300,7 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 77,
+  "attempts": 78,
   "first_seen": null,
   "history": [
    {
@@ -511,12 +511,23 @@
     "outcome": "lead",
     "reason": "spacer->w:before clamp + ruled-only row excess; Google med_dy -13.0->+1.1 on 72_bank, still 41/42; residual is Google's 0.75pt row rung (+0.25/row over 18 rows = +3.5pt)",
     "total": 25
+   },
+   {
+    "at": "2026-11-26 09:27",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: spend a refused page gap into w:before instead of w:line, and charge the 0.75pt ro"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "refused-spacer lead closed: already committed in 9f0a8207; the requested hunk is +0.592pt Google / -1355.5pt LibreOffice over the 19 remaining documents, so it is a regression with no Google effect",
+    "total": 19
    }
   ],
   "last": null,
-  "last_engine": "22d57483",
-  "last_moved": 1,
-  "last_total": 25,
+  "last_engine": "9f0a8207",
+  "last_moved": 0,
+  "last_total": 19,
   "outcomes": [
    "reverted",
    "reverted",
@@ -594,6 +605,7 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
   "park_reason": "no progress in the last 12 attempts (lead, lead, lead, lead, reverted, lead, lead, reverted, reverted, lead, lead, lead)",
@@ -601,7 +613,7 @@
   "pending_moved": 37,
   "ratchet_at": "23 Nov 04:09",
   "ratchet_docs": 212,
-  "reason": "spacer->w:before clamp + ruled-only row excess; Google med_dy -13.0->+1.1 on 72_bank, still 41/42; residual is Google's 0.75pt row rung (+0.25/row over 18 rows = +3.5pt)",
+  "reason": "refused-spacer lead closed: already committed in 9f0a8207; the requested hunk is +0.592pt Google / -1355.5pt LibreOffice over the 19 remaining documents, so it is a regression with no Google effect",
   "reasons": [
    "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 pt mark, Google does not implement lineRule=exact and buys a fraction of it. Applied it (w:before=spacerTw, w:line=1) and measured bank-statement-5-pages through Drive: GOOGLE 40/47 -> 36/47, WORSE, and 27_text_off_page went 0 -> 12 as the extra space overflowed the page. LibreOffice unchanged at 47/47. The reason it cannot work: the spacer is NOT where the 57 pt comes from. Counted in the emitted docx, bank-statement-5-pages carries 9 spacers totalling 81.0 pt across 5 pages, max 16.2 pt - at most 16 pt per page against a measured uniform upward shift of 56.9-57.1 pt on pages 1-4. Forcing the full gap in therefore adds space the page never had and pushes rows off it.",
    "ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 pt - the paper's top edge), while LibreOffice places it at 56.80. The engine emits exactly that construct: bank-statement-5-pages carries w:before=1103 twips (55.15 pt) on the first paragraph of each page, and the measured Google dy on its pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Same number. The probe also found the construct Google DOES honour at a page top: a 1x1 table row with w:trHeight hRule=exact, 55.83 pt of 55.15 asked, exact in LibreOffice. Ruled out with numbers: the table-spacer paragraph (at most 16.2 pt per page against a 57 pt shift, and moving its gap into w:before took Google 40/47 -> 36/47, LO unchanged - reverted), w:line exact (LO honours it, so it cannot split the two renderers), auto line boxes (face-dependent in both). Next run: emit the page-first gap as a trHeight-exact table row and set that paragraph's w:before to 0. FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md has the probe table.",
@@ -677,7 +689,8 @@
    "gap-carrier rule (page-top w:before -> 1x1 exact row) measured live in Google on 4 documents: page-top drop confirmed (bank5 42->46/47, worst_dy 355.5->36.0), 68 spacer 114.3->2.7, but no document becomes clean; residual is a +7-9pt over-delivery. atLeast->exact refuted again. patch not committed: mobile-bill worst_dy 10.0->33.8 and no clean document to buy it with. FINDINGS/18-displacement-GAP-CARRIER-25NOV-relay.md",
    "pgMar-top patch re-measured end to end: Google +9 check-instances on 5 documents, 416_many_tiny_pages 40/42 -> 42/42 CLEAN, LibreOffice identity 212/212, zero new failures. Not committed: gate refuses on a PRE-EXISTING regression (newsletter-3col-header-footer share5 0.2 -> 86.3) introduced by a commit already on main, which this patch cannot cause (exact identity in the docx). Next run: root-cause that regression first, then land the patch with it.",
    "pgMar-top patch committed (b6bfcb7b). Full corpus re-measured on the patched engine: RANKING.csv byte-identical, 212 of 212 unchanged, 0 worse - the LibreOffice proxy is blind to this construct by construction. Emitted .docx confirmed carrying the gap in w:pgMar w:top (1103/1790/1390/230/1040 tw on the five sampled docs; HEAD wrote 0). Google-side movement (9 check-instances, 1 doc clean on 5 docs) was the 01:25 run's live measurement of the same construct; not re-measured here.",
-   "spacer->w:before clamp + ruled-only row excess; Google med_dy -13.0->+1.1 on 72_bank, still 41/42; residual is Google's 0.75pt row rung (+0.25/row over 18 rows = +3.5pt)"
+   "spacer->w:before clamp + ruled-only row excess; Google med_dy -13.0->+1.1 on 72_bank, still 41/42; residual is Google's 0.75pt row rung (+0.25/row over 18 rows = +3.5pt)",
+   "refused-spacer lead closed: already committed in 9f0a8207; the requested hunk is +0.592pt Google / -1355.5pt LibreOffice over the 19 remaining documents, so it is a regression with no Google effect"
   ],
   "requeues": 0,
   "status": "PARKED"
