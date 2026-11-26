@@ -7986,6 +7986,53 @@
 {"t": 1795722192.9912941, "ist": "01:13:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795722193.072985, "ist": "01:13:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795722193.4806643, "ist": "01:13:13", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795722911.8595557, "ist": "01:25:11", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795722912.0759044, "ist": "01:25:12", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795722912.2532868, "ist": "01:25:12", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795722912.4440958, "ist": "01:25:12", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795722912.62617, "ist": "01:25:12", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795722912.7785451, "ist": "01:25:12", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795722912.9513657, "ist": "01:25:12", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795722913.113724, "ist": "01:25:13", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795722927.5412748, "ist": "01:25:27", "ev": "beat", "d": "pod-prep: corpus+jdk+engine setup in slices"}
+{"t": 1795722933.5631585, "ist": "01:25:33", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795723281.1992989, "ist": "01:31:21", "ev": "beat", "d": "corpus-slice: converting remaining documents"}
+{"t": 1795723494.9354181, "ist": "01:34:54", "ev": "beat", "d": "corpus-slice: 6 of 57 converted"}
+{"t": 1795723496.1087546, "ist": "01:34:56", "ev": "beat", "d": "corpus-slice: 12 of 57 converted"}
+{"t": 1795723497.139097, "ist": "01:34:57", "ev": "beat", "d": "corpus-slice: 18 of 57 converted"}
+{"t": 1795723497.285047, "ist": "01:34:57", "ev": "beat", "d": "corpus-slice: 24 of 57 converted"}
+{"t": 1795723497.4452121, "ist": "01:34:57", "ev": "beat", "d": "corpus-slice: 30 of 57 converted"}
+{"t": 1795723497.6248364, "ist": "01:34:57", "ev": "beat", "d": "corpus-slice: 36 of 57 converted"}
+{"t": 1795723497.808467, "ist": "01:34:57", "ev": "beat", "d": "corpus-slice: 42 of 57 converted"}
+{"t": 1795723497.9575248, "ist": "01:34:57", "ev": "beat", "d": "corpus-slice: 48 of 57 converted"}
+{"t": 1795723498.1392865, "ist": "01:34:58", "ev": "beat", "d": "corpus-slice: 54 of 57 converted"}
+{"t": 1795723499.8768148, "ist": "01:34:59", "ev": "beat", "d": "corpus-slice: 103 to go"}
+{"t": 1795723697.6278036, "ist": "01:38:17", "ev": "beat", "d": "corpus-slice: 6 of 57 converted"}
+{"t": 1795723699.2476323, "ist": "01:38:19", "ev": "beat", "d": "corpus-slice: 12 of 57 converted"}
+{"t": 1795723700.7367105, "ist": "01:38:20", "ev": "beat", "d": "corpus-slice: 18 of 57 converted"}
+{"t": 1795723702.1131508, "ist": "01:38:22", "ev": "beat", "d": "corpus-slice: 24 of 57 converted"}
+{"t": 1795723703.5361779, "ist": "01:38:23", "ev": "beat", "d": "corpus-slice: 30 of 57 converted"}
+{"t": 1795723705.0156019, "ist": "01:38:25", "ev": "beat", "d": "corpus-slice: 36 of 57 converted"}
+{"t": 1795723706.2413008, "ist": "01:38:26", "ev": "beat", "d": "corpus-slice: 42 of 57 converted"}
+{"t": 1795723720.6437588, "ist": "01:38:40", "ev": "beat", "d": "corpus-slice: 48 of 57 converted"}
+{"t": 1795723720.823734, "ist": "01:38:40", "ev": "beat", "d": "corpus-slice: 54 of 57 converted"}
+{"t": 1795723722.4561372, "ist": "01:38:42", "ev": "beat", "d": "corpus-slice: 46 to go"}
+{"t": 1795723920.132815, "ist": "01:42:00", "ev": "beat", "d": "corpus-slice: 6 of 46 converted"}
+{"t": 1795723930.035801, "ist": "01:42:10", "ev": "beat", "d": "corpus-slice: 12 of 46 converted"}
+{"t": 1795723931.7147026, "ist": "01:42:11", "ev": "beat", "d": "corpus-slice: 18 of 46 converted"}
+{"t": 1795723933.4247584, "ist": "01:42:13", "ev": "beat", "d": "corpus-slice: 24 of 46 converted"}
+{"t": 1795723934.0285614, "ist": "01:42:14", "ev": "beat", "d": "corpus-slice: 30 of 46 converted"}
+{"t": 1795723934.7433302, "ist": "01:42:14", "ev": "beat", "d": "corpus-slice: 36 of 46 converted"}
+{"t": 1795723935.5344052, "ist": "01:42:15", "ev": "beat", "d": "corpus-slice: 42 of 46 converted"}
+{"t": 1795723942.2431173, "ist": "01:42:22", "ev": "beat", "d": "gate: regress check + measure_gate"}
+{"t": 1795723990.2666516, "ist": "01:43:10", "ev": "beat", "d": "attempt: before-measure of 9 deciding docs on current engine"}
+{"t": 1795724118.0901537, "ist": "01:45:18", "ev": "beat", "d": "attempt: patched DocxWriter, rebuilding engine"}
+{"t": 1795724310.842796, "ist": "01:48:30", "ev": "beat", "d": "attempt: budgetTw accounting fix built, measuring 9 docs"}
+{"t": 1795724593.9530182, "ist": "01:53:13", "ev": "beat", "d": "attempt: guards built, measuring 9 docs"}
+{"t": 1795724781.0656726, "ist": "01:56:21", "ev": "beat", "d": "census: rebuilding 213 docx on guarded engine"}
+{"t": 1795725070.6891966, "ist": "02:01:10", "ev": "beat", "d": "census: measuring 41 margin-claiming docs"}
+{"t": 1795725692.7134347, "ist": "02:11:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795725694.8435285, "ist": "02:11:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795721906.7019532, "ist": "01:08:26", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
 {"t": 1795721906.914677, "ist": "01:08:26", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
 {"t": 1795721907.0682602, "ist": "01:08:27", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}

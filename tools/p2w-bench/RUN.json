@@ -1,14 +1,11 @@
 {
- "agents": [
-  "triaA-01",
-  "ssimB-01"
- ],
- "attempts": 4,
- "class": "18_displacement",
+ "agents": [],
+ "attempts": 1,
  "docs_improved": 0,
- "ended": "01:52",
- "ended_ts": 1795724578.2102368,
+ "ended": null,
+ "ended_ts": null,
  "kept": 0,
- "started": "00:19",
- "started_ts": 1795718982.8522816
+ "started": "01:20",
+ "started_ts": 1795722616.07074,
+ "window_for_claim": 1795722616.07074
 }

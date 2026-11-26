@@ -1,5 +1,5 @@
 {
-  "baseline_started": 1795725719.5830553,
+  "baseline_started": 0,
   "classifier_started": 0,
   "fixer": {
     "agents": [
@@ -17,9 +17,11 @@
       }
     ]
   },
+  "fixer_doing": "census: measuring 41 margin-claiming docs",
+  "fixer_doing_since": 1795725070.690034,
   "fixer_engine_at_claim": "aa496ebe",
-  "fixer_last_beat": 1795722062.2349946,
-  "fixer_started": 0,
+  "fixer_last_beat": 1795725070.6900346,
+  "fixer_started": 1795722616.07074,
   "history": [
     {
       "at": "2026-11-12 09:46",
