@@ -1,0 +1,175 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 80c91eec..f4c9ec16 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -364,6 +364,25 @@ public final class DocxWriter {
+      */
+     private static final boolean BREAK_WHEN_UNFITTABLE = false;
+ 
++    /**
++     * Whether a page's TOP gap is written as a 1x1 table row instead of as {@code w:before}.
++     *
++     * <p>Google Docs DROPS {@code w:spacing w:before} on the first paragraph of a page: a
++     * controlled probe asked 55.15 pt and Google rendered 0.33 pt, while a 1x1
++     * {@code w:trHeight w:hRule="exact"} row in the same position bought 55.83 pt. That is the
++     * uniform, constant-in-points upward shift every page of a zero-margin document shows in
++     * Google and not in LibreOffice (FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md,
++     * probe TOPA vs TOPD).
++     *
++     * <p>The row is FLOW-NEUTRAL: {@code beforeTw} keeps its value for {@code fitPage},
++     * {@code resync} and the shave arithmetic, so the page's measured height and every page break
++     * are exactly what they were - {@code spacingTw} sums {@code w:trHeight} at any depth. Only
++     * the rendered construct changes. Gated by {@code -Dp2w.topgaprow=1} until it is measured
++     * through Google.
++     */
++    private static final boolean TOPGAP_ROW =
++            "1".equals(System.getProperty("p2w.topgaprow"));
++
+     /**
+      * Twips kept back from every page's budget, so the page's own measured height can never sit
+      * a twip above the paper.
+@@ -702,6 +721,41 @@ public final class DocxWriter {
+         ctx.lastWasTable = false;
+     }
+ 
++    /**
++     * A page's top gap, as the one construct Google Docs honours at the top of a page.
++     *
++     * <p>Measured, probe TOPD: {@code w:trHeight w:val="1103" w:hRule="exact"} bought 55.83 pt
++     * of the 55.15 pt asked in Google and 55.15 pt in LibreOffice, against 0.33 pt in Google for
++     * the same length written as {@code w:before} on the paragraph (probe TOPA). The cell holds a
++     * one-point paragraph so the row's height is its declared height and nothing else, and the
++     * cell margins and borders are zero so it adds no ink.
++     */
++    private static void topGapRow(StringBuilder sb, int gapTw) {
++        String nb = "<w:top w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
++                + "<w:left w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
++                + "<w:bottom w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
++                + "<w:right w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
++                + "<w:insideH w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>"
++                + "<w:insideV w:val=\"none\" w:sz=\"0\" w:space=\"0\" w:color=\"auto\"/>";
++        sb.append("<w:tbl><w:tblPr><w:tblW w:w=\"0\" w:type=\"auto\"/>")
++                .append("<w:tblBorders>").append(nb).append("</w:tblBorders>")
++                .append("<w:tblLayout w:type=\"fixed\"/>")
++                .append("<w:tblCellMar><w:top w:w=\"0\" w:type=\"dxa\"/>")
++                .append("<w:left w:w=\"0\" w:type=\"dxa\"/>")
++                .append("<w:bottom w:w=\"0\" w:type=\"dxa\"/>")
++                .append("<w:right w:w=\"0\" w:type=\"dxa\"/></w:tblCellMar>")
++                .append("</w:tblPr><w:tblGrid><w:gridCol w:w=\"1\"/></w:tblGrid>")
++                .append("<w:tr><w:trPr><w:cantSplit/>")
++                .append("<w:trHeight w:val=\"").append(gapTw).append("\" w:hRule=\"exact\"/>")
++                .append("</w:trPr><w:tc><w:tcPr><w:tcW w:w=\"1\" w:type=\"dxa\"/>")
++                .append("<w:vAlign w:val=\"top\"/></w:tcPr>")
++                .append("<w:p><w:pPr><w:snapToGrid w:val=\"0\"/>")
++                .append("<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\"")
++                .append(" w:before=\"0\" w:after=\"0\" w:line=\"1\" w:lineRule=\"exact\"/>")
++                .append("<w:rPr><w:sz w:val=\"2\"/></w:rPr></w:pPr></w:p>")
++                .append("</w:tc></w:tr></w:tbl>");
++    }
++
+     private DocxWriter() {
+     }
+ 
+@@ -3612,6 +3666,7 @@ public final class DocxWriter {
+         // same flow, and two boxes for one flow is two rulers on one page.
+         float linePt = hairlinePt(size);
+         int beforeTw = 0;
++        int topGapRowTw = 0;                      // see flowFromBox: TOPGAP_ROW carrier
+         float placeTopPt = flowTopPt(ctx);        // see flowFromBox: the edge is the placement
+         if (ctx.afterTablePt >= 0f) {
+             // Same rule as flowFromBox: the row is placed against the table's measured edge
+@@ -3633,6 +3688,7 @@ public final class DocxWriter {
+             float topGap = first.y - LINE_BASE * linePt;
+             if (topGap > 0f) {
+                 beforeTw = (int) Math.min((long) firstGapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
++                if (TOPGAP_ROW && (ctx.pageNo > 1 || ctx.brokePage > 0)) topGapRowTw = beforeTw;
+             } else if (first.y > 0f) {
+                 linePt = Math.min(linePt, Math.max(size, first.y / LINE_BASE));
+             }
+@@ -3684,6 +3740,7 @@ public final class DocxWriter {
+             float topGap = first.y - LINE_BASE * linePt;
+             if (topGap > 0f) {
+                 beforeTw = (int) Math.min((long) firstGapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
++                if (TOPGAP_ROW && (ctx.pageNo > 1 || ctx.brokePage > 0)) topGapRowTw = beforeTw;
+             } else {
+                 beforeTw = 0;
+                 if (first.y > 0f) linePt = Math.min(linePt, Math.max(size, first.y / LINE_BASE));
+@@ -3740,6 +3797,12 @@ public final class DocxWriter {
+         recordBaseline(ctx, first.y, linePt, size);
+ 
+         ctx.flowCount++;
++        // THE PAGE'S FIRST LINE, captured BEFORE the flag is cleared. Both flow call sites used to
++        // pass `ctx.newPage` to spacing() after setting it false, so `pageFirst` was false in every
++        // build and the first-line compensation at spacing() was dead code - which is why
++        // -Dp2w.lineRule=autoflow was never a fair experiment. The value passed is unchanged for the
++        // rest of the method; only spacing() now sees what it was written to see.
++        boolean pageFirst = ctx.newPage;
+         ctx.newPage = false;
+         // Re-sync the running position to what was written, not to what was intended. A page
+         // break inside the block above starts a new sheet, so the top is the paper's top again.
+@@ -3810,13 +3873,14 @@ public final class DocxWriter {
+             tabs.append("<w:tab w:val=\"left\" w:pos=\"").append(posTw).append("\"/>");
+         }
+ 
++        if (topGapRowTw > 0) topGapRow(sb, topGapRowTw);
+         sb.append("<w:p><w:pPr>")
+                 // w:tabs comes first, before w:snapToGrid. CT_PPr defines a sequence and tabs
+                 // precedes snapToGrid in it; written last - which it was - every one of these
+                 // paragraphs was out of schema order. The tab stops themselves are unchanged.
+                 .append("<w:tabs>").append(tabs).append("</w:tabs>")
+                 .append("<w:snapToGrid w:val=\"0\"/>")
+-                .append(spacing(beforeTw, lineTw, size, autoFlowLines(), ctx.newPage))
++                .append(spacing(topGapRowTw > 0 ? 0 : beforeTw, lineTw, size, autoFlowLines(), pageFirst))
+                 // A row is laid out by its tab stops, so it must not also be centred or pushed
+                 // right: justification would move the first field off the indent the stops are
+                 // measured from.
+@@ -4479,6 +4543,10 @@ public final class DocxWriter {
+         // accumulates down the page.
+         float linePt = hairlinePt(b.size);
+         int beforeTw = 0;
++        // Set only when this line opens a page AND TOPGAP_ROW is on: the gap is then carried by a
++        // 1x1 trHeight row emitted before the paragraph, and the paragraph itself writes
++        // w:before="0". beforeTw is still the gap, so nothing else in the flow changes.
++        int topGapRowTw = 0;
+         // WHERE THIS PARAGRAPH IS ACTUALLY PUT, as an absolute y from the top of the sheet.
+         //
+         // The flow's own advance places a paragraph at flowTopPt(); the afterTablePt branch
+@@ -4523,6 +4591,7 @@ public final class DocxWriter {
+             float topGap = b.y - LINE_BASE * linePt;
+             if (topGap > 0f) {
+                 beforeTw = (int) Math.min((long) firstGapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
++                if (TOPGAP_ROW && (ctx.pageNo > 1 || ctx.brokePage > 0)) topGapRowTw = beforeTw;
+             } else if (b.y > 0f) {
+                 linePt = Math.min(linePt, Math.max(b.size, b.y / LINE_BASE));
+             }
+@@ -4600,6 +4669,7 @@ public final class DocxWriter {
+             float topGap = b.y - LINE_BASE * linePt;
+             if (topGap > 0f) {
+                 beforeTw = (int) Math.min((long) firstGapCapTw(ctx), Math.round(topGap * TWIPS_PER_PT));
++                if (TOPGAP_ROW && (ctx.pageNo > 1 || ctx.brokePage > 0)) topGapRowTw = beforeTw;
+             } else {
+                 beforeTw = 0;
+                 if (b.y > 0f) linePt = Math.min(linePt, Math.max(b.size, b.y / LINE_BASE));
+@@ -4655,6 +4725,7 @@ public final class DocxWriter {
+         }
+         // The box the pitch solver compares next time is the page's own, not the squeezed one.
+         recordBaseline(ctx, b.y, linePt, b.size);
++        boolean pageFirst = ctx.newPage;   // see flowRow: captured before the clear
+         ctx.newPage = false;
+         // Re-sync to what was written, so the next paragraph is measured from the reader's
+         // position rather than from the PDF's (D-26) - and to the position this paragraph was
+@@ -4662,12 +4733,13 @@ public final class DocxWriter {
+         float beforeY = ctx.flowY;
+         resync(ctx, placeTopPt, beforeTw, lineTw);
+         traceLine(ctx, "flowFromBox", b.y, beforeTw, lineTw, beforeY, text);
++        if (topGapRowTw > 0) topGapRow(sb, topGapRowTw);
+         sb.append("<w:p><w:pPr>");
+         if (p.heading > 0) {
+             sb.append("<w:pStyle w:val=\"Heading").append(Math.min(p.heading, 3)).append("\"/>");
+         }
+         sb.append("<w:snapToGrid w:val=\"0\"/>")
+-                .append(spacing(beforeTw, lineTw, b.size, autoFlowLines(), ctx.newPage))
++                .append(spacing(topGapRowTw > 0 ? 0 : beforeTw, lineTw, b.size, autoFlowLines(), pageFirst))
+                 .append("<w:ind w:left=\"").append(Math.max(0, leftTw - bandLeftTw(ctx, p.column)))
+                 .append("\" w:right=\"").append(rightTw).append("\" w:firstLine=\"0\"/>");
+         if (p.align == 1) sb.append("<w:jc w:val=\"center\"/>");
