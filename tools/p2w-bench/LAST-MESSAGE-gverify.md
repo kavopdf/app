@@ -1,46 +1,49 @@
-# Google verify - 26 Nov, 09:23 IST
+# Google verification - 187 of 213 measured
 
-**Stage `measure-google`.** 127 of 213 documents now carry a Google result on the tree's engine. The next step is 20 more.
+**Stage `measure-google`.** Corpus 213. 187 carry a Google result: 181 scored, 6 refused on page count. Next: measure 20 more.
 
-This run measured the next batch through Google Docs, collected every verdict, and committed the results.
+| | count |
+|---|---:|
+| measured through Google | 187 |
+| scored | 181 |
+| refused (page count) | 6 |
+| pass every check offered | 41 |
+| fail at least one | 140 |
 
-| what | count |
-|:--|--:|
-| verified | 127 |
-| scored | 122 |
-| pass every check offered | 28 |
-| fail at least one | 94 |
-| refused on page count | 5 |
+A refused document is not a pass: Google reflowed it and the score is not a score.
 
-A refused document is not a pass: those 5 reflowed onto a different page count and are counted separately, not scored.
+## Checks that cost the most documents
 
-## Which check costs what
+| check | documents failing |
+|---|---:|
+| `18_displacement` | 91 |
+| `60_text_column_right_edge` | 51 |
+| `04_chars_missing` | 47 |
+| `59_shape_anchor` | 44 |
+| `45_char_accuracy` | 30 |
+| `13_text_colours` | 29 |
+| `17_matched_runs` | 27 |
+| `47_margins` | 25 |
+| `26_text_overlap` | 16 |
+| `44_header_footer` | 16 |
 
-| check | documents failing in Google |
-|:--|--:|
-| `18\_displacement` | 52 |
-| `60\_text\_column\_right\_edge` | 37 |
-| `04\_chars\_missing` | 34 |
-| `59\_shape\_anchor` | 33 |
-| `13\_text\_colours` | 23 |
-| `47\_margins` | 19 |
-| `45\_char\_accuracy` | 19 |
+## Capability table - Google vs LibreOffice
 
-The first row is still the class to take: `18\_displacement`, 52 of the 122 scored documents.
+207 documents have both halves. LibreOffice passes every check on 135 of 207; Google on 42 of 207. Engine in the tree a4d8fca469bba636 - Google is on it for 181 of 207 pairs, LibreOffice for 80, so read a row as a dropped construct only for those 80 pairs.
 
-## The capability table
+| check | LibreOffice fails | Google fails | stricter |
+|---|---:|---:|---|
+| `18_displacement` | 20 | 114 | Google |
+| `60_text_column_right_edge` | 18 | 62 | Google |
+| `04_chars_missing` | 2 | 54 | Google |
+| `59_shape_anchor` | 11 | 49 | Google |
+| `45_char_accuracy` | 2 | 33 | Google |
+| `13_text_colours` | 1 | 32 | Google |
+| `17_matched_runs` | 5 | 31 | Google |
+| `47_margins` | 15 | 27 | Google |
+| `26_text_overlap` | 3 | 19 | Google |
+| `44_header_footer` | 0 | 18 | Google |
 
-| renderer | pass every check offered |
-|:--|--:|
-| Google Docs - the renderer the user opens | 42 of 208 |
-| LibreOffice - local proxy | 135 of 208 |
+## What this run did
 
-Only 80 of those 208 pairs have both halves measured on the tree's engine, so read the gap as a direction, not a per-document verdict.
-
-## The one thing that needed a decision
-
-The commit gate refused the batch on `390\_wide\_data\_appendix`: it fails 4 checks where the committed result failed 3, and that committed result was measured on an older engine. Re-running the verifier on the same export reproduced it, so it is not a flake - on this engine the document loses `59\_shape\_anchor` while its displacement improves. Two other documents improved, so the corpus is net better by 2, and it landed under the tool's own named opt-in, `P2W_ACCEPT_WORSE`, which is granted only when the corpus improves in Google. It is written into `BLOCKERS.md` for the fixer; nothing else was waived.
-
-## What is next
-
-`measure-google` again: 20 more documents through Google. Nothing in the engine was touched by this run.
+Corpus rebuilt in slices to 213 documents on the current engine, then each document uploaded, converted to a Google Doc, exported to PDF and scored with the 42 checks. The temporary Google Docs were deleted from the Drive folder after export; nothing of the user's was touched. The upload is the pace-setter, not Drive: it is one call per document and cannot be batched, so the run takes 60 documents rather than 20.
