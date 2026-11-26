@@ -184,3 +184,52 @@ Three things it must not do, each of which is a way this can lose documents:
 Prove it on `320_balance_sheet_statutory` (med_dy +10.30 -> -0.70 already demonstrated by hand) and on
 `16_right_aligned_amounts_txtpos` (recorded -3.95 pt) before writing it for the class, then run the
 whole corpus through Google. The probe `.docx` files are in `/scratch/output/probe-*.docx`.
+
+---
+
+# The engine build: the table is fixed and one block after it is not
+
+The residue algorithm was written into `DocxWriter` (the content-table row emitter, behind
+`p2w.rowresidue`) and built. `320_balance_sheet_statutory` converted by the new engine emits
+`w:trHeight` 270/255/240 instead of 280 throughout — the residue pattern, in the file.
+
+Google's render of that build, measured the same way as every other number here:
+
+| | base | **engine build** |
+|:--|--:|--:|
+| `med_dy` over the table rows | +10.30 | **-0.70** |
+| every table row | +0.30 … +13.30 | **-0.95 … -0.45** |
+| the block after the table (signature) | -0.16 | **-18.16** |
+| worst_dy, whole page | 18.19 | 18.16 |
+
+**The ramp is gone and nothing moved into its place except one block, which broke.** The signature block
+at y 776.57 sat at -0.16 pt in the base and at -18.16 pt in the build. The page's own text after the
+table is placed from the table's written bottom, and the table is now ~18 pt shorter, so that block
+follows it up. `writtenRowsTw` already charges the page's own pitch, so the loss is not the budget — it
+is the placement of the paragraphs that follow the table.
+
+The change was **reverted, not committed**, for one measured reason: `worst_dy` is still 18.16 pt, the
+document still fails `18_displacement`, and **no document moves**. A change that fixes the median and
+breaks the foot of the same page is not a kept attempt, whatever the median says.
+
+## What the next run must do with it
+
+The algorithm and the law are proven; the remaining defect is one number in the flow after the table.
+Concretely: the paragraphs following a ruled table must be placed from the table's LAID bottom
+(cumulative `0.75 * rung`, which the tracker already knows) rather than from the sum of the declared
+heights it wrote. When that is right, `320_balance_sheet_statutory` should go from
+`med_dy +8.2 / worst_dy 19.4` to something inside 1.5 pt on both, which is the first time this document
+would pass `18_displacement`.
+
+Two things to expect and not be surprised by:
+
+1. **LibreOffice will lay the declared value, not the rung.** Word and LibreOffice honour
+   `hRule="atLeast"` as `max(declared, content)`, and the content here is one 7.5 pt line, so LO lays
+   13.50 or 12.75 where the page wants 14.00 — a 0.5 pt per row error in the proxy, against a 1.0 pt
+   per row error in Google today. Whether that is a `regress.py` regression has NOT been measured: the
+   LO render of the build was attempted with `gverify.py --lo` and `soffice produced nothing` twice, and
+   the slot went to the Google side. **Measure the LO side before committing** — this is the one place
+   where the change could be refused by non-negotiable 3 rather than by the physics.
+2. **The corpus cache is mid-rebuild.** 53 of 213 documents were converted by the patched engine before
+   the revert; the stamp still reads `a4d8fca469bba636`. The next run's first gate call will rebuild the
+   corpus (about 16 minutes in 240 s slices) — that is the tool doing the right thing, not a fault.
