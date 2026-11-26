@@ -8099,3 +8099,7 @@
 {"t": 1795726528.1591868, "ist": "02:25:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795726556.2962947, "ist": "02:25:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795726558.002159, "ist": "02:25:58", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795726561.2665746, "ist": "02:26:01", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795726561.3667302, "ist": "02:26:01", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795726561.4934142, "ist": "02:26:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795726562.1120298, "ist": "02:26:02", "ev": "beat", "d": "classrow.py: refreshing the class file"}

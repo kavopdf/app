@@ -1,4 +1,3 @@
-| 23 Nov 17:00 | fixer | slot claimed - fixer running |
 | 23 Nov 17:41 | fixer | attempt 18_displacement -> lead (0/190 moved) |
 | 23 Nov 18:34 | fixer | attempt 44_header_footer -> lead (0/? moved) |
 | 23 Nov 18:58 | fixer | slot claimed - fixer running |
@@ -198,3 +197,4 @@
 | 27 Nov 02:02 | fixer | slot claimed - fixer running |
 | 27 Nov 02:18 | fixer | slot claimed - fixer running |
 | 27 Nov 02:24 | fixer | attempt 18_displacement -> lead |
+| 27 Nov 02:26 | fixer | attempt 18_displacement -> lead |
