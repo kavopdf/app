@@ -6866,3 +6866,7 @@
 {"t": 1795668681.2851353, "ist": "10:21:21", "ev": "beat", "d": "LO check on the patched row emitter"}
 {"t": 1795668709.0262318, "ist": "10:21:49", "ev": "beat", "d": "engine change reverted; writing the addendum"}
 {"t": 1795668735.3028488, "ist": "10:22:15", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795668739.0433903, "ist": "10:22:19", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795668739.3528457, "ist": "10:22:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795668739.4963448, "ist": "10:22:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795668740.2369657, "ist": "10:22:20", "ev": "beat", "d": "classrow.py: refreshing the class file"}

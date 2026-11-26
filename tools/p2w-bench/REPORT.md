@@ -1,46 +1,40 @@
-# Fixer report - 2026-11-26 08:27
+# Fixer report - 2026-11-26 09:55
 
 ```
 # P2W Fixer - Run Report
 
-**26 Nov 2026 · slot 08:27 → 09:23 IST · 55 min**
+**26 Nov 2026 · slot 09:55 → running IST · 17 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
-| Check-instances passing | **2530** of 2706 (93.5%) on 62 documents |
-| Check-instances still failing | **176** |
+| Check-instances passing | **5002** of 5301 (94.4%) on 122 documents |
+| Check-instances still failing | **299** |
 | Kept attempts vs documents clean | **16** classes with a kept attempt, **47** documents clean - a kept attempt is progress inside a class, not a finished document |
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - subagents: 2 deployed vs no FINDINGS file for 18_dA-04 |
+| Self-check | **every field agrees with its second source** |
 | Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+40.32%** — mean 6.15 → 3.67 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **14** of the **62** re-measured on this engine - **146** of the 208 scored are still on an older engine, and **28** of those were clean on the engine they were measured with |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **3** run(s) for the 146 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **28** of the **122** re-measured on this engine - **86** of the 208 scored are still on an older engine, and **14** of those were clean on the engine they were measured with |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **2** run(s) for the 86 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **5** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (45 still open), not a new class |
+| Working on | `-` - taken from the pending list (49 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `-` by hand instead |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 09:27 | **lead** | 0/19 | refused-spacer lead closed: already committed in 9f0a8207; the requested hunk is +0.592pt Google / -1355.5pt LibreOffice over the 19 remaining documents, so it is a regression with no Google effect |
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **2 min ago** |
+| Measured | **23 min ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -49,30 +43,16 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dA-04` | which clause of 18_displacement fires on the 25 solo | 08:29 | - | - |
-| `18_dB-03` | Google's exact charge for w:lineRule=exact and every | 08:29 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 08:27 → 09:23 · 55 min |
+| Slot window | 09:55 → running · 17 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 18 |
-| Longest silence | **38.7 min** — from 08:35:19, after `heartbeat before any claim: gverify: converting corpus slices, then me` |
-| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **49 min** | `####################` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| other - not attributed to a tool | **3 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
