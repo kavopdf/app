@@ -663,5 +663,16 @@
   "window_for_claim": 1795752748.188662,
   "class": "t12_word_invention",
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "10:05",
+  "started_ts": 1795754128.5828493,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
