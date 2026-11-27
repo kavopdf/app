@@ -113,3 +113,59 @@ text, then the real document's 7.6 gap has another cause and the cell is not it.
 rules are the mechanism and the numbers will say so.
 
 **One export answers it.** It has not been run.
+
+## The table-cell sweep: the cell does NOT behave like body text, and that is the mechanism
+
+The same ten combinations, run inside a single `<w:tc>`:
+
+    label  before  line   rule      advance   implied line
+    C01     0.0    0.6    exact        -          -
+    C02    12.0    0.6    exact      18.3        6.3
+    C03    12.0    9.8    exact      18.6        6.6
+    C04     0.0    9.8    exact       8.0        8.0
+    C05    12.0    9.8    atLeast    21.4        9.4
+    C06    12.0    0.6    atLeast    21.8        9.8
+    C07    24.0    0.6    exact      26.3        2.3
+    C08     6.0    9.8    exact      12.6        6.6
+    C09    12.0   12.0    auto       21.4        9.4
+    C10    12.0    0.0    exact      21.8        9.8
+
+**Side by side with the body-text run:**
+
+    combination            body text    table cell
+    exact, line 0.6            0.6          6.3      <- different
+    atLeast, line 0.6          9.8          9.8      <- same
+    exact, line 0               9.8          9.8     <- same
+
+**`exact` with a tiny line height is honoured literally in body text and given a floor of about 6.3 pt inside a
+cell.** That floor is what makes the two cases look different and it is the whole of the overlap.
+
+### Why 6.3 pt of floor still overlaps
+
+The glyph height is **11.07 pt** on every one of these lines, measured. The cell advances **6.3 pt**. **The
+glyph is 4.8 pt taller than the space it is given**, and that is what prints one line over the next.
+
+**A floor that is smaller than the glyph is not a fix.** It reduces the collapse from total to 4.8 pt and
+leaves the defect visible - which is exactly the state the user photographed.
+
+### And `atLeast` is the combination that works in both places
+
+`atLeast` with `line=0.6` gives **9.8 pt** in body text and **9.8 pt** in a cell. 9.8 is 8.5 pt Times at 1.15,
+which is above the 11.07 pt glyph's requirement of roughly 9.8. **No overlap, no clipping, in either context.**
+
+The cost is that the advance rises: in the cell, C02 (`exact` 0.6) advances 18.3 and C06 (`atLeast` 0.6)
+advances 21.8, so **+3.5 pt per line**. Holding position means lowering `before` by 3.5 - and unlike the
+earlier attempt, **that number is now measured rather than assumed.**
+
+### One thing still does not reconcile, and it is the next measurement
+
+In the real document the four totals paragraphs carried `before` 12.4 and their glyph tops were **7.6 pt**
+apart. In this sweep, `before` 12.0 with the same `line=0.6 exact` gives **18.3 pt**. **7.6 is less than half
+of 18.3**, and less than `before` itself.
+
+So the real document is compressed by something this sweep does not have: a `trHeight`, a row that Word is
+fitting content into, or a cell whose content area is being divided among its paragraphs. **That has not been
+identified and it is the one remaining unknown.**
+
+**The next measurement is the real document's `<w:tr>`: its `trHeight`, `hRule`, and how many rows the totals
+block actually spans. That is one lookup in a file already in hand.**
