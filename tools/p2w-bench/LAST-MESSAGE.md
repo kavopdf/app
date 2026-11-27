@@ -6,8 +6,6 @@
 > for four slots now passes on `main`.** No document moved. The two agents this run deployed changed
 > the answer the next run is working from, and that is the part that will last.
 
-> No change was kept this run. The numbers below say what was tried.
-
 ## Progress
 
 | Check-instances passing | **8477** of 9011 (94.1%) on 213 documents |
