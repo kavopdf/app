@@ -1,32 +1,30 @@
 # P2W Watchdog - Run Report
 
-**27 Nov 2026 · 03:08 IST**
+**27 Nov 2026 · 06:13 IST**
 
 > Nothing is stopped.
 
-This pass found every stage that can run either moving or done, so nothing was paused, released or reopened, and the fixer slot is held by a live claim. The committed trend row and the live tables disagree in one column, and the tool that writes the row allows a single correction a day which an earlier pass already used, so the row stands as written and the difference is recorded in BLOCKERS.md instead of being rewritten. This run holds no cron tool, so the platform half of the check - a paused cron, a stale fire time, a zombie run - could not be run at all; the exact calls are named in BLOCKERS.md.
+The pipeline is moving on every stage that can move, so nothing was restarted. I appended and committed today's trend row, and recorded a fixer claim that has gone silent: it is left to expire on its own rather than force-releasing a run that may be mid-render. This watchdog has no cron tool, so the scheduler half was not read, and that is written into BLOCKERS.md with the calls it would have made.
 
 ## Stages
-
-> **Today's row is stale** - docx_open: committed row says 60, the data says 59. The trend below is the committed row; the data has moved.
 
 
 | stage | state | progress | age |
 |:--|:--|--:|--:|
-| measure-google | moving | 124 of 213 | 0.2 h |
-| matrix | done | 213 of 213 | 4.5 h |
-| classify | waiting |  | 0.7 h |
-| fix | moving | 6 attempt(s) in 3 h | 0.7 h |
-| txt | moving | 205 clean, 8 failing | 0.1 h |
+| measure-google | moving | 197 of 213 | 2.0 h |
+| matrix | done | 213 of 213 | 1.0 h |
+| classify | waiting |  | 3.8 h |
+| fix | moving | 6 attempt(s) in 3 h | 0.2 h |
+| txt | moving | 205 clean, 8 failing | 0.4 h |
 
 ## Trend
 
-| | 2026-11-25 | 2026-11-26 | |
+| | 2026-11-26 | 2026-11-27 | |
 |:--|--:|--:|:--|
-| .docx open | 59 | **60** | +1 |
-| .txt failing | 9 | **8** | -1 |
-| Google measured | 213 | **205** | -8 |
-| Google clean | 42 | **47** | +5 |
+| .docx open | 60 | **59** | -1 |
+| .txt failing | 8 | **8** | no change |
+| Google measured | 205 | **205** | no change |
+| Google clean | 47 | **47** | no change |
 
 ## What this pass did
 
