@@ -2,26 +2,13 @@
   "baseline_started": 1795808173.3851502,
   "classifier_started": 0,
   "fixer": {
-    "agents": [
-      {
-        "deployed": "2026-11-26T11:23+05:30",
-        "id": "5K6VD2QX509EHTJ0N4AJ1RAQKX",
-        "name": "engine spacing code map",
-        "result": "spacing() :149 with the dead pageFirst branch; ctx.newPage :819 cleared at :3800 and :4722; table spacer emitter :6055-6185; patch shapes for TOPGAP_ROW and the page-first capture. Every line number it gave checked out against the tree."
-      },
-      {
-        "deployed": "2026-11-26T12:30+05:30",
-        "id": "4XPVKR9J4N9V4R2CA0ZHN5DGR0",
-        "name": "residual run analysis on the positive control",
-        "result": "the 41 runs still failing on electricity-bill under the new construct are 10 lines; 37 are table cells at 7.20pt explained by dy(row i)=dy(caption)-2.96+i*0.652 - entry offset -3.0pt, pitch +0.652pt/row (19.07 vs 18.4). 4 are page furniture. One construct, not scattered."
-      }
-    ]
+    "agents": [],
+    "doing": "releasing",
+    "started": 1795818649.2767327
   },
-  "fixer_doing": "writing the report",
-  "fixer_doing_since": 1795820482.0177424,
   "fixer_engine_at_claim": "33863086",
   "fixer_last_beat": 1795820482.0177429,
-  "fixer_started": 1795820368.0065424,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
