@@ -8829,3 +8829,37 @@
 {"t": 1795751134.5078597, "ist": "09:15:34", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795751134.6108909, "ist": "09:15:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795751135.1160343, "ist": "09:15:35", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795751662.975145, "ist": "09:24:22", "ev": "beat", "d": "heartbeat before any claim: relay: pod-prep"}
+{"t": 1795751885.1143734, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795751885.346885, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795751885.5837262, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795751885.7876203, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795751885.999233, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795751886.2310708, "ist": "09:28:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795751886.4720533, "ist": "09:28:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795751886.7005837, "ist": "09:28:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
+{"t": 1795751897.2703445, "ist": "09:28:17", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795751897.4694858, "ist": "09:28:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795751897.642543, "ist": "09:28:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795751903.639196, "ist": "09:28:23", "ev": "beat", "d": "claimed, reading handoff"}
+{"t": 1795751912.8895178, "ist": "09:28:32", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795751953.8484006, "ist": "09:29:13", "ev": "beat", "d": "relay: finishing baseline corpus conversion (pre-change engine)"}
+{"t": 1795752185.8597274, "ist": "09:33:05", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795752186.0122638, "ist": "09:33:06", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795752186.1818035, "ist": "09:33:06", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795752186.3608866, "ist": "09:33:06", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795752186.577075, "ist": "09:33:06", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795752186.815893, "ist": "09:33:06", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795752187.0140917, "ist": "09:33:07", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795752187.2269185, "ist": "09:33:07", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795752456.5198195, "ist": "09:37:36", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795752456.7136054, "ist": "09:37:36", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795752456.8865771, "ist": "09:37:36", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795752457.071791, "ist": "09:37:37", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795752457.2178059, "ist": "09:37:37", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795752457.3821359, "ist": "09:37:37", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795752457.5695474, "ist": "09:37:37", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795752457.719706, "ist": "09:37:37", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795752718.7452924, "ist": "09:41:58", "ev": "beat", "d": "relay: pBdr construct refuted in LibreOffice, writing finding"}
+{"t": 1795752732.4604714, "ist": "09:42:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795752745.72, "ist": "09:42:25", "ev": "beat", "d": "attempt.py: recording an attempt"}

@@ -17,8 +17,10 @@
       }
     ]
   },
+  "fixer_doing": "relay: pBdr construct refuted in LibreOffice, writing finding",
+  "fixer_doing_since": 1795752718.74591,
   "fixer_engine_at_claim": "8fb4f503",
-  "fixer_last_beat": 1795749341.9263933,
+  "fixer_last_beat": 1795752718.745911,
   "fixer_started": 1795751894.4804828,
   "history": [
     {
