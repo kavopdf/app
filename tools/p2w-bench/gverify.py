@@ -163,22 +163,22 @@ def _engine_now():
 
     Falls back to the corpus stamp file, then to the commit abbreviation.
     """
-    import hashlib as _h
-    d = os.path.join(ROOT, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
+    # 27 Nov: the writer and the reader disagreed by one file. corpus-convert.py stamps .stamp with
+    # engine_sources("docx"), which excludes TxtWriter.java (fixer commit 571f5b7c, 27 Nov, the .txt
+    # half cannot change a converted .docx byte). This function hashed EVERY .java, so after a corpus
+    # rebuild the store held 211 rows stamped d28ca7516c3f9165 and this returned 74a152e7d3fb3d26 -
+    # _done() saw 2 of 213 and the next run would have re-measured 211 documents, four hours, for a
+    # hash that differed by one file the .docx pipeline never reads. The quantity is the one the store
+    # is stamped with, so it is computed the same way: regress.engine_fingerprint("docx").
     try:
-        if os.path.isdir(d):
-            _s = _h.sha256()
-            for _n in sorted(os.listdir(d)):
-                if not _n.endswith(".java"):
-                    continue
-                _s.update(_n.encode())
-                with open(os.path.join(d, _n), "rb") as _f:
-                    _s.update(_f.read())
-            return _s.hexdigest()[:16]
+        return (json.load(open("/scratch/work/p2w/.stamp", encoding="utf-8")).get("engine") or "")[:16]
     except Exception:
         pass
     try:
-        return (json.load(open("/scratch/work/p2w/.stamp", encoding="utf-8")).get("engine") or "")[:16]
+        import regress as _rg
+        fp = _rg.engine_fingerprint("docx")
+        if fp and fp != "NO-ENGINE-DIR":
+            return fp
     except Exception:
         pass
     import subprocess as _sp

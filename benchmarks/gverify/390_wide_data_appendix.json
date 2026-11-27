@@ -1,25 +1,292 @@
 {
- "name": "390_wide_data_appendix",
- "status": "ok",
- "rc": 1,
- "at": "2026-11-27T04:30:36",
- "passed": 43,
+ "source": "/scratch/work/p2w/corpus/390_wide_data_appendix.pdf",
+ "render": "google",
+ "passed": 44,
  "total": 47,
  "failed": [
   "18_displacement",
   "47_margins",
-  "59_shape_anchor",
   "66_table_cell_width"
  ],
- "displacement": {
-  "med_dy": -6.6,
-  "worst_dy": 9.6,
-  "med_dx": -2.1,
-  "bad_pages": [
-   0
-  ],
-  "runs_matched": 403
+ "engine": "d28ca7516c3f9165",
+ "ok": false,
+ "checks": {
+  "01_page_count": {
+   "source": 1,
+   "render": 1,
+   "ok": true
+  },
+  "04_chars_missing": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "05_chars_extra": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "08_image_count": {
+   "source": 0,
+   "render": 400,
+   "ok": true
+  },
+  "10_font_sizes": {
+   "source": 4,
+   "render": 4,
+   "ok": true
+  },
+  "13_text_colours": {
+   "source": 3,
+   "render": 3,
+   "ok": true
+  },
+  "14_filled_shapes": {
+   "source": 34591,
+   "render": 501560,
+   "ok": true
+  },
+  "17_matched_runs": {
+   "source": 403,
+   "render": 403,
+   "ok": true
+  },
+  "18_displacement": {
+   "source": 0,
+   "render": 1,
+   "ok": false,
+   "detail": {
+    "med_dy": -14.5,
+    "worst_dy": 42.0,
+    "med_dx": -2.1,
+    "bad_pages": [
+     0
+    ],
+    "runs_matched": 403
+   }
+  },
+  "23_line_pitch": {
+   "source": 13.0,
+   "render": 12.8,
+   "ok": true
+  },
+  "25_invisible_text": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "26_text_overlap": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "27_text_off_page": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "28_clipped_at_edge": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "31_pages_lost_their_text": {
+   "source": 1,
+   "render": 0,
+   "ok": true
+  },
+  "32_stroke_lines": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "34a_span_size_match": {
+   "source": 100,
+   "render": 100,
+   "ok": true
+  },
+  "34b_span_colour_match": {
+   "source": 100,
+   "render": 100,
+   "ok": true
+  },
+  "34c_span_weight_match": {
+   "source": 100,
+   "render": 100,
+   "ok": true
+  },
+  "35_rotation": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "36_underline_rules": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "37_super_subscript": {
+   "source": [
+    0,
+    0
+   ],
+   "render": 0,
+   "ok": true
+  },
+  "38_list_markers": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "39_image_position": {
+   "source": 0,
+   "render": 400,
+   "ok": true
+  },
+  "40_link_targets": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "42_justification_edges": {
+   "source": 0,
+   "render": 7,
+   "ok": true
+  },
+  "43_within_10pt_x": {
+   "source": 100,
+   "render": 100,
+   "ok": true
+  },
+  "44_header_footer": {
+   "source": 46,
+   "render": 46,
+   "ok": true
+  },
+  "45_char_accuracy": {
+   "source": 100,
+   "render": 100,
+   "ok": true
+  },
+  "46_text_crossing_rule": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "47_margins": {
+   "source": 2.0,
+   "render": 209,
+   "ok": false
+  },
+  "48_image_area": {
+   "source": 0,
+   "render": 223743,
+   "ok": true
+  },
+  "49_page_size": {
+   "source": 1,
+   "render": 1,
+   "ok": true
+  },
+  "50_annotation_text": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "51_field_values": {
+   "source": 0,
+   "render": 0,
+   "ok": true,
+   "detail": {
+    "state": "none",
+    "widgets": 0,
+    "empty": 0,
+    "unreadable": 0
+   }
+  },
+  "52_outline": {
+   "source": 0,
+   "render": 2,
+   "ok": true,
+   "detail": "source has no outline; render adds 2 entries (not scored)"
+  },
+  "53_embedded_faces": {
+   "source": 1,
+   "render": 1,
+   "ok": true
+  },
+  "54_image_dpi": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "55_orientation_mix": {
+   "source": [
+    1,
+    0
+   ],
+   "render": [
+    1,
+    0
+   ],
+   "ok": true
+  },
+  "59_shape_anchor": {
+   "source": 401,
+   "render": 307,
+   "ok": true
+  },
+  "60_text_column_right_edge": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "61_blank_not_filled": {
+   "source": 0,
+   "render": 0,
+   "ok": true
+  },
+  "62_table_columns": {
+   "source": 1,
+   "render": 0,
+   "ok": true
+  },
+  "63_table_rows": {
+   "source": 1,
+   "render": 0,
+   "ok": true
+  },
+  "64_table_span_across": {
+   "source": 1,
+   "render": 0,
+   "ok": true
+  },
+  "65_table_span_down": {
+   "source": 1,
+   "render": 0,
+   "ok": true
+  },
+  "66_table_cell_width": {
+   "source": 1,
+   "render": 1,
+   "ok": false
+  }
  },
- "engine": "74a152e7d3fb3d26",
- "checks": "375669-1795752290"
+ "detail": {
+  "47_margins": {
+   "worst_median_pt": 2.0,
+   "worst_unregistered": 209,
+   "margin_bad": [],
+   "indent_bad": [
+    {
+     "page": 1,
+     "unregistered": 209,
+     "worst_pt": 4.8
+    }
+   ]
+  }
+ },
+ "document": "390_wide_data_appendix",
+ "source_file": "/scratch/work/p2w/corpus/390_wide_data_appendix.pdf",
+ "render_file": "/scratch/work/renders-live/390_wide_data_appendix.pdf"
 }
