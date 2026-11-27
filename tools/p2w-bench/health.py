@@ -285,10 +285,39 @@ def compute():
     # as the "213 of 212" this file already warns about at the top. The matrix is a LibreOffice render
     # of every document in the corpus; the corpus is what it can have, so the corpus is what it is
     # measured against.
+    # A FILE ON DISK IS NOT A MEASUREMENT - THE SAME RULE, FOR THE OTHER HALF. The count above is
+    # files, and on 27 Nov it read `213 of 214` while only 37 of those results carried the engine in
+    # the tree: the LibreOffice half is refreshed by `gverify.py --lo-stale`, and nothing in this file
+    # could see that 176 results were an engine old. `done` stays coverage (it is what the corpus can
+    # have); the engine-stamped count is reported beside it, because that is the pair the fixer's
+    # capability table depends on and the only number that says whether the pair is one engine.
+    _lo_on = None
+    try:
+        import gverify as _gl
+        _now = _gl._engine_now()
+        _on = 0
+        for _f in os.listdir(LORES):
+            if not _f.endswith(".json"):
+                continue
+            try:
+                _d = json.load(open(os.path.join(LORES, _f), encoding="utf-8"))
+            except Exception:
+                continue
+            if _gl._same_engine(_d.get("engine"), _now):
+                _on += 1
+        _lo_on = _on
+    except Exception:
+        _lo_on = None
     out["stages"]["matrix"] = {
         "done": lo, "of": total, "age_h": round(_newest(LORES), 1),
         "state": "done" if total and lo >= total else
                  ("moving" if _newest(LORES) < THRESHOLD["matrix"] else "stopped")}
+    if _lo_on is not None:
+        out["stages"]["matrix"]["on_engine"] = _lo_on
+        if _lo_on < lo:
+            out["stages"]["matrix"]["why"] = (
+                "only %d of %d results carry the engine in the tree - the rest are re-measured by "
+                "gverify.py --lo-stale" % (_lo_on, lo))
 
     # A TABLE NEWER THAN ITS RESULTS IS CURRENT, NOT LATE. The class table is regenerated AFTER new
     # results land; when it is newer than the newest result, no run is behind and an age past six

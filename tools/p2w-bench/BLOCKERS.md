@@ -1560,3 +1560,59 @@ the measurement beside them. The report above passes that check as written.
 | 2026-11-27 21:05 | STEP 2, the integrity of today's trend row | **today's row overstates the corpus against the live tables.** `benchmarks/PROGRESS.md` 2026-11-27 reads docx 59, txt 8, google 212, clean 42; `progress.py --json` now reads docx 59, txt 6, google 206, clean 46. The printed delta "txt failing 8 -> 8 no change" is therefore wrong: the .txt fix landed at 14:26 and took it from 8 to 6. | `progress.py --json` read beside the committed row | no - `progress.py` and past rows are both out of bounds | the row is not edited and `--amend` was not used this time: the 20:43 pass amended it once already, and a second restatement of the same row from a different count basis is how a trend stops being a record. The next appended row carries the corrected figures, and the 26 to 27 google delta is not trustworthy until it does |
 | 2026-11-27 21:45 | the LibreOffice half after the Google measurement completed | **`--lo-stale` cannot reach most of the corpus from this pod.** It clears everything it can compute and then stops: `LibreOffice on it : 37 of 37 documents`, `re-measuring 0 of 0 stale`. Its work list is `_names()`, the .docx files in `/scratch/work/p2w/out`, and this pod holds 37 of them for a 214-document corpus. `gverify.py --matrix` therefore still reads `LibreOffice on it : 35 of 206 pairs` while `Google on it : 206 of 206`. | `gverify.py --lo-stale 40` (the 37 of 37 line), `ls /scratch/work/p2w/out/*.docx | wc -l` (37) against `ls /scratch/work/p2w/corpus/*.pdf | wc -l` (214), `gverify.py --matrix` (35 of 206) | no - the missing .docx are the engine's output, and the engine is the fixer's alone | what would overturn it: a pod whose `out/` holds a .docx for every corpus PDF, at which point the same idempotent command closes the rest. Until then the LibreOffice column describes older-engine .docx for the pairs it does not cover, and the table's own engine-coverage header says so. The 35 pairs this run refreshed moved the count from 0 of 206 to 35 of 206; every pass is committed |
 | 2026-11-28 00:03 | STEP 3 and STEP 4 A and B, the cron platform, on a pass where nothing is stopped | **This watchdog has no `cron` tool.** A paused or zombie cron cannot be moved by automation from here: `cron(action="list")`, `cron(action="runs", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85")`, `cron(action="pause", cron_id=...)` then `cron(action="resume", cron_id=...)`, and the STEP 4 A `cron(action="delete")` plus `cron(action="create")` pair are all calls this run cannot make - two `tool_search` queries for a cron tool returned no such tool, and the tool list contains no `cron`. | `health.py` (nothing stopped, so no pause/resume/delete was owed this pass either), `status.py` (fixer claim 9 min old, verdict SILENT because it is inside a long step, not wedged), `git log` (claim at 18:27, attempts at 18:25) | no - missing tool, not a decision | nothing is owed by a person this pass: the pipeline is moving and no cron was left paused. The missing power is real and it is a tool, and it is recorded here so the next stalled pass does not read as a judgement call |
+
+## 28 Nov 03:05 IST - watchdog: matrix is the one stopped stage, and its own count said one document when the truth was 176
+
+**The picture, from `health.py`.** corpus 214. measure-google done at 214 of 214, 5.7 h. matrix
+**stopped** at 213 of 214, 5.5 h. classify superseded, 1.0 h. fix moving, 3 attempt(s) in 3 h, last
+activity 0.5 h ago. txt moving, 208 clean and 6 failing, 7.2 h. `health.py --stalled` exits 1 naming
+matrix. `round.py --phase` is `fix`, so STEP 4 C did not fire - `round.py --reopen` refuses when the
+phase is not done. `status.py` reads IDLE, no fixer claim, slot free, so STEP 4 D did not fire and
+`--release-fixer --force` was NOT run. The newest commit is the fixer's release at 21:14 UTC, 23 min
+before this pass: the fixer half of the pipeline is alive.
+
+**What matrix actually is short of, which the row could not say.** The 213 LibreOffice results are
+files; 37 of them carry the engine in the tree and 176 carry an older one, and one corpus document
+(Prakashan_Print_Fidelity_Handbook) has no LibreOffice result at all. `health.py` counted files only, so
+it printed `213 of 214` - one document short - over a pair table where 176 documents are an engine old.
+That is the same fault this file already repaired for measure-google ("a file on disk is not a
+measurement") and it was still live on the other half.
+
+**What I changed.** `health.py` now reports `on_engine` beside `done` for the matrix row, by the same
+stamp rule `gverify.lo_stale()` uses, and prints a `why` line when the two differ. The row now reads
+"only 37 of 213 results carry the engine in the tree - the rest are re-measured by gverify.py
+--lo-stale". `done` and `of` are untouched: coverage is still coverage, and nothing else in the
+repository reads the new field. This is an instrument repair, not a measurement: the engine, the
+verifier and every result are as they were.
+
+**Why matrix stopped, and why this run cannot move it.** gverify's last LibreOffice commit is 16:12 UTC
+and its last Google commit 15:59 UTC - the 5.5 h the row reports. The reason it cannot go further is
+already recorded above at 21:45 today: `--lo-stale` plans from `_names()`, the .docx files in
+`/scratch/work/p2w/out`, and a pod holds 37 of the 214. From here it prints "LibreOffice on it : 37 of
+37 documents, re-measuring 0 of 0 stale" and exits. I did not run it again; a pass that can only see 37
+documents would report the same zero and spend an hour of LibreOffice to do it.
+
+**Today's trend row was 57 documents adrift and is now amended.** `benchmarks/PROGRESS.md` 2026-11-27
+read docx 59, txt 8, google 212, clean 42. The live tables read docx 116 of 213, txt 6 of 214, google
+206, clean 46. `progress.py --amend` rewrote today's row and kept the old numbers in its note. The jump
+of 56 is not 56 new regressions: the .docx table was re-measured on the engine HEAD at 20:43 UTC
+(commit 560986db) and the fixer's own report at 20:44 says the table it replaced was 82 documents
+optimistic. A reader of the trend needs that sentence, which is why it is here.
+
+**No cron tool in this pass, so the gverify cron cannot be inspected or moved.** This watchdog has no
+`cron` tool: STEP 3 and STEP 4 A and B did not run, and no cron was recreated. The calls it would have
+made, exactly:
+
+    cron(action="list")
+    cron(action="runs", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85")   # gverify, from the HEALTH-BRIEF table
+
+and then, only for a stale `next_fire_at` or a zombie run:
+
+    cron(action="pause", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85"); cron(action="resume", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85")
+
+**Decision, on the evidence.** Matrix is not a coordination fault this pass and it is not yet a 24-hour
+stall: it moved at 16:12 UTC and the wall it hit is the pod's corpus, which is a property of the runner
+and not of the engine or the schedule. Nothing is parked and nothing is re-opened. What would overturn
+that: a gverify pass that commits LibreOffice results and still leaves the on-engine count below 213, or
+the matrix row still reading 37 on engine at a pass 24 h from now - either turns this into a woken cron
+or a corpus-build fault, and then it is decided here rather than recorded again.
