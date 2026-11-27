@@ -9517,3 +9517,5 @@
 {"t": 1795789491.220103, "ist": "19:54:51", "ev": "beat", "d": "scoring txt half under the patched instrument"}
 {"t": 1795789514.4606345, "ist": "19:55:14", "ev": "beat", "d": "restamp_txt: re-scoring all 214 with the patched verifier"}
 {"t": 1795789587.3914728, "ist": "19:56:27", "ev": "beat", "d": "committing the txt instrument fix"}
+{"t": 1795789592.0188825, "ist": "19:56:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795789594.8319552, "ist": "19:56:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
