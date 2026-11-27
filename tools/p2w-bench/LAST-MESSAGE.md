@@ -77,6 +77,52 @@ the row-scale and partial-spend refutations.
 
 ## The run before this one said
 
+> # Why no document moved this run: the one construct with a clean-document record does not reproduce
+>
+> I took `18_displacement` because it is the only class where a single construct can reach double-digit
+> clean documents: 25 of the 212 scored documents fail `18` **and nothing else** (`benchmarks/gverify/`,
+> engine `d28ca7516c3f9165`, counted this run). The next largest solo set is `60` at 6 and `59` at 3, and
+> the agent work this run confirmed that ceiling — the census on `60_text_column_right_edge` put the engine-reachable
+> prize at 3 documents and closed `60-P` as measured-dead, and the class's own history has ~100 FINDINGS
+> files of refuted levers.
+>
+> Within `18`, every page-top lever is already refuted and measured: all 25 solo documents are one page,
+> so nothing that acts on pages after the first can touch them. What was left was one record in the tree
+> that a *construct* change produced a clean solo-`18` document:
+> `-Dp2w.lineRule=autoflow -Dp2w.autoEm=1.2207` → `72_bank_statement` 42/42, 26 Nov 12:00.
+>
+> **It does not reproduce.** Five solo-`18` documents, five Google renders, one export each, the flag
+> verified in the bytes (8 flow paragraphs at `w:line="240" lineRule="auto"`, cells still `exact`):
+>
+> - no document changes score — all five still fail `18_displacement` and nothing else;
+> - the median baseline shift moves **the wrong way on 3 of the 4** documents that have a current-engine
+>   baseline to compare against: `72` −3.12 → **−6.72** pt, `16` −2.63 → −3.12, `320` +6.25 → +6.84;
+> - one moves the right way by less than a point: `71` +1.12 → +0.37.
+>
+> Two facts explain the gap, and both were checked rather than assumed. `spacing()`'s `pageFirst`
+> compensation is no longer dead code — both flow call sites pass `ctx.newPage` — so this is the same code
+> path the 26 Nov build measured. And **check 18 no longer scores the bbox top**: the 26 Nov 18:00 relay
+> replaced the scored quantity with `roy`, the origin projected into reading space, precisely so a
+> substitute face's ascent cancels. The 42/42 was measured under the old quantity. A clean document on a
+> retired instrument is not a lead; it is a number that has to be re-earned.
+>
+> So the slot's product is a closed lead, not a kept change. What it leaves the next run is the axis that
+> has never been tried: `AUTO_LINE_EM` is one number for the whole corpus, and the box it asks for is the
+> *substitute* face's line height — `1.15` for a face Google owns (Arial, Times New Roman) and `1.220709`
+> for Calibri → Carlito. The engine declares Arial on some paragraphs and nothing on others, so one
+> global em is right for at most one of those populations. That is the shape of this result: the two
+> documents that declare Arial (`16`, `71`) are the two that moved least badly, and `72`, which declares
+> nothing, moved worst. A per-face ratio is the first version of this construct that is not a single
+> number, and it is a two-line change at `spacing()`'s call sites.
+>
+> **Not a blocker, and said plainly:** the corpus was cold on arrival (164 of 214 documents unconverted,
+> no stamp) and rebuilding it to 214/214 with `corpus-slice.py` cost the first 20 minutes of the slot. The
+> gate then passed in seconds, and `regress.py --check` reports no document worse in either format. That
+> rebuild is what makes the next run's first attempt possible inside 90 minutes instead of after a
+> 20-minute warm-up.
+
+### The run before this one said
+
 > # Why no document moved this run (one was measured clean, and that is not the same thing)
 >
 > Because the class was not blocked - it was **mis-measured**, and I spent the slot proving which half of
@@ -101,6 +147,8 @@ the row-scale and partial-spend refutations.
 > The second finding is the map for the other 24: two of the twelve are a page-wide **constant**
 > (`07` -3.94 pt, 68 % of runs within 1 pt; `06` -1.88 pt, 76 %) and one is the opposite
 > (`320` median +6.25, p90 **14.68**, 16 % within 1 pt) - per-block placement that no page offset reaches.
+
+Accounts share 15% of their significant words - a different account (the cut is 50%).
 
 ## The txt
 
