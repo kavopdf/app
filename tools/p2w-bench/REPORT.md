@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 12:56 → running IST · 34 min**
+**27 Nov 2026 · slot 12:56 → running IST · 43 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,7 +15,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - subagents: 1 deployed vs no FINDINGS filename carries corp-01 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
+| **Self-check** | **1 disagreement(s)** - kept change: 11 code commit(s) in this window, first: instrument: per-document keyed corpus cache (eng vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -36,229 +36,42 @@
 
 ### The run before this one said
 
-> Nothing moved because the class the run took was already down to one construct, and that construct turned
-> out to be an instrument artifact rather than a placement error.
+> Nothing moved because the run did not get to a document. It spent the slot on the gate, and the gate
+> was the reason no earlier run could commit anything either.
 >
 > The chain, in order:
 >
-> 1. `FINDINGS/18-displacement-DOMINANT-SUBCAUSE-27NOV-agent.md` (previous run) had already reduced
-> `18_displacement` to one number: the built baseline sits 0.050 em below the top of a hairline line box
-> where the renderer puts it 0.312 em, and 0.26 em at 10.5 pt is the measured +2.70 pt charge.
-> 2. This run's sub-agent built both halves of that fix - a hairline floor at the 0.312 em fixed point, and a
-> direct `beforeTw -= 0.253 em` shift of every flowed line - and measured each on four documents. Both made
-> documents worse or changed nothing: the direct shift took `31_times` from +2.7 to -21.3 pt and broke its
-> line pitch. Both were reverted; the tree is at HEAD.
-> 3. The fixer then checked the premise instead of the patch, with its own code and not the sub-agent's:
-> on `31_times_body_arial_headings` the built **baselines** already match the source to +0.07 pt median
-> (max 0.96), while the check charges +2.70 pt. `dy(ascent)` is -2.66. The charge is the ascent difference
-> between the source's embedded Helvetica (1.07 em) and the built Arial as this proxy renders it (0.80 em).
-> 4. `verify_google.py:268` sets `ascent = oy - b[1]` and `ry` to `origin - ascent`, i.e. the bbox top; `:5874`
-> subtracts the two bbox tops. Check 18 therefore cannot tell "the line moved" from "the face has a
-> different ascent". `LINE_BASE = 0.8` is correct: a six-box probe put the baseline at 0.769-0.805 of the
-> box including at a hairline box.
+> 1. `install-gate.sh` was the first command and it was killed at 300 s. It is not the hook that is slow -
+> `regress.py --check` is 13.5 s on a warm pod. It is the corpus build the hook drives: 213 documents,
+> ~16.4 minutes on this pod's two cores, sliced at 240 s per call. A run that starts cold cannot reach a
+> commit inside its own slot, which is why the previous two runs both closed with "no change was kept".
+> 2. The delegated worker measured that end to end rather than assuming it: corpus-fetch 14 s, jdk-fetch 14 s,
+> pod-prep cut at 290 s mid-slice, then five slices at 53/44/22/53/41 documents. `-j 2` gave 4.5 s/doc,
+> the same as `-j 4` - the build is CPU-bound on two cores and more workers buy nothing.
+> 3. It found the real defect underneath the cost: freshness was decided from `.progress.json`, one engine
+> fingerprint and one build start time for the whole build, compared against `.docx` mtimes. That cannot
+> distinguish a document this build made from a fossil the previous engine left, and it is blind to a
+> source PDF re-fetched under the same name.
+> 4. The fix is per-document: `.keys/<stem>.json` naming the engine fingerprint and the source PDF's
+> sha256, `doc_fresh()` refusing anything that does not match, and `adopt_legacy()` so a warm pod keeps
+> its cache. Verified on this pod: 102 documents fresh by key in **0.4 s**, 102 keys on disk, each
+> naming engine `d28ca7516c3f9165`; and 5/5 invalidation tests refuse an engine move, a one-byte PDF
+> mutation at the same mtime, a truncated `.docx`, and adoption under another engine.
+> 5. What that buys the next run is the thing this run could not buy itself: once the stamp is written the
+> gate is seconds, so a kept change can be committed after every attempt instead of never. The corpus
+> stood at **102 of 213** when the slot ran out - two or three more slices - and the gate was still
+> timing out at 285 s on the remaining build, so the instrument change is committed with its
+> measurements and **not** yet measured against a stamped corpus.
 >
-> So the class is not blocked on an engine change any more; it is blocked on a decision about the instrument,
-> and that decision needs a corpus-wide count of how many verdicts move before anyone touches check 18. That
-> measurement did not fit in this slot: it needs a full corpus render, and this pod's `regress.py --check`
-> (a full corpus pass, `corpus-convert` with a 2400 s budget) already exceeds the 300 s call limit.
->
-> What is left behind instead: the finding, the numbers, and the two changes that must not be tried again.
->
->
->
->
-> Nothing was kept because the construct this run built was refuted on the second, third, fourth, fifth and sixth documents it was measured on - after it had already cleared the first.
->
-> ## 1. What the run actually measured, and in which renderer
->
-> `18_displacement` is worth 55.5 CLEAN documents by `classpick.py --leverage` - by far the largest prize in the corpus, next is 22.6. It has had ~105 attempts. Every one of those attempts argued about this class in the proxy. This run made **eight Google Doc round trips** and did not argue.
->
-> The first number is new to the project. `31_times_body_arial_headings` was staged, uploaded, converted to a Google Doc, exported as PDF, and its every line matched against the source PDF:
->
-> Google 41/42, fails 18_displacement
-> dy median +2.755 pt   min +0.58   max +3.59      (positive = the built text sits LOWER than the page)
-> LibreOffice, same file: 42/42
->
-> So the class's Google defect is a **downward displacement of ~2.75 pt**, and the proxy does not see it at all. That is why 105 attempts could not close it: they were measuring a renderer that already passes.
->
-> ## 2. The hypothesis was arithmetically exact, and still wrong
->
-> `DocxWriter.LINE_BASE = 0.8` places the baseline `0.8 * box` below the box top. The corpus's flowing line is the hairline `w:line = 13` twips (0.65 pt), written that way deliberately so Word and Google agree on the *advance*. So:
->
-> engine   : baseline = 0.8 * 0.65      = 0.52 pt below the box top
-> renderer : baseline = 0.312 * 10.5 pt = 3.28 pt below the box top
-> gap      = 2.76 pt                    = the measured +2.755, to 0.005 pt
->
-> A gap that lands on the measurement to five thousandths of a point is the kind of thing that ends a class. It did not.
->
-> ## 3. Four arms, measured in Google, on one document
->
-> | arm | construct | dy median | spread | verdict |
-> |:--|:--|--:|--:|:--|
-> | A | HEAD (`w:line=13 exact`) | +2.75 | +0.58..+3.59 | baseline |
-> | B | `-Dp2w.lineRule=auto` | +4.57 | -1.20..+7.58 | **refuted** - worse in the median and double the spread |
-> | C | subtract the gap from every `w:before` | -34.50 | -61.35..-1.05 | **refuted** - `w:before` is a *gap*, so the correction accumulates over the page |
-> | D | move the gap from `w:before` into `w:line` | +1.71 | -0.50..+2.55 | improves, does not zero |
->
-> Arm C is worth the space it takes. The displacement is nearly constant down the page, which makes "subtract 2.76 pt from every `w:before`" look right. It is not: `w:before + w:line` is the advance, so subtracting from `before` shifts line *n* by *n* x 2.76 pt. The build that resulted is 12.5 times worse than the one it was trying to fix. **A constant offset in the render must be corrected once per advance, not once per paragraph.**
->
-> Arm D was designed to avoid exactly that - it leaves the advance untouched and only lifts the box top - and it is the only arm that improved.
->
-> ## 4. Arm D scored 42/42, and then was refuted where it counts
->
-> On `31_times_body_arial_headings`, arm D scored **GOOGLE 42/42**, `failed: []`. One document went from failing to CLEAN. So the swap was written into the engine (`BASELINE_EM = 0.312`, 32 lines, patch kept at `FINDINGS/18-displacement-BASELINE-EM-SWAP-REFUTED-27NOV.patch`) and measured on **five more** documents that also fail only `18_displacement` on this engine:
->
-> | document | before | after |
-> |:--|:--|:--|
-> | `31_times_body_arial_headings` | 41/42 | **42/42** |
-> | `10_stamp_as_image` | 41/42 | 41/42 |
-> | `22_invoice_four_columns_txtpos` | 41/42 | 41/42 |
-> | `320_balance_sheet_statutory` | 46/47 | 46/47 |
-> | `303_discharge_summary` | 46/47 | **45/47** (+ `59_shape_anchor`) |
-> | `33_sans_nondefault_body` | 41/42 | **40/42** (+ `59_shape_anchor`) |
->
-> One clean, four unchanged, two worse - and both of the worse ones gained a check they did not previously fail. The engine is back at HEAD, the patch is kept, and the attempt is recorded as a `lead` with 0 moved. Recording it as kept would have been the easy lie available to this run, and `regress.py --check` would not have caught it, because the regression is Google-only.
->
-> ## 5. Why this is progress even with 0 moved
->
-> - The class's Google defect now has a number (+2.755 pt median, downward) instead of an inference. Nothing in `FINDINGS/` had a Google-measured displacement for this class before.
-> - `auto` is closed as an escape hatch. It was the obvious fallback for a class that cannot move in the proxy, and it is worse.
-> - The `w:before` accumulation trap is written down, so the next run does not spend a slot rediscovering it.
-> - The residual is +1.71 pt, not 0, which says the effect of a taller box on the baseline is **partial** - so the constant is not a constant, and a sweep of `-Dp2w.baselineEm` scored in Google on at least two documents is the next measurement, not another single-document derivation.
-> - `59_shape_anchor` is now known to be coupled to any baseline construct. Any future arm must be scored against it on the same batch.
->
-> ## 6. What the two agents added
->
-> The first re-read every eliminated sub-cause of `18_displacement` and found the same baseline-in-box mechanism from the other end, independently, in the proxy - which is why the arms above were worth building. The second censused `60_text_column_right_edge`: 5 documents fail only it (`313_power_of_attorney`, `316_contract_with_schedules`, `321_auditors_report`, `342_packing_list`, `79_inr_indian_digit_grouping_table`), three are a real underrun of one line (538.63 -> 480.14, -58.48 pt) with DejaVu declared and Arial substituted, and the right-tab construct is **refuted** - Google splits the tabbed line, `60` reads worse and `17_matched_runs` falls 34 -> 13, so 0 CLEAN won. That is 5 documents at stake and no live construct, which is why this run stayed on `18_displacement` rather than switching.
->
-> ## 7. The method, stated without naming a class
->
-> **Measure a text displacement as an absolute y per line against the page, never as a pitch.** Pitch is a difference and is blind to a constant - the previous run wrote the same lesson for rules, arriving from the other side.
->
-> **Before subtracting a constant from a field, ask whether the field is a position or a gap.** `w:before` is a gap; subtracting a constant from it multiplies the correction by the line index.
->
-> **A construct must be scored on documents it was not derived on.** The derivation document passed. Four of five others did not, and two regressed. This run's eight Google round trips cost about twelve minutes and are the only reason that is known.
->
->
->
->
-> > **Nothing moved because the change this run was handed had never been measured where it counts. The
-> > 09:13 run's own recommendation was that `w:pBdr` on the cell paragraph "cannot be refused by the
-> > proxy" - it measures 15.00 pt in LibreOffice. This run built it three ways and it is refused by the
-> > proxy on the first document it was told to prove it on, because 15.00 pt was the PITCH between the
-> > new rules and nobody had asked where the rules were.**
-> >
-> > ## 1. What was inherited, and what it was worth
-> >
-> > `classpick.py --leverage` still puts `18_displacement` first. The 09:13 run left one thing: a
-> > three-variant probe in which `w:pBdr/w:bottom` on the cell paragraph read 15.00 in Google and 15.00
-> > in LibreOffice where `tblBorders/insideH` and `tcBorders/bottom` both read 15.75. Its conclusion -
-> > *"B is the exception: it measures 15.00 in LibreOffice, so it cannot be refused by the proxy"* - is
-> > the reason this run spent its slot on it instead of picking a new class. It was worth checking,
-> > because it is the first construct in 105 attempts on this class that claimed to reconcile both
-> > renderers.
-> >
-> > ## 2. What was built, and what happened in the first ten minutes of measurement
-> >
-> > Three builds behind `-Dp2w.pbdr=true` (patch kept in `FINDINGS/`, 87 lines, engine reverted after):
-> > `w:pBdr/w:bottom` on every cell paragraph but the last row with `insideH` dropped; `w:pBdr/w:top`
-> > with the table's top dropped; and the bottom form plus `w:after` sized so the paragraph box reaches
-> > the row's bottom edge.
-> >
-> > `303_discharge_summary` is the document the 09:13 run named as the first proof target. Its source
-> > PDF draws five ruled rows as five **stroked rectangles** at 273.38, 288.38, 303.38, 318.38, 333.37,
-> > 348.37 - pitch 15.00, x 28.0 to 538.0. **The unmodified engine already reproduces that exactly in
-> > LibreOffice**: 273.2, 288.2, 303.2, 318.2, 333.2, 348.2. There is nothing wrong with this document in
-> > the proxy; its defect is Google-only, so any change to it is pure proxy risk.
-> >
-> > | build | LibreOffice rule y | verdict |
-> > |:--|:--|:--|
-> > | source | 273.38, 288.38, 303.38, 318.38, 333.37, 348.37 | - |
-> > | HEAD | 273.2, 288.2, 303.2, 318.2, 333.2, 348.2 | **exact** |
-> > | bottom | 273.2, **284.5**, 288.4, **299.2**, **314.2**, **329.2**, 348.2 | 5 rules where the page draws 4, the pBdr ones 3.9 pt high |
-> > | top | 273.35, **283.7**, 288.4, **298.7**, **313.7**, **328.7**, 343.7, 348.2 | 8 rules, the pBdr ones 10.45 pt low |
-> > | bottom + `w:after` | ... 284.5, 288.4, 299.9, 315.2, 330.6, **350.0** | rules still 3.9 pt high **and** the table grew 1.8 pt |
-> >
-> > Cell text is byte-identical in all four builds. Nothing here is a text problem.
-> >
-> > ## 3. Why the probe could not see it - the correction this run exists to leave behind
-> >
-> > A paragraph border is drawn on the **paragraph's box**, not on the row. The corpus cell paragraph is
-> > `w:spacing w:before=209 w:line=11 exact` inside a `trHeight` of 15.00, so its top edge sits 10.45 pt
-> > below the row's top and its bottom edge 3.9 pt above the row's bottom. Both builds put the rule on
-> > one of those edges, which is exactly where the page does not draw it.
-> >
-> > **And the probe measured pitch, not position.** Three rules at 15.00, 15.00, 15.00 read "pitch
-> > 15.00" whether they sit on the row boundaries or 3.9 pt above every one of them - a uniform offset
-> > has zero pitch error. The probe's own Google table shows the tell and passes over it: variant B's
-> > rule ys are 237.50, 252.50, 267.50, 282.50, 297.50, four pitches of exactly 15.00, and it never asks
-> > where the first one is relative to the row it belongs to.
-> >
-> > **The method, stated without naming a class: when a construct moves a RULE, measure the rule's
-> > absolute y against the page's rule, not the pitch between rules.** Pitch is a difference and is
-> > blind to a constant. Two constructs in this class now have a right pitch and a wrong origin, and the
-> > 22 Nov build of this same patch was diagnosed as a *text placement* problem when it was the same
-> > placement problem seen from the other end.
-> >
-> > ## 4. Why no Google call was made, and why that is not a shortcut
-> >
-> > The charter's rule 3 - no document gets worse - is decided by `regress.py --check`, which is
-> > LibreOffice. All three builds regress it on the document the lead named. A Google round trip would
-> > have cost five minutes and could not have made a refused change committable, and the 09:13 Google
-> > numbers are not contradicted by this run: a Google pitch of 15.00 for the bottom form is entirely
-> > consistent with a rule 3.9 pt above the row boundary.
-> >
-> > The blast radius is the reason this had to be measured first rather than discovered in a corpus pass:
-> > on the 213 built `.docx` at HEAD, **177 `insideH` rules across 77 documents** would have moved.
-> >
-> > ## 4b. And the construct could not have carried the corpus even if it had worked
-> >
-> > A `w:pBdr` on the cell paragraph lands on the row's edges only where the paragraph's box IS the row's
-> > box. Counted over the 213 built `.docx`: of the 77 documents that carry an `insideH` rule, **2** have
-> > any such row - `041122-Account_Opening_Form` and its fillable twin, 8 rows each. The corpus's common
-> > cell paragraph is `w:before=209 w:line=11 exact` inside a 15 pt row, and the construct cannot reach
-> > either edge of it. The ruled-row branch is parked in `BLOCKERS.md` with that census, so the next run
-> > does not re-open it on the strength of a pitch measurement.
-> >
-> > ## 5. What is now true that was not this morning
-> >
-> > `w:pBdr` in the corpus's cell paragraph cannot carry the row rule in either edge, and `w:after`
-> > cannot make it - the row grows before the border arrives, because `trHeight` is `atLeast` and the
-> > renderer takes `max(trHeight, content + after)`. What would still work is a table whose cell
-> > paragraph's box **is** the row's box (`before=0`, `line = trHeight` exact, no `after`); that document
-> > has not been looked for. The patch, the finding and the four measurements are in `FINDINGS/` for the
-> > run that looks.
->
-> > ## 6. The second attempt: the `.txt` half, root-caused and left as a decision
-> >
-> > `classpick.py` said "next run: the .txt half", and it is the right call - the `.txt` is 205 of 213 clean
-> > against the `.docx`'s 13 of 64, so it is the half that is nearly done. Of the eight failing documents,
-> > `t12_word_invention` is the most common check and the only one with three documents, and it turns out
-> > to be **two constructs that share nothing**:
-> >
-> > - **127 characters on the two `Account_Opening_Form` twins.** The `.txt` carries 127 U+FFFD and the
-> >   source carries exactly 127 characters it does not - `Ĥ` 89, `Ħ` 23, `ģ` 13, `ħ` 2 - all symbol-font
-> >   checkbox glyphs. The verifier decodes those faces through the published Annex D table; the writer
-> >   substitutes the replacement character because `PDFont.toUnicode` has no mapping. The instrument is
-> >   right and the engine is wrong, and the fix is that table, ported.
-> > - **91 characters on `600_reviewed_invoice_with_annotations`, none missing.** The `.txt` hoists
-> >   annotation `/Contents` onto a page that already has text: a sticky note whose words the page never
-> >   draws, a FreeText already present twice, and a stamp whose `/AP` draws `APPROVED` but which
-> >   `drawnByAppearance` fails to recognise. This one is a conflict between `t12_word_invention` and
-> >   `50_annotation_text`, and it needs a decision rather than a patch.
-> >
-> > Neither is a one-line change and neither was half-built. `FINDINGS/TXT-T12-ROOT-CAUSED-ALL-THREE-27NOV-relay.md`
-> > carries both, with the counts, so the next run can start at the table port rather than at the symptom.
->
-> Accounts share 23% of their significant words - a different account (the cut is 50%).
->
-> Accounts share 13% of their significant words - a different account (the cut is 50%).
+> The class question was not reached. `classpick.py --leverage` refused to advise at all - "PENDING FIRST:
+> 34 item(s) you can close" - and `pending.py` opens with agent leads from 123 minutes ago that never
+> committed a finding (`18dA-03`, `60tB-02`). Those are the next run's first reads.
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **2.8 h ago** |
+| Measured | **2.9 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -275,11 +88,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 12:56 → running · 34 min |
+| Slot window | 12:56 → running · 43 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 17 |
+| Tool beats | 19 |
 | Longest silence | **27.7 min** — from 12:56:53, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 2 |
+| Silences over 2 min | 3 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -287,8 +100,10 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **27 min** | `##################` |
-| report - the report and the chain | **6 min** | `####` |
+| fix - diagnose and change the engine | **7 min** | `####` |
+| measure or build - a conversion, screen or compile writes no beacon | **27 min** | `##############` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **7 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |
