@@ -62,3 +62,50 @@ answer the question, as this work has already learned once today at the cost of 
 
 **What is measured is the attribute inventory above.** The mechanism is a well-known behaviour of the viewer, and
 the inventory shows this document is maximally exposed to it: zero automatic colours across 1,622 runs.
+
+## It is not this document. Not one output in 131 carries an automatic colour.
+
+The user said plainly that this is not one document's problem, so it was measured across everything on hand.
+
+    .docx files checked            131
+    with ZERO w:color="auto"       115   (88 percent)
+    with ANY w:color="auto"          0   (none at all)
+
+**The engine never writes an automatic colour.** Not sometimes, not usually - never, in any of the 131 files
+examined. The 16 files not counted in the 115 are ones that carry no explicit colour either, and those are the
+only ones that can invert correctly.
+
+**So every document this tool has produced is exposed to this**, and the exposure is proportional to how much of
+its text is dark: a black-on-white invoice is the worst case, a document with a single dark paragraph is barely
+affected. That matches the user's "almost all documents, a little or a lot".
+
+## Three behaviours in one document, and all three come from `w:color`
+
+The dark-mode screenshots of the 10-page output show three different outcomes in the same page:
+
+- **Headings survive.** They are `#A3232E` at luminance 74 and a teal at 91 - brighter than the dark background,
+  so they stay legible even though they do not invert.
+- **Body text is dim, not gone.** `#1A1A1A` at luminance 26 against a background around 20 is a contrast ratio
+  near 1.1. It is still painted; it simply cannot be seen.
+- **The character-inventory glyph column disappears entirely.** The labels - Currency, Mathematics, Greek - are
+  visible and the symbols beside them are not, which means those symbols are carried differently from the labels,
+  most likely inside textboxes, and textboxes are the ones that get rasterised.
+
+**Three layers, three different failure modes, one attribute.** That is why the user described it as "text, lines
+and many other things" rather than one symptom.
+
+## What the fix has to satisfy
+
+**Not "make everything automatic".** A red total, a teal section marker and a grey rule are content. Setting them
+to automatic would invert them in dark mode and change the document, which is a fidelity failure just as surely
+as this one.
+
+**The distinction that is needed, and that this work has not measured:**
+
+- **Near-black body text that carries no meaning** - `#1A1A1A` at luminance 26 does nothing that "black" would not
+  - **should be automatic**, and dark mode will invert it.
+- **Colour that carries meaning** should keep its value and accept that dark mode leaves it alone.
+- **Rules and borders at `#000000`** are the strongest case for automatic: a rule's colour carries nothing.
+
+**The boundary between "incidental near-black" and "meaningful colour" is a product decision, and it needs the
+corpus to settle it. No threshold has been measured and none should be guessed.**
