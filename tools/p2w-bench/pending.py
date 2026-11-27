@@ -103,6 +103,56 @@ def _epoch(s):
     return 0
 
 
+# A CARRIED-OVER NOTE THAT HAS BEEN RE-APPENDED TO ITSELF IS ONE ITEM, NOT FIFTY.
+#
+# HANDOFF.json's `next` is written by every run, and a run that reads classpick's refusal writes that
+# refusal back into it. The next run reads the field, is refused again, and writes again - so the field
+# grows by one copy of the SAME paragraph per run, and pending.py printed it verbatim as item 1.
+# Measured 27 Nov: item 1 was 26,417 bytes, the same three-sentence paragraph 42 times, the only
+# difference between copies being the number in "PENDING FIRST: N item(s)". The item is the first thing
+# the brief tells a run to read, so an unreadable item 1 is how every run came to skip the list and take
+# a class instead.
+#
+# This is PRESENTATION ONLY: the row is still one carry-over, still first, still carries the instruction.
+# Nothing is dropped from the queue - the duplicates are copies of one note, not separate work. The count
+# inside the note is also labelled for what it is: the number the run that wrote it saw, not today's.
+CARRY_MAX_CHARS = 1400
+
+
+def _collapse_carry(text):
+    """Return (printable text, how many copies of the paragraph it held).
+
+    Inert on a normal handoff: when the note is not self-repeated the text comes back unchanged.
+    """
+    import re as _re
+    raw = (text or "").strip()
+    n = len(_re.findall(r"PENDING FIRST: \d+ item", raw))
+    if n > 1:
+        # Split into sentences and keep the first occurrence of each. The stamp line is identical
+        # between copies except for its number, so it is matched and collapsed separately - otherwise
+        # 42 near-identical lines survive a pass that was meant to leave one paragraph.
+        parts = [p for p in _re.split(r"(?<=[.!?])\s+", raw) if p.strip()]
+        seen, kept = set(), []
+        for p in parts:
+            key = " ".join(p.split())
+            if key in seen:
+                continue
+            seen.add(key)
+            kept.append(p)
+        out, stamped = [], False
+        for p in kept:
+            if _re.match(r"PENDING FIRST: \d+ item", p):
+                if stamped:
+                    continue
+                stamped = True
+            out.append(p)
+        raw = " ".join(out)
+    if len(raw) > CARRY_MAX_CHARS:
+        raw = (raw[:CARRY_MAX_CHARS].rstrip()
+               + " [...] truncated by pending.py - the carried note was %d bytes" % len(text or ""))
+    return raw, n
+
+
 def collect():
     items = []
     now = time.time()
@@ -129,9 +179,15 @@ def collect():
         except Exception:
             pass
         if not _wrote_it:
+            _what, _copies = _collapse_carry(_next)
+            _why = "HANDOFF.md says this is the first work. It is ahead of any new class."
+            if _copies > 1:
+                _why += (" The carried note held the same paragraph %d times (one copy per run); "
+                         "one is printed. A \"PENDING FIRST: N\" inside it is the count THAT run saw - "
+                         "the live count is in the header above." % _copies)
             items.append({"kind": "carry-over", "who": "the last run",
-                          "what": _next,
-                          "why": "HANDOFF.md says this is the first work. It is ahead of any new class."})
+                          "what": _what,
+                          "why": _why})
 
     # 2. Agents that were deployed and have not landed a finding.
     _dead = []
@@ -461,6 +517,13 @@ def main(argv):
         return 0
 
     print("PENDING (%d) - this is the work. Do not take a new class until it is empty." % len(items))
+    # THE LIVE "YOU CAN CLOSE" COUNT, so no reader has to trust a number frozen inside a carried note.
+    # Same rule classpick.py's _pending() applies: a blocker whose own "can I fix it" says no needs a
+    # person, not a patch, so it is counted but does not hold the gate.
+    _dec = [i for i in items
+            if i.get("kind") == "blocker"
+            and (i.get("why") or "").lower().startswith("can i fix it: no")]
+    print("%d a fixer can close; %d need a decision (pending.py --decisions)." % (len(items) - len(_dec), len(_dec)))
     print("")
     for n, it in enumerate(items, 1):
         print("%d. [%s] %s" % (n, it["kind"], it["who"]))

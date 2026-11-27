@@ -8464,3 +8464,37 @@
 {"t": 1795738676.6759572, "ist": "05:47:56", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795738677.1175215, "ist": "05:47:57", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1795738877.7260041, "ist": "05:51:17", "ev": "release", "d": "baseline released"}
+{"t": 1795739189.4545124, "ist": "05:56:29", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795739189.6006777, "ist": "05:56:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795739189.6923842, "ist": "05:56:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795739470.0932367, "ist": "06:01:10", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795739470.2549589, "ist": "06:01:10", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795739470.425101, "ist": "06:01:10", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795739470.6090322, "ist": "06:01:10", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795739470.763201, "ist": "06:01:10", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795739470.9311054, "ist": "06:01:10", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795739471.1183274, "ist": "06:01:11", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795739471.2925231, "ist": "06:01:11", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795739499.591933, "ist": "06:01:39", "ev": "beat", "d": "prep warm, reading briefs"}
+{"t": 1795739502.8198123, "ist": "06:01:42", "ev": "beat", "d": "reading state"}
+{"t": 1795739504.8018205, "ist": "06:01:44", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795739509.1082711, "ist": "06:01:49", "ev": "beat", "d": "classpick"}
+{"t": 1795739509.4836261, "ist": "06:01:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795739509.9408605, "ist": "06:01:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795739510.4154577, "ist": "06:01:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795739510.898057, "ist": "06:01:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795739512.8055377, "ist": "06:01:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795739571.4462986, "ist": "06:02:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795739588.6957269, "ist": "06:03:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795739736.4058442, "ist": "06:05:36", "ev": "beat", "d": "applying pending.py fix"}
+{"t": 1795739738.1144166, "ist": "06:05:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795739738.6258256, "ist": "06:05:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795740006.8266423, "ist": "06:10:06", "ev": "beat", "d": "reverting DocxWriter, checking gate"}
+{"t": 1795740208.6060193, "ist": "06:13:28", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795740209.927455, "ist": "06:13:29", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795740212.1112924, "ist": "06:13:32", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795740212.9151595, "ist": "06:13:32", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795740213.6194994, "ist": "06:13:33", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795740214.0574281, "ist": "06:13:34", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795740214.2184436, "ist": "06:13:34", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795740214.3719947, "ist": "06:13:34", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
