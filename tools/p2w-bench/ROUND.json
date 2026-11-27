@@ -17,10 +17,10 @@
       }
     ]
   },
-  "fixer_doing": "relay: report validated, committing",
-  "fixer_doing_since": 1795738905.3030849,
+  "fixer_doing": "corpus-slice: 48 of 53 converted",
+  "fixer_doing_since": 1795739143.3190517,
   "fixer_engine_at_claim": "3462086",
-  "fixer_last_beat": 1795738905.3030856,
+  "fixer_last_beat": 1795739143.3190525,
   "fixer_started": 1795738802.5661776,
   "history": [
     {

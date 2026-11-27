@@ -8415,3 +8415,11 @@
 {"t": 1795738899.2047727, "ist": "05:51:39", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795738901.369832, "ist": "05:51:41", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795738905.3026123, "ist": "05:51:45", "ev": "beat", "d": "relay: report validated, committing"}
+{"t": 1795739141.9378786, "ist": "05:55:41", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795739142.131088, "ist": "05:55:42", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795739142.337506, "ist": "05:55:42", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795739142.522919, "ist": "05:55:42", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795739142.72198, "ist": "05:55:42", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795739142.9519594, "ist": "05:55:42", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795739143.136882, "ist": "05:55:43", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795739143.318604, "ist": "05:55:43", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
