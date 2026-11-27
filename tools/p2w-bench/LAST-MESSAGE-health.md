@@ -1,33 +1,19 @@
-## Watchdog, 27 Nov 21:05
+## Watchdog — 28 Nov 2026, 00:03 IST
 
-One stage is stopped: matrix. The rest are moving, or waiting correctly behind it.
+**Nothing is stopped.** health.py --stalled exits 0 and prints "nothing is stopped". Every row is done, moving or superseded.
 
 | stage | state | progress | age |
 |---|---|---|---|
-| measure-google | moving | 213 of 214 | 0.3 h |
-| matrix | stopped | 213 of 214 | 4.2 h |
-| classify | waiting | behind matrix | 18.9 h |
-| fix | moving | 5 attempt(s) in 3 h | 0.3 h |
-| txt | moving | 208 clean, 6 failing | 1.3 h |
+| measure-google | done | 214 of 214 | 2.6 h |
+| matrix | moving | 213 of 214 | 2.4 h |
+| classify | superseded | — | 1.5 h |
+| fix | moving | 5 attempt(s) in 3 h | 0.2 h |
+| txt | moving | 208 clean, 6 failing | 4.1 h |
 
-Trend, today's row against 26 Nov: docx open 60 to 59, txt failing 8 to 8 with no change, google 205 to 212, google clean 47 to 42. Today's row already existed, so progress.py appended nothing and there was nothing to commit.
+**Trend.** Today's row already exists, so progress.py appended nothing and there is nothing to commit for it. The 2026-11-27 row reads docx open 59 of 212, txt failing 8, google 212 with 46 clean; the live tables behind progress.py --json now read docx open 59 of 212, txt failing 6, google 206 with 46 clean. The txt axis moved: 8 failing on the row, 6 now, from the 23:10 re-score of all 214 .txt files. The 2026-11-26 to 2026-11-27 delta reads docx open 60 to 59, txt failing 8 to 8, google 205 to 212.
 
-Round phase: fix.
+**Round.** Phase is fix, round 1 of 3, 212 of 212 documents scored, and classes are still open. So STEP 4 C does not apply: the phase is not done with documents still failing.
 
-## Why matrix stopped, and what I did about it
+**Cron platform: no cron was recreated and there is no id to report.** This watchdog has no cron tool, so STEP 3 and STEP 4 A and B cannot run from here. The exact calls a run with the tool would have made, and could not, are cron(action="list"), cron(action="runs", cron_id=...), and for a stalled stage cron(action="pause") then cron(action="resume"). Nothing was owed this pass in any case: no stage is stopped, and the fixer slot is live, with a fresh claim at the time of the check, so STEP 4 D was not needed and round.py --release-fixer --force was not run.
 
-The LibreOffice half is on no engine at all. gverify.py --matrix reads LibreOffice on it 0 of 206 pairs against Google on it 205 of 206. The engine moved after the last LibreOffice commit, and every gverify run since measured Google only. stage.py now reads classify, and the matrix stage fills only documents that have no LibreOffice result - with every document carrying one, nothing routes to that half again.
-
-The fault was a contradiction between two paragraphs of GVERIFY-BRIEF.md: "every run does both" against "if it is not your stage, stop". I corrected the brief, with the measurement beside the correction, and named the tool: gverify.py --lo-stale 40. It is idempotent - it skips anything already stamped with the tree engine - so it costs nothing on a pass with no stale work.
-
-I did not run it. Measuring is the gverify cron's job, and a second soffice pool beside a live fixer is the contention that loses conversions.
-
-## What this run could not do
-
-This watchdog has no cron tool, so a paused or zombie cron cannot be moved by automation: cron list, cron runs and pause then resume are calls it cannot make. That is a missing tool, not a decision anyone has to make. It does not explain this stall - the gverify cron is firing, and its Google results committed four times since the engine moved.
-
-The fixer slot is live, with a recent claim and a recent beacon, so round.py --release-fixer was not run. round.py --reopen refused: the phase is fix, not done.
-
-## One instrument fault
-
-Today's trend row overstates the corpus. It reads txt failing 8 and google 212 clean 42; progress.py --json reads txt failing 6 and google 206 clean 46. The .txt fix landed after the row was written, so "8 to 8 no change" is wrong. That row is a past row and was not edited.
+Written into BLOCKERS.md and pushed as 9578d6d5.
