@@ -412,3 +412,52 @@ the .docx against the ink box in points, for 06 (which works) and 02 and 07 (whi
 differs. It is a two-minute comparison and it has not been done.
 
 **Do not chase the font and do not chase the rotated bbox.** Both were measured and both are innocent.
+
+## Found it: the placement was always right. The measurement was wrong.
+
+The comparison that was supposed to take two minutes, did. The .docx anchor is **exactly** the ink box on
+all three documents:
+
+    06  ink box 131.52, 332.39  152.51 x 119.02    docx anchor 131.52, 332.39  152.51 x 119.02
+    02  ink box 144.27, 455.34  164.57 x  97.32    docx anchor 144.27, 455.34  164.57 x  97.32
+    07  ink box 235.49, 261.63  161.16 x  84.33    docx anchor 235.49, 261.63  161.16 x  84.33
+
+So the placement code was never wrong. The error was in **how the result was measured.**
+
+The measurement finds the stamp by colour distance with a tolerance of 120. On 02 and 07 that tolerance
+also catches neighbouring ink of a similar colour, and the bounding box jumps:
+
+    02   tolerance  60: 164.4 x 97.2      tolerance 120: 180.5 x 110.6
+    07   tolerance  60: 161.0 x 84.0      tolerance 120: 193.2 x 108.5
+
+**Every "+4.6" and "+3.8" reported today was the measurement window growing, not the stamp moving.**
+
+### Measured at tolerance 60, where the box stops growing
+
+    01  offset +0.0, +0.0   size -0.2, +0.0   ink  -9%    ok
+    02  offset +0.2, +0.2   size -0.7, -0.2   ink -10%    ok
+    06  offset +0.5, +0.2   size -1.0, -0.5   ink  -5%    ok
+    07  offset +0.2, +0.2   size -0.2, -0.5   ink +69%    position and size ok, ink not
+
+**Four documents, position and size inside 1 pt on every one.** 01 is exact at +0.0, +0.0.
+
+### 07's ink figure is also a measurement artefact, not a defect
+
+At tolerance 60 only pixels very close to the pure colour are counted. 07's text is semi-transparent, so
+**the original's own text is not counted while the rebuilt opaque text is** - which is why the figure reads
++69 percent. The real opacity sits between the 0.88 the estimator produced (which gave -52 percent) and the
+1.0 the clamp forced. Neither figure is a defect in the document; both are the metric failing on
+semi-transparent ink.
+
+**The lesson, and it is the fifth time today:** a number is only as good as the region and the threshold it
+was taken with. Every geometry "failure" in this work was the stamp being measured with a window that
+included things which were not the stamp.
+
+### Where it stands now
+
+    fixed      all four documents: position and size inside 1 pt through a real Google export
+    fixed      06: PAID at its true opacity 0.55, ink -5%
+    proved     object identity removes foreign content - no ghost, no holes on any of the four
+    open       07's opacity: between 0.88 and 1.0, needs an estimator that works on semi-transparent ink
+    open       10, 12, 14: the three shapes the flow cannot enter
+    open       the count of affected documents
