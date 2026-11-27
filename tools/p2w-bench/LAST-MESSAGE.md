@@ -1,39 +1,155 @@
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 13:54 → running IST · 49 min**
+**27 Nov 2026 · slot 14:28 → running IST · 1h 04m**
 
 > No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
-| Check-instances passing | **0** of 0 (0.0%) on 0 documents |
-| Check-instances still failing | **0** |
+| Check-instances passing | **8681** of 9273 (93.6%) on 212 documents |
+| Check-instances still failing | **592** |
 | Kept attempts vs documents clean | **16** classes with a kept attempt, **43** documents clean - a kept attempt is progress inside a class, not a finished document |
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 8 code commit(s) in this window, first: t01: two of three word-accuracy failures are cha vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| **Self-check** | **2 disagreement(s)** - kept change: 2 code commit(s) in this window, first: p2w: corpus-slice.py --only <stem> - measure one vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 14:28 vs TIMELINE.jsonl records the claim at 13:54, so the window was reset and the duration is short |
 | Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **could not be read** - 0 of 212 scored were read as current, which is a failed read and not a measurement. No count is stated rather than a zero |
-| Who re-measures them | the **:20 gverify** cron, once the read works |
+| **Fixed - Google, every applicable check** | **42** of the **212** re-measured on this engine - **0** of the 212 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **1** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `t01_word_accuracy` - taken from the pending list (52 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `t01_word_accuracy` by hand instead |
+| Working on | `-` - taken from the pending list (52 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 14:42 | **lead** | 0/3 | t01's whitespace token unit charges the source's own bidi and letter-spacing extraction artefacts as lost words: 77_arabic_rtl_document and 39_small_caps_letter_spacing carry every alphanumeric charac |
+| 15:24 | **lead** | 0/None | no engine change landed. Instrument fix landed instead: report.py:engine_now() hashed every .java while the docx store stamp excludes TxtWriter.java, so the Google-truth read returned 0 of 0 on a stor |
 
 ## Why nothing moved, in this run's own words
+
+> # Why nothing moved
+>
+> Because the slot was spent building the pod, and then on an instrument that stops the next run
+> spending its slot the same way.
+>
+> ## 1. The 32 minutes before any document can be touched
+>
+> A fixer run starts on an empty pod. `/scratch/work` is gone, so the corpus cache, the JDK and the
+> compiled engine are gone with it. Measured this run, 2 cores:
+>
+>     corpus-fetch.sh                 16 s    213 PDFs
+>     jdk-fetch.sh                    23 s
+>     libs + aar + stubs + engine     50 s    out/ConvertAll.class
+>     corpus conversion, 213 docs    ~27 min  6 slices: 103 -> 133 -> 161 -> 187 -> 208 -> 213
+>
+> That is 32 of the 90 minutes, and a run that goes quiet for 45 minutes during it is reaped, so it has
+> to be sliced into calls that each finish inside 300 s. Six calls of bookkeeping before the first
+> document exists to look at.
+>
+> ## 2. Why the remaining 58 minutes could not hold an engine change
+>
+> `corpus-convert.py` keys every document on the engine source hash. One line changed under
+> `app/src/main/java` invalidates all 213 keys, and `regress.py --check` refuses to run until the corpus
+> is rebuilt and stamped - the hook will not let the commit land before then.
+>
+>     32 min setup  +  27 min rebuild  =  59 min
+>
+> leaving 31 minutes for the change, its Google verification, and the report. That arithmetic is the
+> whole reason runs land one attempt: by the time the engine is measurable there is room for one look,
+> and the first look usually refutes the hypothesis.
+>
+> I did not start a rebuild I could not finish. A commit that cannot pass the gate is not a change, and
+> half a rebuilt corpus is a corpus with no stamp, which is worse than the one I started with.
+>
+> ## 3. What was done instead, and why it is worth the slot
+>
+> `corpus-slice.py` had no way to name a document. `--budget 0 -j 1` converts exactly one document - but
+> it converts `todo[0]`, the first *pending* document alphabetically, so the filesystem chose the
+> document, not the person fixing it. `--only <stem>` now names it: **4.5 s for one document** against
+> 27 minutes for the corpus.
+>
+> That is not a document. It is the thing that makes the *next* run's first attempt cost 4.5 s instead
+> of 27 minutes, which is the difference between the one attempt every run gets and the four to six the
+> charter asks for.
+>
+> ## 4. What I could not prove
+>
+> The post-conversion stamp guard in `--only` is the only new behaviour and it is the only thing I did
+> not run: the corpus was fully converted and stamped before the patch landed, so no unconverted document
+> existed to name, and manufacturing one meant either invalidating a real key (deleting a file) or
+> adding a probe PDF to a corpus of 213. It is written down in
+> `FINDINGS/cold-pod-tax-and-only-flag-27NOV-relay.md` as not exercised, with the two branches that were.
+>
+> ## 5. The self-check's two disagreements, in plain words
+>
+> * *A code commit with no kept record in ATTEMPTS.json.* `attempt.py` refuses a class that is not in
+>   `benchmarks/DEFECT-CLASSES.md`, and `instrument` is not one - it said so: "that is not there writes
+>   against nothing and leaves the real class at zero." Recording a tooling change under a document
+>   defect class would corrupt that class's count, so it is recorded here and in the commit message
+>   instead. The next run should read this before assuming the class is parked.
+> * *RUN.json says 14:28, TIMELINE.jsonl says 13:54.* The window was reset by this run's claim; the
+>   13:54 row is the slot's previous occupant.
+
+## The choice, and its reason
+
+**The class was not the decision this run; the setup was.** A fixer run starts on an empty pod, so
+before any document can be looked at it pays:
+
+    corpus-fetch 16 s + jdk-fetch 23 s + engine compile 50 s + corpus conversion ~27 min = ~32 min
+
+and a changed line under `app/src/main/java` invalidates all 213 keys, so the commit gate then refuses
+until another ~27 min rebuild finishes. 32 + 27 = 59 of 90 minutes, leaving 31 for the change, its
+Google verification and the report. That arithmetic - not appetite - is why runs land one attempt.
+
+I spent the slot on the half of that tax that can be removed for the *next* run.
+
+## What was kept
+
+`corpus-slice.py --only <stem>` - commit `b08a0c65`, through the gate (`PASS - nothing got worse in
+both formats`, `google-safe` clean, `measure_gate.py` READY 212/212).
+
+Before: the only way to convert one document was `--budget 0 -j 1`, which converts `todo[0]` - the first
+*pending* document alphabetically. The document was chosen by the filesystem, not by the person fixing
+it. After: **4.5 s for one named document** against 27 minutes for the corpus. Three hunks in `main()`
+only; no engine and no `app/` change, so no key is invalidated and no document is at risk. The third
+hunk returns **before** `write_stamp()`: one document is not evidence for the other 212, and a stamp
+written there would make the next `--ensure` read WARM over a corpus 212 documents short.
+
+| | before | after |
+|:--|:--|:--|
+| convert one *named* document | not possible | `--only 415_inline_images` -> 4.5 s |
+| unknown stem | not possible | `no such document: no_such_doc`, exit 1 |
+| already-converted stem | n/a | `already converted on this engine - nothing to do, no stamp written`, exit 0 |
+| the `.stamp` after a `--only` call | n/a | byte-identical, `at: 2026-11-27T09:59:13` unchanged |
+
+**Tried to prove it wrong:** the post-conversion stamp guard is the only new behaviour and it is the
+only thing not run. The corpus was fully converted and stamped before the patch landed, so no
+unconverted document existed to name, and manufacturing one meant invalidating a real key or adding a
+probe PDF to a corpus of 213. It is written into the FINDINGS file as not exercised.
+
+**Gates checked before blaming the slot:** `regress.py --check` PASS (docx and txt, no document worse,
+google-safe clean); `measure_gate.py` READY, docx 212/212 scored, 1 exempt, 0 blocking. The corpus is
+complete and stamped: 213 documents, engine `d28ca7516c3f9165`, stamp 09:57:51Z. Neither gate refused
+this run.
+
+**The two self-check disagreements.** (1) A code commit with no kept record in ATTEMPTS.json:
+`attempt.py` refuses a class that is not in `benchmarks/DEFECT-CLASSES.md`, and `instrument` is not one
+- it says so itself, *"that is not there writes against nothing and leaves the real class at zero."*
+Filing a tooling change under a document defect class would corrupt that class's count, so it is
+recorded in the commit message and in `FINDINGS/cold-pod-tax-and-only-flag-27NOV-relay.md` instead.
+The next run should read those before assuming a class is parked. (2) RUN.json 14:28 vs TIMELINE 13:54:
+the window was reset by this run's claim; the 13:54 row is the slot's previous occupant.
+
+
+### The run before this one said
 
 > Nothing moved because the run spent its first 45 minutes converting a corpus that no run had
 > finished converting, and the work that was left after that was instrument work, not a document.
@@ -41,39 +157,38 @@
 > The chain, in order:
 >
 > 1. `install-gate.sh` was the second command and it was killed at 300 s. It is not the hook that is
->    slow - `regress.py --check` is seconds on a warm pod. It is the corpus build the hook drives.
->    This pod started with **41 of 213** `.docx`, so the gate had nothing to compare and the check
->    timed out at 200 s. That is the same wall the previous run hit from the other side: it diagnosed
->    the wall, this run had to walk through it before anything could be committed at all.
+> slow - `regress.py --check` is seconds on a warm pod. It is the corpus build the hook drives.
+> This pod started with **41 of 213** `.docx`, so the gate had nothing to compare and the check
+> timed out at 200 s. That is the same wall the previous run hit from the other side: it diagnosed
+> the wall, this run had to walk through it before anything could be committed at all.
 >
 > 2. Four slices of `corpus-slice.py` (53 / 50 / 17 / the rest, 4 workers, 280 s budget) took the
->    corpus from 41 to **213 of 213**, stamp written for engine `d28ca7516c3f9165`. `regress.py --check`
->    then returned PASS - docx and txt both "no document worse than baseline", google-safe clean - and
->    the pre-commit hook landed the commit through the gate. **This is the one durable change the run
->    made: the gate is no longer the reason this pipeline cannot commit.**
+> corpus from 41 to **213 of 213**, stamp written for engine `d28ca7516c3f9165`. `regress.py --check`
+> then returned PASS - docx and txt both "no document worse than baseline", google-safe clean - and
+> the pre-commit hook landed the commit through the gate. **This is the one durable change the run
+> made: the gate is no longer the reason this pipeline cannot commit.**
 >
 > 3. What was left in the slot was the `.txt` half, and the honest finding there is that two of its
->    three word-accuracy failures are not text loss. `77_arabic_rtl_document` scores 92.1 and
->    `39_small_caps_letter_spacing` 97.4, and both carry **every alphanumeric character the source
->    carries** - 546/546 and 930/930, zero missing, zero extra. `t01`'s unit is a whitespace token
->    (`\S+`) over a source side rebuilt from glyph runs, so bidi glues `الفاتورة` to `1,880,000` in the
->    source's own extraction and letter-spacing breaks a small-caps word at every gap; the `.txt`
->    writes the word whole and is charged 8 lost words for it.
+> three word-accuracy failures are not text loss. `77_arabic_rtl_document` scores 92.1 and
+> `39_small_caps_letter_spacing` 97.4, and both carry **every alphanumeric character the source
+> carries** - 546/546 and 930/930, zero missing, zero extra. `t01`'s unit is a whitespace token
+> (`\S+`) over a source side rebuilt from glyph runs, so bidi glues `الفاتورة` to `1,880,000` in the
+> source's own extraction and letter-spacing breaks a small-caps word at every gap; the `.txt`
+> writes the word whole and is charged 8 lost words for it.
 >
 > 4. That repair is in the truth instrument, not the writer. The last run's own lesson on
->    `18_displacement` is that an instrument must not be flipped without counting how many verdicts
->    move in each direction - and that count is corpus-wide `glyph_truth` over 213 documents, which did
->    not fit the 20 minutes that were left. A half-measured instrument change is worse than a named
->    defect, so it is recorded as a `lead` with the exact experiment written out.
+> `18_displacement` is that an instrument must not be flipped without counting how many verdicts
+> move in each direction - and that count is corpus-wide `glyph_truth` over 213 documents, which did
+> not fit the 20 minutes that were left. A half-measured instrument change is worse than a named
+> defect, so it is recorded as a `lead` with the exact experiment written out.
 >
 > So: **0 documents became clean, and the reason is not that the work was misdirected - it is that the
 > work available after the unblock was measurement of the checker, and the measurement needs a full
 > corpus pass that the corpus build itself consumed.**
 >
 > The next run starts from a warm gate and an empty `t01` counterfactual, not from a cold pod.
-
-### The run before this one said
-
+>
+>
 >
 >
 > Nothing moved because the run did not get to a document. It spent the slot on the gate, and the gate
@@ -109,14 +224,16 @@
 > The class question was not reached. `classpick.py --leverage` refused to advise at all - "PENDING FIRST:
 > 34 item(s) you can close" - and `pending.py` opens with agent leads from 123 minutes ago that never
 > committed a finding (`18dA-03`, `60tB-02`). Those are the next run's first reads.
+>
+> Accounts share 22% of their significant words - a different account (the cut is 50%).
 
-Accounts share 22% of their significant words - a different account (the cut is 50%).
+Accounts share 21% of their significant words - a different account (the cut is 50%).
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.2 h ago** |
+| Measured | **2.1 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -131,11 +248,11 @@ Accounts share 22% of their significant words - a different account (the cut is 
 
 | | |
 |:--|:--|
-| Slot window | 13:54 → running · 49 min |
+| Slot window | 14:28 → running · 1h 04m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 33 |
-| Longest silence | **26.2 min** — from 14:00:12, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 5 |
+| Tool beats | 43 |
+| Longest silence | **18.6 min** — from 14:43:57, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 7 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -143,9 +260,11 @@ Accounts share 22% of their significant words - a different account (the cut is 
 
 | Phase | Time | |
 |:--|--:|:--|
-| build - compiling the engine | **1 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **41 min** | `###################` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
+| build - compiling the engine | **2 min** | `#` |
+| fix - diagnose and change the engine | **9 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **42 min** | `###############` |
+| record - attempt, handoff, class rows | **2 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 | other - not attributed to a tool | **4 min** | `##` |
 
 The unattributed row is 2 distinct beat(s) that matched no phase. They said:
