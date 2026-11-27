@@ -935,8 +935,13 @@ def _src_pages(path):
 
 
 def _txt_lines(path):
+    # THE SEPARATOR LINE IS KEPT. TxtWriter writes "\f\n" on its own line at every page boundary
+    # (TxtWriter.java:86), and `l.strip()` is empty for a line that holds only U+000C because the
+    # form feed is whitespace to Python - so every .txt was read as ONE segment whatever its page
+    # count, and every check that reasons about pages or page furniture was measuring a document
+    # that does not exist. Measured 27 Nov 2026: t09's band arm read 0 of 29 for exactly this.
     with open(path, encoding="utf-8", errors="replace") as f:
-        return [l.rstrip("\n") for l in f if l.strip()]
+        return [l.rstrip("\n") for l in f if l.strip() or "\f" in l]
 
 
 def _txt_bytes(path):

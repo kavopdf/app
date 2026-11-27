@@ -66,10 +66,34 @@ rows, 360 → 350 twips, i.e. 0.5 pt each, 2.5 pt in total, in the direction tha
 coming from the row heights at all — it is coming from what the flow after the table is charged
 (half B, `writtenRowsTw += laidTw`) or from `cumLaidPt` inside the table, not from the declaration.
 
-**Next run: bisect the halves.** The property already isolates the whole block. Split it into two
-properties — `p2w.rungDecl` (half A) and `p2w.rungCharge` (half B) — and measure mobile-bill and
-electricity-bill with each alone (4 round trips). If half B alone reproduces +56.7 on mobile-bill
-while leaving 303 clean, the rule is two rules with different scopes and only one of them is right.
+**THE BISECT WAS RUN IN THIS SLOT, AND IT MOVES THE BLAME TO HALF A.**
+
+The patch was split with `-Dp2w.rungCharge=0` (half A only: declare the rung, charge the old
+expression) and measured on the two documents that matter, in Google:
+
+| document | baseline | half A only (charge unchanged) | both halves |
+|---|---|---|---|
+| 303_discharge_summary | 46/47, 4.1 | **47/47**, 3.0 | 47/47, 3.0 |
+| mobile-bill | 46/47, 9.2 | 46/47, **66.7** | 46/47, 65.9 |
+
+**Half A alone reproduces both the fix and the regression.** The charge (half B) is not the culprit;
+the relay's framing — "the 26 Nov build changed the declaration and got -0.70 pt, and its only
+failure was the block after the table" — is wrong about which half does the damage.
+
+That is a sharper lead than the one this run started from, because it is also a puzzle: on
+mobile-bill the declaration changed **five rows, 360 → 350 twips (0.5 pt each, 2.5 pt total,
+upward)** and the page moved **57.5 pt downward**. A 2.5 pt row change cannot do that through
+arithmetic, so the declaration is reaching something else — most likely whether a row's content still
+fits it, and therefore whether Google lays the row at its declaration or at its content.
+
+**Next run, in this order:**
+1. Convert mobile-bill with half A and diff `document.xml` against the baseline *in full* — not just
+   the `trHeight` values. If the only difference really is five `trHeight` attributes, the next
+   question is Google's `atLeast` behaviour at that boundary and it should be tested on a
+   hand-written two-row docx rather than on the corpus.
+2. If a row's content sits within 0.5 pt of its declaration, the declaration decides the layout and a
+   rung-rounding that moves it *down* is not safe. A guard that only rounds **up** (never declares
+   less than the content floor plus a margin) is the obvious next variant, and it is one line.
 
 ## Why this is worth more than the document it fixed
 
