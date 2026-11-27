@@ -639,5 +639,21 @@
   "started": "08:34",
   "started_ts": 1795748651.9435802,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "agents": [
+   "18_dA-03",
+   "60_tB-01"
+  ],
+  "attempts": 2,
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "started": "08:34",
+  "started_ts": 1795748648.3210151,
+  "window_for_claim": 1795748648.3210151,
+  "class": "60_text_column_right_edge",
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
