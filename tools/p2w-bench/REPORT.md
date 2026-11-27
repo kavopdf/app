@@ -1,39 +1,39 @@
-# Fixer report - 2026-11-27 17:11
+# Fixer report - 2026-11-27 18:25
 
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 17:11 → running IST · 16 min**
+**27 Nov 2026 · slot 18:25 → 18:58 IST · 33 min**
 
-> **2 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
-| Check-instances passing | **84** of 84 (100.0%) on 2 documents |
-| Check-instances still failing | **0** |
-| Kept attempts vs documents clean | **16** classes with a kept attempt, **45** documents clean - a kept attempt is progress inside a class, not a finished document |
+| Check-instances passing | **5600** of 5933 (94.4%) on 142 documents |
+| Check-instances still failing | **333** |
+| Kept attempts vs documents clean | **16** classes with a kept attempt, **48** documents clean - a kept attempt is progress inside a class, not a finished document |
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1 |
-| Document-moves this run | **2** — 2 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 1 code commit(s) in this window, first: finding 27NOV: the cell-before shortfall reaches vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **2** of the **2** re-measured on this engine - **210** of the 212 scored are still on an older engine, and **42** of those were clean on the engine they were measured with |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **4** run(s) for the 210 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **37** of the **137** re-measured on this engine - **70** of the 207 scored are still on an older engine, and **5** of those were clean on the engine they were measured with |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **2** run(s) for the 70 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
-| Not scored - page count did not match | **1** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
+| Not scored - page count did not match | **6** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (54 still open), not a new class |
+| Working on | `18_displacement` - taken from the pending list (61 still open), not a new class |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 17:27 | **kept** | 2/None | engine writes a single-line cell at its row height; 362 and 16 both 41/42 -> 42/42 in Google |
+| 18:57 | **lead** | 0/None | cell-before shortfall: patch reaches the XML (w:before 170->136 tw on 74_balance_sheet, 317->254 on bus-timetable) but screen.py on 10 docs shows share5/median_pt/p90_pt identical - share5's 5px thres |
 
 ## Why nothing moved, in this run's own words
 
@@ -41,36 +41,44 @@
 
 ### The run before this one said
 
-> # Why no document moved this run (one was measured clean, and that is not the same thing)
+> Nothing was kept because the change cannot be certified by the instrument this repo gates on, and
+> that is a measurement, not a shrug.
 >
-> Because the class was not blocked - it was **mis-measured**, and I spent the slot proving which half of
-> the 25 sole-18 documents is the instrument and which half is the page.
+> The engine change is real and it reaches the output. The "raise a slightly-short cell" branch in
+> DocxWriter.java wrote `before = rowHeight - cellBox` while the branch eleven lines above it writes
+> `before = LINE_BASE * (rowHeight - cellBox)` and the file's own comment states the law
+> `before + LINE_BASE*box = LINE_BASE*rowLine`. Rebuilt both ways from the same PDF, the emitted XML
+> moves by exactly the arithmetic the branch predicts: `w:before` 170 -> 136 twips (-1.70 pt) on
+> 74_balance_sheet_indented_subitems, 317 -> 254 twips (-3.15 pt) on bus-timetable.
 >
-> `18_displacement` scored `g["ry"] - r["ry"]`, and `ry` is the span's bbox TOP: the origin minus the
-> rendered face's own ascent. So the difference it scored was the baseline difference **plus** the
-> difference between the source face's ascent and the substituted face's - a font metric. `runs()` now
-> publishes `roy`, the origin projected into reading space, and 18 scores that. `ry` is untouched: the
-> pair matcher and checks 34/42/43 are keyed on it and must not move.
+> Then the repository's own instrument was asked, and it is blind. screen.py on 10 documents - the
+> four the sub-agent named plus six controls chosen for the raise branch's scope - returned share5,
+> median_pt and p90_pt IDENTICAL on 10 of 10. Not a small improvement: bit-identical. The reason is
+> structural. The largest move available here is 6.6 px at 150 DPI and share5 counts ink more than
+> 5 px from where the page drew it; a 1.70 pt move is 3.5 px, inside the threshold by construction.
+> And median_pt did not move either, which means LibreOffice is not laying the cell line out from
+> w:before at all.
 >
-> **Twelve live Google renders, both instruments, the same PDF each time.** One document flipped:
-> `31_times_body_arial_headings` 18 FAIL (med +2.6 pt) -> PASS (med +0.9 pt), 41/42 -> **42/42**. No new
-> failure on any of the twelve, including the six passing-18 documents I chose for having the smallest
-> margin in the store (`07`, `312`, `364`, `393`, `09`, `06`).
+> So regress.py --check can neither certify nor refute this construct. It would have said "no
+> document worse" - true, and worth nothing. Committing on that is the 23 Nov mistake, so the patch
+> is in PATCHES/18-small-dy-cellbefore.patch and the run stops at the one measurement that settles
+> it: a Google render of 74_balance_sheet_indented_subitems at HEAD and at the patch, reading
+> 18_displacement's dy off the export. That needs four Drive calls per document and a slot that
+> budgets for it; this one spent its middle on the corpus conversion and had ~20 minutes left.
 >
-> **And it refuted the reason I did it.** The hypothesis was that the ascent term explains all 25 sole-18
-> documents. It explains one of the five measured. Four carry a real baseline shift of -3.1 to +6.3 pt,
-> confirmed by a second script that reads `span["origin"][1]` from both PDFs and imports nothing from the
-> file I edited. Those four are Google moving the text, which is the engine's problem.
->
-> The second finding is the map for the other 24: two of the twelve are a page-wide **constant**
-> (`07` -3.94 pt, 68 % of runs within 1 pt; `06` -1.88 pt, 76 %) and one is the opposite
-> (`320` median +6.25, p90 **14.68**, 16 % within 1 pt) - per-block placement that no page offset reaches.
+> The other two results are negative and cheap, which is what a slot is for. flowFromBox is not the
+> second anchor site: its zero-gap branch is the wrong predicate and the guard there is worth one
+> document of 214, so it was not landed. And the txt half's "a document got worse" is not a
+> regression at all - one document was ADDED (Prakashan_Print_Fidelity_Handbook), none removed, no
+> failed_ids changed: 205/213 -> 205/214 and 8 -> 9 failing with no document moving. The txt ratchet
+> cannot tell a new document from a worse one, and a run that believes it will hunt a regression that
+> does not exist.
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.6 h ago** |
+| Measured | **3.5 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -85,28 +93,13 @@
 
 | | |
 |:--|:--|
-| Slot window | 17:11 → running · 16 min |
+| Slot window | 18:25 → 18:58 · 33 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 21 |
-| Longest silence | **9.1 min** — from 17:11:57, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 2 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 10 |
+| Silences over 2 min | 0 |
+| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | same refusal as 17:55 - `ENGINE CHANGED (docx): table measured on `d28ca7516c3f9165`, the tree is `a05b20eb05f |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `############` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| other - not attributed to a tool | **6 min** | `########` |
-
-The unattributed row is 5 distinct beat(s) that matched no phase. They said:
-
-- `relay: building engine (JDK + javac)`
-- `relay: engine edit - single-line cell to row height`
-- `relay: narrowing the rule to a deficit bound`
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -119,7 +112,7 @@ The unattributed row is 5 distinct beat(s) that matched no phase. They said:
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

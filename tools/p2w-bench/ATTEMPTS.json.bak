@@ -300,20 +300,9 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 111,
+  "attempts": 112,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-26 19:42",
-    "changed": {
-     "files": [],
-     "last_engine_commit": "18_displacement: the page-top gap moves from w:before into w:pgMar w:top"
-    },
-    "moved": 0,
-    "outcome": "lead",
-    "reason": "three arms of the table-gap spacer room guard measured first-hand in Google on 7 documents (42 renders). FULL clears 403_crossword_puzzle 41/42 -> 42/42 at med_dy -0.6 but drives worst_dy to 29-34 pt ",
-    "total": null
-   },
    {
     "at": "2026-11-26 22:11",
     "changed": {
@@ -522,10 +511,21 @@
     "outcome": "kept",
     "reason": "engine writes a single-line cell at its row height; 362 and 16 both 41/42 -> 42/42 in Google",
     "total": null
+   },
+   {
+    "at": "2026-11-27 18:57",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "cell-before shortfall: patch reaches the XML (w:before 170->136 tw on 74_balance_sheet, 317->254 on bus-timetable) but screen.py on 10 docs shows share5/median_pt/p90_pt identical - share5's 5px thres",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "3386308",
+  "last_engine": "33863086",
   "last_moved": 0,
   "last_total": 208,
   "outcomes": [
@@ -638,14 +638,15 @@
    "lead",
    "lead",
    "kept",
-   "kept"
+   "kept",
+   "lead"
   ],
   "park_reason": "no progress in the last 12 attempts (lead, lead, lead, lead, reverted, lead, lead, reverted, reverted, lead, lead, lead)",
   "parked_at": "24 Nov 03:30",
   "pending_moved": 37,
   "ratchet_at": "27 Nov 07:44",
   "ratchet_docs": 213,
-  "reason": "engine writes a single-line cell at its row height; 362 and 16 both 41/42 -> 42/42 in Google",
+  "reason": "cell-before shortfall: patch reaches the XML (w:before 170->136 tw on 74_balance_sheet, 317->254 on bus-timetable) but screen.py on 10 docs shows share5/median_pt/p90_pt identical - share5's 5px threshold is blind to a 1.7-3.15 pt shift and LibreOffice does not lay the cell line out from w:before. Patch in PATCHES/18-small-dy-cellbefore.patch, not landed. Settling measurement: Google render of 74_balance_sheet at HEAD vs patched.",
   "reasons": [
    "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 pt mark, Google does not implement lineRule=exact and buys a fraction of it. Applied it (w:before=spacerTw, w:line=1) and measured bank-statement-5-pages through Drive: GOOGLE 40/47 -> 36/47, WORSE, and 27_text_off_page went 0 -> 12 as the extra space overflowed the page. LibreOffice unchanged at 47/47. The reason it cannot work: the spacer is NOT where the 57 pt comes from. Counted in the emitted docx, bank-statement-5-pages carries 9 spacers totalling 81.0 pt across 5 pages, max 16.2 pt - at most 16 pt per page against a measured uniform upward shift of 56.9-57.1 pt on pages 1-4. Forcing the full gap in therefore adds space the page never had and pushes rows off it.",
    "ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 pt - the paper's top edge), while LibreOffice places it at 56.80. The engine emits exactly that construct: bank-statement-5-pages carries w:before=1103 twips (55.15 pt) on the first paragraph of each page, and the measured Google dy on its pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Same number. The probe also found the construct Google DOES honour at a page top: a 1x1 table row with w:trHeight hRule=exact, 55.83 pt of 55.15 asked, exact in LibreOffice. Ruled out with numbers: the table-spacer paragraph (at most 16.2 pt per page against a 57 pt shift, and moving its gap into w:before took Google 40/47 -> 36/47, LO unchanged - reverted), w:line exact (LO honours it, so it cannot split the two renderers), auto line boxes (face-dependent in both). Next run: emit the page-first gap as a trHeight-exact table row and set that paragraph's w:before to 0. FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md has the probe table.",
@@ -754,7 +755,8 @@
    "no engine change landed. Instrument fix landed instead: report.py:engine_now() hashed every .java while the docx store stamp excludes TxtWriter.java, so the Google-truth read returned 0 of 0 on a store holding 8681 of 9273 passing check-instances over 212 documents. After the fix the Google truth reads 42 clean of 212 and 592 failing check-instances. Evidence for 18_displacement as the next class: 120 of 170 failing documents fail it, and 25 documents fail it and NOTHING else - the largest single-check population in the corpus (next is 6).",
    "table-with-no-header-row: the charge is a per-row PITCH RAMP (source 18.4pt, render 17.9pt, 0.44pt/row, 0.7->12.0pt over 27 rows), not the constant offset med_dy reports; and worst_dy 101.4 is the check's greedy assignment claiming one source row's cells at three render rows 5.5 rows apart. Declared trHeight is already exact; LINE_BASE's whole lever is <=0.52pt. No engine change can be validated in-slot because the only renderer that sees this cluster (Google) has no cached export on the pod.",
    "18_displacement scored the bbox top (origin minus the rendered face's ascent), so dy was baseline difference + ascent difference. runs() now also publishes roy (origin in reading space) and 18 scores/reports it; ry untouched. Measured on 12 live Google renders with HEAD's instrument and the patched one on the same PDF: 31_times_body_arial_headings 18 FAIL (med +2.6) -> PASS (med +0.9), 41/42 -> 42/42 clean; no new failure on any of the 12, including the six passing-18 documents with the smallest margin (07/312/364/393/09/06). The other four sole-18 documents tested carry a real baseline shift of -3.1 to +6.3 pt, confirmed by a second implementation that reads span origins directly. FINDINGS/18dA-06-ORIGIN-NOT-BBOX-ONE-DOCUMENT-AND-FOUR-REAL-1730-relay.md",
-   "engine writes a single-line cell at its row height; 362 and 16 both 41/42 -> 42/42 in Google"
+   "engine writes a single-line cell at its row height; 362 and 16 both 41/42 -> 42/42 in Google",
+   "cell-before shortfall: patch reaches the XML (w:before 170->136 tw on 74_balance_sheet, 317->254 on bus-timetable) but screen.py on 10 docs shows share5/median_pt/p90_pt identical - share5's 5px threshold is blind to a 1.7-3.15 pt shift and LibreOffice does not lay the cell line out from w:before. Patch in PATCHES/18-small-dy-cellbefore.patch, not landed. Settling measurement: Google render of 74_balance_sheet at HEAD vs patched."
   ],
   "requeues": 0,
   "status": "PARKED"

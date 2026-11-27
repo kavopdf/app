@@ -9498,3 +9498,7 @@
 {"t": 1795788512.9064038, "ist": "19:38:32", "ev": "beat", "d": "patched build converted; uploading the 3 to Google"}
 {"t": 1795788563.2218173, "ist": "19:39:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795788572.0406625, "ist": "19:39:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795788575.8111696, "ist": "19:39:35", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795788575.9698515, "ist": "19:39:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795788576.0835924, "ist": "19:39:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795788576.9203758, "ist": "19:39:36", "ev": "beat", "d": "classrow.py: refreshing the class file"}
