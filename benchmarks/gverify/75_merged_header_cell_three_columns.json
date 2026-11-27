@@ -2,7 +2,7 @@
  "name": "75_merged_header_cell_three_columns",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T22:34:24",
+ "at": "2026-11-27T05:18:54",
  "passed": 43,
  "total": 47,
  "failed": [
@@ -12,14 +12,14 @@
   "65_table_span_down"
  ],
  "displacement": {
-  "med_dy": 5.0,
-  "worst_dy": 9.2,
+  "med_dy": 0.3,
+  "worst_dy": 5.6,
   "med_dx": 0.9,
   "bad_pages": [
    0
   ],
   "runs_matched": 50
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795731016"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795755225"
 }

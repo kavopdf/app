@@ -2,21 +2,21 @@
  "name": "two-tables-stacked-with-no-gap",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T22:43:10",
+ "at": "2026-11-27T05:19:08",
  "passed": 46,
  "total": 47,
  "failed": [
   "18_displacement"
  ],
  "displacement": {
-  "med_dy": 1.7,
-  "worst_dy": 7.3,
+  "med_dy": -1.8,
+  "worst_dy": 3.5,
   "med_dx": 0.4,
   "bad_pages": [
    0
   ],
   "runs_matched": 72
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795731016"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795755225"
 }

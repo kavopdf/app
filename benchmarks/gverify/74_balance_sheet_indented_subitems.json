@@ -1,22 +1,18 @@
 {
  "name": "74_balance_sheet_indented_subitems",
  "status": "ok",
- "rc": 1,
- "at": "2026-11-26T22:34:22",
- "passed": 41,
+ "rc": 0,
+ "at": "2026-11-27T05:18:38",
+ "passed": 42,
  "total": 42,
- "failed": [
-  "18_displacement"
- ],
+ "failed": [],
  "displacement": {
-  "med_dy": 2.2,
-  "worst_dy": 4.2,
+  "med_dy": 0.8,
+  "worst_dy": 2.5,
   "med_dx": -0.1,
-  "bad_pages": [
-   0
-  ],
+  "bad_pages": [],
   "runs_matched": 54
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795731016"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795755225"
 }

@@ -2,7 +2,7 @@
  "name": "text-held-twice-shadow-text",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T22:43:07",
+ "at": "2026-11-27T05:18:40",
  "passed": 44,
  "total": 47,
  "failed": [
@@ -11,12 +11,12 @@
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": 0.1,
-  "worst_dy": 2.6,
+  "med_dy": -0.7,
+  "worst_dy": 1.7,
   "med_dx": 0.0,
   "bad_pages": [],
   "runs_matched": 47
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795731016"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795755225"
 }

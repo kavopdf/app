@@ -2,7 +2,7 @@
  "name": "bank-statement-horizontal-rules-only",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T22:35:07",
+ "at": "2026-11-27T05:20:29",
  "passed": 40,
  "total": 42,
  "failed": [
@@ -18,6 +18,6 @@
   ],
   "runs_matched": 197
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795731016"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795755225"
 }

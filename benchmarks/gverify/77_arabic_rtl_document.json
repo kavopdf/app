@@ -2,7 +2,7 @@
  "name": "77_arabic_rtl_document",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T22:34:29",
+ "at": "2026-11-27T05:18:33",
  "passed": 40,
  "total": 47,
  "failed": [
@@ -15,14 +15,14 @@
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": 13.2,
-  "worst_dy": 36.3,
+  "med_dy": 8.4,
+  "worst_dy": 31.5,
   "med_dx": -0.2,
   "bad_pages": [
    0
   ],
   "runs_matched": 22
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795731016"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795755225"
 }

@@ -2,7 +2,7 @@
  "name": "table-with-rotated-header",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T22:43:05",
+ "at": "2026-11-27T05:20:17",
  "passed": 42,
  "total": 47,
  "failed": [
@@ -13,14 +13,14 @@
   "59_shape_anchor"
  ],
  "displacement": {
-  "med_dy": 2.4,
-  "worst_dy": 7.5,
+  "med_dy": -1.5,
+  "worst_dy": 2.5,
   "med_dx": 0.6,
   "bad_pages": [
    0
   ],
   "runs_matched": 126
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795731016"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795755225"
 }

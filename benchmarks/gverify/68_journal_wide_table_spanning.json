@@ -2,21 +2,22 @@
  "name": "68_journal_wide_table_spanning",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T22:34:06",
- "passed": 41,
+ "at": "2026-11-27T05:19:39",
+ "passed": 40,
  "total": 42,
  "failed": [
-  "18_displacement"
+  "18_displacement",
+  "59_shape_anchor"
  ],
  "displacement": {
-  "med_dy": -114.3,
-  "worst_dy": 115.0,
+  "med_dy": -36.6,
+  "worst_dy": 37.3,
   "med_dx": -0.4,
   "bad_pages": [
    0
   ],
   "runs_matched": 74
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795731016"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795755225"
 }

@@ -2,7 +2,7 @@
  "name": "76_devanagari_table",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T22:34:27",
+ "at": "2026-11-27T05:18:17",
  "passed": 43,
  "total": 47,
  "failed": [
@@ -12,14 +12,14 @@
   "47_margins"
  ],
  "displacement": {
-  "med_dy": 7.4,
-  "worst_dy": 11.8,
+  "med_dy": 3.4,
+  "worst_dy": 7.6,
   "med_dx": -0.5,
   "bad_pages": [
    0
   ],
   "runs_matched": 56
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795731016"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795755225"
 }
