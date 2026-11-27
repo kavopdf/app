@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-27 20:57
+# Fixer report - 2026-11-27 20:09
 
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 20:57 → 21:09 IST · 11 min**
+**27 Nov 2026 · slot 20:09 → 21:09 IST · 59 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -164,7 +164,7 @@ FINDINGS reproduce recipe so no run pays it again.
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 5 code commit(s) in this window, first: final report: LAST-MESSAGE.md regenerated from c vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| **Self-check** | **1 disagreement(s)** - kept change: 8 code commit(s) in this window, first: final: 3 attempts recorded, slot released --forc vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -182,6 +182,7 @@ FINDINGS reproduce recipe so no run pays it again.
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
+| 20:52 | **lead** | 1/2 | cell-before LINE_BASE rescale measured live in Google on 74 (41/42 -> 42/42 CLEAN) and 72 (41/42 -> 41/42, not worse); predicted net-zero, measured +1 clean and 0 worse. Cannot land: measure_gate NOT |
 | 20:57 | **lead** | 0/1 | pagetop-guarded-27NOV.patch applied, recompiled, converted 22/71/74/price-list: emits w:pgMar w:top=0 on all four, so sectionTopTw() returned 0 and the page is laid out exactly as before - the patch i |
 | 21:08 | **lead** | 0/4 | instrumented sectionTopTw's two return sites (System.err at guard1 hasColumnBands and guard2 room), recompiled, re-converted 22/71/74/price-list: guard2 refuses 22 (top 59.48 vs room 28.0), 71 (61.48 |
 
@@ -244,20 +245,31 @@ FINDINGS reproduce recipe so no run pays it again.
 
 | | |
 |:--|:--|
-| Slot window | 20:57 → 21:09 · 11 min |
+| Slot window | 20:09 → 21:09 · 59 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 25 |
-| Longest silence | **7.7 min** — from 20:59:28, after `lastmessage.py: running report.py for the numbers` |
-| Silences over 2 min | 1 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 67 |
+| Longest silence | **23.6 min** — from 20:10:11, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 6 |
+| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | same refusal as 17:55 and 18:45: `ENGINE CHANGED (docx): table measured on `d28ca7516c3f9165`, the tree is `a0 |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `################` |
-| report - the report and the chain | **3 min** | `######` |
+| setup - claim, housekeeping, reading the gate | **5 min** | `##` |
+| build - compiling the engine | **1 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **31 min** | `###########` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **5 min** | `##` |
+| other - not attributed to a tool | **15 min** | `######` |
+
+The unattributed row is 11 distinct beat(s) that matched no phase. They said:
+
+- `corpus slice 2/4 for the gate`
+- `collecting Google scores for HEAD probes 74 and 72`
+- `rebuilding engine with cell-before patch`
 ## Best results this round
 
 | Document | Before | After | Change |
