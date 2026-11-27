@@ -195,3 +195,34 @@ alpha, continuous alpha, and redact-then-render.
 
 **Close it by** applying the six rules to one stamp document, exporting to Google, and checking
 position, size, ink and isolation against the source PDF - the same four numbers above. Then widen.
+
+---
+
+## The stamp method is now stated generally. Read this before any stamp work.
+
+`FINDINGS/STAMP-GENERAL-METHOD-OBJECT-IDENTITY-NOT-COLOUR-27NOV-agent.md`
+
+The short version, because it changes what a run should do:
+
+**Do not build another colour mask.** Five were measured and every one failed, each differently, and the
+reason is not tuning. Where two objects paint the same pixel the result is a blend, and a blend does not
+record how much of each contributed. No threshold recovers information that was never in the image.
+
+**Separate by object identity instead.** The PDF knows which object each pixel came from. Find the stamp
+as a cluster of vector objects that is not part of the body text grid, then render **only those objects**
+onto a blank page. The body text is not on that page, so nothing can blend. It is colour-blind, so it
+holds for black stamps, multi-colour, semi-transparent, any shape, and stamps that are already raster or
+are glyphs with no border.
+
+**Step 2 is engine work** - PyMuPDF renders pages, not objects. PDFBox's `DrawObject` filter, MuPDF's
+display list, or copying the operator subset into a fresh page. The standing rule keeps the engine out of
+this work's hands, so this is a fixer task.
+
+**The acceptance test is a proof, not a threshold:** render the page with the stamp's objects and again
+without them; the difference must equal the image. No colour variant could ever pass it because they all
+inferred the difference instead of measuring it.
+
+Still proved and unchanged: the crop is the union of the stamp's drawings and its own text spans, padded
+in **points** not pixels; every anchor overlapping the stamp rect belongs to it, of any kind; never
+redact; RGBA, one floating anchor, `wrapNone`; position through a real Google export at 0.0 to 0.7 pt on
+ten documents.
