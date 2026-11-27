@@ -1,23 +1,56 @@
-**gverify: the Google side is complete at 197 verified, and the last 16 documents all fail more checks on the engine in the tree than on the one before it.**
+# Google verify - run report
 
-`stage.py` reads `measure-google`, `next: measure 16 more through Google` — because those 16 measurements were refused by the commit gate, not because they were not taken. All 213 documents have now been through Google; 197 carry a result on the engine in the tree, 189 scored and 8 refused on page count. 42 pass every check offered, 147 fail at least one.
+**Stage `measure-google`.** 72 of 213 documents carry a Google result on the current engine: 64 scored, 8 refused on page count. The stage has not moved; `stage.py` says measure 20 more.
 
-**Which checks cost the most documents** (Google, committed results)
+## What this run measured
+
+Two documents, both collected and committed:
+
+`33\_sans\_nondefault\_body` now fails one check in Google and none in LibreOffice.
+`344\_customs\_declaration` fails four in Google and none in LibreOffice. A document's check set is
+not always the same size, so a document can score out of more than 42 checks and that is not a
+regression.
+
+Then the platform file-upload bridge stopped resolving its keys and no further document could be
+measured. The exact calls, the exact errors and what would overturn it are in
+`tools/p2w-bench/BLOCKERS.md`. The short version: uploading a .docx gives a single-slot key that a
+second upload kills, so the four Drive calls per document cannot be batched; and after the first two
+documents every key, including fresh ones, answered storage not-found. Nothing in this repository can
+route around it, because every path that puts a local .docx into Drive needs a key from that bridge.
+So this run measured two of the sixty it was aimed at. It did not reach the cap and was not cut off by
+it.
+
+## Checks Google fails, by how many documents
 
 | check | documents |
-|---|---:|
-| 18\_displacement | 95 |
-| 60\_text\_column\_right\_edge | 54 |
-| 04\_chars\_missing | 46 |
-| 59\_shape\_anchor | 44 |
-| 13\_text\_colours | 32 |
+|:--|--:|
+| `18\_displacement` | 32 |
+| `04\_chars\_missing` | 23 |
+| `60\_text\_column\_right\_edge` | 21 |
+| `13\_text\_colours` | 19 |
+| `59\_shape\_anchor` | 17 |
+| `45\_char\_accuracy` | 14 |
+| `35\_rotation` | 11 |
+| `17\_matched\_runs` | 11 |
+| `47\_margins` | 9 |
+| `43\_within\_10pt\_x` | 6 |
 
-**The pair, both renderers**
+Of the 64 scored documents, 13 pass every check offered and 51 fail at least one.
 
-LibreOffice 135 of 205 pass every check; Google 47 of 205. On the engine in the tree that is 130 of 205 pairs for LibreOffice and 189 of 205 for Google, up from a LibreOffice half that was mostly on an older engine when this run started.
+## The capability table, as it stands
 
-**The finding this run exists to report**
+Constructs LibreOffice honours and Google does not: `44\_header\_footer` on 13 documents,
+`10\_font\_sizes` on 6, `32\_stroke\_lines` on 5, `23\_line\_pitch` on 3, `46\_text\_crossing\_rule` on 2,
+`31\_pages\_lost\_their\_text` on 1, `42\_justification\_edges` on 1.
 
-The 16 documents measured this run went from engine `025fe9deda5ac7b1` to `a4d8fca469bba636` and every one of them fails more checks on the new engine — 16 of 16. `18_displacement` is on all 16, and on `412_page_labels_roman` the median vertical shift moved from 2.3 pt to -59.0 pt across every page. That is a page-geometry change, not a per-construct misplacement. `regress.py --check` refused the commit and I did not override it: the 16 committed results were left at their old values so the LibreOffice half and the table could land, and the refused measurements are committed beside the write-up at `FINDINGS/GOOGLE-REGRESSION-16-OF-16-ON-a4d8fca-27NOV.md`. The fixer should re-measure those 16 before touching anything.
+Constructs Google honours and LibreOffice does not: `14\_filled\_shapes` on 3 documents.
 
-**Next**: stage `matrix` work is the LibreOffice half — 130 of 205 pairs are on the engine, so the remaining pairs are still a backlog for the next run.
+That is the table the fixer works from, and it is the reason this measurement exists: a check Google
+fails and LibreOffice does not is a construct Google drops.
+
+## What is next
+
+`measure-google` again, and the first thing the next run should do is try one upload -> create ->
+export -> collect cycle. If that cycle works, measure as many as the bridge allows and no more; if it
+fails the same way, the bridge is the blocker and the slot belongs to something else rather than to a
+retry loop. `--plan` is the count to trust, not the number of `.json` files on disk.

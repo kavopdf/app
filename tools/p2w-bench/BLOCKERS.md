@@ -1308,3 +1308,42 @@ schedule=<same>, prompt=<same>)`. What is unchecked as a result: whether the :50
 both exist and are enabled, whether either has a stale next_fire_at, and whether the 00:26 claim belongs
 to a live run or a zombie. The evidence for "moving" above therefore rests on the files in git, not on
 the scheduler.
+
+## 2026-11-27 ~09:00 IST - the platform file-upload bridge is single-slot, and it then stopped resolving keys at all
+
+gverify measured two documents and then could not measure any more. The Drive side is fine; the
+file-bytes bridge in front of it is not.
+
+The working sequence, measured twice (33\_sans\_nondefault\_body and 344\_customs\_declaration):
+
+    upload(path=/scratch/output/<name>.docx, tool_slug=GOOGLEDRIVE_CREATE_FILE, toolkit=googledrive)
+      -> {name, mimetype, s3key: project_scope/ok_.../files/<id>.docx}
+    GOOGLEDRIVE_CREATE_FILE(name=..., mimeType="application/vnd.google-apps.document",
+                            parents=[1OoSHtsv-qEUwk8CnNa9d5hsCKu8PFeij],
+                            file_to_upload={name, mimetype: docx, s3key})
+      -> {id}                       <- this is the docx -> Google Doc conversion
+    GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE(fileId=id, mimeType="application/pdf")
+      -> artifacts[0].workspace_path = /scratch/downloads/composio/<name>.pdf
+    python3 tools/p2w-bench/gverify.py --collect <name> <workspace_path>
+
+Three things this run learned, each from a failing call:
+
+1. `GOOGLEDRIVE_UPLOAD_FILE` alone is not enough. It stores the .docx as a blob, and exporting a blob
+   answers `Export only supports Docs Editors files`. The conversion happens only through
+   `GOOGLEDRIVE_CREATE_FILE` with `mimeType: application/vnd.google-apps.document` beside a
+   `file_to_upload` whose own mimetype is the docx one.
+2. The upload key is single-slot. Uploading more than one file before the create that consumes the
+   first leaves every key dead - measured on a batch of three, all three answered `The file does not
+   exist in storage, may have expired, or the file reference is invalid`. So the four Drive calls per
+   document cannot be issued with `asyncio.gather` across a batch: the upload is a platform tool that
+   cannot be called from inside a program, and one upload per message is all that survives.
+3. The bridge then failed for every key, including keys made seconds earlier in a message of their own:
+   `Failed to retrieve file for upload: ... storage returned HTTP 404` from
+   `GOOGLEDRIVE_RESUMABLE_UPLOAD`, and the same not-found from `GOOGLEDRIVE_CREATE_FILE`. Six
+   consecutive documents failed this way after the two that succeeded. Nothing in this repository can
+   work around it: every route that puts a local .docx into Drive needs a key from that bridge.
+
+What would overturn this: one clean upload -> create -> export -> collect cycle after the bridge
+recovers, or a tool that accepts a local path or file bytes directly instead of an s3key. Until then
+the Google measurement advances at whatever rate the bridge allows, not at sixty documents a run, and
+`--plan` remains the honest count.
