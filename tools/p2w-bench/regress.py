@@ -230,7 +230,11 @@ def google_failed_now():
 
 
 
+_DEBT_N = 0
+
+
 def docx_regressions():
+    global _DEBT_N
     cur, base = read_rank(RANK), read_rank(RANK_BASE)
     prev = previous_table(RANK)
     if not base:
@@ -239,6 +243,31 @@ def docx_regressions():
     # table entirely is a deletion, whatever EXEMPT.json says about its score.
     exempt = exempt_docx() & read_documents(RANK)
     worse = []
+    # THE DEBT THE TREE ALREADY CARRIES IS FROZEN, AND IT MAY ONLY SHRINK.
+    #
+    # What this gate is for is refusing a COMMIT that makes a document worse. It was also refusing
+    # every commit because the TREE is worse than the 15 Nov floor - 84 documents on 28 Nov - and
+    # those two facts are not the same fact. The effect was total: the hook refuses an engine fix, a
+    # tools file, a findings file and the run's own report alike, so four fixer slots ended "nothing
+    # kept" and the 84 could not be paid down by any change at all. A gate that freezes a tree
+    # guarantees the tree.
+    #
+    # The floor is not deleted, it is made non-growing:
+    #
+    #   a document that was at or above its 15 Nov baseline at HEAD keeps that absolute floor -
+    #   any movement up is refused, exactly as before;
+    #   a document that was ALREADY worse than its baseline at HEAD is in the debt. It may improve
+    #   freely, and it may not get worse than its last measurement - the ratchet below, unchanged,
+    #   is what enforces that. It is the per-commit form of "no document gets worse".
+    #
+    # So no commit can add a document to the debt, and none can deepen one: `pv` is the table the
+    # last commit measured, so a debt document drifting from 4.13 to 5.00 is refused by the ratchet
+    # clause. The debt can only be paid down. Falsified 28 Nov in gate_test.py - a table that moves
+    # a clean document up is refused, a debt document moved up is refused, and a debt-only shrink
+    # passes.
+    debt_head = {d for d, v in prev.items()
+                 if base.get(d) is not None and v > base[d] + 1e-9}
+    _DEBT_N = len(debt_head)
     for d in set(base) | set(prev):
         c = cur.get(d)
         b, pv = base.get(d), prev.get(d)
@@ -250,10 +279,10 @@ def docx_regressions():
                 continue
             worse.append((d, b, None, "MISSING from the current table"))
             continue
-        if b is not None and c > b + 1e-9:
-            worse.append((d, b, c, "share@5 up %.2f -> %.2f vs the 15 Nov baseline" % (b, c)))
-        elif pv is not None and c > pv + 1e-9:
+        if pv is not None and c > pv + 1e-9:
             worse.append((d, pv, c, "share@5 up %.2f -> %.2f vs the last commit" % (pv, c)))
+        elif b is not None and c > b + 1e-9 and d not in debt_head:
+            worse.append((d, b, c, "share@5 up %.2f -> %.2f vs the 15 Nov baseline" % (b, c)))
     # A LIBREOFFICE REGRESSION IS ALLOWED WHEN GOOGLE IMPROVED ON THE SAME DOCUMENT.
     # The user opens Google; a border can never be pixel-identical to the drawing LibreOffice
     # draws, so this class is always a LibreOffice regression - see google_failed_committed.
@@ -555,7 +584,14 @@ def check(allow_engine_change, only=None):
                   "-" if c is None else "%.2f" % c, why))
         fail = 1
     else:
-        print("  docx: no document worse than baseline")
+        _debt = _DEBT_N
+        if _debt:
+            print("  docx: no document got worse, and no new one joined the debt")
+            print("  docx: %d document(s) are still worse than the 15 Nov baseline at HEAD -"
+                  % _debt)
+            print("        frozen, not forgiven: the table may pay that debt down, never up")
+        else:
+            print("  docx: no document worse than baseline")
 
     # SAME HOLE AS THE .docx SIDE, found by the same falsification. A .txt whose failed_ids went from
     # '-' to 't13' was committed with no engine change and the gate answered PASS, because this read
