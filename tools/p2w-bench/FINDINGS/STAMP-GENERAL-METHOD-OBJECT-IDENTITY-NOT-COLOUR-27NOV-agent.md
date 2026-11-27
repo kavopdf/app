@@ -769,3 +769,62 @@ everything else recorded above.
     ink set   every colour inside the located rect, taken after locating
 
 **Sixteen of sixteen located. Fifteen of sixteen renderable.**
+
+## The coverage metric: much better than pixel counting, and still not measuring the stamp
+
+Pixel counting at a colour tolerance swung between -52 and +69 percent on the same documents depending on
+where the tolerance was set. Summing alpha-weighted coverage instead gives:
+
+    document                           coverage orig   coverage export   delta
+    01_stamp_rotated_15deg_upright         50847            52776         +3.8%
+    02_stamp_rotated_15deg_upleft          46190            52659        +14.0%
+    06_rect_paid_stamp_red_transparent     76762            78469         +2.2%
+    07_stamp_over_table                    50476            63021        +24.9%
+
+**Stable, and it no longer cares about antialiasing or about the stamp's opacity.** 07's 69 percent swing
+becomes 25. That is the metric working as intended.
+
+### But every one is positive, and that is a real signal
+
+All four read **higher** in the export than in the source, between 2 and 25 percent. Two explanations, and
+the second is the likely one:
+
+1. the reconstruction draws slightly heavier than the source - possible, since it redraws lines with a
+   chosen cap and redraws text with a substitute font
+2. **the measurement window still contains body text, and body text registers as coverage**
+
+The second is more likely and it is checkable by arithmetic. The coverage of a pixel is its projection onto
+the paper-to-ink line:
+
+    t = (255 - pixel) . (255 - ink) / |255 - ink|^2
+
+Grey body text at `(0.35,0.35,0.35)` against a green stamp at `(0.05,0.42,0.18)` gives a **non-zero t**,
+because grey is not perpendicular to that line. So body text inside the window counts as stamp coverage, and
+if the export renders that text a little differently from the source, the delta moves - which is exactly the
+2 to 25 percent spread seen.
+
+**So the metric is better but it is still not measuring the stamp.** It is measuring "stamp ink plus whatever
+else lies along the same colour direction in this window", and that is the isolation problem wearing a
+different hat.
+
+### What the honest metric would be
+
+**Coverage summed over pixels that belong to the stamp's own objects** - which means the metric depends on
+the same object-level separation the method is built on. The measurement cannot be fixed before the
+separation is, because it is asking the same question.
+
+**Until then: use coverage sum rather than pixel count, treat anything under about 25 percent as "within the
+measurement's own noise", and do not report an ink figure as a document defect without checking whether the
+window contained body text.**
+
+### Where this leaves the whole file
+
+    solved      the method (object identity, not colour)
+    solved      the stamp rect (the ink box, not the stroke's centre path)
+    solved      the locator (rotated text, image, closed tall path) - 16 of 16
+    solved      opacity (measure inside glyphs; 06's PAID is 0.55, everything else 1.0)
+    measured    position and size inside 1 pt on all four test documents through a real Google export
+    measured    five colour-mask variants, all failed, all recorded so they are not retried
+    open        12's stitching across a page boundary
+    open        the ink metric, which needs the same object separation as everything else
+    open        the count of affected documents
