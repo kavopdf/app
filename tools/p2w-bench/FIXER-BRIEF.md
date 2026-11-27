@@ -326,10 +326,17 @@ Write it as: what you believed, what you measured, what is now true, and what wo
 
 You are step 3 of 3. You are the only step that changes code.
 
-**BEFORE ANYTHING ELSE, READ `SETTLED.md`.** It is 87 lines and it is the list of things that are
+**BEFORE ANYTHING ELSE, READ `SETTLED.md`, AND READ ITS LAST SIX SECTIONS FIRST.** It is not 87 lines any
+more - it is around 600 - and everything learned on 27 November sits at the bottom, after 400 lines of
+older material. A run that budgets two minutes and reads top-down misses the stamp method, the `lineRule`
+clipping that affects 213 of 213 documents, the tab-stop overlap, and the decision not to chase pageless
+mode. It is the list of things that are
 already measured and decided: the baseline to compare against, the scipy requirement, all 29 patches,
 the four commits, the three retired files, and the one idea worth carrying forward. Every line there
 cost a run to learn. Reading it takes two minutes; not reading it costs a run.
+
+**`PENDING-NOW.md` is required reading too, and nothing else in this brief names it.** It holds what is
+pending and where the current thinking is; several findings are reachable only from it.
 
 **This file is a manual, not a prologue. Read the section you need, when you need it.** It used to
 be 1510 lines and a run that read it whole produced sixteen silent minutes and no attempt. Every
