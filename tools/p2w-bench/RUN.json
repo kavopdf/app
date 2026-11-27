@@ -1,5 +1,8 @@
 {
- "agents": [],
+ "agents": [
+  "18_dA-03",
+  "60_tB-01"
+ ],
  "attempts": 2,
  "docs_improved": 0,
  "ended": null,
