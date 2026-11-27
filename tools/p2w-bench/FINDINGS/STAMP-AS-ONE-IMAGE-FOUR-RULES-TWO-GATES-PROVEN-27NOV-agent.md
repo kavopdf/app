@@ -364,3 +364,50 @@ and the three that fail are not random - they are the three shapes the current f
 Running one document produced a method that looked complete. Running three produced two corrections.
 Running sixteen produced two more. **The defects are in the shapes the sample did not contain, and there
 is no way to find them except to run the whole set.**
+
+## The whole set, end to end through Google: ten of thirteen pass
+
+Thirteen stamp documents built with the rules, uploaded, converted to Google Docs, exported, and each
+compared against its source PDF. Measured inside a window around the stamp, not page-wide.
+
+    ok       01  03  04  08  09  11  13  15  312  43          ten
+    flagged  02  06  07                                        three
+
+    02  dx +0.2  dy +2.4   size -1.2 x -3.4 pt   ink  -6%
+    06  dx +2.2  dy +2.2   size -4.6 x -5.0 pt   ink  -6%
+    07  dx +0.0  dy -4.1   size  0.0 x -2.2 pt   ink -17%
+
+The ten that pass sit between 0.0 and 0.7 pt of offset, under 1.9 pt of size, under 23 percent of ink.
+`312` is exact at dx 0.0, dy 0.0.
+
+### The three that do not
+
+All three come out **smaller** than the original, and 06 by nearly 5 pt on each side. That is the mask
+eating the border's outer edge: a pixel is kept only when its colour is within 170 of the pure stamp ink
+**and** its saturation clears the floor, and the outermost anti-aliased ring of a thin stroke fails both.
+The border is trimmed, so the box measures small. 07 also sits 4.1 pt high.
+
+Not fixed. The next thing to try is widening the crop by a few pixels before measuring and letting the
+alpha carry the partial coverage, rather than judging each pixel on its own colour distance - the same
+"alpha is coverage, not a threshold" reasoning that rule 5 already asks for but the current mask does not
+implement.
+
+### The measurement that was wrong before this one
+
+The first pass measured the stamp colour **page-wide**, and eight documents reported the identical
+dy +13 to +14.8 and dh -13 to -14.8. That constant is not a stamp moving; it is a heading in the same
+colour at the top of the page, present in the source and rendered slightly differently in the export. The
+windowed measurement above is the correct one.
+
+**Fourth time in this work that a number described something other than the thing it was printed
+against.** The rule that keeps catching it: before trusting a delta, check that the thing being measured
+is the only thing of its kind in the region being measured.
+
+### Where the stamp work now stands
+
+    proved    position under 1 pt on ten documents, through a real Google export
+    proved    six rules, two gates, alpha preserved, nothing foreign carried
+    open      02, 06, 07 - border edge trimmed by the mask threshold
+    open      10_stamp_as_image, 12_stamp_across_page_break, 14_stamp_chars_positioned_td
+              - the three shapes the flow cannot enter (rule 1' and rule 6' in the batch section)
+    open      the count of affected documents
