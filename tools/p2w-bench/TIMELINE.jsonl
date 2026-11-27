@@ -9857,3 +9857,22 @@
 {"t": 1795801218.2114146, "ist": "23:10:18", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795801218.6914203, "ist": "23:10:18", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795801221.2810857, "ist": "23:10:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795801626.9674323, "ist": "23:17:06", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795801627.1716442, "ist": "23:17:07", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795801627.2790065, "ist": "23:17:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795801629.7848291, "ist": "23:17:09", "ev": "beat", "d": "relay: claimed, reading brief"}
+{"t": 1795801635.7520905, "ist": "23:17:15", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795801645.6162703, "ist": "23:17:25", "ev": "beat", "d": "relay: checking gates"}
+{"t": 1795801670.2903447, "ist": "23:17:50", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795801670.4125073, "ist": "23:17:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795801671.100203, "ist": "23:17:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795801671.2464926, "ist": "23:17:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795801673.7537186, "ist": "23:17:53", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795801673.8806882, "ist": "23:17:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795801674.5783465, "ist": "23:17:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795803016.4720583, "ist": "23:40:16", "ev": "beat", "d": "relay: agent A landed root cause, testing falsifier"}
+{"t": 1795803052.9474146, "ist": "23:40:52", "ev": "beat", "d": "relay: fetching corpus (6 min)"}
+{"t": 1795803078.1188505, "ist": "23:41:18", "ev": "beat", "d": "relay: compiling engine (baseline)"}
+{"t": 1795803406.316267, "ist": "23:46:46", "ev": "beat", "d": "relay: rung=0 verified on 1 doc (47.48->0.61), converting corpus"}
+{"t": 1795803767.9731236, "ist": "23:52:47", "ev": "beat", "d": "relay: corpus converted, starting measure"}
+{"t": 1795803852.317032, "ist": "23:54:12", "ev": "beat", "d": "relay: running regress --check on warm corpus"}
