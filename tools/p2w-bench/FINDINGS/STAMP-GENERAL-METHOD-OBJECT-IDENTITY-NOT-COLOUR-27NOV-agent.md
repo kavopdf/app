@@ -461,3 +461,43 @@ included things which were not the stamp.
     open       07's opacity: between 0.88 and 1.0, needs an estimator that works on semi-transparent ink
     open       10, 12, 14: the three shapes the flow cannot enter
     open       the count of affected documents
+
+## The opacity question settled, and the ink metric is the last thing that is wrong
+
+Measured peak coverage inside the ink box on all four:
+
+    document                         p50   p90   p99   max
+    01_stamp_rotated_15deg_upright  0.93  1.00  1.00  1.00
+    02_stamp_rotated_15deg_upleft   0.96  1.00  1.00  1.00
+    06_rect_paid_stamp_red_transparent 1.00 1.00 1.00  1.00
+    07_stamp_over_table             0.91  1.00  1.00  1.00
+
+**Every stamp's border is fully opaque, and so is every stamp's text.** The medians below 1.00 are the
+background inside the box dragging them down, not semi-transparent ink. So:
+
+- the **clamp to 1.0 was correct** for 07, and the 0.88 the estimator produced was its own background
+- **06's PAID at 0.55 is a different case** - that measurement was taken inside the PAID span alone, where
+  the background fraction is small and the median is trustworthy. It is genuinely semi-transparent.
+
+The rule that separates them: **measure inside the glyphs, not inside the span's bounding box.** A span box
+is mostly background; a glyph's interior is not.
+
+### The last thing that is wrong is the ink metric, not the documents
+
+At tolerance 60, 07 reads +69 percent ink. That is not the document - at that tolerance only pixels very
+close to the pure colour are counted, so **semi-transparent or antialiased pixels are excluded from the
+count**. The original's own edges and the rebuilt image's edges are antialiased differently, and the count
+swings wildly on a 12 percent difference in edge pixels.
+
+**Count coverage, not pixels.** Sum the alpha-weighted coverage over the window instead of counting pixels
+above a threshold. That is opacity-independent and edge-independent, and it is the only version of this
+metric that can be trusted across documents.
+
+### Final state of the four documents
+
+    position and size   inside 1 pt on all four through a real Google export (01 exact at +0.0, +0.0)
+    isolation           no ghost, no holes on any of the four
+    opacity             06's PAID at its true 0.55; every other stamp text opaque at 1.0
+    ink metric          still threshold-based and still unreliable - switch to coverage sum
+    open                10, 12, 14: the three shapes the flow cannot enter
+    open                the count of affected documents
