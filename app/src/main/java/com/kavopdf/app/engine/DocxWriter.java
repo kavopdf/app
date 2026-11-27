@@ -6963,6 +6963,55 @@ public final class DocxWriter {
                 // the row's height is therefore not the cells' business. Where the table has
                 // no row pitch at all (rowTwHere == 0, no trPr) a row of empty cells IS sized
                 // by its content, and a hairline there would collapse the row to nothing.
+                // A SINGLE-LINE CELL MUST FILL ITS OWN ROW, BECAUSE GOOGLE LAYS THE CELL.
+                //
+                // Google does not honour w:trHeight as a floor: it lays the row at the height of
+                // the cell's own content, and the w:trHeight declaration is only a hint it drops.
+                // The repo has known that since FINDINGS/18_displacement-GOOGLE-IGNORES-TRHEIGHT-1045
+                // and drew the opposite conclusion from it - "so the cell content is the row" -
+                // which is right only when the cell is written at the row's height. It is not:
+                // a one-line cell is written as w:before (the page's own baseline, e.g. 128 tw on
+                // 362_price_list_dense) plus the HAIRLINE box (8 tw), and the row's w:trHeight is
+                // 168. The cell is 32 tw (1.6 pt) short of its row, so Google lays every row
+                // 1.6 pt short and the table ramps: on 362 that is a straight line of slope
+                // -0.01475 per page pt, 181 of 257 runs out.
+                //
+                // MEASURED BEFORE THIS LINE EXISTED (27 Nov, engine a4de7df896875a39, hand-edited
+                // XML, live Google renders): raising w:before to the row's own height - 362
+                // 128 -> 160, 16_right_aligned_amounts_txtpos 152 -> 190 - took BOTH documents
+                // from 41/42 to 42/42 on the full 42-check set, and on 362 n_out went 181 -> 0
+                // with the slope falling 87x. w:before is honoured 1:1 by Google
+                // (FINDINGS/18_displacement-WBEFORE-IS-1TO1-GOOGLE-1005-agentA), which is why the
+                // deficit goes there and not into w:line.
+                //
+                // SCOPED, because the blanket form is a known breaker: 402_calendar_month_grid
+                // holds multi-line cells and doubling their box took its six-week grid to nine
+                // rows. So only a row where EVERY cell holds exactly one line (rowParts == 1),
+                // only a single-row cell (a merged cell's box is the rows it covers, not this
+                // one), only a non-empty cell, and only where the cell is genuinely SHORT - a
+                // cell already at its row's height is left exactly as it was, which is what keeps
+                // this a no-op on the documents that already pass.
+                // THE BOUND IS A QUARTER OF THE ROW, AND IT IS MEASURED, NOT PICKED.
+                //
+                // rowParts cannot draw this line: 16_right_aligned_amounts_txtpos' short rows and
+                // 402_calendar_month_grid's 1230-tw week rows have the SAME shape - one paragraph
+                // per cell, a box far below the row's w:trHeight - and one of them must be raised
+                // and the other must not. The size of the shortfall separates them cleanly, on all
+                // four documents the probe covers:
+                //     362_price_list_dense     168 - 136 = 32 tw   = 19 % of the row   RAISE
+                //     16_right_aligned_amounts 380 - 342 = 38 tw   = 10 %               RAISE
+                //     36_embedded_subset_font  400 - 360 = 40 tw   = 10 %               RAISE
+                //     402_calendar_month_grid 1230 - 335 = 895 tw  = 73 %               LEAVE
+                // A cell within a quarter of its row is the same row measured slightly short, and
+                // the page's own text has to fill it. A cell a quarter short of its row is a cell
+                // that holds several lines and whose row is tall for a reason this paragraph does
+                // not carry; filling it would double the row, which is the 402 breakage the
+                // scope was first written for. So the bound is the shortfall's share of the row.
+                int deficitTw = rowHeightTw - cellBeforeTw - cellBoxTw;
+                if (vspan <= 1 && !cell.isEmpty() && rowTwHere > 0 && cellBoxTw > 0
+                        && deficitTw > 0 && deficitTw * 4 <= rowHeightTw) {
+                    cellBeforeTw = rowHeightTw - cellBoxTw;
+                }
                 if (cell.isEmpty() && rowTwHere > 0) {
                     cellBoxTw = 1;
                     cellBeforeTw = 0;
