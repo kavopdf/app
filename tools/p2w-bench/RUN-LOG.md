@@ -198,3 +198,4 @@
 | 27 Nov 05:31 | fixer | attempt 18_displacement -> lead (0/? moved) |
 | 27 Nov 05:44 | fixer | attempt t09_page_furniture -> lead (0/? moved) |
 | 27 Nov 05:46 | fixer | attempt 18_displacement -> lead (0/? moved) |
+| 27 Nov 05:47 | fixer | slot FORCED released - see INCIDENTS.md for why |
