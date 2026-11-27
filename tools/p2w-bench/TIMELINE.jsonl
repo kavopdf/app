@@ -10194,3 +10194,8 @@
 {"t": 1795816674.468999, "ist": "03:27:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795816675.7787883, "ist": "03:27:55", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795816684.4907742, "ist": "03:28:04", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795816707.7108066, "ist": "03:28:27", "ev": "beat", "d": "heartbeat before any claim: regenerating the report with the run's own account in it"}
+{"t": 1795816709.8314846, "ist": "03:28:29", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795816711.793375, "ist": "03:28:31", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795816712.2103596, "ist": "03:28:32", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795816714.3712883, "ist": "03:28:34", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

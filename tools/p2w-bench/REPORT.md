@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 03:24 → running IST · 0 min**
+**28 Nov 2026 · slot 03:24 → 03:28 IST · 3 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,7 +15,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - run window: RUN.json says this run began at 03:24 vs TIMELINE.jsonl records the claim at 03:07, so the window was reset and the duration is short |
+| **Self-check** | **1 disagreement(s)** - kept change: 1 code commit(s) in this window, first: fixer 28nov 03:24: the 84 regressions are one co vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
@@ -37,10 +37,48 @@
 
 ## Why nothing moved, in this run's own words
 
-*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+> The gate's regressions are not five constructs. They are one constant, and this run bisected them to it.
+>
+> The last three reports said the 84 LibreOffice regressions were several unrelated constructs and that no
+> single patch would move them. That was never measured; it was inferred from the class table. So I stopped
+> inferring and bisected the engine the way you bisect any regression: build the tree at each commit, score
+> one document, watch the number. `table-with-no-header-row` sits at the baseline score for four commits in a
+> row and jumps to its full tree score at exactly one of them. That commit is the table work of 27 November.
+>
+> It went in as two rules at once, so the second question was which half did it. Both were made switchable
+> and measured separately, and only one of them moves anything: the rule that declares a pitch-bound table row
+> ten twips under its own pitch. Turning that rule off returns every table document I probed to its baseline
+> score, and five of the six come out better than the baseline rather than level with it, because the other
+> engine work since 15 November is real and the rung was hiding it. The gap rule from the same commit is inert
+> on both documents I tested it on.
+>
+> So the answer to "what makes these documents worse" is now a named constant with a named commit, and the
+> probe that shows it costs fifteen seconds a document instead of a corpus pass. That is the thing this run
+> was worth.
+>
+> What I did not do is decide which renderer is right, and I want to be plain about why that matters. The rung
+> was landed on Google evidence: its own commit message says it took two documents to a clean sheet in Google
+> Docs. Every measurement against it since has been LibreOffice. Under the rule this project is built on -
+> Google is the truth and LibreOffice is a proxy - a change that is right in Google and wrong in the proxy is
+> not a regression at all, and a tenth of the "regressed" documents pass every Google check while their proxy
+> score rises. That is consistent with the gate refusing on an artifact of the proxy. It is also exactly the
+> kind of comfortable story that turns out to be wrong, so it stays a hypothesis: the Google side of this
+> constant is unmeasured, and it is two documents wide.
+>
+> The next run should measure it before it builds anything, because the answer decides two different jobs. If
+> the two documents stay clean with the rung off, the constant is pure cost and should go, and the gate
+> unblocks by itself. If either one loses its clean sheet, the rung is right and the gate is charging a
+> Google-proved construct to a renderer nobody opens - and then the gate is the defect, with a measurement in
+> FINDINGS/ to argue from rather than an opinion.
+>
+> Nothing was kept and no engine line was committed: a change that requires a full corpus re-measurement does
+> not fit the slot that found it, and a change measured only in the proxy would be the exact mistake this file
+> is warning about. The switches I built were reverted; the tree's engine is byte-identical to HEAD.
 
 ### The run before this one said
 
+>
+>
 > Nothing was kept because the commit gate refuses every engine change, and this run measured what it
 > refuses on rather than working around it.
 >
@@ -122,11 +160,13 @@
 >
 > Accounts share 17% of their significant words - a different account (the cut is 50%).
 
+Accounts share 21% of their significant words - a different account (the cut is 50%).
+
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **43 min ago** |
+| Measured | **46 min ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -141,12 +181,20 @@
 
 | | |
 |:--|:--|
-| Slot window | 03:24 → running · 0 min |
+| Slot window | 03:24 → 03:28 · 3 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 6 |
-| Silences over 2 min | 0 |
+| Tool beats | 11 |
+| Longest silence | **2.0 min** — from 03:25:50, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| setup - claim, housekeeping, reading the gate | **2 min** | `#################` |
+| report - the report and the chain | **0 min** | `#####` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -159,7 +207,7 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
