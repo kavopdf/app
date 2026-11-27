@@ -1,66 +1,79 @@
-# Fixer report - 2026-11-27 19:18
+# Fixer report - 2026-11-27 19:15
 
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 19:18 → 19:41 IST · 22 min**
+**27 Nov 2026 · slot 19:15 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
-| Check-instances passing | **5600** of 5933 (94.4%) on 142 documents |
-| Check-instances still failing | **333** |
-| Kept attempts vs documents clean | **16** classes with a kept attempt, **48** documents clean - a kept attempt is progress inside a class, not a finished document |
+| Check-instances passing | **3231** of 3445 (93.8%) on 82 documents |
+| Check-instances still failing | **214** |
+| Kept attempts vs documents clean | **16** classes with a kept attempt, **47** documents clean - a kept attempt is progress inside a class, not a finished document |
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 1 code commit(s) in this window, first: finding 27NOV relay: the cell-before patch measu vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **37** of the **137** re-measured on this engine - **70** of the 207 scored are still on an older engine, and **5** of those were clean on the engine they were measured with |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **2** run(s) for the 70 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **18** of the **79** re-measured on this engine - **130** of the 209 scored are still on an older engine, and **25** of those were clean on the engine they were measured with |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **3** run(s) for the 130 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
-| Not scored - page count did not match | **6** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
+| Not scored - page count did not match | **4** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (61 still open), not a new class |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 19:39 | **lead** | 0/None | cell-before patch measured in Google on the 3 only-18 documents: 74_balance_sheet 41/42 -> 42/42 (dy 1.5->0.6); bus-timetable 18 fixed but gains 46_text_crossing_rule; 72_bank_statement dy -1.0 -> -3. |
+| Working on | `-` - taken from the pending list (61 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## Why nothing moved, in this run's own words
 
-> The one open question the 18:00 run left was a measurement it could not afford: the cell-before
-> patch moves `w:before` exactly as its arithmetic predicts, and the LibreOffice instrument is blind
-> to a 1.7-3.2 pt move by construction. This run spent its middle on the Google render that settles it,
-> on the three documents the store's census named as "fail 18_displacement and nothing else".
+*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+
+### The run before this one said
+
+> Nothing was kept because the change cannot be certified by the instrument this repo gates on, and
+> that is a measurement, not a shrug.
 >
-> Google answered, and the answer is not one law. `74_balance_sheet_indented_subitems` goes 41/42 ->
-> 42/42 with its median dy 1.5 -> 0.6 pt: the branch's own case, and a real CLEAN document.
-> `bus-timetable-station-left-times-right` fixes its displacement (4.2 -> 1.1) and gains a failure it
-> did not have, `46_text_crossing_rule`: the raised cell now crosses a rule in Google's layout.
-> `72_bank_statement_no_rules_right_amounts` moves the wrong way, dy -1.0 -> -3.0.
+> The engine change is real and it reaches the output. The "raise a slightly-short cell" branch in
+> DocxWriter.java wrote `before = rowHeight - cellBox` while the branch eleven lines above it writes
+> `before = LINE_BASE * (rowHeight - cellBox)` and the file's own comment states the law
+> `before + LINE_BASE*box = LINE_BASE*rowLine`. Rebuilt both ways from the same PDF, the emitted XML
+> moves by exactly the arithmetic the branch predicts: `w:before` 170 -> 136 twips (-1.70 pt) on
+> 74_balance_sheet_indented_subitems, 317 -> 254 twips (-3.15 pt) on bus-timetable.
 >
-> So the patch is a real defect fix and a wrong class-wide change at the same time. One document
-> becomes CLEAN, one trades its failure, one gets worse: a net of -1. Landing it would be the 23 Nov
-> mistake with a nicer table, so the engine is unchanged, the three store rows were restored to their
-> HEAD measurement (a row measured on `f4ce54f257d15f1c` describes an engine that is not in the tree),
-> and the whole measurement is committed as FINDINGS/18-cellbefore-GOOGLE-27NOV-relay.md with the
-> predicate the next run should test first: `cellBoxTw * 2 >= rowHeightTw`, which is true of 74 and
-> false of both documents this change broke.
+> Then the repository's own instrument was asked, and it is blind. screen.py on 10 documents - the
+> four the sub-agent named plus six controls chosen for the raise branch's scope - returned share5,
+> median_pt and p90_pt IDENTICAL on 10 of 10. Not a small improvement: bit-identical. The reason is
+> structural. The largest move available here is 6.6 px at 150 DPI and share5 counts ink more than
+> 5 px from where the page drew it; a 1.70 pt move is 3.5 px, inside the threshold by construction.
+> And median_pt did not move either, which means LibreOffice is not laying the cell line out from
+> w:before at all.
+>
+> So regress.py --check can neither certify nor refute this construct. It would have said "no
+> document worse" - true, and worth nothing. Committing on that is the 23 Nov mistake, so the patch
+> is in PATCHES/18-small-dy-cellbefore.patch and the run stops at the one measurement that settles
+> it: a Google render of 74_balance_sheet_indented_subitems at HEAD and at the patch, reading
+> 18_displacement's dy off the export. That needs four Drive calls per document and a slot that
+> budgets for it; this one spent its middle on the corpus conversion and had ~20 minutes left.
+>
+> The other two results are negative and cheap, which is what a slot is for. flowFromBox is not the
+> second anchor site: its zero-gap branch is the wrong predicate and the guard there is worth one
+> document of 214, so it was not landed. And the txt half's "a document got worse" is not a
+> regression at all - one document was ADDED (Prakashan_Print_Fidelity_Handbook), none removed, no
+> failed_ids changed: 205/213 -> 205/214 and 8 -> 9 failing with no document moving. The txt ratchet
+> cannot tell a new document from a worse one, and a run that believes it will hunt a regression that
+> does not exist.
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **3.8 h ago** |
+| Measured | **3.4 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -75,22 +88,12 @@
 
 | | |
 |:--|:--|
-| Slot window | 19:18 → 19:41 · 22 min |
+| Slot window | 19:15 → running · 0 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 25 |
-| Longest silence | **7.1 min** — from 19:24:32, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 3 |
+| Tool beats | 4 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `######` |
-| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `##############` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

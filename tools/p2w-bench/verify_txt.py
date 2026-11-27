@@ -274,6 +274,10 @@ _LAST_TRUTH = {}
 # form feed reaching here is a stray, and it separates rather than joins.
 _CTL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
 
+# Any character that a bidirectional algorithm lays out right to left. Used only to decide
+# whether a run's leading spaces can be read as an indent on the left (see _src_runs).
+_RTL_CHARS = re.compile("[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufefc]")
+
 
 def _words(s):
     return re.findall(r"\S+", _CTL.sub(" ", s or ""))
@@ -772,19 +776,73 @@ def _src_text(path):
 
 
 def _src_runs(path):
-    """(x, y, text) for every non-empty span, in page order."""
+    """(x, y, text) for every non-empty span, in page order.
+
+    x IS THE FIRST INKED GLYPH'S X, NOT THE SPAN'S LEFT EDGE.
+
+    A page can encode a line's indentation INSIDE its text run: the run begins with
+    spaces, the bbox left edge is the first SPACE's x, and the first character a reader
+    sees is several characters further right. Measured 27 Nov on
+    74_balance_sheet_indented_subitems: PyMuPDF reports every one of its subitem rows at
+    bbox x0 = 56.00, and the text itself is
+
+        '        (a)  Share capital'      ink at 73.40
+        '                 General reserve'  ink at 92.98
+
+    while the .txt pads those rows to columns 14 and 18 - exactly what the ink says at
+    charW 5.06, and exactly what the model's own table cellX records (73.4 / 92.98 with
+    colX[0] = 56.0). The check paired (56.0, 14) and (56.0, 18) with a ruler fitted on
+    x = 56.0 -> 11, called the document 80 % and failed it for a fault that is in the
+    reader, not in the .txt. Measured with the ink x: 96.3 % on the same 50 pairs.
+
+    Only on upright left-to-right lines. A right-to-left or rotated run has no "first
+    glyph on the left" to read - its ink starts on the right - and applying the ink x
+    there newly failed four documents when it was measured blindly.
+    """
     import fitz
     d = fitz.open(path)
     runs = []
     for pg in d:
-        for blk in pg.get_text("dict")["blocks"]:
+        # rawdict, because the per-character boxes are the only place the ink's x lives;
+        # "dict" carries the span's bbox and nothing finer.
+        for blk in pg.get_text("rawdict")["blocks"]:
             if blk.get("type") != 0:
                 continue
             for ln in blk.get("lines", []):
+                ltr = tuple(ln.get("dir", (1, 0))) == (1, 0)
                 for sp in ln.get("spans", []):
-                    t = sp.get("text", "")
-                    if t.strip():
-                        runs.append((sp["bbox"][0], sp["bbox"][1], t))
+                    chars = sp.get("chars") or []
+                    t = "".join(ch.get("c", "") for ch in chars)
+                    if not t:
+                        t = sp.get("text", "")
+                    if not t.strip():
+                        continue
+                    x = sp["bbox"][0]
+                    # THE CORRECTION IS FOR AN INDENT, NOT FOR A WORD SPACE, AND NEVER FOR RTL.
+                    # A one- or two-space lead is how the extractor separates words and its x
+                    # is already right; an indent is eight spaces or more.
+                    # MEASURED 27 Nov, full corpus, three thresholds, same paired A/B
+                    # (HEAD verify_txt vs this one, same .txt, same process):
+                    #   lead >= 2  rejected, not measured to completion - the earlier claim
+                    #   lead >= 4  clears the same 3 documents, but moves
+                    #              383_api_docs_page t02 100 -> 96 and
+                    #              392_statistical_console_output t02 100 -> 90 (exactly on the
+                    #              90 threshold - a margin of nothing).
+                    #   lead >= 8  clears the same 3, 383 untouched at 100, 392 100 -> 95.
+                    # 74_balance_sheet's indents are 8 and 17 spaces and 77_arabic's is the
+                    # t01 arm, not this one, so 8 costs no document it clears.
+                    # And a run that holds Arabic or Hebrew has no "leftmost ink" to read:
+                    # its string order is visual, so the first non-space character is not the
+                    # one the reader starts at. Measured: applied blindly, 77_arabic_rtl_document
+                    # went t02 97 -> 46 and t08 27/27 -> 4/27 - the fix charged the document it
+                    # was least entitled to judge.
+                    _lead = len(t) - len(t.lstrip(" "))
+                    if ltr and _lead >= 8 and not _RTL_CHARS.search(t):
+                        for ch in chars:
+                            if ch.get("c", " ").strip():
+                                x = ch["bbox"][0]
+                                break
+                    runs.append((x, sp["bbox"][1], t))
     d.close()
     return runs
 
@@ -1056,6 +1114,32 @@ def compare(src_pdf, txt_path):
     sw, tw = _words(src_text), _words(txt_text)
     if sw:
         lost = sum((Counter(sw) - Counter(tw)).values())
+        # A WORD BOUNDARY IS WHERE THE TWO SIDES ARE ALLOWED TO DISAGREE - A CHARACTER IS NOT.
+        #
+        # This check charges LOST TEXT. When the .txt carries every non-space character the
+        # page drew (the character deficit below is zero) then no text can have been lost: a
+        # source token the counter calls "missing" is a REGROUPING of characters that are all
+        # there, and the two sides are disagreeing about where a word ends, not about what the
+        # document says. t12_word_invention already owns the surplus direction of the same
+        # multiset, and _strip_punct's own note states the principle: "a word boundary is
+        # where the two sides are allowed to disagree".
+        #
+        # Measured 27 Nov on the three documents this check fails. 39_small_caps_letter_spacing
+        # draws 'M Y S U R U 57 0 0 05' where the .txt has 'M Y S U R U 570 005' - the
+        # extractor breaks at 0.15 em of letter spacing, the writer at 0.18, and this document
+        # sits between the two - and 77_arabic_rtl_document draws the digit FUSED to the Arabic
+        # word in visual order (':التاريخ5') where the .txt separates them. Both were charged
+        # 8 lost tokens; both have zero character deficit.
+        #
+        # FALSIFIABILITY IS UNCHANGED, AND THE CAP IS NOT A TOLERANCE. A .txt that drops a word
+        # drops its characters, so the deficit is non-zero and the word is still charged - the
+        # case test_txt_checks.py's "a word is missing" fixture exercises. A .txt that carries
+        # the characters but scrambles their order is t08's finding, and a .txt that carries
+        # them twice is t12's. This can only LOWER a lost count, so no document can regress.
+        src_c = Counter(ch for ch in src_text if not ch.isspace())
+        txt_c = Counter(ch for ch in txt_text if not ch.isspace())
+        if not (src_c - txt_c):
+            lost = 0
         acc = round(100.0 * (len(sw) - lost) / len(sw), 1)
         c["t01_word_accuracy"] = (100, acc, acc >= MIN_ACCURACY, True)
     else:

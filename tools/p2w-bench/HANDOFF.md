@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 17:11 |
-| ended | 19:41 |
-| how it ended | forced |
+| started | 19:15 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## What the next run should do first
@@ -52,6 +52,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
+- `09:13` attempt 104 on 18_displacement -> lead
 - `09:14` agent deployed: 18-displacement w:pBdr probe: measured Google 15.00 vs 15.75, finding committed /  - 
 - `09:42` attempt 105 on 18_displacement -> lead
 - `09:46` attempt 13 on t12_word_invention -> lead
@@ -76,7 +77,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `16:50` attempt 110 on 18_displacement -> kept
 - `17:27` attempt 111 on 18_displacement -> kept
 - `18:58` attempt 112 on 18_displacement -> lead
-- `19:39` attempt 113 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 

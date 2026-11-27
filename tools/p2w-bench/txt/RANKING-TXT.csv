@@ -97,7 +97,7 @@ document,applicable,passed,failed,abstained,failed_ids
 392_statistical_console_output,7,7,0,0,
 393_spectrum_peak_table,7,7,0,0,
 394_map_with_legend,7,7,0,0,
-39_small_caps_letter_spacing,9,8,1,0,t01_word_accuracy
+39_small_caps_letter_spacing,9,9,0,0,
 400_comic_page_speech_bubbles,7,7,0,0,
 401_trifold_brochure,7,7,0,0,
 402_calendar_month_grid,7,7,0,0,
@@ -151,14 +151,15 @@ document,applicable,passed,failed,abstained,failed_ids
 71_invoice_space_aligned_no_rules,10,10,0,0,
 72_bank_statement_no_rules_right_amounts,10,10,0,0,
 73_marksheet_subject_marks_grade,9,9,0,0,
-74_balance_sheet_indented_subitems,10,9,1,0,t02_position
+74_balance_sheet_indented_subitems,10,10,0,0,
 75_merged_header_cell_three_columns,10,10,0,0,
 76_devanagari_table,10,10,0,0,
-77_arabic_rtl_document,9,8,1,0,t01_word_accuracy
+77_arabic_rtl_document,9,9,0,0,
 78_mixed_english_devanagari_line,9,9,0,0,
 79_inr_indian_digit_grouping_table,10,10,0,0,
 80_gstin_pan_cin_ifsc_table,9,9,0,0,
 Account_Opening_Form_Fillable_filled,10,7,3,0,t06_encoding t09_page_furniture t12_word_invention
+Prakashan_Print_Fidelity_Handbook,11,7,4,0,t01_word_accuracy t03_symbols t07_symbol_counts t12_word_invention
 academic-paper-ieee-2col-abstract,10,10,0,0,
 admission-form-labels-left-boxes-right,9,9,0,0,
 admit-card,9,9,0,0,

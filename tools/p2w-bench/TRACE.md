@@ -405,4 +405,4 @@
 | 27 Nov 17:25 | fixer | build-engine | engine built in 42s |
 | 27 Nov 17:27 | fixer | attempt | 18_displacement -> kept (2/? moved) |
 | 27 Nov 18:58 | fixer | attempt | 18_displacement -> lead (0/? moved) |
-| 27 Nov 19:39 | fixer | attempt | 18_displacement -> lead (0/? moved) |
+| 27 Nov 19:15 | fixer | claim | fixer claimed the slot |

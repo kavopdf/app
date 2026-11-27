@@ -276,6 +276,11 @@
  ],
  "history": [
   {
+   "at": "19:45",
+   "how": "forced",
+   "plan": ""
+  },
+  {
    "at": "20:46",
    "how": "forced",
    "plan": ""
@@ -367,11 +372,6 @@
   },
   {
    "at": "18:58",
-   "how": "forced",
-   "plan": ""
-  },
-  {
-   "at": "19:41",
    "how": "forced",
    "plan": ""
   }
@@ -597,16 +597,12 @@
   {
    "at": "18:58",
    "text": "attempt 112 on 18_displacement -> lead"
-  },
-  {
-   "at": "19:39",
-   "text": "attempt 113 on 18_displacement -> lead"
   }
  ],
  "plan": "",
  "run": {
-  "started": "17:11",
-  "ended": "19:41",
-  "ended_how": "forced"
+  "started": "19:15",
+  "ended": null,
+  "ended_how": null
  }
 }
