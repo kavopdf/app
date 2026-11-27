@@ -1,6 +1,6 @@
 {
   "source": "/scratch/work/p2w/corpus/041122-Account_Opening_Form.pdf",
-  "render": "/scratch/tmp/lo-one-5zx9ncsx/041122-Account_Opening_Form.pdf",
+  "render": "/scratch/tmp/lo-one-t3ir2_ny/041122-Account_Opening_Form.pdf",
   "passed": 27,
   "total": 47,
   "failed": [
@@ -25,7 +25,7 @@
     "65_table_span_down",
     "66_table_cell_width"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -70,19 +70,17 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 9,
+      "render": 7,
       "ok": false,
       "detail": {
-        "med_dy": 8.5,
-        "worst_dy": 575.4,
+        "med_dy": 1.9,
+        "worst_dy": 586.6,
         "med_dx": 0.1,
         "bad_pages": [
           0,
           1,
           2,
           3,
-          4,
-          5,
           6,
           7,
           8
@@ -147,7 +145,7 @@
     },
     "36_underline_rules": {
       "source": 0,
-      "render": 28,
+      "render": 47,
       "ok": true
     },
     "37_super_subscript": {
@@ -334,5 +332,5 @@
   },
   "document": "041122-Account_Opening_Form",
   "source_file": "/scratch/work/p2w/corpus/041122-Account_Opening_Form.pdf",
-  "render_file": "/scratch/tmp/lo-one-5zx9ncsx/041122-Account_Opening_Form.pdf"
+  "render_file": "/scratch/tmp/lo-one-t3ir2_ny/041122-Account_Opening_Form.pdf"
 }
