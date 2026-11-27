@@ -6,5 +6,6 @@
  "ended_ts": null,
  "kept": 0,
  "started": "04:55",
- "started_ts": 1795735553.4313154
+ "started_ts": 1795735553.4313154,
+ "class": "18_displacement"
 }

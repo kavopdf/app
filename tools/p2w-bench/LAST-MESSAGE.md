@@ -1,57 +1,121 @@
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 03:24 → running IST · 53 min**
+**27 Nov 2026 · slot 04:55 → running IST · 36 min**
 
-> No change was kept this run. One construct was measured corpus-wide and refused; the numbers below say
-> why, and the patch is saved for the run that can measure Google instead of the proxy.
+> No change was kept this run. The numbers below say what was tried.
 
-## What this run changed
+## Progress
 
-Nothing in `app/`. The corpus was rebuilt and re-measured, and the engine change was **reverted** after its
-own measurement.
+| Check-instances passing | **7788** of 8247 (94.4%) on 190 documents |
+| Check-instances still failing | **459** |
+| Kept attempts vs documents clean | **16** classes with a kept attempt, **55** documents clean - a kept attempt is progress inside a class, not a finished document |
+| Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
+| | |
+|:--|:--|
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
+| Regressions | **none** |
+| Exempt from the LibreOffice comparison | **0** — none |
+| **Fixed - Google, every applicable check** | **42** of the **189** re-measured on this engine - **16** of the 205 scored are still on an older engine, and **5** of those were clean on the engine they were measured with |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **1** run(s) for the 16 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Not scored - page count did not match | **8** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
+| Moved but still open | **28** — improved, not fixed |
+| Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
+| Working on | `18_displacement` - taken from the pending list (52 still open), not a new class |
+| Findings vs landing | **74** finding(s) on this class and **0** documents moved - writing is cheaper than landing, and nothing else says so |
 
-**Attempt 1 - `18_displacement`: "make a one-line cell's content equal its `w:trHeight`".** 23 lines in
-`DocxWriter.java`, guarded to rows whose every cell holds one line (wrapped rows, vertical merges, empty
-cells and the row cut at the paper's bottom keep the old pair), and it fires where it should: on
-`362_price_list_dense` 255 of its 260 `(before + line)` pairs now equal their row's declared height, on
-`402_calendar_month_grid` only 10 of 47 do.
+## What was tried
 
-Then the corpus: 213/213 rebuilt, 204 of 212 scored before the slot ended.
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 05:31 | **lead** | 0/None | row-rung pair patch (declare the rung, charge the rung): 303_discharge_summary 46/47 -> 47/47 (worst_dy 4.1 -> 3.0) and 320 19.4 -> 7.4, BUT mobile-bill 9.2 -> 65.9 and electricity-bill 28.5 -> 47.8 o |
 
-| | documents |
-|:--|--:|
-| better | 13 |
-| worse | **91** |
-| unchanged | 100 |
-| corpus mean `median_pt` | 2.274 → **2.641** |
+## Why nothing moved, in this run's own words
 
-`23_timetable_grid_txtpos` 0.96 → 12.48, `404_sudoku_grid` 1.44 → 7.68, `electricity-bill` 0.96 → 5.76.
-Reverted. The patch, the table and the guards are in
-`FINDINGS/18-displacement-ROWH-CONTENT-EQUAL-TRHEIGHT-REFUTED-27NOV-relay.md` with the 41-line diff beside
-it.
+> **A trade was refused, and two instruments were found to be lying.** Three things happened, in this order.
+>
+> **1. The class I picked, and why it was not the tool's suggestion.** `classpick.py` suggested
+> `t09_page_furniture` on the strength of an open lead. A sub-agent spent the first minutes of this run
+> on that lead and came back with a refutation: the .docx half of t09 is already landed at all four
+> code sites, and the one surviving candidate can only shrink a firing set whose members already pass.
+> I took `18_displacement` instead: on the current engine it is 18 of 61 scored rows, and the shape
+> census puts 27 documents on `18_displacement` alone, 15 more on it plus `60_text_column_right_edge`.
+> The reason is in the report, not the tool.
+>
+> **2. The attempt: the row rung as a pair. 303_discharge_summary went 46/47 → 47/47 in Google and
+> was not kept, because two other documents got worse.** The relay's prediction held exactly where it
+> fired — the footer on 303 moved 1.10 pt, as predicted, and the document is now 47/47. But
+> mobile-bill went worst_dy 9.2 → 65.9 and electricity-bill 28.5 → 47.8, both measured in Google. A
+> document that goes clean while two get worse is a trade, and rule three refuses it, so the engine was
+> reverted and the attempt recorded as a lead.
+>
+> **3. The regression is real, and I proved it rather than assuming it.** The patch carries
+> `-Dp2w.rungTw=0` as an identity switch, so the same tree converts mobile-bill two ways. With the
+> switch off, Google reads 9.2 — the committed baseline exactly. With it on, 65.9. That control cost one
+> Drive round trip and it is the only reason the number in the table can be believed at all.
+>
+> **What the failure narrowed, which is the part worth carrying forward.** Two guards were built and
+> neither removed the regression: a content-driven guard (rows whose content exceeds the declaration
+> keep their old height and charge) and a per-table kill switch. The numbers barely moved. And the
+> declarations themselves cannot explain 57 pt: the patch changed five rows on mobile-bill by 0.5 pt
+> each, upward. So the movement is not coming from row heights at all — it is coming from what the flow
+> after the table is charged, i.e. half B. **The next run should split the two halves behind two
+> properties and measure mobile-bill and electricity-bill with each alone: four round trips, and it
+> decides whether the rung law is one rule or two.**
+>
+> **Two instruments were caught lying, and both are worth more than the document.**
+>
+> - `verify_txt.py:939` filters `if l.strip()`, and a line holding only a form feed is whitespace in
+>   Python — so the reader drops every page separator the writer carefully emits (`TxtWriter.java:86`,
+>   `"\f\n"`, on its own line, by measurement). **Every .txt check in this pipeline is computed on a
+>   single segment for a multi-page document.** The t09 lead was recorded in the ledger as blocked on
+>   "an aligner plus a full 213-document .txt re-measure"; it is blocked on six lines of reader, and on
+>   the full .txt re-measure that any honest fix to the reader owes.
+> - The Google after-side works from this pod: `upload` → `CREATE_FILE` → `EXPORT` → `--collect`, with
+>   the file copied to `/scratch/output` first. Eleven probe documents were created this run and all
+>   eleven were deleted from the verify folder at the end of it.
+>
+> **Not done, and not claimed.** No document is newly clean in the committed tree. The two FINDINGS
+> files carry the measurements; the three relay reports are in `FINDINGS/` with a header saying which
+> of their claims I checked myself and which I did not. The gate passes on the reverted tree
+> (`a4d8fca469bba636`, docx: no document worse than baseline).
 
-This is the third form of this construct to be measured and refused, and all three are now written down in
-one place: the code already records `w:before = rowLineTw - box` (`18_median_dy` 64 → 100) and shortening
-`w:trHeight` instead (`electricity-bill` 18.0/19.0 → 17.5/18.5); this run adds content = `trHeight`.
+### The run before this one said
 
-## The gate, and why the run is 90 minutes and not one attempt
+> I chose `18_displacement` because it is the largest class by leverage and because the run before this one had
+> left a two-document Google probe saying this exact change takes documents to 42/42. What I did not have, and
+> what the run before this one also did not have, is a Google measurement of the documents the change hurts.
+> The proxy says 91 of them. Both statements can be true at once - LibreOffice honours `w:trHeight`, so the row
+> was already right there and this only moves the baseline down inside it; a renderer that lays the cell needs
+> the move. That is a collision between the instrument and the renderer the user opens, and no amount of
+> further patching in `DocxWriter.java` settles it: what is missing is Google numbers for the same 204
+> documents, not a better patch.
+>
+> So the honest result of this slot is one construct eliminated by measurement, one patch preserved with its
+> numbers, and the corpus warm on the next engine it is applied to.
+>
+>
+> The commit gate is open again, and two documents were taken to 42/42 in Google by changing four characters
+> of XML each. Neither is landed: the engine change needs the 212-document table re-measured on the new
+> engine, and that pass did not fit the slot.
+>
+> That pass did fit this slot - 213/213 converted in four slices, 204 of 212 measured in four chunks - and it
+> is what refused the change. The finding that run says it wrote,
+> `FINDINGS/18-displacement-CELL-CONTENT-SHORT-OF-ROWH-27NOV-fixer.md`, is **not in the repository**: the
+> report claims it, `git log -- FINDINGS/` has no commit for it, and `ls FINDINGS/` does not list it. The
+> probe's exports were on that pod only. That gap is why this run had to re-derive the mechanism from the code
+> instead of from the numbers.
 
-The pod arrived with 124 of 213 documents converted and no stamp, so the pre-commit hook could not run: the
-first two calls that touch git (`install-gate.sh`, `round.py --claim-fixer`) each burned their 300 s limit
-inside `regress.py --check`'s corpus build and were killed. Two `corpus-slice.py` calls (245 s, 153 s)
-finished it; the claim then held and the hook was never the blocker again. `measure_gate.py` reported READY
-on the way in.
-
-The measurement itself chunked cleanly: `benchmarks/p2w.py --budget` writes `RANKING.partial.csv` and leaves
-the published table alone until 212 of 212 are scored, so four chunks of ~265 s took 60 → 120 → 168 → 204 of
-212 with nothing to redo. **The last 8 documents are unmeasured**, and the published `RANKING.csv` is
-untouched, so the gate is exactly where this run found it.
+Accounts share 11% of their significant words - a different account (the cut is 50%).
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.4 h ago** |
+| Measured | **2.6 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -60,35 +124,35 @@ untouched, so the gate is exactly where this run found it.
 
 ## Subagents
 
-*Two read-only agents deployed this run.* One produced the line-anchored spec for the row-height patch
-(`DocxWriter.table()` at 6005-7181, `rowHeightTw` at 6546, the emit point at 6962, the four guards); the
-other was not run, because the first returned a complete spec and the slot was needed for the measurement.
-
+*None deployed this run.*
 
 ## Timing
 
-| Slot window | 03:24 → running · 54 min |
-| Tool beats | 167 |
-| Longest silence | **5.1 min** — from 04:12:14, after `p2w.py: scoring landscape-page-inside-portra (12 in this pass)` |
-| Silences over 2 min | 7 |
+| | |
+|:--|:--|
+| Slot window | 04:55 → running · 36 min |
+| Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
+| Tool beats | 46 |
+| Longest silence | **13.2 min** — from 05:00:26, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| build - compiling the engine | **18 min** | `########` |
-| fix - diagnose and change the engine | **5 min** | `##` |
-| measure or build - a conversion, screen or compile writes no beacon | **20 min** | `#########` |
-| other - not attributed to a tool | **5 min** | `##` |
-| report - the report and the chain | **1 min** | `#` |
+| setup - claim, housekeeping, reading the gate | **3 min** | `##` |
+| build - compiling the engine | **0 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **25 min** | `################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| other - not attributed to a tool | **4 min** | `###` |
 
-The unattributed row is 3 distinct beat(s) that matched no phase. They said:
+The unattributed row is 9 distinct beat(s) that matched no phase. They said:
 
-- `relay: row-height patch applied, rebuilding engine to probe it`
-- `relay: corpus rebuilt on new engine; measuring`
-- `18_displacement -> reverted`
-
+- `18_displacement: reviewing agent patch 18-row-rung`
+- `18_displacement: baseline 303 = 46/47 (18_displacement, dy +4.1); applying row-rung pair patch`
+- `18_displacement: building row-rung pair patch`
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -101,62 +165,7 @@ The unattributed row is 3 distinct beat(s) that matched no phase. They said:
 
 ## Next run
 
-Take the 36 pending items first (`pending.py`), then: the patch in
-`FINDINGS/18-displacement-ROWH-CONTENT-EQUAL-TRHEIGHT-27NOV.patch` needs GOOGLE numbers on the 91 documents
-it costs in LibreOffice, not another patch. The corpus on this pod was rebuilt on that patch and then the
-patch was reverted, so a pod that arrives warm will convert 213 again - apply the patch first if you are
-measuring it, and skip the conversion if you are not.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 39 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 39 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below. READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.
 
-## Progress
-
-| Check-instances passing | **4758** of 5044 (94.3%) on 117 documents |
-| Check-instances still failing | **286** |
-| Kept attempts vs documents clean | **16** classes with a kept attempt, **55** documents clean - a kept attempt is progress inside a class, not a finished document |
-| Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
-| | |
-|:--|:--|
-| Self-check | **every field agrees with its second source** |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept |
-| Documents improved, round total | **61** of the 212 compared (corpus 213) |
-| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
-| Regressions | **none** — the engine change was reverted before the table moved |
-| Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **28** of the **116** re-measured on this engine - **89** of the 205 scored are still on an older engine |
-| Not scored - page count did not match | **8** of the 213 gverify saw |
-| Moved but still open | **28** — improved, not fixed |
-| Classes solved | 0 of 40 clear |
-| Working on | `18_displacement` |
-| The rotation says | `18_displacement` |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 03:55 | **reverted** | 0 | one-line cell content = w:trHeight (23 lines, guarded): 13 documents better, 91 worse, mean median_pt 2.274 -> 2.641 over 204 of 212; reverted, diff in FINDINGS |
-
-## Why nothing moved, in this run's own words
-
-I chose `18_displacement` because it is the largest class by leverage and because the run before this one had
-left a two-document Google probe saying this exact change takes documents to 42/42. What I did not have, and
-what the run before this one also did not have, is a Google measurement of the documents the change hurts.
-The proxy says 91 of them. Both statements can be true at once - LibreOffice honours `w:trHeight`, so the row
-was already right there and this only moves the baseline down inside it; a renderer that lays the cell needs
-the move. That is a collision between the instrument and the renderer the user opens, and no amount of
-further patching in `DocxWriter.java` settles it: what is missing is Google numbers for the same 204
-documents, not a better patch.
-
-So the honest result of this slot is one construct eliminated by measurement, one patch preserved with its
-numbers, and the corpus warm on the next engine it is applied to.
-
-### The run before this one said
-
-> The commit gate is open again, and two documents were taken to 42/42 in Google by changing four characters
-> of XML each. Neither is landed: the engine change needs the 212-document table re-measured on the new
-> engine, and that pass did not fit the slot.
-
-That pass did fit this slot - 213/213 converted in four slices, 204 of 212 measured in four chunks - and it
-is what refused the change. The finding that run says it wrote,
-`FINDINGS/18-displacement-CELL-CONTENT-SHORT-OF-ROWH-27NOV-fixer.md`, is **not in the repository**: the
-report claims it, `git log -- FINDINGS/` has no commit for it, and `ls FINDINGS/` does not list it. The
-probe's exports were on that pod only. That gap is why this run had to re-derive the mechanism from the code
-instead of from the numbers.
+---
+*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
