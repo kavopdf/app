@@ -8353,3 +8353,34 @@
 {"t": 1795733313.0432491, "ist": "04:18:33", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795733313.4021256, "ist": "04:18:33", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795733315.2033799, "ist": "04:18:35", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795736623.1875377, "ist": "05:13:43", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795736623.3330235, "ist": "05:13:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795736623.417418, "ist": "05:13:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795736911.4253883, "ist": "05:18:31", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795736911.5938678, "ist": "05:18:31", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795736911.760858, "ist": "05:18:31", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795736911.924322, "ist": "05:18:31", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795736912.087381, "ist": "05:18:32", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795736912.2755585, "ist": "05:18:32", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795736912.427374, "ist": "05:18:32", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795736912.5934513, "ist": "05:18:32", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795736932.613743, "ist": "05:18:52", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795737341.4597409, "ist": "05:25:41", "ev": "beat", "d": "relay: building row-height rung rule"}
+{"t": 1795737461.1635637, "ist": "05:27:41", "ev": "beat", "d": "relay: 4 probes converted, staging for Google"}
+{"t": 1795737516.366815, "ist": "05:28:36", "ev": "beat", "d": "relay: 4 Google exports in hand, scoring"}
+{"t": 1795737554.0322738, "ist": "05:29:14", "ev": "beat", "d": "relay: patch refuted, writing report"}
+{"t": 1795737567.9909234, "ist": "05:29:27", "ev": "beat", "d": "relay: attempt 2 - rebuilding corpus to A/B the t01 unit"}
+{"t": 1795737909.1734638, "ist": "05:35:09", "ev": "beat", "d": "relay: t01 unit A/B refuted (205->201), reading 600 finding"}
+{"t": 1795737960.5789833, "ist": "05:36:00", "ev": "beat", "d": "relay: annotation guard built, 600 t12 83->49, corpus-wide .txt A/B"}
+{"t": 1795738762.1174443, "ist": "05:49:22", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795738762.3292935, "ist": "05:49:22", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795738762.5950491, "ist": "05:49:22", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795738762.8540585, "ist": "05:49:22", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795738763.1074827, "ist": "05:49:23", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795738763.403345, "ist": "05:49:23", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795738763.643334, "ist": "05:49:23", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795738763.870754, "ist": "05:49:23", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795738786.678244, "ist": "05:49:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795738789.3082051, "ist": "05:49:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795738789.561123, "ist": "05:49:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795738789.8231845, "ist": "05:49:49", "ev": "beat", "d": "attempt.py: recording an attempt"}

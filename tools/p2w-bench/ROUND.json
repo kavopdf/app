@@ -17,10 +17,10 @@
       }
     ]
   },
-  "fixer_doing": "p2w.py: scoring landscape-page-inside-portra (12 in this pass)",
-  "fixer_doing_since": 1795732934.4375875,
-  "fixer_engine_at_claim": "ee5a00d6",
-  "fixer_last_beat": 1795732934.437588,
+  "fixer_doing": "corpus-slice: 48 of 53 converted",
+  "fixer_doing_since": 1795738763.8715386,
+  "fixer_engine_at_claim": "3462086",
+  "fixer_last_beat": 1795738763.8715398,
   "fixer_started": 1795736620.5802848,
   "history": [
     {
