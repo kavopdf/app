@@ -714,3 +714,58 @@ was of the right page and the right colour and it still described the wrong thin
     ink set   every colour inside the located rect, after locating
 
 Fifteen of sixteen, with 312 now correct rather than excepted.
+
+## Branch 3 built: document 12, and it is a stamp split across a page boundary
+
+12 was the last document with no rotated text and no image. Its drawings on both pages:
+
+    page 0   (0.75,0.75,0.75) w0.50  line     56.0,  52.0  483.3 x   0.0
+             (0.75,0.75,0.75) w0.50  line     56.0, 793.9  483.3 x   0.0
+             (0.45,0.03,0.10) w1.78  rect    300.0, 749.6  147.6 x  80.8
+             (0.45,0.03,0.10) w0.60  rect    303.0, 752.6  141.6 x  74.8
+
+    page 1   (0.75,0.75,0.75) w0.50  line     56.0,  52.0  483.3 x   0.0
+             (0.35,0.35,0.35) w0.60  line     56.0, 430.0  180.0 x   0.0
+             (0.35,0.35,0.35) w0.60  line    316.0, 430.0  180.0 x   0.0
+             (0.75,0.75,0.75) w0.50  line     56.0, 793.9  483.3 x   0.0
+             (0.45,0.03,0.10) w1.78  rect    300.0, -16.4  147.6 x  80.8
+             (0.45,0.03,0.10) w0.60  rect    303.0, -13.4  141.6 x  74.8
+
+**Two nested rectangles in the same colour, on both pages, at the same x and the same size.** The only
+difference is y: 749.6 on page 0 and **-16.4 on page 1**. Negative, above the page top.
+
+**So 12's stamp is not "across a page break" in the sense of being duplicated. It is one stamp drawn at a
+position that falls partly off the bottom of page 0 and partly off the top of page 1**, and each page clips
+its half. That is why the document was built and why it is hard: there is no page on which the whole stamp
+exists.
+
+### The branch-3 rule
+
+**A stamp drawn as bare shapes is a closed path whose rect is tall and which does not align to any single
+text baseline.** Measured against 12's page:
+
+- the horizontal rules are `line` items with **height 0** - excluded by the height test
+- the stamp is `rect` items at **80.8 pt tall** - kept
+- none of the six align to a text baseline, so the baseline test alone would have kept the rules too
+
+**Both conditions are needed:** closed path **and** height above a floor. Height 0 kills the rules; closed
+path kills anything drawn as an open stroke.
+
+### What 12 still needs, and it is not a locator problem
+
+The stamp exists on neither page in full. Rendering it means **stitching the two halves across the page
+boundary** - take page 0's rect at y 749.6 to 830.4, page 1's at y -16.4 to 64.4, and reconstruct the
+80.8 pt tall stamp from two clips. That is a different kind of work from anything else in this file and it
+affects exactly one document.
+
+**Branch 3 locates 12 correctly. It does not solve 12.** Saying otherwise would be the same mistake as
+everything else recorded above.
+
+### Locator, complete
+
+    branch 1  rotated text spans         14 documents
+    branch 2  the page carries an image   1 document
+    branch 3  closed tall path            1 document  (12, located but not renderable)
+    ink set   every colour inside the located rect, taken after locating
+
+**Sixteen of sixteen located. Fifteen of sixteen renderable.**
