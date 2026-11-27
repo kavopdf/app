@@ -8693,3 +8693,16 @@
 {"t": 1795747614.2237864, "ist": "08:16:54", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
 {"t": 1795747614.4622679, "ist": "08:16:54", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
 {"t": 1795747614.7205122, "ist": "08:16:54", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795747824.3261113, "ist": "08:20:24", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795747824.567954, "ist": "08:20:24", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795747824.7989035, "ist": "08:20:24", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795747825.0855768, "ist": "08:20:25", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795747825.4815598, "ist": "08:20:25", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795747825.7973602, "ist": "08:20:25", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795747826.170041, "ist": "08:20:26", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795747826.435518, "ist": "08:20:26", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795748148.3000414, "ist": "08:25:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795748176.773058, "ist": "08:26:16", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795748176.9016683, "ist": "08:26:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795748177.0018241, "ist": "08:26:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795748177.5539808, "ist": "08:26:17", "ev": "killed", "d": "dead claim cleared by force release"}
