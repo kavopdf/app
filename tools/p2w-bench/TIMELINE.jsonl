@@ -8637,3 +8637,19 @@
 {"t": 1795745602.6803145, "ist": "07:43:22", "ev": "beat", "d": "corpus-slice: 24 of 29 converted"}
 {"t": 1795745622.8162806, "ist": "07:43:42", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795745657.4714398, "ist": "07:44:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795745660.7742958, "ist": "07:44:20", "ev": "attempt", "d": "18_displacement -> kept"}
+{"t": 1795745660.9117737, "ist": "07:44:20", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795745660.9968348, "ist": "07:44:20", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795745661.5902514, "ist": "07:44:21", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795745681.8505445, "ist": "07:44:41", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795745684.2951264, "ist": "07:44:44", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795745684.6900516, "ist": "07:44:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795745686.8515327, "ist": "07:44:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795745699.6432116, "ist": "07:44:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795745701.8557315, "ist": "07:45:01", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795745702.2488272, "ist": "07:45:02", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795745704.555219, "ist": "07:45:04", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795745712.623191, "ist": "07:45:12", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795745714.8955271, "ist": "07:45:14", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795745715.2748976, "ist": "07:45:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795745717.4077423, "ist": "07:45:17", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
