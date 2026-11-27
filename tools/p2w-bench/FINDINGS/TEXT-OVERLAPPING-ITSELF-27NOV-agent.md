@@ -61,3 +61,55 @@ and the arithmetic - and both are recorded as wrong so neither is tried again.
 text; the part of the glyph outside the box is cut, and that is the descender. Confirmed on two documents.
 **The overlap is a second symptom of the same `lineRule="exact"` construct, and it is not fixed by anything
 tried so far.**
+
+## The controlled sweep, run. And it points at the table.
+
+Ten test paragraphs, one per line, each with a known `before`/`line`/`lineRule`, exported through Google
+once. `w:sz` 8.5 pt throughout, so the glyph height is 11.07 pt on every line, measured.
+
+    label  before  line   rule      advance   implied line height
+    T01     0.0    0.6    exact        -           -
+    T02    12.0    0.6    exact      12.6         0.6
+    T03    12.0    9.8    exact      18.6         6.6
+    T04     0.0    9.8    exact       8.0         8.0
+    T05    12.0    9.8    atLeast    21.4         9.4
+    T06    12.0    0.6    atLeast    21.8         9.8
+    T07    24.0    0.6    exact      26.3         2.3
+    T08     6.0    9.8    exact      12.6         6.6
+    T09    12.0   12.0    auto       21.4         9.4
+    T10    12.0    0.0    exact      21.8         9.8
+
+### What it establishes
+
+**`exact` with a tiny line height is honoured, and that is what collapses lines.** T02: `line=0.6`, advance
+12.6, so the line contributed 0.6 pt. Nothing else did.
+
+**`atLeast` substitutes the natural height.** T06: `line=0.6` under `atLeast` gives 9.8 pt, which is 8.5 pt
+Times at 1.15. **Nothing collapses and nothing clips.**
+
+**`line=0` under `exact` also gives natural** (T10). Google special-cases zero. That matches the note already
+in this repository that Google rewrites `w:line="1"` exact to an auto line.
+
+**The arithmetic fix is right in principle** - to hold the advance constant when switching `exact`/0.6 to
+`atLeast`/9.8, `before` must drop by 9.2, which is exactly what was done.
+
+### Why it still failed on the real document, and the clue that explains it
+
+**In the real document the advance was SMALLER than `before`.** The four totals paragraphs carried
+`before` 11.9, 12.4, 12.4, 24.4 and the measured gaps between their glyph tops were 7.6, 7.9, 14.6, 24.9.
+**7.6 is less than 12.4** - the line advanced by less than the space that was asked for.
+
+**In this sweep that never happens**; the advance is always `before` plus something non-negative.
+
+**The difference is the table.** Every one of those four paragraphs sits inside a `<w:tc>`. Table cells
+carry their own rules - `trHeight`, `cantSplit`, the cell's content area, and Word's habit of fitting cell
+content to the row. **The sweep was body text and body text is not where the bug lives.**
+
+### The next sweep, which is the one that matters
+
+**Repeat exactly this test inside a single table cell** - ten paragraphs, one cell, the same ten
+`before`/`line`/`lineRule` combinations, one export. If the advance inside a cell behaves as it does in body
+text, then the real document's 7.6 gap has another cause and the cell is not it. If it does not, the cell
+rules are the mechanism and the numbers will say so.
+
+**One export answers it.** It has not been run.
