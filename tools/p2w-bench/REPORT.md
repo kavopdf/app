@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 22:00 → running IST · 1h 08m**
+**27 Nov 2026 · slot 22:00 → 23:10 IST · 1h 10m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 2 code commit(s) in this window, first: fixer run 22:00: gate state measured, 84 real re vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3; kept change: 5 code commit(s) in this window, first: fixer report 22:00: the gate is refusing 96 real vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -25,69 +25,26 @@
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
-| Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `63_table_rows` - taken from the pending list (61 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `63_table_rows` by hand instead |
+| Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
+| Working on | `18_displacement` - taken from the pending list (61 still open), not a new class |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
+| 22:16 | **lead** | None/213 | measured the tree instead of a construct: p2w --force reached 206/213 in 44 min, 7 documents give no render, so RANKING.csv could not be republished and measure_gate is still NOT READY. Next run must |
 | 23:07 | **lead** | 0/None | GATE STATE, NOT A FIX: full 212-doc re-measurement on engine a05b20eb shows the commit gate refuses on 96 REAL regressions vs the 15 Nov baseline (84 on share@5, recomputed independently from the two |
+| 23:09 | **lead** | 0/None | CONSTRUCT ANALYSIS, NOT A FIX: the 4-6 pt residual left on 22_invoice_four_columns_txtpos and 71_invoice_space_aligned_no_rules after the 20:09 cell-before measurement is a whole-page flow-origin offs |
 
 ## Why nothing moved, in this run's own words
 
 *(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
 
-### The run before this one said
-
->
->
->
->
-> Nothing was KEPT because the change is real but unlandable, and that is a gate verdict, not a diagnosis
-> problem.
->
-> The change: `PATCHES/18-small-dy-cellbefore.patch`, a one-line `LINE_BASE` rescale of the `w:before` a
-> single-line table cell already carries. Measured live in Google by this run, before and after, on two
-> documents:
->
-> 74_balance_sheet_indented_subitems      41/42 -> 42/42  CLEAN
-> 72_bank_statement_no_rules_right_amounts 41/42 -> 41/42  not worse
->
-> Predicted net-zero, measured +1 clean and 0 worse. I reverted it because:
->
-> measure_gate.py  -> engine docx d28ca7516c3f9165, tree f4ce54f257d15f1c  NOT READY
-> regress.py --check -> ENGINE CHANGED (docx): table measured on d28ca7, the tree is f4ce54f2  REFUSED
->
-> Both tables pass the comparison ("docx: no document worse than baseline", "txt: no document worse than
-> baseline"). What refuses is that RANKING.csv has not been re-measured on this engine. That is one full
-> corpus pass - 213 documents through LibreOffice and 42 checks each - and it is the measurement cron's
-> work, not something a fixer can do in a slot and still write an honest report.
->
-> What I did spend the slot on instead, because it changes what the NEXT run should do:
->
-> 1. The patch is worth +1, not 54. I measured the three other documents whose cells carry the same
-> 0.500 shape that made 74 clean - 71_invoice_space_aligned_no_rules, 22_invoice_four_columns_txtpos,
-> price-list-2col-dense-right-aligned - and all three stay at 41/42. The shape is necessary and not
-> sufficient. That kills the "worth 53.9 clean documents" reading of the leverage table for this
-> construct with a measurement instead of an inference.
->
-> 2. The relay's proposed gate (cellBoxTw*2 >= rowHeightTw) is unnecessary AND ineffective: counting the
-> emitted XML, 72 carries 66 cells at exactly the shape the gate is meant to exclude, so it does not
-> spare 72 - and 72 does not need sparing, because it does not get worse at the check level. The
-> earlier "72 regresses" was read off med_dy, and med_dy moving inside a still-failing check is not a
-> regression.
->
-> 3. The residual on 71 and 22 is NOT a row displacement. An independent probe (not verify_google.py)
-> shows every run on the page off by the same 5.84 pt (71) and 4.01 pt (22), footer included. It is
-> the page's flow origin, and the two documents need OPPOSITE corrections. That is the lead.
-
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **3.1 h ago** |
+| Measured | **3.2 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -102,9 +59,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 22:00 → running · 1h 08m |
+| Slot window | 22:00 → 23:10 · 1h 10m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 152 |
+| Tool beats | 162 |
 | Longest silence | **14.6 min** — from 22:00:01, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 8 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -118,10 +75,10 @@
 | fix - diagnose and change the engine | **4 min** | `#` |
 | measure or build - a conversion, screen or compile writes no beacon | **47 min** | `###############` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 | other - not attributed to a tool | **10 min** | `###` |
 
-The unattributed row is 5 distinct beat(s) that matched no phase. They said:
+The unattributed row is 8 distinct beat(s) that matched no phase. They said:
 
 - `corpus slice 2/4 for the gate`
 - `corpus slice 3/4 for the gate`
@@ -138,7 +95,7 @@ The unattributed row is 5 distinct beat(s) that matched no phase. They said:
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

@@ -10,13 +10,13 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 22:00 |
-| ended | still running |
-| how it ended | - |
+| ended | 23:10 |
+| how it ended | forced |
 | plan | - |
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `10:58` agent deployed: 18_displacement / A - which sub-cause of the displacement survives every eliminated one, measured on o
 - `10:58` agent deployed: 60_text_column_right_edge / B - how many CLEAN documents does fixing 60 alone win, and is there a live construct
 - `10:58` agent landed: 18_displacement / A -> FINDINGS/18-displacement-DOMINANT-SUBCAUSE-27NOV-agent.md
 - `10:58` agent landed: 60_text_column_right_edge / B -> FINDINGS/60-COLUMN-RIGHT-EDGE-CENSUS-27NOV-agent.md
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `20:57` attempt 115 on 18_displacement -> lead (0/1 moved)
 - `21:08` attempt 116 on 18_displacement -> lead (0/4 moved)
 - `23:07` attempt 1 on 63_table_rows -> lead
+- `23:09` attempt 118 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 

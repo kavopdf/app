@@ -1,16 +1,5 @@
 [
  {
-  "started": "17:16",
-  "started_ts": 1795607202.1812255,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "agents": [],
   "attempts": 2,
   "class": "t12_word_invention",
@@ -779,5 +768,19 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [],
+  "attempts": 4,
+  "class": "18_displacement",
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "needs_human": 0,
+  "obstacles_cleared": 0,
+  "started": "22:00",
+  "started_ts": 1795797002.3513694,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
