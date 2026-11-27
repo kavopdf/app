@@ -20,4 +20,4 @@ watchdog's job is to find out why.
 | 2026-11-24 | 59 | 14 | 190 | 35 | amended: was docx 59, txt 14, google 190/29 |
 | 2026-11-25 | 59 | 9 | 213 | 42 | amended: was docx 59, txt 11, google 213/42 |
 | 2026-11-26 | 60 | 8 | 205 | 47 | amended: was docx 59, txt 8, google 208/42 |
-| 2026-11-27 | 59 | 8 | 205 | 42 | amended: was docx 59, txt 8, google 205/47 |
+| 2026-11-27 | 59 | 8 | 212 | 42 | amended: was docx 59, txt 8, google 205/42 |

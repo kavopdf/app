@@ -294,7 +294,13 @@ The fixer's report has always come out of `report.py`. Yours now comes out of `c
 same files the verifier reads, so the numbers and the shape are both fixed before a run touches them.
 
     python3 tools/p2w-bench/cronreport.py --for watchdog > /tmp/report.md
-    python3 tools/p2w-bench/lastmessage.py --file /tmp/report.md --for watchdog
+    python3 tools/p2w-bench/lastmessage.py --file /tmp/report.md --for health
+
+    `--for health`, NOT `--for watchdog`. lastmessage.py's `--for` table has no `watchdog` key, so
+    `--for watchdog` falls through to the fixer's check and demands a fixer slot window, tool beats
+    and a .txt section that a watchdog report never has - it refused a correct report on 27 Nov with
+    "21 number(s) in this message do not match report.py". `--for health` is the profile that reads
+    cronreport.py --for watchdog, which is the generator above. Measured 27 Nov 15:45 IST.
 
 Then add **one short paragraph, in your own words, under the pull-quote**, saying what THIS run did -
 "nothing needed moving", "measured twenty, committed them", "shipped v3.53.27". No numbers in that

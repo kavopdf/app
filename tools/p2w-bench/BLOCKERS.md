@@ -1467,3 +1467,85 @@ free) or a stale `next_fire_at`:
 
 Both are unreachable from here. On this pass neither was needed on the evidence available: the fixer
 slot has a fresh beat, so no zombie is indicated by the only state file this run can read.
+
+## 27 Nov 15:45 IST - watchdog: classify is the one stopped stage, and the Google clean drop is the corpus, not the row
+
+**The picture, from `health.py`.** corpus 213. measure-google done at 213 of 213, 1.4 h. matrix done at
+213 of 213, 1.4 h. classify **stopped**, 13.3 h. fix moving, 2 attempt(s) in 3 h, last activity 0.3 h
+ago. txt moving, 205 clean and 8 failing, 5.5 h. `health.py --stalled` exits 1 naming classify.
+`round.py --phase` is `fix`. `status.py` reads IDLE - no fixer claim, the slot is free - so STEP 4 D did
+not fire: there is no dead run holding the slot, and `--release-fixer --force` was NOT run. STEP 4 C did
+not fire either: `round.py --reopen` refused with "the phase is fix, not done".
+
+**classify stopped is a real transition, not a stale row.** The class table was last committed
+2026-11-26 20:55:32 UTC, which is the 13.3 h the row reports. The Google results are 1.4 h old, so the
+table is older than the results it summarises and `health.py` reads `stopped` rather than `superseded`.
+This row read `waiting` at the 12:09 IST pass for the correct reason - measure-google was short - and it
+went red the moment the corpus reached 213 of 213. One classifier slot has elapsed since the results
+landed (`:40`, 09:40 UTC) with no class regeneration committed. The consequence that matters is not the
+row: `classpick.py` ranks `benchmarks/DEFECT-CLASSES-GOOGLE.md`, so the fixer that is working right now
+is picking its class from a table older than the verdicts it is meant to rank.
+
+**No cron tool in this pass, so the classifier cannot be inspected or moved.** This watchdog has no
+`cron` tool, so a paused or zombie cron cannot be moved by automation, and STEP 3 and STEP 4 A and B did
+not run. The calls it would have made, exactly:
+
+    cron(action="list")
+    cron(action="runs", cron_id="01M733RFR3D71C2E0T2TQ9PW0R")   # classifier, read from the HEALTH-BRIEF table
+
+and then, only for a stale `next_fire_at` or a zombie run:
+
+    cron(action="pause", cron_id="01M733RFR3D71C2E0T2TQ9PW0R"); cron(action="resume", cron_id="01M733RFR3D71C2E0T2TQ9PW0R")
+
+This is a missing tool, not a decision waiting for a person. There is no person behind this pipeline.
+What would overturn the reading: a classifier run that commits a `benchmarks/DEFECT-CLASSES-GOOGLE.md`
+newer than 2026-11-27 08:49 UTC turns the row to `superseded` on its own.
+
+**The 47 to 42 Google clean drop is the corpus, and the 12:09 IST note that called it an artifact of the
+row was wrong.** That note said reading `benchmarks/gverify` at HEAD and twelve commits back both give 42
+clean of 205. Measured this pass with `progress.py`'s own rule (clean = no `failed` list, refusals
+skipped), over `git archive` of the gverify store at 339b2a3c (26 Nov 22:44 UTC) against HEAD:
+
+    store at 339b2a3c   205 measured, 47 clean, 8 refused
+    store at HEAD       212 measured, 42 clean, 1 refused
+
+Five documents that were clean then fail now, and none of the seven newly scorable ones is clean. The
+five, with their current failing checks:
+
+    412_page_labels_roman            18_displacement, 27_text_off_page
+    416_many_tiny_pages              18_displacement, 27_text_off_page
+    417_rotate180_and_mirrored       04_chars_missing, 17_matched_runs, 18_displacement, 27_text_off_page
+    57_centred_title_page_left_body   18_displacement, 27_text_off_page, 44_header_footer
+    58_header_rule_footer_rule       04_chars_missing, 18_displacement, 27_text_off_page, 44_header_footer
+
+Across the whole store the two checks that moved are `18_displacement`, 105 to 120 failing documents, and
+`27_text_off_page`, 1 to 19. `27_text_off_page` going from one document to nineteen is the single biggest
+mover and it is on every one of the five regressions.
+
+**The competing explanation was checked and does not hold on the files this run may read.** The verifier
+was not made stricter: `git diff 339b2a3c HEAD` on `verify_google.py` and `gverify.py` is 26 insertions
+and 23 deletions, all of them engine-fingerprint provenance, and the commit that made them says in its
+own words "nothing here changes a check". So the same 42 checks, applied to today's .docx, pass five
+fewer documents than they did on 26 Nov's .docx. What would overturn it: re-rendering the 26 Nov engine
+through today's verifier and getting 47, which would move the fault to the instrument rather than the
+engine. This run cannot do that - the engine is the fixer's alone and re-measuring the corpus is
+gverify's, not the watchdog's.
+
+**Nothing here re-opens a settled decision and nothing here is STEP 5.** The stall is 13.3 h, not more
+than a day, and it moved today: docx open 60 to 59, and the fixer landed a refutation with its
+measurement at 09:28. txt failing has now read 8 on four consecutive rows (24 Nov amended row, 25 Nov,
+26 Nov, 27 Nov) with 2 attempt(s) in the last 3 h beside it - the fixer is working and that axis is not
+moving, which is a fact for the trend to carry, not yet a stall older than a day.
+
+**Trend row amended, not appended.** `progress.py` found today's row already present and appended
+nothing; `progress.py --amend` rewrote it from the live tables, naming what it used to say, because the
+committed row carried google 205 while the data reads 212. The row now reads google 212, clean 42, and
+the note records "amended: was docx 59, txt 8, google 205/42". No past row was touched.
+
+**The brief's own report check could not pass, and is now fixed.** `HEALTH-BRIEF.md` told a watchdog to
+verify its report with `lastmessage.py --for watchdog`. That key does not exist in the tool's `_CMDS`
+table, so the argument fell through to the fixer's check and refused a correct watchdog report on this
+pass with "21 number(s) in this message do not match report.py", demanding a fixer slot window, tool
+beats and a .txt section a watchdog report never carries. The profile that reads
+`cronreport.py --for watchdog` is `--for health`. The two lines in the brief now say `--for health`, with
+the measurement beside them. The report above passes that check as written.
