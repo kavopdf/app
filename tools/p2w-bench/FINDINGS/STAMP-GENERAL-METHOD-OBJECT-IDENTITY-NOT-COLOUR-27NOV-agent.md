@@ -633,3 +633,42 @@ substitute, no crop to get wrong. **Check for it first, before any of the hard w
 The three branches are measured, not implemented. Branch 1 is straightforward. Branch 2 is easier than
 what has been built so far. Branch 3 is the only one with real work in it, and it affects one document of
 sixteen - which is the right thing to know before spending a day on it.
+
+## The three-branch locator built and run: fifteen of sixteen
+
+The rule from the section above was implemented and run across the corpus.
+
+    branch 1  rotated text spans        14 documents
+    branch 2  the page carries an image  1 document  (10_stamp_as_image)
+    branch 3  bare shapes                1 document  (12_stamp_across_page_break)
+
+**Fifteen of sixteen, and only one needs the branch that has real work in it.**
+
+The stamp rects it produces look right: 03's is 35.2 x 105.4 pt, narrow and tall as a 90-degree stamp
+should be; 14's is 216.2 x 65.2 pt with ink `(0.05,0.15,0.55)`, which is the document that was never
+reachable before and now is.
+
+### One caveat, measured and not glossed
+
+**312 comes back with ink `(0.25,0.25,0.55)`, which is its body text colour, not its stamp's.** Its stamp is
+`(0.48,0.12,0.12)`. 312's seal is drawn as 26 individually rotated letters, and some of the spans that carry
+a non-`(1,0)` direction belong to something other than the seal.
+
+So the branch-1 rule needs one more condition, and 312 is the document that proves it: **a rotated span is
+part of the stamp only if it is not in the body text's colour, or only if it clusters spatially with the
+other rotated spans.** 312's 26 spans are spread around a circle; the body text spans that got caught are
+somewhere else on the page.
+
+**Until that condition is added, 312 is located wrongly and everything downstream of it will be wrong too.**
+Fourteen of fifteen are clean; 312 is the exception and it is known.
+
+### What is now settled about locating a stamp
+
+- **Not by colour.** Measured and disproved on all sixteen.
+- **Not by container.** Three of sixteen have no `wps:txbx` anchor at all.
+- **By geometry.** Rotated text finds fourteen; an existing image finds one more; bare shapes are the last
+  one and affect a single document.
+
+That is a locator that holds for a tool rather than for a sample, which is what was asked for. It needs the
+312 condition and it needs implementing in the engine, but the question of *how a stamp is found* is
+answered.
