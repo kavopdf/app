@@ -884,3 +884,56 @@ only as good as the branches are, which is to say it is a lower bound on nothing
 nothing.
 
 **Do not report 52. Report 16, and report that discrimination is the open problem.**
+
+## The overlap test fails too. Three discriminators tested, three failed.
+
+The section above proposed that a stamp overlaps body text where a rotated table header, a callout box or a
+photograph does not. Measured on the corpus - counting flat body spans that a rotated cluster overlaps by at
+least a quarter of their area:
+
+    STAMPS   7 of 15 have any overlap     values: 0 0 0 0 0 0 0 0 1 1 1 2 3 4 4
+    OTHERS   5 of 16 have any overlap     values: 0 0 0 0 0 0 0 0 0 0 0 3 3 3 3 4
+
+**The two distributions are indistinguishable, and the direction is wrong.** Eight of fifteen stamps overlap
+**nothing** - they sit in clear space. Five of the sixteen non-stamps overlap three or four body spans.
+
+**"A stamp is laid over the text it marks" is not true in this corpus.** It is a thing stamps *can* do, not a
+thing they *do*.
+
+### Three hypotheses, three measurements, three failures
+
+    1  colour - the stamp's colour is rare and not the body's    ranges overlap completely; two documents
+                                                                have the stamp colour AS the body colour
+    2  rarity alone                                             same measurement, same failure
+    3  overlap - the stamp sits over body text                   indistinguishable from non-stamps, and
+                                                                eight of fifteen stamps overlap nothing
+
+**All three were plausible. All three were measured. All three are dead.** They are recorded here so that
+none of them is proposed again by anyone, including me.
+
+### What this actually means for the count
+
+**There is no automatic rule in this file that separates a stamp from rotated table headers, page borders,
+photographs and callout boxes.** Every candidate has been tested and failed.
+
+So the honest statement about the corpus is:
+
+- **16 documents carry a stamp** - established by looking at each one individually, not by a rule
+- **the locator finds 52 candidates** and cannot rank them
+- **whether the other 197 documents contain stamps that no branch catches is unknown**
+
+**Anyone reporting a stamp count from this locator would be reporting the count of rotated content, not the
+count of stamps.** That is the state of it, and the file says so rather than putting a number on it.
+
+### The one thing not tried
+
+A stamp is **a picture of an object** - it has a closed border with something inside it, drawn as a unit. A
+rotated table header is a row of glyphs with no container; a page border is four lines with nothing in them;
+a callout box has a border but its content is in the normal flow.
+
+**The test would be: a closed path that fully contains text or shapes that are not part of the page's flow.**
+That is a containment question rather than an overlap one, and containment is not what was measured above -
+what was measured was whether the stamp's bounding box covers body text, which is a different thing.
+
+It is untested. It is the fourth hypothesis and there is no reason yet to believe it more than the first
+three.
