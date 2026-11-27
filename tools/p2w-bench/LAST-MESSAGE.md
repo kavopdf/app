@@ -1,6 +1,9 @@
+# Fixer report - 2026-11-27 19:18
+
+```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 18:25 → 18:58 IST · 33 min**
+**27 Nov 2026 · slot 19:18 → running IST **
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -12,7 +15,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 1 code commit(s) in this window, first: finding 27NOV: the cell-before shortfall reaches vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 1 code commit(s) in this window, first: finding 27NOV relay: the cell-before patch measu vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -30,14 +33,33 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 18:57 | **lead** | 0/None | cell-before shortfall: patch reaches the XML (w:before 170->136 tw on 74_balance_sheet, 317->254 on bus-timetable) but screen.py on 10 docs shows share5/median_pt/p90_pt identical - share5's 5px thres |
+| 19:39 | **lead** | 0/None | cell-before patch measured in Google on the 3 only-18 documents: 74_balance_sheet 41/42 -> 42/42 (dy 1.5->0.6); bus-timetable 18 fixed but gains 46_text_crossing_rule; 72_bank_statement dy -1.0 -> -3. |
 
 ## Why nothing moved, in this run's own words
 
-*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+> The one open question the 18:00 run left was a measurement it could not afford: the cell-before
+> patch moves `w:before` exactly as its arithmetic predicts, and the LibreOffice instrument is blind
+> to a 1.7-3.2 pt move by construction. This run spent its middle on the Google render that settles it,
+> on the three documents the store's census named as "fail 18_displacement and nothing else".
+>
+> Google answered, and the answer is not one law. `74_balance_sheet_indented_subitems` goes 41/42 ->
+> 42/42 with its median dy 1.5 -> 0.6 pt: the branch's own case, and a real CLEAN document.
+> `bus-timetable-station-left-times-right` fixes its displacement (4.2 -> 1.1) and gains a failure it
+> did not have, `46_text_crossing_rule`: the raised cell now crosses a rule in Google's layout.
+> `72_bank_statement_no_rules_right_amounts` moves the wrong way, dy -1.0 -> -3.0.
+>
+> So the patch is a real defect fix and a wrong class-wide change at the same time. One document
+> becomes CLEAN, one trades its failure, one gets worse: a net of -1. Landing it would be the 23 Nov
+> mistake with a nicer table, so the engine is unchanged, the three store rows were restored to their
+> HEAD measurement (a row measured on `f4ce54f257d15f1c` describes an engine that is not in the tree),
+> and the whole measurement is committed as FINDINGS/18-cellbefore-GOOGLE-27NOV-relay.md with the
+> predicate the next run should test first: `cellBoxTw * 2 >= rowHeightTw`, which is true of 74 and
+> false of both documents this change broke.
 
 ### The run before this one said
 
+>
+>
 > Nothing was kept because the change cannot be certified by the instrument this repo gates on, and
 > that is a measurement, not a shrug.
 >
@@ -71,11 +93,13 @@
 > cannot tell a new document from a worse one, and a run that believes it will hunt a regression that
 > does not exist.
 
+Accounts share 22% of their significant words - a different account (the cut is 50%).
+
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **3.5 h ago** |
+| Measured | **3.8 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -90,13 +114,21 @@
 
 | | |
 |:--|:--|
-| Slot window | 18:25 → 18:58 · 33 min |
+| Slot window | 19:18 → running · 21 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 10 |
-| Silences over 2 min | 0 |
-| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | same refusal as 17:55 - `ENGINE CHANGED (docx): table measured on `d28ca7516c3f9165`, the tree is `a05b20eb05f |
+| Tool beats | 20 |
+| Longest silence | **7.1 min** — from 19:24:32, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 3 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| setup - claim, housekeeping, reading the gate | **4 min** | `######` |
+| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `###############` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -109,7 +141,13 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+```
+
+Written by report.py from committed files only. Every number above is read from
+ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
+and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
