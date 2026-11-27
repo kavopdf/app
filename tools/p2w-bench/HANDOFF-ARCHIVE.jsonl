@@ -534,3 +534,4 @@
 {"_list": "agents", "_entry": {"angle": "B", "class": "18_displacement", "deployed": "16:18", "deployed_at": "2026-11-26T16:18", "expected": "15:28", "finding": "FINDINGS/18-displacement-SINGLE-PAGE-SPACER-MEASURED-26NOV-explore.md", "id": "18_dB-01", "landed_at": "2026-11-26T16:18", "question": "single-page half: is the exact-line spacer charged proportionally by Google", "status": "landed"}}
 {"_list": "notes", "_entry": {"at": "15:46", "text": "attempt 90 on 18_displacement -> lead"}}
 {"_list": "agents", "_entry": {"id": "44_hA-01", "class": "44_header_footer", "angle": "A", "question": "is flowFromBox the second anchor site and does the foot-band guard transfer to it", "expected": "17:39", "deployed": "17:43", "status": "running", "finding": "", "deployed_at": "2026-11-26T17:43"}}
+{"_list": "notes", "_entry": {"at": "15:48", "text": "attempt 91 on 18_displacement -> lead"}}

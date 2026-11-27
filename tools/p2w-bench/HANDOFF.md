@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `10:58` agent landed: 60_text_column_right_edge / B -> FINDINGS/60-COLUMN-RIGHT-EDGE-CENSUS-27NOV-agent.md
 - `11:21` agent deployed: 18dA-03 / 18_displacement - baseline placement inside the hairline exact line box
 - `11:21` agent deployed: 60tB-02 / 60_text_column_right_edge - the right-tab line is split by our own reader
 - `11:54` attempt 107 on 18_displacement -> lead
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `23:09` attempt 118 on 18_displacement -> lead
 - `23:17` agent deployed: 63_table_rows / A - which engine commit between d28ca7516c3f9165 and a05b20eb05fe0fc8 broke table ro
 - `23:17` agent deployed: 63_table_rows / B - what exactly differs in the docx for table-with-no-header-row: per-row placement
+- `23:56` attempt 2 on 63_table_rows -> lead
 
 ## Where the rest of the state lives
 
