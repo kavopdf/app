@@ -61,3 +61,51 @@ characters.** The user opened the same `.docx` in Google Docs and it was **10 pa
    version of the page-9 question worth asking.
 2. **What the 5 page-sized images cover** - which PDF objects became pictures. That is the "not editable" share.
 3. **The 352 textboxes** - how many of them hold body text rather than a stamp or a label.
+
+## Through Google, the last pages are not degraded - they are gone
+
+The LibreOffice measurement above is withdrawn as a result. The same `.docx` exported through Google:
+
+    10 source pages -> 11 rendered pages
+
+    pg  source chars  google chars  recall   median offset
+     1      1854          856        46.2%     168.6 pt
+     2      4232          203         4.8%      42.9 pt
+     3      3089          507        16.4%      79.2 pt
+     4      1187          536        45.2%     364.1 pt
+     5      2143         1746        81.5%      39.4 pt
+     6      2104          292        13.9%     168.4 pt
+     7      1568         1680       107.1%      63.8 pt
+     8      2525         2577       102.1%      44.8 pt
+     9      2286           35         1.5%     825.0 pt
+    10      2233         2168        97.1%     198.3 pt
+
+**46 percent of the text reaches the render. The median position error is 123.8 pt - one and a half inches.**
+
+**And page 9 is visually blank.** Rendered side by side against the source, the source page holds a header, a
+section heading, five stage boxes, six formulae, a code listing, a checklist table and two note columns. The
+Google page holds a single horizontal rule and some fragments clipped at the top edge.
+
+**This is not rasterisation and not degradation. The content is absent** - not present as text, not present as an
+image, not present as anything.
+
+### Why, and it is the mechanism this work suspected from the start
+
+**Every paragraph is positioned absolutely by `w:before`. There is no flow.** When the accumulated vertical
+position passes the page's height, **Google does not carry the content to the next page - it drops it.** A flowing
+document would push it forward; an absolutely positioned one has nowhere to put it.
+
+The fragments at the top of the blank page confirm the direction: content ended up at a **negative y**, above the
+page origin, and was clipped.
+
+**That also explains the extra page.** Some of the overflow does land on the following page, which is why the
+render is 11 pages for a 10-page source while still losing half the text.
+
+### What this means
+
+**Absolute positioning turns an overflow into permanent data loss.** In a flowing document an overflow is a
+pagination problem; here it is deletion. That is the whole difference between our output and Adobe's or
+iLovePDF's, and it is why theirs degrades in pageless mode while ours destroys content in the default view.
+
+**Every document long enough to overflow is affected. That is not a class of documents; it is any document with
+more content than one page holds.**
