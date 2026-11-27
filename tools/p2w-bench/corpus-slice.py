@@ -127,6 +127,13 @@ def main(argv):
     ap.add_argument("--budget", type=int, default=240, help="seconds of conversion this slice may use")
     ap.add_argument("-j", "--jobs", type=int, default=4)
     ap.add_argument("--status", action="store_true")
+    # ONE NAMED DOCUMENT. The corpus is 213 documents and a full build is ~16 minutes on 2 cores;
+    # a fixer that changed one code path wants to see ONE document converted, not wait for the
+    # whole corpus. Until now the closest thing was `--budget 0 -j 1`, which converts exactly one
+    # document - but it converts todo[0], the first pending document alphabetically, so the
+    # document is not chosen, it is whatever sorts first. --only names it.
+    ap.add_argument("--only", default="", metavar="STEM",
+                    help="convert just this one document (stem or .pdf name)")
     a = ap.parse_args(argv)
 
     d = cc.pdf_dir()
@@ -144,6 +151,21 @@ def main(argv):
         st = cc.read_stamp()
         print("  stamp       : %s" % (st if st else "none"))
         return 0
+
+    if a.only:
+        want = os.path.basename(a.only)
+        if want.endswith(".pdf"):
+            want = want[:-4]
+        if not os.path.exists(os.path.join(d, want + ".pdf")):
+            print("  no such document: %s (not in %s)" % (want, d))
+            return 1
+        named = [p for p in todo if os.path.basename(p)[:-4] == want]
+        if not named:
+            print("  %s is already converted on this engine - nothing to do, no stamp written" % want)
+            return 0
+        todo = named
+        print("  --only %s : 1 document, %d of %d still to go in the corpus"
+              % (want, len(missing()), total))
 
     if not todo:
         cc.write_stamp(cc.engine_now(), total)
@@ -191,6 +213,16 @@ def main(argv):
     if bad:
         print("  no stamp written - a partial corpus must not look like a whole one")
         return 1
+
+    # A ONE-DOCUMENT RUN MUST NOT CERTIFY A CORPUS. write_stamp() is the statement "every document
+    # in this cache is this engine's output"; one named document is not evidence for the other 212,
+    # and a stamp written here would make the next --ensure read WARM over a corpus that is 212
+    # documents short. The per-document key convert_one() already wrote is the whole of this run's
+    # claim.
+    if a.only:
+        print("  --only %s converted - stamp NOT written (a one-document run cannot certify a corpus)"
+              % want)
+        return 0
 
     left = missing()
     if left:
