@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-27 16:06
+# Fixer report - 2026-11-27 16:50
 
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 16:06 → 16:46 IST · 39 min**
+**27 Nov 2026 · slot 16:50 → running IST · 9 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 6 code commit(s) in this window, first: slot: release the fixer claim after the 27 Nov 1 vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,15 +26,43 @@
 | Not scored - page count did not match | **1** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (54 still open), not a new class |
+| Working on | `-` - taken from the pending list (54 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 16:43 | **lead** | 0/None | table-with-no-header-row: the charge is a per-row PITCH RAMP (source 18.4pt, render 17.9pt, 0.44pt/row, 0.7->12.0pt over 27 rows), not the constant offset med_dy reports; and worst_dy 101.4 is the che |
+| 16:50 | **kept** | 1/None | 18_displacement scored the bbox top (origin minus the rendered face's ascent), so dy was baseline difference + ascent difference. runs() now also publishes roy (origin in reading space) and 18 scores/ |
 
 ## Why nothing moved, in this run's own words
+
+> # Why no document moved this run (one was measured clean, and that is not the same thing)
+>
+> Because the class was not blocked - it was **mis-measured**, and I spent the slot proving which half of
+> the 25 sole-18 documents is the instrument and which half is the page.
+>
+> `18_displacement` scored `g["ry"] - r["ry"]`, and `ry` is the span's bbox TOP: the origin minus the
+> rendered face's own ascent. So the difference it scored was the baseline difference **plus** the
+> difference between the source face's ascent and the substituted face's - a font metric. `runs()` now
+> publishes `roy`, the origin projected into reading space, and 18 scores that. `ry` is untouched: the
+> pair matcher and checks 34/42/43 are keyed on it and must not move.
+>
+> **Twelve live Google renders, both instruments, the same PDF each time.** One document flipped:
+> `31_times_body_arial_headings` 18 FAIL (med +2.6 pt) -> PASS (med +0.9 pt), 41/42 -> **42/42**. No new
+> failure on any of the twelve, including the six passing-18 documents I chose for having the smallest
+> margin in the store (`07`, `312`, `364`, `393`, `09`, `06`).
+>
+> **And it refuted the reason I did it.** The hypothesis was that the ascent term explains all 25 sole-18
+> documents. It explains one of the five measured. Four carry a real baseline shift of -3.1 to +6.3 pt,
+> confirmed by a second script that reads `span["origin"][1]` from both PDFs and imports nothing from the
+> file I edited. Those four are Google moving the text, which is the engine's problem.
+>
+> The second finding is the map for the other 24: two of the twelve are a page-wide **constant**
+> (`07` -3.94 pt, 68 % of runs within 1 pt; `06` -1.88 pt, 76 %) and one is the opposite
+> (`320` median +6.25, p90 **14.68**, 16 % within 1 pt) - per-block placement that no page offset reaches.
+
+### The run before this one said
 
 > # Why nothing moved
 >
@@ -46,10 +74,10 @@
 > I did not take `18_displacement` because the tool printed it. I took it because it is the largest single
 > blocker in the store and the reason is checkable in one query:
 >
->     40 documents fail exactly ONE check
->     30 of those 40 fail ONLY 18_displacement
->     18_displacement fails on 119 of 211 scored documents
->     60_text_column_right_edge, the next largest, fails on 63
+> 40 documents fail exactly ONE check
+> 30 of those 40 fail ONLY 18_displacement
+> 18_displacement fails on 119 of 211 scored documents
+> 60_text_column_right_edge, the next largest, fails on 63
 >
 > So the class is worth up to 30 clean documents from one construct, and `classpick --leverage` puts its
 > worth at 54.6. The rotation said `18_displacement` too. That is a reason; it is not the tool's print.
@@ -61,16 +89,16 @@
 > twice: at HEAD, and with `dy` taken from the baseline origin instead of the bbox top.
 >
 > - The baseline-in-line site is **arithmetically excluded**. Its whole lever is `LINE_BASE × hairlinePt(size)`,
->   and `hairlinePt` caps the box at 0.6485 pt, so the entire term is ≤ **0.52 pt**. The observed charge is
->   1.6–3.0 pt and **sign-mixed (8 positive, 7 negative)**. A lever that cannot change sign cannot explain a
->   population that does. That is why the `BASELINE_EM` swap moved `31_times` 1.04 pt where it predicted 2.76.
+> and `hairlinePt` caps the box at 0.6485 pt, so the entire term is ≤ **0.52 pt**. The observed charge is
+> 1.6–3.0 pt and **sign-mixed (8 positive, 7 negative)**. A lever that cannot change sign cannot explain a
+> population that does. That is why the `BASELINE_EM` swap moved `31_times` 1.04 pt where it predicted 2.76.
 > - 11 of the 15 **pass under LibreOffice**. Their `.docx` already puts every line where the page put it as far
->   as any renderer honouring Word's spacing model is concerned; the residual is Google's layout of the same
->   construct.
+> as any renderer honouring Word's spacing model is concerned; the residual is Google's layout of the same
+> construct.
 > - 4 of the 15 are wrong in **both** renderers (`table-with-no-header-row` −5.0 pt, `worst_dy` 101.4;
->   `two-tables-stacked-with-no-gap` −2.5 / 5.6; `71_invoice_space_aligned_no_rules` +1.5 / 8.7;
->   `balance-sheet-two-columns-of-figures` +0.0 / 3.5). Those are genuine engine faults and they are the
->   table-row class, not the baseline class.
+> `two-tables-stacked-with-no-gap` −2.5 / 5.6; `71_invoice_space_aligned_no_rules` +1.5 / 8.7;
+> `balance-sheet-two-columns-of-figures` +0.0 / 3.5). Those are genuine engine faults and they are the
+> table-row class, not the baseline class.
 >
 > **Agent B — the previous run's txt lead.** Closed, with a fixture rather than an argument: the form-feed bug
 > was real, is already fixed at `verify_txt.py:944` (commit `0d45ff6`), is **not** a writer bug, and clears
@@ -100,12 +128,12 @@
 > laid pitch is written, then prove it on the corpus. That needs two things this slot did not have:
 >
 > 1. **A corpus rebuild.** `corpus-convert.py` keys every document on the engine source hash; one line under
->    `app/src/main/java` invalidates all 213 keys and `regress.py --check` refuses to stamp until they are
->    rebuilt — ~27 min, and a rebuild I cannot finish is a corpus with no stamp, worse than the one I had.
+> `app/src/main/java` invalidates all 213 keys and `regress.py --check` refuses to stamp until they are
+> rebuilt — ~27 min, and a rebuild I cannot finish is a corpus with no stamp, worse than the one I had.
 > 2. **A Google render.** The only renderer that sees this cluster is Google, and there is **no cached Google
->    export on the pod** — `/scratch/work/p2w/gverify/gd` is empty, and `/scratch/work` does not survive a run.
->    Every measurement of this class costs a Drive round trip, which is why 57 attempts have steered by
->    `med_dy` alone.
+> export on the pod** — `/scratch/work/p2w/gverify/gd` is empty, and `/scratch/work` does not survive a run.
+> Every measurement of this class costs a Drive round trip, which is why 57 attempts have steered by
+> `med_dy` alone.
 >
 > I chose to land the measurement rather than a patch I could not verify. The pod was warm this run (corpus,
 > JDK and engine all present), so the 32 minutes the last run spent building it went into the agents and the
@@ -114,14 +142,13 @@
 > ## 5. What the next run should do first
 >
 > 1. **Read `med_dy` as a ramp for any table document.** The store carries no per-row data, so the ramp is
->    invisible in it. That gap is the highest-value instrument change available to this class.
+> invisible in it. That gap is the highest-value instrument change available to this class.
 > 2. **Do not fit a correction to `worst_dy` alone.** Guard first: a pair whose `|dy|` exceeds 2× the page's own
->    row pitch is more likely a mis-pair than a displacement.
+> row pitch is more likely a mis-pair than a displacement.
 > 3. **The 4 Group-1 documents are the only ones in this cluster that can be validated without Google.** Start
->    there; a fix that moves them is measurable in the slot.
-
-### The run before this one said
-
+> there; a fix that moves them is measurable in the slot.
+>
+>
 > # Why nothing moved
 >
 > Because the class I took is not blocked on an engine change. It is blocked on a **renderer that has no
@@ -275,14 +302,16 @@
 > 13:54 row is the slot's previous occupant.
 >
 > Accounts share 20% of their significant words - a different account (the cut is 50%).
+>
+> Accounts share 72% of their significant words - **the same blocker, named twice** (the cut is 50%).
 
-Accounts share 72% of their significant words - **the same blocker, named twice** (the cut is 50%).
+Accounts share 11% of their significant words - a different account (the cut is 50%).
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **3.3 h ago** |
+| Measured | **3.5 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -291,20 +320,17 @@ Accounts share 72% of their significant words - **the same blocker, named twice*
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `18_dsmall-dy cluster of 15-01` | which code site places a run's baseline, and is the  | 16:45 | - | - |
-| `txtform-feed lead-01` | is _txt_lines dropping page separators, and how many | 16:45 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 16:06 → 16:46 · 39 min |
+| Slot window | 16:50 → running · 9 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 39 |
-| Longest silence | **24.4 min** — from 16:11:08, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 4 |
+| Tool beats | 7 |
+| Longest silence | **6.9 min** — from 16:51:02, after `relay: committing findings and writing the report` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -312,17 +338,9 @@ Accounts share 72% of their significant words - **the same blocker, named twice*
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `###` |
-| fix - diagnose and change the engine | **24 min** | `##############` |
-| record - attempt, handoff, class rows | **5 min** | `###` |
-| report - the report and the chain | **0 min** | `#` |
-| other - not attributed to a tool | **4 min** | `##` |
-
-The unattributed row is 4 distinct beat(s) that matched no phase. They said:
-
-- `gate check: regress --check running`
-- `18_displacement -> lead`
-- `fixer released (forced)`
+| measure or build - a conversion, screen or compile writes no beacon | **6 min** | `################` |
+| record - attempt, handoff, class rows | **0 min** | `##` |
+| report - the report and the chain | **1 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |

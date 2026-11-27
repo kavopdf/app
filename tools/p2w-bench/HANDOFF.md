@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `08:12` agent deployed: gate / B - why does regress.py --check refuse on unmodified HEAD
 - `08:12` agent landed: 60_text_column_right_edge / A -> FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md
 - `08:12` agent landed: gate / B -> FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md
 - `09:13` attempt 104 on 18_displacement -> lead
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `16:43` attempt 109 on 18_displacement -> lead
 - `16:45` agent deployed: 18_displacement / small-dy cluster of 15 - which code site places a run's baseline, and is the small dy an ascent artefact 
 - `16:45` agent deployed: txt / form-feed lead - is _txt_lines dropping page separators, and how many documents does it clear
+- `16:50` attempt 110 on 18_displacement -> kept
 
 ## Where the rest of the state lives
 

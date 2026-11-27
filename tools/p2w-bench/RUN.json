@@ -1,16 +1,11 @@
 {
- "agents": [
-  "18_dsmall-dy cluster of 15-01",
-  "txtform-feed lead-01"
- ],
- "attempts": 2,
- "class": "18_displacement",
- "docs_improved": 0,
- "ended": "16:46",
- "ended_ts": 1795778189.4209416,
+ "started_ts": 1795778423.2175019,
+ "started": "16:50",
+ "window_for_claim": 1795778423.2175019,
+ "ended_ts": null,
+ "ended": null,
+ "attempts": 1,
  "kept": 0,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "16:06",
- "started_ts": 1795775815.0087092
+ "agents": [],
+ "docs_improved": 0
 }
