@@ -1407,7 +1407,7 @@
   "status": "OPEN"
  },
  "63_table_rows": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": null,
   "history": [
    {
@@ -1431,18 +1431,31 @@
     "outcome": "lead",
     "reason": "Root cause proved, not landed: table row placement IS ROW_RUNG_UNDER_TW (DocxWriter.java:54, from 8fb4f503). rung=0 reproduces RANKING.csv digit for digit on 4 docs (table-with-no-header-row 47.48->0.",
     "total": null
+   },
+   {
+    "at": "2026-11-28 01:27",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": 0,
+    "outcome": "reverted",
+    "reason": "ROW_RUNG_UNDER_TW=0 reproduces four published table values digit for digit (table-with-no-header-row 47.48->0.61, boq 0.62, mobile-bill 1.55, electricity-bill 1.33) but the full 213-document measure i",
+    "total": 0
    }
   ],
   "last": null,
   "last_engine": "33863086",
   "outcomes": [
    "lead",
-   "lead"
+   "lead",
+   "reverted"
   ],
-  "reason": "Root cause proved, not landed: table row placement IS ROW_RUNG_UNDER_TW (DocxWriter.java:54, from 8fb4f503). rung=0 reproduces RANKING.csv digit for digit on 4 docs (table-with-no-header-row 47.48->0.61, boq 0.62, electricity-bill 1.33, mobile-bill 1.55). Full-corpus measure did not fit the slot; one-line change + FINDINGS/table-row-placement-IS-THE-RUNG-PROVEN-27NOV-relay.md",
+  "reason": "ROW_RUNG_UNDER_TW=0 reproduces four published table values digit for digit (table-with-no-header-row 47.48->0.61, boq 0.62, mobile-bill 1.55, electricity-bill 1.33) but the full 213-document measure is 63 documents WORSE than the committed table and only 4 better (price-list-2col-dense-right-aligned 2.69->27.89, reproduced independently on a fresh single-document conversion). The rung is a per-document trade, not one constant to delete; reverted, nothing committed.",
   "reasons": [
    "GATE STATE, NOT A FIX: full 212-doc re-measurement on engine a05b20eb shows the commit gate refuses on 96 REAL regressions vs the 15 Nov baseline (84 on share@5, recomputed independently from the two CSVs), not on a stale table as the last nine runs assumed. The regressions are table row placement: table-with-no-header-row 0.61->47.48, boq-tender-bill-of-quantities 7.10->41.95, very-long-single-column-table 6.87->41.14. Measured on the p2w share@5 axis, not on a Google check. Did NOT run regress.py --stamp: stamping would ratify the 84 as the new floor. Evidence: FINDINGS/GATE-BLOCKED-BY-84-REAL-REGRESSIONS-NOT-A-STALE-TABLE-27NOV.md",
-   "Root cause proved, not landed: table row placement IS ROW_RUNG_UNDER_TW (DocxWriter.java:54, from 8fb4f503). rung=0 reproduces RANKING.csv digit for digit on 4 docs (table-with-no-header-row 47.48->0.61, boq 0.62, electricity-bill 1.33, mobile-bill 1.55). Full-corpus measure did not fit the slot; one-line change + FINDINGS/table-row-placement-IS-THE-RUNG-PROVEN-27NOV-relay.md"
+   "Root cause proved, not landed: table row placement IS ROW_RUNG_UNDER_TW (DocxWriter.java:54, from 8fb4f503). rung=0 reproduces RANKING.csv digit for digit on 4 docs (table-with-no-header-row 47.48->0.61, boq 0.62, electricity-bill 1.33, mobile-bill 1.55). Full-corpus measure did not fit the slot; one-line change + FINDINGS/table-row-placement-IS-THE-RUNG-PROVEN-27NOV-relay.md",
+   "ROW_RUNG_UNDER_TW=0 reproduces four published table values digit for digit (table-with-no-header-row 47.48->0.61, boq 0.62, mobile-bill 1.55, electricity-bill 1.33) but the full 213-document measure is 63 documents WORSE than the committed table and only 4 better (price-list-2col-dense-right-aligned 2.69->27.89, reproduced independently on a fresh single-document conversion). The rung is a per-document trade, not one constant to delete; reverted, nothing committed."
   ],
   "requeues": 0,
   "status": "OPEN"

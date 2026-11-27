@@ -9898,3 +9898,177 @@
 {"t": 1795804733.5531347, "ist": "00:08:53", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795804733.7571037, "ist": "00:08:53", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795804773.535684, "ist": "00:09:33", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795805281.380842, "ist": "00:18:01", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795805281.5496888, "ist": "00:18:01", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795805281.6958902, "ist": "00:18:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795805289.9238722, "ist": "00:18:09", "ev": "beat", "d": "relay: reading gaps/status"}
+{"t": 1795805290.074789, "ist": "00:18:10", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795805404.2083354, "ist": "00:20:04", "ev": "beat", "d": "relay: pod-prep (jdk+corpus+engine compile), ~5 min"}
+{"t": 1795805619.014743, "ist": "00:23:39", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795805619.2199006, "ist": "00:23:39", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795805619.4327655, "ist": "00:23:39", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795805619.6457915, "ist": "00:23:39", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795805619.8715472, "ist": "00:23:39", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795805620.071315, "ist": "00:23:40", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795805620.2215984, "ist": "00:23:40", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795805620.3985627, "ist": "00:23:40", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795805648.8229876, "ist": "00:24:08", "ev": "beat", "d": "relay: rung=0 patch, compile, one-document test"}
+{"t": 1795805679.9034307, "ist": "00:24:39", "ev": "beat", "d": "relay: one-document test of rung=0 (table-with-no-header-row)"}
+{"t": 1795805686.8928454, "ist": "00:24:46", "ev": "beat", "d": "relay: scoring one-document test"}
+{"t": 1795805716.9930136, "ist": "00:25:16", "ev": "beat", "d": "relay: scoring 3 controls on rung=0"}
+{"t": 1795805749.5424368, "ist": "00:25:49", "ev": "beat", "d": "relay: full-corpus conversion on rung=0, slice 1 of ~4 (240s)"}
+{"t": 1795805966.7162542, "ist": "00:29:26", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795805966.990722, "ist": "00:29:26", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795805967.1657133, "ist": "00:29:27", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795805967.3885028, "ist": "00:29:27", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795805967.5764177, "ist": "00:29:27", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795805967.8280926, "ist": "00:29:27", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795805968.0213609, "ist": "00:29:28", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795805968.2494738, "ist": "00:29:28", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795805970.1926746, "ist": "00:29:30", "ev": "beat", "d": "relay: full-corpus conversion on rung=0, slice 2 of ~4 (240s)"}
+{"t": 1795806171.9101343, "ist": "00:32:51", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795806173.1939569, "ist": "00:32:53", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795806177.6318004, "ist": "00:32:57", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795806177.8290937, "ist": "00:32:57", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795806178.0042434, "ist": "00:32:58", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795806178.2210937, "ist": "00:32:58", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795806178.4769137, "ist": "00:32:58", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795806178.7298229, "ist": "00:32:58", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795806180.499319, "ist": "00:33:00", "ev": "beat", "d": "relay: full-corpus conversion on rung=0, slice 3 of ~4 (240s)"}
+{"t": 1795806362.489446, "ist": "00:36:02", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795806362.6380649, "ist": "00:36:02", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795806362.8093107, "ist": "00:36:02", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795806362.9922876, "ist": "00:36:02", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795806363.1390111, "ist": "00:36:03", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795806363.3188987, "ist": "00:36:03", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795806363.5111592, "ist": "00:36:03", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795806363.6816573, "ist": "00:36:03", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795806365.6793518, "ist": "00:36:05", "ev": "beat", "d": "relay: full-corpus conversion on rung=0, final slice"}
+{"t": 1795806647.299127, "ist": "00:40:47", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795806647.443293, "ist": "00:40:47", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795806647.6187966, "ist": "00:40:47", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795806647.7968216, "ist": "00:40:47", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795806647.9475079, "ist": "00:40:47", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795806648.1317103, "ist": "00:40:48", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795806648.3260744, "ist": "00:40:48", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795806648.5042279, "ist": "00:40:48", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795806664.5993915, "ist": "00:41:04", "ev": "beat", "d": "relay: regress.py --check on rung=0 corpus"}
+{"t": 1795806685.574408, "ist": "00:41:25", "ev": "beat", "d": "relay: gate.py full-corpus measure, slice 1 (budget 250)"}
+{"t": 1795806775.703973, "ist": "00:42:55", "ev": "beat", "d": "p2w.py: scoring 02_stamp_rotated_15deg_uplef (2 in this pass)"}
+{"t": 1795806780.2958398, "ist": "00:43:00", "ev": "beat", "d": "p2w.py: scoring 04_stamp_180deg_upside_down (4 in this pass)"}
+{"t": 1795806784.9340465, "ist": "00:43:04", "ev": "beat", "d": "p2w.py: scoring 06_rect_paid_stamp_red_trans (6 in this pass)"}
+{"t": 1795806789.4719605, "ist": "00:43:09", "ev": "beat", "d": "p2w.py: scoring 08_two_overlapping_stamps (8 in this pass)"}
+{"t": 1795806794.1503825, "ist": "00:43:14", "ev": "beat", "d": "p2w.py: scoring 10_stamp_as_image (10 in this pass)"}
+{"t": 1795806799.0935605, "ist": "00:43:19", "ev": "beat", "d": "p2w.py: scoring 13_stamp_non_english (12 in this pass)"}
+{"t": 1795806818.6025913, "ist": "00:43:38", "ev": "beat", "d": "p2w.py: scoring 15_stamp_on_scanned_page (2 in this pass)"}
+{"t": 1795806823.8339071, "ist": "00:43:43", "ev": "beat", "d": "p2w.py: scoring 17_three_column_widths_txtpo (4 in this pass)"}
+{"t": 1795806828.6270401, "ist": "00:43:48", "ev": "beat", "d": "p2w.py: scoring 19_hanging_indent_txtpos (6 in this pass)"}
+{"t": 1795806833.3999557, "ist": "00:43:53", "ev": "beat", "d": "p2w.py: scoring 21_form_labels_x60_values_x3 (8 in this pass)"}
+{"t": 1795806838.1373687, "ist": "00:43:58", "ev": "beat", "d": "p2w.py: scoring 23_timetable_grid_txtpos (10 in this pass)"}
+{"t": 1795806842.5327241, "ist": "00:44:02", "ev": "beat", "d": "p2w.py: scoring 25_signature_block_underscor (12 in this pass)"}
+{"t": 1795806864.1053228, "ist": "00:44:24", "ev": "beat", "d": "p2w.py: scoring 27_two_column_left_short_txt (2 in this pass)"}
+{"t": 1795806868.7163794, "ist": "00:44:28", "ev": "beat", "d": "p2w.py: scoring 29_dot_leaders_txtpos (4 in this pass)"}
+{"t": 1795806873.3936763, "ist": "00:44:33", "ev": "beat", "d": "p2w.py: scoring 301_lab_report_panel (6 in this pass)"}
+{"t": 1795806878.1032007, "ist": "00:44:38", "ev": "beat", "d": "p2w.py: scoring 303_discharge_summary (8 in this pass)"}
+{"t": 1795806882.6912382, "ist": "00:44:42", "ev": "beat", "d": "p2w.py: scoring 305_vaccination_certificate (10 in this pass)"}
+{"t": 1795806887.3834493, "ist": "00:44:47", "ev": "beat", "d": "p2w.py: scoring 30_mixed_font_sizes_one_base (12 in this pass)"}
+{"t": 1795806907.1793287, "ist": "00:45:07", "ev": "beat", "d": "p2w.py: scoring 311_fir_police_form (2 in this pass)"}
+{"t": 1795806911.918098, "ist": "00:45:11", "ev": "beat", "d": "p2w.py: scoring 313_power_of_attorney (4 in this pass)"}
+{"t": 1795806916.7173793, "ist": "00:45:16", "ev": "beat", "d": "p2w.py: scoring 315_gazette_notification (6 in this pass)"}
+{"t": 1795806921.5100465, "ist": "00:45:21", "ev": "beat", "d": "p2w.py: scoring 317_rti_response (8 in this pass)"}
+{"t": 1795806926.289719, "ist": "00:45:26", "ev": "beat", "d": "p2w.py: scoring 31_times_body_arial_headings (10 in this pass)"}
+{"t": 1795806931.0860364, "ist": "00:45:31", "ev": "beat", "d": "p2w.py: scoring 321_auditors_report (12 in this pass)"}
+{"t": 1795806952.7251465, "ist": "00:45:52", "ev": "beat", "d": "p2w.py: scoring 323_credit_card_statement (2 in this pass)"}
+{"t": 1795806957.477657, "ist": "00:45:57", "ev": "beat", "d": "p2w.py: scoring 326_itr_computation (4 in this pass)"}
+{"t": 1795806962.3404272, "ist": "00:46:02", "ev": "beat", "d": "p2w.py: scoring 330_cad_drawing_sheet (6 in this pass)"}
+{"t": 1795806966.972577, "ist": "00:46:06", "ev": "beat", "d": "p2w.py: scoring 332_bom_on_drawing (8 in this pass)"}
+{"t": 1795806971.5952632, "ist": "00:46:11", "ev": "beat", "d": "p2w.py: scoring 334_patent_document (10 in this pass)"}
+{"t": 1795806975.4090428, "ist": "00:46:15", "ev": "beat", "d": "relay: gate.py full-corpus measure, slice 2 (budget 250)"}
+{"t": 1795806979.0059023, "ist": "00:46:19", "ev": "beat", "d": "p2w.py: scoring 33_sans_nondefault_body (12 in this pass)"}
+{"t": 1795807020.036093, "ist": "00:47:00", "ev": "beat", "d": "p2w.py: scoring 341_shipping_manifest (2 in this pass)"}
+{"t": 1795807024.780562, "ist": "00:47:04", "ev": "beat", "d": "p2w.py: scoring 343_air_waybill (4 in this pass)"}
+{"t": 1795807029.8034918, "ist": "00:47:09", "ev": "beat", "d": "p2w.py: scoring 34_monospace_document (6 in this pass)"}
+{"t": 1795807035.0386963, "ist": "00:47:15", "ev": "beat", "d": "p2w.py: scoring 351_omr_answer_sheet (8 in this pass)"}
+{"t": 1795807040.325968, "ist": "00:47:20", "ev": "beat", "d": "p2w.py: scoring 353_admit_card (10 in this pass)"}
+{"t": 1795807045.112316, "ist": "00:47:25", "ev": "beat", "d": "p2w.py: scoring 360_restaurant_menu (12 in this pass)"}
+{"t": 1795807070.275481, "ist": "00:47:50", "ev": "beat", "d": "p2w.py: scoring 362_price_list_dense (2 in this pass)"}
+{"t": 1795807075.0404892, "ist": "00:47:55", "ev": "beat", "d": "p2w.py: scoring 364_event_ticket (4 in this pass)"}
+{"t": 1795807079.809061, "ist": "00:47:59", "ev": "beat", "d": "p2w.py: scoring 36_embedded_subset_font (6 in this pass)"}
+{"t": 1795807084.5925796, "ist": "00:48:04", "ev": "beat", "d": "p2w.py: scoring 371_experience_certificate (8 in this pass)"}
+{"t": 1795807089.7506433, "ist": "00:48:09", "ev": "beat", "d": "p2w.py: scoring 373_leave_application_form (10 in this pass)"}
+{"t": 1795807094.5814538, "ist": "00:48:14", "ev": "beat", "d": "p2w.py: scoring 375_attendance_register (12 in this pass)"}
+{"t": 1795807117.944652, "ist": "00:48:37", "ev": "beat", "d": "p2w.py: scoring 380_runbook_terminal_output (2 in this pass)"}
+{"t": 1795807123.1627812, "ist": "00:48:43", "ev": "beat", "d": "p2w.py: scoring 382_architecture_diagram (4 in this pass)"}
+{"t": 1795807128.6030629, "ist": "00:48:48", "ev": "beat", "d": "p2w.py: scoring 38_faux_bold_italic_synthesi (6 in this pass)"}
+{"t": 1795807133.8999193, "ist": "00:48:53", "ev": "beat", "d": "p2w.py: scoring 391_survey_questionnaire_gri (8 in this pass)"}
+{"t": 1795807138.7834334, "ist": "00:48:58", "ev": "beat", "d": "p2w.py: scoring 393_spectrum_peak_table (10 in this pass)"}
+{"t": 1795807143.9716747, "ist": "00:49:03", "ev": "beat", "d": "p2w.py: scoring 39_small_caps_letter_spacing (12 in this pass)"}
+{"t": 1795807166.079744, "ist": "00:49:26", "ev": "beat", "d": "p2w.py: scoring 401_trifold_brochure (2 in this pass)"}
+{"t": 1795807171.3975413, "ist": "00:49:31", "ev": "beat", "d": "p2w.py: scoring 403_crossword_puzzle (4 in this pass)"}
+{"t": 1795807176.931431, "ist": "00:49:36", "ev": "beat", "d": "p2w.py: scoring 405_sheet_music_lyrics (6 in this pass)"}
+{"t": 1795807182.0589008, "ist": "00:49:42", "ev": "beat", "d": "p2w.py: scoring 407_id_card_front_back (8 in this pass)"}
+{"t": 1795807186.8215497, "ist": "00:49:46", "ev": "beat", "d": "p2w.py: scoring 410_form_xobject_reused (10 in this pass)"}
+{"t": 1795807191.9131658, "ist": "00:49:51", "ev": "beat", "d": "p2w.py: scoring 413_tagged_pdf_actualtext (12 in this pass)"}
+{"t": 1795807211.4306192, "ist": "00:50:11", "ev": "beat", "d": "p2w.py: scoring 415_inline_images (2 in this pass)"}
+{"t": 1795807216.3395495, "ist": "00:50:16", "ev": "beat", "d": "p2w.py: scoring 42_table_coloured_header_alt (4 in this pass)"}
+{"t": 1795807269.797626, "ist": "00:51:09", "ev": "beat", "d": "relay: gate.py measure, slice 3 (budget 200)"}
+{"t": 1795807309.885783, "ist": "00:51:49", "ev": "beat", "d": "p2w.py: scoring 45_coloured_callout_box (2 in this pass)"}
+{"t": 1795807320.3001833, "ist": "00:52:00", "ev": "beat", "d": "p2w.py: scoring 47_grey_body_black_headings (4 in this pass)"}
+{"t": 1795807330.170446, "ist": "00:52:10", "ev": "beat", "d": "p2w.py: scoring 49_coloured_background_block (6 in this pass)"}
+{"t": 1795807340.6877658, "ist": "00:52:20", "ev": "beat", "d": "p2w.py: scoring 51_two_cm_margins (8 in this pass)"}
+{"t": 1795807350.211356, "ist": "00:52:30", "ev": "beat", "d": "p2w.py: scoring 53_single_space_body_15_head (10 in this pass)"}
+{"t": 1795807359.9969115, "ist": "00:52:39", "ev": "beat", "d": "p2w.py: scoring 55_sidebar_box_beside_body (12 in this pass)"}
+{"t": 1795807385.7978315, "ist": "00:53:05", "ev": "beat", "d": "p2w.py: scoring 600_reviewed_invoice_with_an (2 in this pass)"}
+{"t": 1795807396.575015, "ist": "00:53:16", "ev": "beat", "d": "p2w.py: scoring 60_page_border (4 in this pass)"}
+{"t": 1795807406.5166926, "ist": "00:53:26", "ev": "beat", "d": "p2w.py: scoring 62_two_col_newsletter_pull_q (6 in this pass)"}
+{"t": 1795807416.1883876, "ist": "00:53:36", "ev": "beat", "d": "p2w.py: scoring 64_newspaper_uneven_columns_ (8 in this pass)"}
+{"t": 1795807425.687601, "ist": "00:53:45", "ev": "beat", "d": "p2w.py: scoring 66_two_col_footnotes_bottom (10 in this pass)"}
+{"t": 1795807433.2127929, "ist": "00:53:53", "ev": "beat", "d": "p2w.py: scoring 68_journal_wide_table_spanni (12 in this pass)"}
+{"t": 1795807452.8463278, "ist": "00:54:12", "ev": "beat", "d": "p2w.py: scoring 70_magazine_drop_cap_photo_c (2 in this pass)"}
+{"t": 1795807457.706091, "ist": "00:54:17", "ev": "beat", "d": "p2w.py: scoring 72_bank_statement_no_rules_r (4 in this pass)"}
+{"t": 1795807462.4234684, "ist": "00:54:22", "ev": "beat", "d": "p2w.py: scoring 74_balance_sheet_indented_su (6 in this pass)"}
+{"t": 1795807467.2066672, "ist": "00:54:27", "ev": "beat", "d": "p2w.py: scoring 76_devanagari_table (8 in this pass)"}
+{"t": 1795807471.826839, "ist": "00:54:31", "ev": "beat", "d": "p2w.py: scoring 78_mixed_english_devanagari_ (10 in this pass)"}
+{"t": 1795807476.515623, "ist": "00:54:36", "ev": "beat", "d": "p2w.py: scoring 80_gstin_pan_cin_ifsc_table (12 in this pass)"}
+{"t": 1795807517.985784, "ist": "00:55:17", "ev": "beat", "d": "relay: gate.py measure, slice 4 (budget 200)"}
+{"t": 1795807556.494857, "ist": "00:55:56", "ev": "beat", "d": "p2w.py: scoring admit-card (2 in this pass)"}
+{"t": 1795807566.4034812, "ist": "00:56:06", "ev": "beat", "d": "p2w.py: scoring balance-sheet-two-columns-of (4 in this pass)"}
+{"t": 1795807576.206312, "ist": "00:56:16", "ev": "beat", "d": "p2w.py: scoring boq-horizontal-rules-only (6 in this pass)"}
+{"t": 1795807587.0770664, "ist": "00:56:27", "ev": "beat", "d": "p2w.py: scoring brochure-3col-with-sidebar-b (8 in this pass)"}
+{"t": 1795807597.8862398, "ist": "00:56:37", "ev": "beat", "d": "p2w.py: scoring delivery-challan (10 in this pass)"}
+{"t": 1795807608.4859536, "ist": "00:56:48", "ev": "beat", "d": "p2w.py: scoring eway-bill (12 in this pass)"}
+{"t": 1795807646.6984415, "ist": "00:57:26", "ev": "beat", "d": "p2w.py: scoring gst-invoice-horizontal-rules (2 in this pass)"}
+{"t": 1795807656.7771895, "ist": "00:57:36", "ev": "beat", "d": "p2w.py: scoring insurance-policy-schedule (4 in this pass)"}
+{"t": 1795807666.986884, "ist": "00:57:46", "ev": "beat", "d": "p2w.py: scoring itr-computation-with-slab-ta (6 in this pass)"}
+{"t": 1795807677.1724982, "ist": "00:57:57", "ev": "beat", "d": "p2w.py: scoring magazine-2col-pullquote-span (8 in this pass)"}
+{"t": 1795807687.3738744, "ist": "00:58:07", "ev": "beat", "d": "p2w.py: scoring marksheet-university-consoli (10 in this pass)"}
+{"t": 1795807697.3112674, "ist": "00:58:17", "ev": "beat", "d": "p2w.py: scoring newsletter-3col-header-foote (12 in this pass)"}
+{"t": 1795807766.2717545, "ist": "00:59:26", "ev": "beat", "d": "relay: gate.py measure, slice 5 (budget 200)"}
+{"t": 1795807834.5751595, "ist": "01:00:34", "ev": "beat", "d": "p2w.py: scoring payslip-label-left-amount-ri (2 in this pass)"}
+{"t": 1795807851.6836915, "ist": "01:00:51", "ev": "beat", "d": "p2w.py: scoring price-list-2col-dense-right- (4 in this pass)"}
+{"t": 1795807868.3935373, "ist": "01:01:08", "ev": "beat", "d": "p2w.py: scoring product-catalogue-code-left- (6 in this pass)"}
+{"t": 1795807884.8881397, "ist": "01:01:24", "ev": "beat", "d": "p2w.py: scoring purchase-order (8 in this pass)"}
+{"t": 1795807902.0774975, "ist": "01:01:42", "ev": "beat", "d": "p2w.py: scoring report-2col-table-spanning-b (10 in this pass)"}
+{"t": 1795807919.4872396, "ist": "01:01:59", "ev": "beat", "d": "p2w.py: scoring salary-slip-factory-wages (12 in this pass)"}
+{"t": 1795807949.5518785, "ist": "01:02:29", "ev": "beat", "d": "p2w.py: scoring table-of-contents-dot-leader (2 in this pass)"}
+{"t": 1795807959.694223, "ist": "01:02:39", "ev": "beat", "d": "p2w.py: scoring table-with-no-header-row (4 in this pass)"}
+{"t": 1795807969.5862586, "ist": "01:02:49", "ev": "beat", "d": "p2w.py: scoring text-held-twice-shadow-text (6 in this pass)"}
+{"t": 1795807979.8773363, "ist": "01:02:59", "ev": "beat", "d": "p2w.py: scoring 12_stamp_across_page_break (8 in this pass)"}
+{"t": 1795808024.1225326, "ist": "01:03:44", "ev": "beat", "d": "relay: gate.py measure, slice 6 (budget 200)"}
+{"t": 1795808096.0798151, "ist": "01:04:56", "ev": "beat", "d": "p2w.py: scoring 58_header_rule_footer_rule (2 in this pass)"}
+{"t": 1795808115.2105365, "ist": "01:05:15", "ev": "beat", "d": "p2w.py: scoring academic-paper-ieee-2col-abs (4 in this pass)"}
+{"t": 1795808134.979467, "ist": "01:05:34", "ev": "beat", "d": "p2w.py: scoring form16-part-b (6 in this pass)"}
+{"t": 1795808154.5950203, "ist": "01:05:54", "ev": "beat", "d": "p2w.py: scoring one-page-rotated-180-degrees (8 in this pass)"}
+{"t": 1795808169.040732, "ist": "01:06:09", "ev": "beat", "d": "p2w.py: scoring landscape-page-inside-portra (10 in this pass)"}
+{"t": 1795808180.8757136, "ist": "01:06:20", "ev": "beat", "d": "p2w.py: scoring very-long-single-column-tabl (12 in this pass)"}
+{"t": 1795808273.1812859, "ist": "01:07:53", "ev": "beat", "d": "relay: gate.py measure, final slice"}
+{"t": 1795808565.393368, "ist": "01:12:45", "ev": "beat", "d": "relay: gate.py measure, last 6 docs (budget 280)"}
+{"t": 1795808694.1829174, "ist": "01:14:54", "ev": "beat", "d": "p2w.py: scoring 412_page_labels_roman (2 in this pass)"}
+{"t": 1795808712.9708588, "ist": "01:15:12", "ev": "beat", "d": "p2w.py: scoring 324_loan_amortisation_schedu (4 in this pass)"}
+{"t": 1795808793.472473, "ist": "01:16:33", "ev": "beat", "d": "p2w.py: scoring Account_Opening_Form_Fillabl (6 in this pass)"}
+{"t": 1795808872.3917835, "ist": "01:17:52", "ev": "beat", "d": "relay: gate.py complete pass (measurement done 213/213)"}
+{"t": 1795809166.976449, "ist": "01:22:46", "ev": "beat", "d": "relay: gate.py with small budget so the later layers fit"}
+{"t": 1795809426.1352606, "ist": "01:27:06", "ev": "beat", "d": "relay: comparing new table to HEAD table"}
+{"t": 1795809456.680539, "ist": "01:27:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795809458.5782764, "ist": "01:27:38", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795809460.4714317, "ist": "01:27:40", "ev": "beat", "d": "attempt.py: recording an attempt"}
