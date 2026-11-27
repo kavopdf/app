@@ -17,9 +17,11 @@
       }
     ]
   },
+  "fixer_doing": "relay: cloned, checking slot",
+  "fixer_doing_since": 1795787331.8091495,
   "fixer_engine_at_claim": "57c6462",
   "fixer_last_beat": 1795780600.907196,
-  "fixer_started": 1795787136.8109174,
+  "fixer_started": 1795787336.1094377,
   "history": [
     {
       "at": "2026-11-12 09:46",
