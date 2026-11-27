@@ -674,5 +674,22 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "18_dA-03",
+   "60_tB-01"
+  ],
+  "attempts": 2,
+  "class": "18_displacement",
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "needs_human": 0,
+  "obstacles_cleared": 0,
+  "started": "10:05",
+  "started_ts": 1795754138.4587972,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
