@@ -717,5 +717,32 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795764414.8296728,
+  "started": "12:56",
+  "ended_ts": null,
+  "ended": "(never)",
+  "class": "",
+  "attempts": 0,
+  "kept": 0,
+  "docs_improved": 0,
+  "agents": [
+   "corp-01"
+  ],
+  "obstacles_cleared": 0,
+  "needs_human": 0,
+  "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "13:41",
+  "started_ts": 1795767079.353773,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
