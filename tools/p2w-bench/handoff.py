@@ -24,7 +24,8 @@ The next run reads it before it reads anything else and before it picks a class.
     python3 tools/p2w-bench/handoff.py --agent-land "class|A" --finding "FINDINGS/x.md"
     python3 tools/p2w-bench/handoff.py --run-end released
 """
-import json, os, subprocess, sys, time
+import json
+import re, os, subprocess, sys, time
 
 try:
     from beacon import beat
@@ -114,6 +115,29 @@ def save(d):
             _lead = ("PENDING FIRST: %d item(s) you can close - run pending.py and take them in its "
                      "order before the class below. " % _n)
             _cur = str(d.get("next") or "")
+            # PEEL WHAT A PREVIOUS RUN ADDED, THEN ADD ONE COPY.
+            #
+            # The three guards below test `startswith` on the whole string, but they prepend in the
+            # order READ_FIRST, CORPUS, PENDING, so the value a run reads back never starts with
+            # "PENDING FIRST" once a CORPUS block sits in front of it. Each run therefore added a
+            # whole new triple in front of the last one. Measured 27 Nov: HANDOFF.json's `next` held
+            # 89 copies of this block concatenated into a single 55,980-character line, and
+            # LAST-MESSAGE.md rendered it verbatim, so the report every run reads and writes was
+            # 62 KB of one unreadable line. Peeling first makes the append idempotent, which is what
+            # the guards were meant to be.
+            for _ in range(200):
+                _ch = False
+                for _p in (READ_FIRST, CORPUS):
+                    if _cur.startswith(_p):
+                        _cur = _cur[len(_p):].lstrip()
+                        _ch = True
+                _m = re.match(r"PENDING FIRST: \d+ item\(s\) you can close - run pending\.py and "
+                               r"take them in its order before the class below\.\s*", _cur)
+                if _m:
+                    _cur = _cur[_m.end():]
+                    _ch = True
+                if not _ch:
+                    break
             if not _cur.startswith("PENDING FIRST"):
                 _cur = _lead + _cur
             if not _cur.startswith("CORPUS:"):
