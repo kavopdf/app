@@ -215,3 +215,61 @@ Neither is a number to tune; both are a rule to stop using.
 
 **Neither has been applied and measured yet.** The next step is one document with both changes, one Google
 export, and the same measurement: glyph tops of the totals block, and the page count.
+
+## Both fixes applied together, measured, and they do not work
+
+    paragraphs changed : 78  (lineRule exact -> atLeast, line -> natural, before -> before - (natural - line))
+    trHeight changed   :  3  (hRule exact -> atLeast)
+
+Through a real Google export, on the totals block:
+
+    BEFORE   2 overlaps   (5.2 pt, 3.0 pt)      1 page
+    AFTER    1 overlap    (7.7 pt)              2 pages
+
+    BEFORE   Total y1 385.2 | E.&O.E. y0 380.1   advance 7.6
+    AFTER    Total y1 395.4 | E.&O.E. y0 387.8   advance 5.1
+
+**The CGST overlap is gone. The Total/E.&O.E. overlap got worse, 5.2 to 7.7, and the page count went from one
+to two.**
+
+### Why it failed, and it is the same reason as last time
+
+**The advance between those two lines went DOWN, 7.6 to 5.1, even though every line box was raised.** That can
+only happen if the reduction applied to `before` reached these two paragraphs but the natural line height did
+not help them - because the thing squeezing them is not their own line box.
+
+They are almost certainly **not two consecutive paragraphs of one cell.** One is the totals label and the
+other is the `E. & O.E.` note, and they sit in different cells of a row whose height is still constrained by
+something my two fixes did not reach.
+
+**So there is a third constraint, and it has not been found.** Two have been named and fixed, and the symptom
+survives both - which means the model is still incomplete, and patching further is guessing again.
+
+### What is now known for certain, and what is not
+
+**Known, measured:**
+
+- `lineRule="exact"` with a 0.6 pt line is a 0.6 pt box in body text and a **6.3 pt floor** inside a cell,
+  against an **11.07 pt** glyph. That clips descenders on its own, and it is 213 of 213 documents.
+- `trHeight w:hRule="exact"` pins a row to a fixed height and compresses its content - 18.3 pt of advance in a
+  free cell against 7.6 pt in that row.
+- `atLeast` restores the natural 9.8 pt line in **both** body text and a cell.
+- Changing those two alone **does not fix the document**, and makes its page count worse.
+
+**Not known:**
+
+- what the third constraint is, and whether it is the other two cells of that row, a `cantSplit` interaction,
+  or the table's own `tblLayout`.
+- whether the fixes would help the **clipping** - which is a separate defect and may well be fixed by them even
+  though the **overlap** is not. That has not been measured separately, and it should be, because the clipping
+  is the one that affects all 213 documents.
+
+### The honest position
+
+**Four things have been tried for this overlap: `exact` -> `atLeast` alone, the arithmetic alone, both together,
+and the sweep that was supposed to justify them. The sweep produced real numbers. The fixes did not produce a
+real result.**
+
+**The next step is not another patch.** It is to find the third constraint by measuring the row that holds
+those two lines - which cells, which heights, and what the row's total content needs against what it is given.
+That is a lookup on a file already in hand, and it is the fourth time this file has needed one.
