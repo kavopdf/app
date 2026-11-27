@@ -1,11 +1,8 @@
-# Fixer report - 2026-11-27 17:11
-
-```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 17:11 → running IST · 16 min**
+**27 Nov 2026 · slot 18:00 → running IST · 56 min**
 
-> **2 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
@@ -15,8 +12,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1 |
-| Document-moves this run | **2** — 2 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 1 code commit(s) in this window, first: finding 27NOV: the cell-before shortfall reaches vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; .txt scored: RANKING-TXT says 214 vs corpus says 213 |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -27,153 +24,78 @@
 | Not scored - page count did not match | **1** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (54 still open), not a new class |
+| Working on | `18_displacement` - taken from the pending list (55 still open), not a new class |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 17:27 | **kept** | 2/None | engine writes a single-line cell at its row height; 362 and 16 both 41/42 -> 42/42 in Google |
+| 18:56 | **lead** | 0/None | cell-before shortfall: patch reaches the XML (w:before 170->136 tw on 74_balance_sheet, 317->254 on bus-timetable) but screen.py on 10 docs shows share5/median_pt/p90_pt bit-identical - share5's 5px t |
 
-## The class, and why this one
+## Why nothing moved, in this run's own words
 
-`18_displacement` is 25 documents on its own and 48 with the checks that travel with it - the largest
-open shape in the store. The previous slot proved the construct on two documents by hand-editing four
-characters of XML and never landed it; the engine was untouched. This slot landed it.
-
-**What the engine wrote, and what it writes now.** Google lays a table row at the height of the cell's
-own content and does not honour `w:trHeight` as a floor. A one-line cell was written as `w:before` (the
-page's own baseline) plus the hairline box, which is short of its row, so every row below it moved up by
-the shortfall:
-
-| document | `w:trHeight` | cell `before + line` before | after |
-|---|---|---|---|
-| `362_price_list_dense` | 168 tw | 136 tw | **168** |
-| `16_right_aligned_amounts_txtpos` | 380 tw | 342 tw | **380** |
-| `36_embedded_subset_font` | 400 tw | 360 tw | **400** |
-| `402_calendar_month_grid` | 1230 tw | 335 tw | **335, unchanged** |
-
-**The scope, and how it was decided.** `rowParts` cannot draw this line: `16`'s short rows and `402`'s
-1230-tw week rows have the same shape - one paragraph per cell, a box far below the row - and one must be
-raised while the other must not. The shortfall's share of the row separates all four cleanly: 19 %, 10 %,
-10 % raise; 73 % leaves. A cell within a quarter of its row is the same row measured slightly short; a
-cell a quarter short of its row belongs to a row that is tall for a reason that paragraph does not carry.
-
-**The control, checked without a renderer.** `402_calendar_month_grid` is the document the scope exists
-for. Its generated `document.xml` is identical before and after the change, cell by cell - every
-`w:before`/`w:line` pair unchanged. The patch does not touch `402`, so it cannot regress it.
-
-**What was NOT done.** The 212-document Google table was not re-measured on the new engine, so the
-corpus-wide move count is not known. `36_embedded_subset_font` is 41/42 on the same construct, its XML now
-at its row height, and was not rendered through Google - it is the cheapest next test and should clear.
-`31_times_body_arial_headings` has no table at all and is not this construct. `RUN.json` records 2
-attempts; one is a malformed `attempt.py` call that argparse rejected before recording anything. The
-ledger holds the one real attempt, and it was left as it is rather than edited to match.
-
-**Subagents.** Two `Explore` agents in the first ten minutes, both read-only: one mapped the engine's cell
-vertical-placement path (it is what found the `cellLineHere` / `baseLineTw` site), one consolidated which
-causes of `18_displacement` were already measured and refuted, which is what stopped this run re-running
-the row-scale and partial-spend refutations.
-
-## The run before this one said
-
-> # Why no document moved this run: the one construct with a clean-document record does not reproduce
+> Nothing was kept because the change cannot be certified by the instrument this repo gates on, and
+> that is a measurement, not a shrug.
 >
-> I took `18_displacement` because it is the only class where a single construct can reach double-digit
-> clean documents: 25 of the 212 scored documents fail `18` **and nothing else** (`benchmarks/gverify/`,
-> engine `d28ca7516c3f9165`, counted this run). The next largest solo set is `60` at 6 and `59` at 3, and
-> the agent work this run confirmed that ceiling — the census on `60_text_column_right_edge` put the engine-reachable
-> prize at 3 documents and closed `60-P` as measured-dead, and the class's own history has ~100 FINDINGS
-> files of refuted levers.
+> The engine change is real and it reaches the output. The "raise a slightly-short cell" branch in
+> DocxWriter.java wrote `before = rowHeight - cellBox` while the branch eleven lines above it writes
+> `before = LINE_BASE * (rowHeight - cellBox)` and the file's own comment states the law
+> `before + LINE_BASE*box = LINE_BASE*rowLine`. Rebuilt both ways from the same PDF, the emitted XML
+> moves by exactly the arithmetic the branch predicts: `w:before` 170 -> 136 twips (-1.70 pt) on
+> 74_balance_sheet_indented_subitems, 317 -> 254 twips (-3.15 pt) on bus-timetable.
 >
-> Within `18`, every page-top lever is already refuted and measured: all 25 solo documents are one page,
-> so nothing that acts on pages after the first can touch them. What was left was one record in the tree
-> that a *construct* change produced a clean solo-`18` document:
-> `-Dp2w.lineRule=autoflow -Dp2w.autoEm=1.2207` → `72_bank_statement` 42/42, 26 Nov 12:00.
+> Then the repository's own instrument was asked, and it is blind. screen.py on 10 documents - the
+> four the sub-agent named plus six controls chosen for the raise branch's scope - returned share5,
+> median_pt and p90_pt IDENTICAL on 10 of 10. Not a small improvement: bit-identical. The reason is
+> structural. The largest move available here is 6.6 px at 150 DPI and share5 counts ink more than
+> 5 px from where the page drew it; a 1.70 pt move is 3.5 px, inside the threshold by construction.
+> And median_pt did not move either, which means LibreOffice is not laying the cell line out from
+> w:before at all.
 >
-> **It does not reproduce.** Five solo-`18` documents, five Google renders, one export each, the flag
-> verified in the bytes (8 flow paragraphs at `w:line="240" lineRule="auto"`, cells still `exact`):
+> So regress.py --check can neither certify nor refute this construct. It would have said "no
+> document worse" - true, and worth nothing. Committing on that is the 23 Nov mistake, so the patch
+> is in PATCHES/18-small-dy-cellbefore.patch and the run stops at the one measurement that settles
+> it: a Google render of 74_balance_sheet_indented_subitems at HEAD and at the patch, reading
+> 18_displacement's dy off the export. That needs four Drive calls per document and a slot that
+> budgets for it; this one spent its middle on the corpus conversion and had ~20 minutes left.
 >
-> - no document changes score — all five still fail `18_displacement` and nothing else;
-> - the median baseline shift moves **the wrong way on 3 of the 4** documents that have a current-engine
->   baseline to compare against: `72` −3.12 → **−6.72** pt, `16` −2.63 → −3.12, `320` +6.25 → +6.84;
-> - one moves the right way by less than a point: `71` +1.12 → +0.37.
->
-> Two facts explain the gap, and both were checked rather than assumed. `spacing()`'s `pageFirst`
-> compensation is no longer dead code — both flow call sites pass `ctx.newPage` — so this is the same code
-> path the 26 Nov build measured. And **check 18 no longer scores the bbox top**: the 26 Nov 18:00 relay
-> replaced the scored quantity with `roy`, the origin projected into reading space, precisely so a
-> substitute face's ascent cancels. The 42/42 was measured under the old quantity. A clean document on a
-> retired instrument is not a lead; it is a number that has to be re-earned.
->
-> So the slot's product is a closed lead, not a kept change. What it leaves the next run is the axis that
-> has never been tried: `AUTO_LINE_EM` is one number for the whole corpus, and the box it asks for is the
-> *substitute* face's line height — `1.15` for a face Google owns (Arial, Times New Roman) and `1.220709`
-> for Calibri → Carlito. The engine declares Arial on some paragraphs and nothing on others, so one
-> global em is right for at most one of those populations. That is the shape of this result: the two
-> documents that declare Arial (`16`, `71`) are the two that moved least badly, and `72`, which declares
-> nothing, moved worst. A per-face ratio is the first version of this construct that is not a single
-> number, and it is a two-line change at `spacing()`'s call sites.
->
-> **Not a blocker, and said plainly:** the corpus was cold on arrival (164 of 214 documents unconverted,
-> no stamp) and rebuilding it to 214/214 with `corpus-slice.py` cost the first 20 minutes of the slot. The
-> gate then passed in seconds, and `regress.py --check` reports no document worse in either format. That
-> rebuild is what makes the next run's first attempt possible inside 90 minutes instead of after a
-> 20-minute warm-up.
-
-### The run before this one said
-
-> # Why no document moved this run (one was measured clean, and that is not the same thing)
->
-> Because the class was not blocked - it was **mis-measured**, and I spent the slot proving which half of
-> the 25 sole-18 documents is the instrument and which half is the page.
->
-> `18_displacement` scored `g["ry"] - r["ry"]`, and `ry` is the span's bbox TOP: the origin minus the
-> rendered face's own ascent. So the difference it scored was the baseline difference **plus** the
-> difference between the source face's ascent and the substituted face's - a font metric. `runs()` now
-> publishes `roy`, the origin projected into reading space, and 18 scores that. `ry` is untouched: the
-> pair matcher and checks 34/42/43 are keyed on it and must not move.
->
-> **Twelve live Google renders, both instruments, the same PDF each time.** One document flipped:
-> `31_times_body_arial_headings` 18 FAIL (med +2.6 pt) -> PASS (med +0.9 pt), 41/42 -> **42/42**. No new
-> failure on any of the twelve, including the six passing-18 documents I chose for having the smallest
-> margin in the store (`07`, `312`, `364`, `393`, `09`, `06`).
->
-> **And it refuted the reason I did it.** The hypothesis was that the ascent term explains all 25 sole-18
-> documents. It explains one of the five measured. Four carry a real baseline shift of -3.1 to +6.3 pt,
-> confirmed by a second script that reads `span["origin"][1]` from both PDFs and imports nothing from the
-> file I edited. Those four are Google moving the text, which is the engine's problem.
->
-> The second finding is the map for the other 24: two of the twelve are a page-wide **constant**
-> (`07` -3.94 pt, 68 % of runs within 1 pt; `06` -1.88 pt, 76 %) and one is the opposite
-> (`320` median +6.25, p90 **14.68**, 16 % within 1 pt) - per-block placement that no page offset reaches.
-
-Accounts share 15% of their significant words - a different account (the cut is 50%).
+> The other two results are negative and cheap, which is what a slot is for. flowFromBox is not the
+> second anchor site: its zero-gap branch is the wrong predicate and the guard there is worth one
+> document of 214, so it was not landed. And the txt half's "a document got worse" is not a
+> regression at all - one document was ADDED (Prakashan_Print_Fidelity_Handbook), none removed, no
+> failed_ids changed: 205/213 -> 205/214 and 8 -> 9 failing with no document moving. The txt ratchet
+> cannot tell a new document from a worse one, and a run that believes it will hunt a regression that
+> does not exist.
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.6 h ago** |
-| Scored | **213** of 213 |
-| Clean - every applicable check passes | **205** (96.2%) |
-| Failing at least one check | **8** |
+| Measured | **4 min ago** |
+| Scored | **214** of 213 |
+| Clean - every applicable check passes | **205** (95.8%) |
+| Failing at least one check | **9** |
 | Moved since the last commit | **none** - nothing changed |
-| Most common failure | `t12_word_invention` - 3 documents |
+| Most common failure | `t12_word_invention` - 4 documents |
 
 ## Subagents
 
-*None deployed this run.*
+Two, deployed in the first ten minutes, both back inside the slot.
+
+| agent | question | verdict |
+|:--|:--|:--|
+| 18 small-dy | which code site places a table cell's baseline, and is the small dy an ascent artefact or a displacement | **engine defect**, one branch, `DocxWriter.java` ~:7013. The identity `dy(bbox) = dy(origin) + (ascent_src - ascent_built)` holds to 0.0000 pt over 128 pairs; 31_times is the artefact side, 74_balance_sheet is the engine side. Committed as `FINDINGS/AGENT-18-small-dy-27NOV.md`. Its "+4 documents flip on LibreOffice" did not survive my own re-measurement. |
+| flowFromBox | is `flowFromBox` a second anchor site, and does the foot-band guard transfer | **no, do not land.** Anchor points at :4512 and :4549 (guarded) and :4627 (unguarded), but the guard is the wrong predicate at :4627. Over all 214 PDFs / 573 pages: 1,042 anchor boxes, flowFromBox owns 25 (2.4%) on 18 documents; guarding its zero-gap branch changes 1 document of 214. Also corrected the brief's premise: there is no guard at the PAGE_POSITION_ON_ANCHOR emit site at all. Committed as `FINDINGS/AGENT-flowFromBox-anchor-site-27NOV.md`. |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 17:11 → running · 16 min |
+| Slot window | 18:00 → running · 56 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 21 |
-| Longest silence | **9.1 min** — from 17:11:57, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 2 |
+| Tool beats | 33 |
+| Longest silence | **37.4 min** — from 18:00:58, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -181,16 +103,17 @@ Accounts share 15% of their significant words - a different account (the cut is 
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **9 min** | `############` |
+| build - compiling the engine | **1 min** | `#` |
+| fix - diagnose and change the engine | **3 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **45 min** | `##################` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| other - not attributed to a tool | **6 min** | `########` |
+| other - not attributed to a tool | **5 min** | `##` |
 
-The unattributed row is 5 distinct beat(s) that matched no phase. They said:
+The unattributed row is 3 distinct beat(s) that matched no phase. They said:
 
-- `relay: building engine (JDK + javac)`
-- `relay: engine edit - single-line cell to row height`
-- `relay: narrowing the rule to a deficit bound`
+- `both agents back; verifying the 18_displacement cell-before claim`
+- `screening 10 docs: 4 predicted flips + 6 controls`
+- `18_displacement -> lead`
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -203,13 +126,7 @@ The unattributed row is 5 distinct beat(s) that matched no phase. They said:
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-```
-
-Written by report.py from committed files only. Every number above is read from
-ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
-and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.

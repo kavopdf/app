@@ -1,0 +1,20 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index efbc4cd1..b0e4800d 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -7010,7 +7010,14 @@ public final class DocxWriter {
+                 int deficitTw = rowHeightTw - cellBeforeTw - cellBoxTw;
+                 if (vspan <= 1 && !cell.isEmpty() && rowTwHere > 0 && cellBoxTw > 0
+                         && deficitTw > 0 && deficitTw * 4 <= rowHeightTw) {
+-                    cellBeforeTw = rowHeightTw - cellBoxTw;
++                    // THE SAME LAW AS THE BRANCH ABOVE, which was fixed and this one was not.
++                    // A cell's baseline is cellBeforeTw + LINE_BASE * cellBoxTw, so to put it
++                    // at the foot of the row - LINE_BASE * rowHeightTw - the before must be
++                    // LINE_BASE * (rowHeightTw - cellBoxTw). Writing the raw shortfall
++                    // (rowHeightTw - cellBoxTw) instead puts the baseline (1 - LINE_BASE) of
++                    // the shortfall BELOW the row's foot, i.e. 0.2 * shortfall too low.
++                    cellBeforeTw = Math.max(0,
++                            Math.round(LINE_BASE * (rowHeightTw - cellBoxTw)));
+                 }
+                 if (cell.isEmpty() && rowTwHere > 0) {
+                     cellBoxTw = 1;
