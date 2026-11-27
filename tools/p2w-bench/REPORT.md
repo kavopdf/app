@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 20:57 → running IST · 9 min**
+**27 Nov 2026 · slot 20:57 → running IST · 10 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,7 +15,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - kept change: 3 code commit(s) in this window, first: the relay's '.txt half' of this lead is already  vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 20:57 vs TIMELINE.jsonl records the claim at 20:09, so the window was reset and the duration is short |
+| **Self-check** | **1 disagreement(s)** - kept change: 4 code commit(s) in this window, first: record the gate's own state: correctly blocked o vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -95,9 +95,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 20:57 → running · 9 min |
+| Slot window | 20:57 → running · 10 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 13 |
+| Tool beats | 14 |
 | Longest silence | **7.7 min** — from 20:59:28, after `lastmessage.py: running report.py for the numbers` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -107,8 +107,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `##################` |
-| report - the report and the chain | **1 min** | `####` |
+| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `#################` |
+| report - the report and the chain | **2 min** | `#####` |
 ## Best results this round
 
 | Document | Before | After | Change |
