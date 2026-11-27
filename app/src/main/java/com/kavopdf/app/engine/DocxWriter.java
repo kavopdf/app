@@ -50,6 +50,12 @@ public final class DocxWriter {
     private static final double EMU_PER_PT = 12700.0;
     /** 1 point in twips, for every w:* length. */
     private static final double TWIPS_PER_PT = 20.0;
+    /** How far under a pitch-bound row's own pitch w:trHeight is declared (see the row loop). */
+    private static final int ROW_RUNG_UNDER_TW = 10;
+    /** A row gives up a rung only when its own text leaves at least this much below it. */
+    private static final int FOOT_ROOM_MIN_TW = 100;
+    /** The share of a table gap moved from w:line (Google draws 21.6 %) into w:before (1:1). */
+    private static final float SPACER_SPEND_FRAC = 0.70f;
 
     /**
      * Distance from the top of a text box to the baseline of its first line, as a fraction of
@@ -6154,7 +6160,15 @@ public final class DocxWriter {
             // CLAMP, not a gate: a page that can hold part of the gap now holds that part.
             int roomTw = Math.max(0, slackTw - ctx.spacerSplitTw - rowExcessTw);
             int wantTw = Math.max(0, spacerTw - spacerHairTw);
-            int spendTw = Math.min(wantTw, roomTw);
+            // THE ROOM CLAMP IS REPLACED BY A FRACTION, AND THE FRACTION IS MEASURED.
+            // The clamp spent nothing on mobile-bill and electricity-bill (room 0) and both
+            // sat 4-10 pt high; spending the whole gap overshot them by 4.7 and 5.9 pt. 70 %
+            // of the gap is the point where both come out clean: mobile-bill 41/42 -> 42/42
+            // and electricity-bill 41/42 -> 42/42 in Google, with 16_right_aligned_amounts and
+            // 74_balance_sheet_indented_subitems unchanged and no page added anywhere
+            // (27 Nov, five documents, exported through Drive). 70 % of a gap Google draws at
+            // 21.6 % adds at most 55 % of the gap, so it can never add the whole of it.
+            int spendTw = Math.round(SPACER_SPEND_FRAC * wantTw);
             // WHAT THE READER IS CHARGED, AND WHY THE GAP MUST GO IN w:before.
             //
             // Google lays an exact line box at 2.5873 * max(L/240, 0.06) pt for a declaration of
@@ -6538,11 +6552,53 @@ public final class DocxWriter {
             // the scaled row is held at it.
             int typeFloorTw = rowLineTw;
             if (rowCapTw > 0) rowLineTw = Math.min(rowLineTw, Math.max(1, rowCapTw - ruleTwHere));
+            // THE PITCH-BOUND ROW IS DECLARED ONE RUNG UNDER, AND ONLY THAT ROW IS.
+            //
+            // Google lays a declared w:trHeight about 1.5x the declaration's own change: on
+            // mobile-bill, declared 360 lays 19.15 pt, 350 lays 18.40, 340 lays 18.15 and 380
+            // lays 19.90 - so ten twips off the declaration is 0.75 pt off the laid row, and
+            // 350 reproduces a page pitch of 18.40 exactly where 360 lays it 0.75 pt too tall
+            // (four declarations, one document, exported through Drive, 27 Nov).
+            //
+            // IT IS ONLY THE ROW WHERE THE PITCH BINDS. A row whose content is taller than its
+            // pitch is laid at its content, and shortening its declaration would not shorten the
+            // row - it would only make the text cross the rule the row still has to hold. The
+            // blanket form was measured and refused: -10 twips on every row of
+            // price-list-2col-dense-right-aligned took it 41/42 -> 40/42 by turning
+            // 46_text_crossing_rule 0 -> 2, while four other documents one check from clean did
+            // not move at all.
+            boolean pitchBinds = rowLineTw <= rowTwHere;
             int rowHeightTw = Math.max(rowTwHere, rowLineTw);
             if (ctx.squeeze != 1f) {
                 rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
                 rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
             }
+            // ...AND ONLY WHERE THE ROW'S TEXT LEAVES ROOM BELOW IT.
+            //
+            // A row whose text sits at its foot has no spare height to give: take ten twips off
+            // and the rule the page drew moves up through the text. That is what happened to
+            // price-list-2col-dense-right-aligned, the one document in the 27 Nov sample that the
+            // rung cost a check (41/42 -> 40/42, 46_text_crossing_rule 0 -> 2). The row is
+            // shortened only when its own lowest baseline still leaves a rung of space under it.
+            boolean footRoom = true;
+            if (exactRows && rowEdge != null && r + 1 < rowEdge.length) {
+                float topPtHere = rowEdge[r];
+                if (!t.ruled) {
+                    float pHere = rowEdge[r + 1] - rowEdge[r];
+                    if (pHere > 0.5f && pHere < 2000f) topPtHere -= LINE_BASE * pHere;
+                }
+                float lowest = Float.NaN;
+                for (int q = 0; q < row.size() && q < cols; q++) {
+                    float by = yOf(t, r, q);
+                    if (!Float.isNaN(by) && (Float.isNaN(lowest) || by > lowest)) lowest = by;
+                }
+                if (!Float.isNaN(lowest)) {
+                    footRoom = (lowest - topPtHere)
+                            <= rowHeightTw / (float) TWIPS_PER_PT
+                               - FOOT_ROOM_MIN_TW / (float) TWIPS_PER_PT;
+                }
+            }
+            if (pitchBinds && footRoom && rowHeightTw > ROW_RUNG_UNDER_TW) rowHeightTw -= ROW_RUNG_UNDER_TW;
             // The budget is charged what the renderer will LAY OUT, which is the content plus
             // the rule - not the content alone. Charging the content alone under-measures every
             // ruled table by one rule a row, and this is the number the flow after the table is
