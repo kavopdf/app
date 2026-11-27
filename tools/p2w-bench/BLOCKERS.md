@@ -1616,3 +1616,27 @@ and not of the engine or the schedule. Nothing is parked and nothing is re-opene
 that: a gverify pass that commits LibreOffice results and still leaves the on-engine count below 213, or
 the matrix row still reading 37 on engine at a pass 24 h from now - either turns this into a woken cron
 or a corpus-build fault, and then it is decided here rather than recorded again.
+
+**The commit gate refuses `main` itself, so no commit of any kind can land.** 28 Nov, 03:5x IST.
+`regress.py --check` exits 1 on a clean clone of `main` with `scope.py: no engine change` - 84 docx
+documents worse than the 15 Nov baseline. `.git/hooks/pre-commit` (installed by `tools/install-gate.sh`,
+no override) runs exactly that command, so it refuses an engine fix, a tool, a findings file and the
+run's own report alike. Four slots have now ended "nothing kept" against this wall and each wrote it up
+as if the slot had run out of time; the wall is the reason, and it predates them.
+
+The arithmetic, recomputed from the committed tables (`tools/p2w-bench/gate_decompose.py`, added this
+run): of the 84, **27 have a baseline of exactly 0.00** and **6 already sit inside the corpus's own
+99 % bar** (`share5 <= 1.0`); ten baseline rows contradict themselves (`share5 = 0.00` with
+`max_pt > 2.4 pt`, i.e. ink beyond the 5 px radius that the metric says is zero), four of them among
+the 84. The largest real lever is `ROW_RUNG_UNDER_TW = 0`, measured over the full corpus in
+`FINDINGS/RANKING-rung0-FULL-CORPUS-28NOV.csv`: **84 -> 57**, releasing 28 documents and costing 1
+(`marksheet-subject-left-marks-right`), net 27.
+
+What would close it, in order of soundness: (1) land the rung in its per-row form so the 28 are
+released without the 1 (mechanism and falsifier in
+`FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md` §6); (2) re-measure the ten
+self-contradicting baseline rows, which is a data defect and not a rule change; (3) only then, and only
+with the numbers above in front of it, decide whether a gate that refuses a tree in which nothing
+changed is still the right gate. Re-baselining to today's state without (1) would ratify 27 documents
+of avoidable damage and must not be done. This entry stays open until `regress.py --check` exits 0 on
+`main`.
