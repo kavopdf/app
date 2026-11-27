@@ -10284,3 +10284,8 @@
 {"t": 1795820234.206666, "ist": "04:27:14", "ev": "beat", "d": "p2w.py: scoring balance-sheet-and-profit-los (8 in this pass)"}
 {"t": 1795820253.7534375, "ist": "04:27:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795820255.6816144, "ist": "04:27:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795820258.043669, "ist": "04:27:38", "ev": "attempt", "d": "63_table_rows -> lead"}
+{"t": 1795820258.2035806, "ist": "04:27:38", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795820258.2881384, "ist": "04:27:38", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795820258.837261, "ist": "04:27:38", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795820365.685764, "ist": "04:29:25", "ev": "beat", "d": "attempt.py: recording an attempt"}
