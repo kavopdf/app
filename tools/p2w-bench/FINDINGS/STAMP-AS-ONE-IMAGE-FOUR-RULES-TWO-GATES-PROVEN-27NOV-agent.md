@@ -271,3 +271,36 @@ describe. The first two were not measurement errors in the arithmetic; they were
 wrong object, and the wrong object was there because the previous fix had left it behind. **A number is
 only as good as the page it was taken from.** Before measuring a change, check that the page holds
 nothing but the change.
+
+## Rule 7 - never redact. Redaction deletes whatever else shares the rectangle.
+
+Proved by applying the rules to `01_stamp_rotated_15deg_upright` and `02_stamp_rotated_15deg_upleft`,
+which the earlier single-document work on 312 had not exposed.
+
+On the first attempt `02` came out reading **"IN ER" and "ODS RECEIVED"** - the left half of both lines
+gone. The stamp's own text was the right colour and inside the crop, so neither the colour rule nor the
+crop was at fault. The cause was the redaction step: to remove the black body text
+`Total packages: 7 | Total quantity: ...` I redacted its bounding box, and **that box overlaps the green
+stamp text**, so `page.apply_redactions()` erased both. Redaction removes everything inside the
+rectangle, not the span you named.
+
+**So rule 4 is a mask, never a redaction.** Render the region as it is and decide per pixel:
+
+    keep = colour distance to the stamp ink < 170
+           AND saturation >= max(25, target_saturation * 0.45)
+           AND the pixel lies inside a stamp drawing or a stamp-colour text span
+
+That keeps the black body text out by colour and the grey text out by saturation, and it cannot delete
+anything, because it never edits the page.
+
+### Measured on both stamps after the change
+
+    01_stamp_rotated_15deg_upright   dx +0.2  dy +0.2 pt   size 206.6x105.4 vs 207.8x106.3   ink -4%
+    02_stamp_rotated_15deg_upleft    dx +0.5  dy +0.7 pt   size 163.4x96.0  vs 164.9x97.7    ink -5%
+
+Both under one point of offset, under 1.5 pt of size, under 5 percent of ink, with the body text behind
+each stamp showing through the transparent interior exactly as it does in the PDF.
+
+**The lesson that cost this round:** 312 did not have overlapping body text under its stamp, so the
+redaction bug was invisible there. A method proved on one document is proved on one document. 01 and 02
+were the reason it surfaced.
