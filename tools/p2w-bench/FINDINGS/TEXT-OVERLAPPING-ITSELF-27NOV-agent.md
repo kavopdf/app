@@ -69,3 +69,57 @@ tab stop at the column's right edge - not two paragraphs at the same position.
 there were two, and its width must span from the label's left edge to the value's right edge.
 
 **Not applied. Not measured. This is the first correct statement of the cause.**
+
+## The cause, and the fix that works
+
+The paragraph already held both the label and the value. It was never two paragraphs. What was wrong was the
+**tab stop**:
+
+    <w:tabs><w:tab w:val="left" w:pos="2747"/></w:tabs>
+    <w:tcW w:w="2747"/>                      <- the cell is the same width
+
+The tab sat **exactly at the cell's right edge**, so the value had zero room, **wrapped to the next line**, and
+- because the line box is 0.6 pt - printed almost on top of the label.
+
+All four tabs in that row were wrong, each differently:
+
+    'Total job work charges'   left 2747    = cell width, zero room
+    'CGST @ 6%'                left 2889    > cell width, outside the cell
+    'SGST @ 6%'                left 2889    > cell width, outside the cell
+    'Grand Total'              left 2562    inside, but the value still wrapped
+
+**The cell itself was too narrow.** In the source PDF the label runs x 356-441 and the value x 494-539, so the
+content needs 183 pt. The cell was 2747 twips = **137 pt**.
+
+**The fix, applied and measured:**
+
+    cell   2747 -> 3660 twips      (137 pt -> 183 pt, enough for the value)
+    cell   2018 -> 1105 twips      (so the row's total width is unchanged)
+    tabs   all four -> right at 3660
+
+**Result through a real Google export:**
+
+    BEFORE   4 overlaps (10.4, 9.6, 9.6, 10.7 pt)   1 page
+    AFTER    0 overlaps                             1 page
+
+    'Total job work charges  2,81,120.00'   x 357-494   one line
+    'CGST @ 6%     16,867.20'               x 357-411 + 456-494
+    'SGST @ 6%     16,867.20'               x 357-411 + 456-494
+    'Grand Total   3,14,854.40'             x 362-417 + 444-494
+
+**Values sit to the right of their labels, on one line, and the page count is unchanged.**
+
+### The general rule
+
+**A tab stop must leave room for what follows it.** When a label/value pair is emitted as one paragraph, the
+tab must be a **right** tab at a position that is **inside** the cell and **at least the value's width** away
+from the label's end - never a left tab at the cell's edge.
+
+**And the cell must be wide enough for both.** A cell narrower than its content wraps the value, and with a
+0.6 pt line box the wrap is invisible as a wrap and looks like an overlap.
+
+### One thing still short
+
+The values end at x 494 where the source PDF has them at 539 - **45 pt narrower**. The fix put the value on
+its own line correctly but did not widen the cell far enough to match the source's right edge. **That is a
+width calculation, not a structural problem, and it is the next thing to correct.**
