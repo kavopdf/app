@@ -1,14 +1,11 @@
 {
- "started_ts": 1795745660.7751477,
- "started": "07:44",
- "window_for_claim": 1795745660.7751477,
- "ended_ts": 1795748177.555306,
- "ended": "08:26",
- "attempts": 2,
+ "started_ts": 1795748648.3210151,
+ "started": "08:34",
+ "window_for_claim": 1795748648.3210151,
+ "ended_ts": null,
+ "ended": null,
+ "attempts": 0,
  "kept": 0,
- "agents": [
-  "60_tA-02",
-  "gateB-02"
- ],
+ "agents": [],
  "docs_improved": 0
 }

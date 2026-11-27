@@ -8706,3 +8706,12 @@
 {"t": 1795748176.9016683, "ist": "08:26:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795748177.0018241, "ist": "08:26:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795748177.5539808, "ist": "08:26:17", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795748905.2341344, "ist": "08:38:25", "ev": "release", "d": "baseline released"}
+{"t": 1795749035.5411787, "ist": "08:40:35", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795749036.149434, "ist": "08:40:36", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795749036.5395422, "ist": "08:40:36", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795749037.029586, "ist": "08:40:37", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795749037.4276123, "ist": "08:40:37", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795749037.8446999, "ist": "08:40:37", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795749038.2431633, "ist": "08:40:38", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795749038.6405687, "ist": "08:40:38", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
