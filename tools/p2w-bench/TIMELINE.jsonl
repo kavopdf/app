@@ -9158,3 +9158,40 @@
 {"t": 1795762218.5924902, "ist": "12:20:18", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795762219.116902, "ist": "12:20:19", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795762340.201109, "ist": "12:22:20", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795764413.0673223, "ist": "12:56:53", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795764413.385024, "ist": "12:56:53", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795764413.6563387, "ist": "12:56:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795766077.226002, "ist": "13:24:37", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795766077.471421, "ist": "13:24:37", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795766077.705001, "ist": "13:24:37", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795766077.9698489, "ist": "13:24:37", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795766078.1943269, "ist": "13:24:38", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795766078.4273667, "ist": "13:24:38", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795766078.650999, "ist": "13:24:38", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795766078.822435, "ist": "13:24:38", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795766085.4150069, "ist": "13:24:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795766088.3266125, "ist": "13:24:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795766427.159547, "ist": "13:30:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766430.3240745, "ist": "13:30:30", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795766430.8345575, "ist": "13:30:30", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766433.844928, "ist": "13:30:33", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766446.6222355, "ist": "13:30:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766450.0597148, "ist": "13:30:50", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795766450.5408964, "ist": "13:30:50", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766453.4359539, "ist": "13:30:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766459.9233932, "ist": "13:30:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795766460.047117, "ist": "13:31:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795766465.7115922, "ist": "13:31:05", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795766465.8574324, "ist": "13:31:05", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795766466.6219697, "ist": "13:31:06", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766469.0427694, "ist": "13:31:09", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795766469.462722, "ist": "13:31:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766471.7846599, "ist": "13:31:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766479.679889, "ist": "13:31:19", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766483.4053547, "ist": "13:31:23", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795766484.2412424, "ist": "13:31:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766487.418302, "ist": "13:31:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766502.009411, "ist": "13:31:42", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766504.5330288, "ist": "13:31:44", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795766505.008384, "ist": "13:31:45", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795766507.3665972, "ist": "13:31:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

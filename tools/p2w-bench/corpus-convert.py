@@ -58,6 +58,17 @@ STAMP = os.path.join(os.path.dirname(CACHE), ".stamp")
 # second kind as if it were the first - the cache equivalent of trusting a fossil.
 PROGRESS = os.path.join(os.path.dirname(CACHE), ".progress.json")
 
+# THE UNIT OF THE CACHE IS THE DOCUMENT, NOT THE BUILD. `.progress.json` records ONE engine and one
+# timestamp for a whole build, so resuming from it can only answer "was this build started on this
+# engine", never "was THIS .docx produced by this engine from THIS pdf". Measured 24 Nov and written
+# down in corpus-slice.missing(): a .docx left by the previous engine counted as this build's progress
+# and the stamp certified a corpus that was a mix of two engines. The fix there was a build start
+# time compared against mtime, which is a heuristic: it is wrong after a clock change, wrong after a
+# copy or a restore that touches mtimes, and blind to a source PDF that was re-fetched under the same
+# name. A per-document key file states the two facts directly - engine fingerprint and source-PDF
+# content hash - so the answer is about the file in front of it.
+KEYS = os.path.join(os.path.dirname(CACHE), ".keys")
+
 # The build runs from tools/engine-verify and writes its classes to out/ there, so both the working
 # directory and this classpath are relative to THAT, not to the repo root. Measured by finding
 # ConvertAll.class: it is tools/engine-verify/out/ConvertAll.class, and the first version of this tool
@@ -204,6 +215,12 @@ def convert_one(args):
         if r.returncode != 0:
             return (name, False, time.time() - t0,
                     (r.stdout or "")[-300:] + (r.stderr or "")[-300:])
+        # THE OUTPUT IS KEYED AS SOON AS IT EXISTS. A .docx on disk with no key is not progress this
+        # cache can resume from - doc_fresh() refuses it - so writing the key here, in the worker that
+        # made the file, is what makes the next slice skip exactly the documents this one finished.
+        _docx = os.path.join(out, name[:-4] + ".docx")
+        if _docx_ok(_docx):
+            write_key(name[:-4], engine_now(), pdf_sig(src), os.path.getsize(_docx))
         return (name, True, time.time() - t0, "")
     except subprocess.TimeoutExpired:
         return (name, False, time.time() - t0, "timed out after 300 s")
@@ -226,6 +243,106 @@ def _docx_ok(path):
             return "word/document.xml" in z.namelist()
     except Exception:
         return False
+
+
+def pdf_sig(path):
+    """A content fingerprint of one source PDF. 213 PDFs are 20 MB, so hashing the corpus is ~0.1 s.
+
+    Content, not mtime: corpus-fetch.sh re-unpacks the release zips with `unzip -o` and `cp -n`, so a
+    re-fetched document can arrive with the same name, the same size and a fresh mtime, or with an
+    unchanged mtime and different bytes. The key has to name the bytes.
+    """
+    try:
+        h = hashlib.sha256()
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(1 << 20), b""):
+                h.update(chunk)
+        return h.hexdigest()[:16]
+    except Exception:
+        return None
+
+
+def _key_path(stem):
+    return os.path.join(KEYS, stem + ".json")
+
+
+def read_key(stem):
+    try:
+        return json.load(open(_key_path(stem), encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def write_key(stem, engine, sig, docx):
+    """Record what produced one cached document. Atomic: a killed call must not leave half a key."""
+    try:
+        os.makedirs(KEYS, exist_ok=True)
+        tmp = _key_path(stem) + ".tmp%d" % os.getpid()
+        json.dump({"engine": engine, "pdf": sig, "docx": docx, "at": time.strftime("%Y-%m-%dT%H:%M:%S")},
+                  open(tmp, "w", encoding="utf-8"), indent=1)
+        os.replace(tmp, _key_path(stem))
+        return True
+    except Exception:
+        return False
+
+
+def doc_fresh(stem, src, engine=None, sig=None):
+    """True only when the cached .docx for `stem` is THIS engine's output from THIS source PDF.
+
+    Three questions, all answered from files rather than from a build-level timestamp:
+      1. is there a key at all (no key = nobody recorded what made it, so it is not trusted)
+      2. does the key name this engine
+      3. does the key name these bytes of this PDF
+    and then `_docx_ok` says the .docx is a document and not a corpse a killed worker left behind.
+    """
+    k = read_key(stem)
+    if not k:
+        return False
+    if engine is None:
+        engine = engine_now()
+    if k.get("engine") != engine:
+        return False
+    if sig is None:
+        sig = pdf_sig(src)
+    if not sig or k.get("pdf") != sig:
+        return False
+    docx = os.path.join(CACHE, stem + ".docx")
+    if not _docx_ok(docx):
+        return False
+    try:
+        if k.get("docx") and k.get("docx") != os.path.getsize(docx):
+            return False
+    except Exception:
+        return False
+    return True
+
+
+def adopt_legacy(stem, src, engine, prog, since):
+    """Take an unkeyed .docx into the keyed cache under the trust the OLD rule already gave it.
+
+    Without this, a pod whose corpus is already warm pays a full 16-minute rebuild on the first call
+    after this change, for a cache that is provably fine. The old rule was: the progress file names
+    this engine AND the .docx was written after that build started. That is exactly the trust that
+    was being extended until now, so adopting it changes nothing except that the trust becomes
+    per-document and stops depending on mtimes from here on. A key that is PRESENT and stale is not
+    adopted - it is a statement that this document belongs to another engine, and it is re-converted.
+    """
+    if read_key(stem):
+        return False
+    if prog.get("engine") != engine:
+        return False
+    docx = os.path.join(CACHE, stem + ".docx")
+    if not _docx_ok(docx):
+        return False
+    try:
+        if os.path.getmtime(docx) < since:
+            return False
+    except Exception:
+        return False
+    sig = pdf_sig(src)
+    if not sig:
+        return False
+    return write_key(stem, engine, sig, os.path.getsize(docx))
 
 
 def _read_progress():
@@ -266,11 +383,14 @@ def convert_shard(args):
         msg = ""
         if r.returncode != 0:
             msg = ((r.stdout or "")[-300:] + (r.stderr or "")[-300:]).strip()
+        eng = engine_now()
         res = []
         for src in srcs:
             name = os.path.basename(src)
             docx = os.path.join(out, name[:-4] + ".docx")
             good = _docx_ok(docx)
+            if good:
+                write_key(name[:-4], eng, pdf_sig(src), os.path.getsize(docx))
             res.append((name, good, time.time() - t0,
                         "" if good else (msg or "no .docx written")))
         return res
@@ -301,18 +421,18 @@ def build(jobs, quiet=False, batch=10):
     except Exception:
         pass
 
-    # RESUME, BECAUSE A BUILD IS LONGER THAN ONE CALL. 213 documents at ~10.8 s is 19 minutes on this
-    # two-core pod and a bash call is 290 s, so a build that starts from zero can never finish inside a
-    # run: it was rebuilt from zero every time and every run ended with the "corpus could not be built"
-    # the gate refuses. A document already converted by THIS engine is not work, it is the progress the
-    # last call made. Anything left by a different engine is stale and is converted again.
+    # RESUME, BECAUSE A BUILD IS LONGER THAN ONE CALL. 213 documents at ~4.6 s of wall time is ~16
+    # minutes on this two-core pod and a bash call is 290 s, so a build that starts from zero can never
+    # finish inside a run.
+    #
+    # THE DECISION IS PER DOCUMENT AND IS MADE BY doc_fresh(): a .docx is this build's progress only
+    # when a key beside it names THIS engine fingerprint and THESE bytes of THIS pdf. That replaced
+    # "the progress file names this engine", which could not tell a document this build converted from
+    # one the previous engine left behind - it skipped the fossils and stamped a corpus that was a mix
+    # of two engines (measured 24 Nov, see corpus-slice.missing()). The progress file is still written
+    # because it is the build's log, but nothing decides anything from it any more.
     eng = engine_now()
-    prog = _read_progress()
-    if prog.get("engine") != eng:
-        todo = list(pdfs)
-    else:
-        todo = [p for p in pdfs
-                if not _docx_ok(os.path.join(CACHE, os.path.basename(p)[:-4] + ".docx"))]
+    todo = [p for p in pdfs if not doc_fresh(os.path.basename(p)[:-4], p, eng)]
     _write_progress(eng)
     done = len(pdfs) - len(todo)
     if done and not quiet:

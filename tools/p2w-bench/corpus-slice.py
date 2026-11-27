@@ -84,41 +84,41 @@ def missing():
     d = cc.pdf_dir()
     if not d:
         return None
-    _st = cc.read_stamp()
-    _fresh = bool(_st) and _st.get('engine') == cc.engine_now()
     eng = cc.engine_now()
-    # A .docx ON DISK IS NOT A .docx FROM THIS ENGINE. Skipping on existence alone is right on an
-    # empty cache and wrong the moment the engine moves: the old bytes stay, the corpus becomes a mix
-    # of two engines, and every measurement after it is against the wrong file.
-    # THE PROGRESS FILE SAYS WHICH ENGINE, AND IT HAS TO SAY WHICH BUILD. MEASURED 24 Nov, twenty
-    # minutes after the resume fix above: the file said "engine db9f9ffb" and a slice converted 52
-    # documents, but the 161 .docx the PREVIOUS engine had left on disk were good zips under the
-    # right names, so they counted as this build's progress, "213 to go" became DONE after one
-    # slice, and the stamp certified a corpus that was a mix of two engines. A name and a
-    # fingerprint say nothing about WHEN the bytes were written; the build's start time does.
+    # A .docx ON DISK IS NOT A .docx FROM THIS ENGINE, and until 27 Nov this function could only
+    # approximate that with a build start time compared against mtime (see the comment below). It now
+    # asks the file in front of it: cc.doc_fresh() requires a per-document key naming this engine
+    # fingerprint and this pdf's content hash, so an engine move, a re-fetched PDF, a restored cache
+    # or a clock change all answer correctly instead of relying on timestamps that agree by luck.
+    #
+    # THE PROGRESS FILE IS STILL READ, FOR ONE PURPOSE ONLY: adopting a cache that predates the keys.
+    # cc.adopt_legacy() takes an unkeyed .docx in only when the OLD rule would have trusted it (the
+    # progress file names this engine and the .docx is newer than that build's start), so a pod that
+    # is already warm stays warm instead of paying a 16-minute rebuild for a bookkeeping change. Once
+    # adopted, the trust is per document and permanent; a key that is present and stale is never
+    # adopted, it is re-converted.
     _prog = cc._read_progress()
-    resuming = _fresh or _prog.get('engine') == eng
     _since = 0.0
     if _prog.get('engine') == eng and _prog.get('at'):
         try:
             _since = time.mktime(time.strptime(_prog['at'], "%Y-%m-%dT%H:%M:%S"))
         except Exception:
             _since = 0.0
-    if not _fresh and _prog.get('engine') != eng:
-        # Claim the build for this engine before the first conversion, so the NEXT slice can see the
-        # progress this one makes. Same call build() makes, for the same reason.
+    if _prog.get('engine') != eng:
+        # Claim the build for this engine before the first conversion, so the log names the build these
+        # slices belong to. Nothing decides anything from it any more; the keys do.
         cc._write_progress(eng)
     out = []
     for f in sorted(os.listdir(d)):
         if not f.endswith(".pdf"):
             continue
         stem = f[:-4]
-        # _docx_ok, not os.path.exists: a call killed at 290 s leaves a truncated zip under the right
-        # name, and "the name is on disk" is not evidence that the document was converted.
-        _out = os.path.join(cc.CACHE, stem + '.docx')
-        if resuming and cc._docx_ok(_out) and os.path.getmtime(_out) >= _since:
+        src = os.path.join(d, f)
+        if cc.doc_fresh(stem, src, eng):
             continue
-        out.append(os.path.join(d, f))
+        if cc.adopt_legacy(stem, src, eng, _prog, _since):
+            continue
+        out.append(src)
     return out
 
 
