@@ -9322,3 +9322,23 @@
 {"t": 1795774120.6722932, "ist": "15:38:40", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795774121.4589455, "ist": "15:38:41", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795774126.170951, "ist": "15:38:46", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795775812.1707242, "ist": "16:06:52", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795775812.8862846, "ist": "16:06:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795775813.2272031, "ist": "16:06:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795776049.5531015, "ist": "16:10:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795776051.8784037, "ist": "16:10:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795776054.3895438, "ist": "16:10:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795776056.5141091, "ist": "16:10:56", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795776061.594249, "ist": "16:11:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795776068.9755337, "ist": "16:11:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795777532.6877453, "ist": "16:35:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795777755.941272, "ist": "16:39:15", "ev": "beat", "d": "gate check: regress --check running"}
+{"t": 1795778020.9698777, "ist": "16:43:40", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795778022.596061, "ist": "16:43:42", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795778024.6097808, "ist": "16:43:44", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795778026.243051, "ist": "16:43:46", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795778030.0819461, "ist": "16:43:50", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795778030.7545774, "ist": "16:43:50", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795778031.666397, "ist": "16:43:51", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795778032.1500819, "ist": "16:43:52", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795778036.6889, "ist": "16:43:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
