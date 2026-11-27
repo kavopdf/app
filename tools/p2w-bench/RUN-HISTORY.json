@@ -574,5 +574,17 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795740570.1311493,
+  "started": "06:19",
+  "window_for_claim": 1795740570.1311493,
+  "ended_ts": null,
+  "ended": "(never)",
+  "attempts": 1,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
