@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 20:57 → running IST · 10 min**
+**27 Nov 2026 · slot 20:57 → 21:09 IST · 11 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - kept change: 4 code commit(s) in this window, first: record the gate's own state: correctly blocked o vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 5 code commit(s) in this window, first: final report: LAST-MESSAGE.md regenerated from c vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -27,14 +27,14 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (57 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `18_displacement` - taken from the pending list (57 still open), not a new class |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 20:57 | **lead** | 0/1 | pagetop-guarded-27NOV.patch applied, recompiled, converted 22/71/74/price-list: emits w:pgMar w:top=0 on all four, so sectionTopTw() returned 0 and the page is laid out exactly as before - the patch i |
+| 21:08 | **lead** | 0/4 | instrumented sectionTopTw's two return sites (System.err at guard1 hasColumnBands and guard2 room), recompiled, re-converted 22/71/74/price-list: guard2 refuses 22 (top 59.48 vs room 28.0), 71 (61.48 |
 
 ## Why nothing moved, in this run's own words
 
@@ -80,7 +80,7 @@
 
 | | |
 |:--|:--|
-| Measured | **1.1 h ago** |
+| Measured | **1.2 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -95,9 +95,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 20:57 → running · 10 min |
+| Slot window | 20:57 → 21:09 · 11 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 14 |
+| Tool beats | 25 |
 | Longest silence | **7.7 min** — from 20:59:28, after `lastmessage.py: running report.py for the numbers` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -107,8 +107,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `#################` |
-| report - the report and the chain | **2 min** | `#####` |
+| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `################` |
+| report - the report and the chain | **3 min** | `######` |
 ## Best results this round
 
 | Document | Before | After | Change |

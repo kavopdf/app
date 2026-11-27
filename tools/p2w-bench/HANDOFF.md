@@ -10,8 +10,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 20:09 |
-| ended | still running |
-| how it ended | - |
+| ended | 21:09 |
+| how it ended | forced |
 | plan | - |
 
 ## What the next run should do first
@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `09:46` attempt 13 on t12_word_invention -> lead
 - `10:56` attempt 106 on 18_displacement -> lead
 - `10:58` agent deployed: 18_displacement / A - which sub-cause of the displacement survives every eliminated one, measured on o
 - `10:58` agent deployed: 60_text_column_right_edge / B - how many CLEAN documents does fixing 60 alone win, and is there a live construct
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `19:56` attempt 22 on t01_word_accuracy -> kept (3/6 moved)
 - `20:52` attempt 114 on 18_displacement -> lead (1/2 moved)
 - `20:57` attempt 115 on 18_displacement -> lead (0/1 moved)
+- `21:08` attempt 116 on 18_displacement -> lead (0/4 moved)
 
 ## Where the rest of the state lives
 

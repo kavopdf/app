@@ -1,16 +1,5 @@
 [
  {
-  "started": "14:17",
-  "started_ts": 1795596463.152636,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "agents": [
    "scresoffice prerender-01",
    "t12_txt instrument-01"
@@ -793,5 +782,18 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [],
+  "attempts": 3,
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "started": "20:57",
+  "started_ts": 1795793259.7012837,
+  "window_for_claim": 1795793259.7012837,
+  "class": "18_displacement",
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
