@@ -1,0 +1,27 @@
+{
+ "name": "table-across-page-break-repeated-header",
+ "status": "ok",
+ "rc": 1,
+ "at": "2026-11-27T01:24:53",
+ "passed": 43,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "18_displacement",
+  "27_text_off_page",
+  "60_text_column_right_edge"
+ ],
+ "displacement": {
+  "med_dy": -33.5,
+  "worst_dy": 401.3,
+  "med_dx": 0.3,
+  "bad_pages": [
+   0,
+   1,
+   2
+  ],
+  "runs_matched": 466
+ },
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795741074"
+}

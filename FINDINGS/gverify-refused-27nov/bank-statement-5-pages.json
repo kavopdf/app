@@ -1,0 +1,30 @@
+{
+ "name": "bank-statement-5-pages",
+ "status": "ok",
+ "rc": 1,
+ "at": "2026-11-27T01:24:33",
+ "passed": 42,
+ "total": 47,
+ "failed": [
+  "18_displacement",
+  "25_invisible_text",
+  "27_text_off_page",
+  "44_header_footer",
+  "59_shape_anchor"
+ ],
+ "displacement": {
+  "med_dy": -55.0,
+  "worst_dy": 355.4,
+  "med_dx": 0.1,
+  "bad_pages": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "runs_matched": 585
+ },
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795741074"
+}

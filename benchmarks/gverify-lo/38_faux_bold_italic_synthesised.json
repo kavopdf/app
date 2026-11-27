@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/38_faux_bold_italic_synthesised.pdf",
-  "render": "/scratch/tmp/lo-one-5t5pyo95/38_faux_bold_italic_synthesised.pdf",
+  "render": "/scratch/tmp/lo-one-gi46ef67/38_faux_bold_italic_synthesised.pdf",
   "passed": 40,
   "total": 42,
   "failed": [
     "04_chars_missing",
     "60_text_column_right_edge"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "a4d8fca469bba636",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -254,5 +254,5 @@
   },
   "document": "38_faux_bold_italic_synthesised",
   "source_file": "/scratch/work/p2w/corpus/38_faux_bold_italic_synthesised.pdf",
-  "render_file": "/scratch/tmp/lo-one-5t5pyo95/38_faux_bold_italic_synthesised.pdf"
+  "render_file": "/scratch/tmp/lo-one-gi46ef67/38_faux_bold_italic_synthesised.pdf"
 }

@@ -1,0 +1,28 @@
+{
+ "name": "very-long-single-column-table",
+ "status": "ok",
+ "rc": 1,
+ "at": "2026-11-27T01:25:37",
+ "passed": 42,
+ "total": 47,
+ "failed": [
+  "04_chars_missing",
+  "18_displacement",
+  "27_text_off_page",
+  "44_header_footer",
+  "60_text_column_right_edge"
+ ],
+ "displacement": {
+  "med_dy": -7.4,
+  "worst_dy": 656.7,
+  "med_dx": 0.3,
+  "bad_pages": [
+   0,
+   1,
+   2
+  ],
+  "runs_matched": 511
+ },
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795741074"
+}

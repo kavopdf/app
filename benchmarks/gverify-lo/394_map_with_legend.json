@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/394_map_with_legend.pdf",
-  "render": "/scratch/tmp/lo-one-m2p5gfn0/394_map_with_legend.pdf",
+  "render": "/scratch/tmp/lo-one-wskjw4n1/394_map_with_legend.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "a4d8fca469bba636",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -251,5 +251,5 @@
   },
   "document": "394_map_with_legend",
   "source_file": "/scratch/work/p2w/corpus/394_map_with_legend.pdf",
-  "render_file": "/scratch/tmp/lo-one-m2p5gfn0/394_map_with_legend.pdf"
+  "render_file": "/scratch/tmp/lo-one-wskjw4n1/394_map_with_legend.pdf"
 }

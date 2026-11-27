@@ -1,0 +1,26 @@
+{
+ "name": "602_bookmarked_annual_report",
+ "status": "ok",
+ "rc": 1,
+ "at": "2026-11-27T01:24:16",
+ "passed": 38,
+ "total": 42,
+ "failed": [
+  "04_chars_missing",
+  "18_displacement",
+  "27_text_off_page",
+  "52_outline"
+ ],
+ "displacement": {
+  "med_dy": -67.6,
+  "worst_dy": 142.6,
+  "med_dx": -0.5,
+  "bad_pages": [
+   1,
+   2
+  ],
+  "runs_matched": 24
+ },
+ "engine": "a4d8fca469bba636",
+ "checks": "375669-1795741074"
+}
