@@ -120,6 +120,92 @@
 >
 > # Why nothing moved
 >
+> **Nothing moved because 27 of this slot's 90 minutes went to two agents that ran inline instead of in the
+> background, and 10 more went to a cold pod. The engine change this run intended to build was never started.
+> That is a scheduling failure of mine, and it is the whole of the answer.**
+>
+> ## 1. What the run was for, and what it found instead
+>
+> `classpick.py --leverage` refused a new class (35 pending items) and `pending.py`'s first item said to read
+> `FINDINGS/DOCS-ROOT-CAUSES-24NOV.md` before anything. Doing that, the highest-leverage check with a live
+> cause was `60_text_column_right_edge` (23.5 in the mixed-engine store, **5 over the 61 current-engine rows**).
+>
+> Before touching it I ran `install-gate.sh`, as the prompt says to. **It timed out at 300 s.** That is the
+> first fact of the run, and it turned out to be the whole story.
+>
+> ## 2. The gate was not refusing a change. It was refusing a pod.
+>
+> On an unmodified HEAD tree `regress.py --check` refuses with four different messages, in sequence, and none
+> of them is about the code:
+>
+> ```
+> corpus : could not be built (1)      -> no corpus PDFs found - run corpus-fetch.sh first
+> no java on PATH and no JAVA_HOME     -> run jdk-fetch.sh
+> ClassNotFoundException: ConvertAll    -> engine classes never compiled
+> PASS
+> ```
+>
+> `pod-prep.sh` exists to install exactly those in exactly that order, and `install-gate.sh` calls it — which
+> is why `install-gate.sh` cannot finish inside one 300 s call. Once the pod is warm:
+>
+> ```
+> corpus-fetch.sh          213 PDFs, 212 scored, 0 missing
+> pod-prep.sh              [1..6/6] warm, then 53 converted, 79 to go
+> corpus-slice.py          53 converted in 242 s, 26 to go
+> corpus-slice.py          26 converted in 130 s, DONE, stamp a4d8fca469bba636
+> regress.py --check       PASS, exit 0
+> ```
+>
+> **Three calls and about ten minutes from cold, thirteen seconds once warm.** Runs have been reporting this
+> gate as the reason nothing lands; the gate was reporting a missing corpus, a missing JDK and missing classes.
+> That is the correction, and it is in `FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md` with
+> the exact commands and their output.
+>
+> ## 3. The two agents: right answers, wrong mode
+>
+> Both were dispatched with `background=true` and both came back **inside this turn** ("an unattended run has
+> no one to answer later"). 202 s and 1427 s. The second one alone was 24 minutes.
+>
+> Their findings are real and are committed:
+>
+> * **`60_text_column_right_edge` is settled.** The engine never writes a body line's right extent
+>   (`DocxWriter.java:4444`, `int rightTw = 0;`, no `w:jc` at `:4672-4675`), so the column edge is whatever
+>   advance the renderer's resolved face gives the string. Three engine fixes are already refuted by
+>   measurement: the right indent, the `w:jc="distribute"` pin (refuted in Google: 41/42 → 39/42, 28 lines
+>   wrapped), and the `w:rPr/w:spacing` advance carry (on `google_safe.py`'s IGNORED list, so the gate refuses
+>   it). The one construct that survives is a **right tab stop at the source line's own edge**, which
+>   `flowRow` already emits at `:3805-3809` — a position, not an advance, so it is face-independent and
+>   absolute in both renderers. Ceiling: **5 CLEAN documents**, not 23.5, because 55 of the 61 are held by
+>   other checks too.
+> * **The gate diagnosis** above, which also produced two instrument defects recorded as proposals and
+>   deliberately not committed: `regress.py:636` labels every `google_safe.py` return-3 as "no .docx output
+>   directory" when the other cause is a corpus/mark size mismatch, and a docx-scoped commit can land with
+>   google-safe disclosed as skipped and the gate still exiting 0. Neither could be A/B measured on this pod
+>   without moving the 213-document output directory, so both stayed proposals, per non-negotiable 2.
+>
+> ## 4. What the next run should do first
+>
+> 1. `bash tools/p2w-bench/corpus-fetch.sh` then `bash tools/p2w-bench/pod-prep.sh` then `corpus-slice.py`
+>    until `DONE`, **before** `install-gate.sh`. Three calls, ~10 min. Do not read a timeout here as a refusal.
+> 2. Build the right-tab construct in `flowFromBox` (`DocxWriter.java:4438`, schema position after `w:pStyle`,
+>    before `w:snapToGrid`) and move the last word behind `<w:tab/>`.
+> 3. Test it on **`302_radiology_report` only** first. The prediction is falsifiable and already written down:
+>    source edge 543.74, today's Google edge ≤ 503.06, so the edge must travel right by ≥ 40.68 pt and land on
+>    **543.74 ± 1.0**, with `60` reading `(0,0,True)` and the document going **41/42 → 42/42**. Negative
+>    control: `purchase-order` must still read **+102.98** — that is an instrument artefact at
+>    `verify_google.py:2692`, a line moved 0.12 pt across a 10 pt bucket, and it must not change.
+>
+> ## 5. What I would do differently
+>
+> Deploy the agents, then **work in the same turn while they run** — or do not deploy them. In an unattended
+> run they do not run in the background, and 27 minutes of a 90-minute slot is a third of the run spent
+> waiting for two files I could have written myself from `FINDINGS/`. The gate prerequisites come first and
+> cost ten minutes; the attempt is what the other eighty are for.
+
+### The run before this one said
+
+> # Why nothing moved
+>
 > **Nothing moved because the change is a real trade, and this run measured the trade properly instead of
 > the number that had been used to close it.**
 >
@@ -652,7 +738,10 @@ Accounts share 18% of their significant words - a different account (the cut is 
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `60_tA-01` | which engine construct sets a body line's right edge | 08:04 | - | not recorded |
+| `gateB-01` | why does regress.py --check refuse on unmodified HEA | 08:04 | - | not recorded |
 
 ## Timing
 

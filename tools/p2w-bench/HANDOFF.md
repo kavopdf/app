@@ -35,6 +35,8 @@ unfinished work, not as a result.
 | ssimB-01 | ssim | B | what caps the 99 percent SSIM goal - is the deficit concentrated or un | 01:12 | 19:00 | running |  |
 | Expl-01 | Explore:docx construct ranking by documents-cleared (10-row table, rung rule named first) |  |  | 05:51 |  | running |  |
 | Expl-02 | Explore:txt failure root cause (8 docs, 12 check-instances; recommended the t01 character unit) |  |  | 05:51 |  | running |  |
+| 60_tA-01 | 60_text_column_right_edge | A | which engine construct sets a body line's right edge, and which fixes  | 08:04 | 07:40 | landed | FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md |
+| gateB-01 | gate | B | why does regress.py --check refuse on unmodified HEAD | 08:04 | 07:41 | landed | FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
