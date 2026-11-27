@@ -181,3 +181,25 @@ I did not apply either change. `PATCHES/pagetop-guarded-27NOV.patch` has no `pag
 single-page documents — the multi-page scope belongs to the earlier `sectmargin` patch, not to this one.
 That is a correction to what the rest of this file says above: check which patch you are holding before
 assuming a page-count guard is in the way.
+
+## Second attempt: `pagetop-guarded-27NOV.patch` is INERT on all four documents that carry the page offset
+
+Applied cleanly to HEAD, recompiled, and converted the same shard. The prediction written before it
+(`/scratch/work/PREDICTION2.md`) named its own falsifier: *if `22` does not move at all, the patch is
+inert on a single-page document (the guard refused), and the page-level-offset lead is wrong for a
+different reason than "the guard is in the way".*
+
+**The falsifier fired.** The emitted section reads, in every one of the four:
+
+    <w:sectPr><w:pgSz .../><w:pgMar w:top="0" w:right="0" w:bottom="0" w:left="0" .../>
+
+`w:pgMar w:top="0"` is the identity the patch's own comment describes, so `sectionTopTw()` returned 0 and
+**the page is laid out exactly as before**. `22`, `71`, `74` and `price-list` all take that path.
+
+Which guard refuses is **not determined by this run** and must not be guessed. The patch has two, and both
+are live on these four: `hasColumnBands(page)` (guard 1) and the room check (guard 2). All four are
+column-layout documents, which makes guard 1 the prime suspect, but the measurement that would settle it —
+instrumenting which `return 0` fired — was not run. That is the first thing the next run should do, because
+until it is answered the page-level-offset lead has no construct behind it.
+
+The engine is reverted. `pagetop-guarded-27NOV.patch` is unchanged in `PATCHES/`.

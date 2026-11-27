@@ -1,11 +1,12 @@
 {
  "agents": [],
- "attempts": 2,
+ "attempts": 3,
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
  "started": "20:09",
  "started_ts": 1795790357.94,
- "window_for_claim": 1795792937.9400852
+ "window_for_claim": 1795792937.9400852,
+ "class": "18_displacement"
 }
