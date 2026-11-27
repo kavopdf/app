@@ -1,0 +1,26 @@
+document,med_dy,worst_dy,src_pitch_pt,google_pitch_pt,pitch_delta_pt,declared_rows,trHeight_pt,class,construct
+16_right_aligned_amounts_txtpos,-1.6,3.4,19.0,18.8,-0.2,13,19.0,constant offset,A baseline-in-line-box
+303_discharge_summary,-0.2,4.1,15.0,15.8,0.8,5,15.0,accumulated drift,B table row height
+31_times_body_arial_headings,2.6,3.5,16.6,16.7,0.1,0,,constant offset,A baseline-in-line-box
+320_balance_sheet_statutory,8.2,19.4,14.0,15.0,1.0,21,14.0,accumulated drift,B table row height
+325_demat_holdings_statement,3.8,38.1,15.0,15.8,0.8,12,15.0,accumulated drift,B table row height
+362_price_list_dense,-2.8,5.4,8.4,8.2,-0.2,29,8.4,constant offset,A baseline-in-line-box
+36_embedded_subset_font,1.7,3.5,20.0,20.2,0.2,7,20.0,constant offset,A baseline-in-line-box
+402_calendar_month_grid,1.4,6.5,62.0,62.9,0.9,6,61.5,accumulated drift,B table row height
+403_crossword_puzzle,-43.6,45.7,11.0,11.2,0.2,7,11.0,constant offset,C block placement
+68_journal_wide_table_spanning,-114.3,115.0,19.0,18.8,-0.2,7,19.0,constant offset,C block placement
+70_magazine_drop_cap_photo_caption,3.0,3.3,13.4,13.4,0.0,0,,constant offset,A baseline-in-line-box
+71_invoice_space_aligned_no_rules,1.1,6.7,18.0,18.9,0.9,14,18.0,accumulated drift,B table row height
+72_bank_statement_no_rules_right_amounts,-13.0,28.2,17.0,17.2,0.2,18,17.0,constant offset,C block placement
+74_balance_sheet_indented_subitems,2.2,4.2,17.0,17.2,0.2,10,17.0,constant offset,A baseline-in-line-box
+balance-sheet-two-columns-of-figures,-2.3,5.1,11.6,11.2,-0.4,16,11.6,accumulated drift,B table row height
+bus-timetable-station-left-times-right,-3.0,4.9,16.4,16.5,0.1,33,16.4,constant offset,A baseline-in-line-box
+electricity-bill,-8.5,28.5,18.4,19.2,0.8,23,17.5,accumulated drift,B table row height
+insurance-policy-schedule,-7.7,47.8,18.4,19.1,0.7,22,17.5,accumulated drift,B table row height
+marksheet-subject-left-marks-right,-10.9,85.8,18.4,18.9,0.5,20,15.75,accumulated drift,B table row height
+mobile-bill,-6.0,9.2,18.4,19.1,0.7,24,17.5,accumulated drift,B table row height
+price-list-2col-dense-right-aligned,2.1,5.3,16.4,16.5,0.1,41,16.4,constant offset,A baseline-in-line-box
+report-2col-table-spanning-both-columns,2.8,6.8,18.4,18.9,0.5,7,17.5,accumulated drift,B table row height
+table-inside-two-column-page,8.0,73.5,11.8,11.8,0.0,7,18.5,constant offset,C block placement
+table-with-no-header-row,-0.5,9.0,18.4,19.1,0.7,26,17.5,accumulated drift,B table row height
+two-tables-stacked-with-no-gap,1.7,7.3,18.4,19.2,0.8,13,17.5,accumulated drift,B table row height
