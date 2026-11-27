@@ -1,18 +1,25 @@
 {
  "name": "417_rotate180_and_mirrored",
  "status": "ok",
- "rc": 0,
- "at": "2026-11-26T13:22:50",
- "passed": 42,
+ "rc": 1,
+ "at": "2026-11-27T04:31:38",
+ "passed": 38,
  "total": 42,
- "failed": [],
+ "failed": [
+  "04_chars_missing",
+  "17_matched_runs",
+  "18_displacement",
+  "27_text_off_page"
+ ],
  "displacement": {
-  "med_dy": 2.5,
-  "worst_dy": 2.9,
-  "med_dx": 1.2,
-  "bad_pages": [],
-  "runs_matched": 8
+  "med_dy": 2.3,
+  "worst_dy": 59.0,
+  "med_dx": -0.1,
+  "bad_pages": [
+   1
+  ],
+  "runs_matched": 7
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795697520"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

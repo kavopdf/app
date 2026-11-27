@@ -2,7 +2,7 @@
  "name": "404_sudoku_grid",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:24:31",
+ "at": "2026-11-27T04:30:56",
  "passed": 43,
  "total": 47,
  "failed": [
@@ -12,14 +12,14 @@
   "59_shape_anchor"
  ],
  "displacement": {
-  "med_dy": 10.6,
-  "worst_dy": 23.8,
+  "med_dy": -2.6,
+  "worst_dy": 9.6,
   "med_dx": 1.7,
   "bad_pages": [
    0
   ],
   "runs_matched": 33
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

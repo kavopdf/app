@@ -2,7 +2,7 @@
  "name": "371_experience_certificate",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:24:06",
+ "at": "2026-11-27T04:29:28",
  "passed": 36,
  "total": 42,
  "failed": [
@@ -20,6 +20,6 @@
   "bad_pages": [],
   "runs_matched": 16
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

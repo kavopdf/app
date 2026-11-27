@@ -2,7 +2,7 @@
  "name": "375_attendance_register",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:24:13",
+ "at": "2026-11-27T04:30:08",
  "passed": 43,
  "total": 47,
  "failed": [
@@ -12,14 +12,14 @@
   "59_shape_anchor"
  ],
  "displacement": {
-  "med_dy": 2.6,
-  "worst_dy": 5.9,
+  "med_dy": -1.4,
+  "worst_dy": 4.5,
   "med_dx": 4.9,
   "bad_pages": [
    0
   ],
   "runs_matched": 459
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

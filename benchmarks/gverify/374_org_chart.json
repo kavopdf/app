@@ -2,19 +2,23 @@
  "name": "374_org_chart",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T18:11:46",
- "passed": 41,
+ "at": "2026-11-27T04:29:41",
+ "passed": 39,
  "total": 42,
  "failed": [
-  "26_text_overlap"
+  "18_displacement",
+  "26_text_overlap",
+  "59_shape_anchor"
  ],
  "displacement": {
-  "med_dy": -0.8,
-  "worst_dy": 2.6,
+  "med_dy": -2.6,
+  "worst_dy": 14.6,
   "med_dx": -0.4,
-  "bad_pages": [],
+  "bad_pages": [
+   0
+  ],
   "runs_matched": 21
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

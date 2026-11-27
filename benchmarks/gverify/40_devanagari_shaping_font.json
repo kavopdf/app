@@ -2,24 +2,22 @@
  "name": "40_devanagari_shaping_font",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:24:41",
+ "at": "2026-11-27T04:31:11",
  "passed": 43,
  "total": 47,
  "failed": [
-  "18_displacement",
+  "25_invisible_text",
   "34a_span_size_match",
   "38_list_markers",
   "47_margins"
  ],
  "displacement": {
-  "med_dy": 3.9,
-  "worst_dy": 9.0,
+  "med_dy": -0.1,
+  "worst_dy": 3.5,
   "med_dx": 0.1,
-  "bad_pages": [
-   0
-  ],
+  "bad_pages": [],
   "runs_matched": 57
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

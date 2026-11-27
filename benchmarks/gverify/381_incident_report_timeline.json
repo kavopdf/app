@@ -2,23 +2,24 @@
  "name": "381_incident_report_timeline",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T18:14:46",
- "passed": 44,
+ "at": "2026-11-27T04:29:56",
+ "passed": 43,
  "total": 47,
  "failed": [
   "04_chars_missing",
   "18_displacement",
+  "59_shape_anchor",
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": 3.7,
-  "worst_dy": 10.3,
+  "med_dy": 1.7,
+  "worst_dy": 6.4,
   "med_dx": -0.1,
   "bad_pages": [
    0
   ],
   "runs_matched": 63
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

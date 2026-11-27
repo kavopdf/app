@@ -2,20 +2,22 @@
  "name": "343_air_waybill",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T18:14:32",
+ "at": "2026-11-27T04:28:36",
  "passed": 40,
  "total": 42,
  "failed": [
-  "59_shape_anchor",
+  "18_displacement",
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": 0.3,
-  "worst_dy": 2.8,
+  "med_dy": -0.9,
+  "worst_dy": 3.9,
   "med_dx": -0.4,
-  "bad_pages": [],
-  "runs_matched": 39
+  "bad_pages": [
+   0
+  ],
+  "runs_matched": 38
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

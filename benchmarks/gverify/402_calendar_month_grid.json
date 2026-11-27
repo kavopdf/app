@@ -1,22 +1,18 @@
 {
  "name": "402_calendar_month_grid",
  "status": "ok",
- "rc": 1,
- "at": "2026-11-26T20:50:03",
- "passed": 46,
+ "rc": 0,
+ "at": "2026-11-27T04:30:50",
+ "passed": 47,
  "total": 47,
- "failed": [
-  "18_displacement"
- ],
+ "failed": [],
  "displacement": {
-  "med_dy": 1.4,
-  "worst_dy": 6.5,
+  "med_dy": -1.9,
+  "worst_dy": 4.3,
   "med_dx": 0.4,
-  "bad_pages": [
-   0
-  ],
+  "bad_pages": [],
   "runs_matched": 46
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795724644"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

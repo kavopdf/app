@@ -2,17 +2,17 @@
  "name": "41_coloured_headings_white_bg",
  "status": "ok",
  "rc": 0,
- "at": "2026-11-26T21:26:08",
+ "at": "2026-11-27T04:31:43",
  "passed": 42,
  "total": 42,
  "failed": [],
  "displacement": {
-  "med_dy": 1.2,
-  "worst_dy": 1.9,
+  "med_dy": -0.4,
+  "worst_dy": 1.3,
   "med_dx": -0.1,
   "bad_pages": [],
   "runs_matched": 36
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

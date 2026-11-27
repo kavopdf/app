@@ -2,26 +2,25 @@
  "name": "383_api_docs_page",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T18:14:53",
- "passed": 41,
+ "at": "2026-11-27T04:30:11",
+ "passed": 42,
  "total": 47,
  "failed": [
   "04_chars_missing",
   "18_displacement",
   "47_margins",
-  "59_shape_anchor",
   "60_text_column_right_edge",
   "66_table_cell_width"
  ],
  "displacement": {
-  "med_dy": 2.2,
-  "worst_dy": 5.8,
+  "med_dy": -1.7,
+  "worst_dy": 4.0,
   "med_dx": -0.6,
   "bad_pages": [
    0
   ],
   "runs_matched": 56
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

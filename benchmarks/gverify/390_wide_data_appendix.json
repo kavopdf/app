@@ -2,7 +2,7 @@
  "name": "390_wide_data_appendix",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:24:20",
+ "at": "2026-11-27T04:30:36",
  "passed": 43,
  "total": 47,
  "failed": [
@@ -12,14 +12,14 @@
   "66_table_cell_width"
  ],
  "displacement": {
-  "med_dy": -3.1,
-  "worst_dy": 6.1,
+  "med_dy": -6.6,
+  "worst_dy": 9.6,
   "med_dx": -2.1,
   "bad_pages": [
    0
   ],
   "runs_matched": 403
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

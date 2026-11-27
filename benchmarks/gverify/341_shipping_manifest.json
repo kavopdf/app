@@ -2,7 +2,7 @@
  "name": "341_shipping_manifest",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:23:39",
+ "at": "2026-11-27T04:28:36",
  "passed": 45,
  "total": 47,
  "failed": [
@@ -10,14 +10,14 @@
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": -7.1,
-  "worst_dy": 222.7,
+  "med_dy": 1.0,
+  "worst_dy": 20.0,
   "med_dx": 0.2,
   "bad_pages": [
    0
   ],
   "runs_matched": 304
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }

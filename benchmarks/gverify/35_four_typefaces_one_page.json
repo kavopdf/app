@@ -1,18 +1,22 @@
 {
  "name": "35_four_typefaces_one_page",
  "status": "ok",
- "rc": 0,
- "at": "2026-11-26T18:11:36",
- "passed": 42,
+ "rc": 1,
+ "at": "2026-11-27T04:28:49",
+ "passed": 41,
  "total": 42,
- "failed": [],
+ "failed": [
+  "18_displacement"
+ ],
  "displacement": {
-  "med_dy": 0.0,
-  "worst_dy": 1.0,
+  "med_dy": -2.8,
+  "worst_dy": 3.7,
   "med_dx": -0.1,
-  "bad_pages": [],
+  "bad_pages": [
+   0
+  ],
   "runs_matched": 52
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795752290"
 }
