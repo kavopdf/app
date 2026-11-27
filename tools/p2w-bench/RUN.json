@@ -1,11 +1,11 @@
 {
- "started_ts": 1795793259.7012837,
- "started": "20:57",
- "window_for_claim": 1795793259.7012837,
- "ended_ts": null,
- "ended": null,
- "attempts": 1,
- "kept": 0,
  "agents": [],
- "docs_improved": 0
+ "attempts": 2,
+ "docs_improved": 0,
+ "ended": null,
+ "ended_ts": null,
+ "kept": 0,
+ "started": "20:57",
+ "started_ts": 1795793259.7012837,
+ "window_for_claim": 1795793259.7012837
 }
