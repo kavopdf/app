@@ -176,6 +176,21 @@ is a backlog that does not clear.**
 **If step 2 would eat the whole run, do it anyway.** A Google number with no LibreOffice partner says a
 document fails but not which construct; the pair is the only thing a fixer can act on.
 
+**`stage.py` READING `classify` DOES NOT CANCEL STEP 2 - measured, not argued.** Once the Google side is
+complete `stage.py` stops saying `matrix`, and the matrix stage only fills documents that have NO
+LibreOffice result at all - so with every document carrying one, nothing is ever routed to the
+LibreOffice half again and it stays frozen on whatever engine first converted it. Measured 27 Nov 21:05
+IST: `gverify.py --matrix` read `LibreOffice on it 0 of 206 pairs` against `Google on it 205 of 206`,
+because the engine moved at 11:57 (33863086) after the last LibreOffice commit at 11:32 and all four runs
+between measured Google only. The tool for that state:
+
+    python3 tools/p2w-bench/gverify.py --lo-stale 40
+
+It computes its own work list from the stamps and skips anything already on the engine in the tree, so
+it is a no-op once the backlog is clear and costs nothing on a pass where there is nothing stale. **Run
+it before you stop on a `classify` stage whenever `--matrix` shows the LibreOffice count below the
+document count.**
+
 ## STAGE `matrix` — the other half of every document
 
     python3 tools/p2w-bench/stage.py
