@@ -304,3 +304,63 @@ each stamp showing through the transparent interior exactly as it does in the PD
 **The lesson that cost this round:** 312 did not have overlapping body text under its stamp, so the
 redaction bug was invisible there. A method proved on one document is proved on one document. 01 and 02
 were the reason it surfaced.
+
+## The whole stamp set, run through the rules in one pass
+
+Sixteen stamp documents run through all seven rules locally, checking per document that a stamp colour
+was found, that the crop is sane, that anchors were actually found to remove, and that the mask is
+neither empty nor nearly empty.
+
+**Thirteen pass.** Two bugs came out of it that three documents alone had not shown.
+
+### Bug A - rule 6's test was containment, and it is wrong
+
+`03_stamp_vertical_90deg` and `04_stamp_180deg_upside_down` both came back **kill 0** - no anchor
+removed - which is exactly the duplicate-stamp bug the user had already caught by eye on 312.
+
+The reason is that a textbox is **larger than the stamp it draws**:
+
+    03   anchor 108 x 122 pt   stamp  55 x 122 pt   overlap 51%
+    04   anchor 182 x  73 pt   stamp 182 x  64 pt   overlap 87%
+
+The test `q.x1 <= stamp.x1 + 2` demands the anchor be **inside** the stamp. It never is, because the
+box carries padding. The right test is the other way round:
+
+> An anchor belongs to the stamp when it overlaps the stamp's rect and the overlap is at least **half
+> the area of the smaller of the two rectangles**.
+
+That is 100 percent on 03, 100 percent on 04, and 100 percent on each of 312's 28 per-letter anchors,
+while a body-text anchor that merely clips the corner scores far below half and is excluded. With the
+change 03 and 04 both report kill 1.
+
+### Bug B - the flow starts in the wrong place
+
+Three documents still fail, and each for the same structural reason: **the method begins by looking for
+a textbox anchor**, and these three do not have one.
+
+    10_stamp_as_image            0 textbox, 14 shape, 1 picture  - the stamp is ALREADY a picture
+    12_stamp_across_page_break   0 textbox, 10 shape, 0 picture  - the stamp is drawn as shapes only
+    14_stamp_chars_positioned_td 2 textbox but the stamp is text with NO border drawing, so rule 1
+                                 finds no coloured drawing to take a colour from
+
+Two generalisations, neither written yet:
+
+- **Rule 1'** - when there is no coloured drawing in the region, take the most common non-black **text**
+  colour instead. `14`'s stamp text is `(0.05,0.15,0.55)` and appears in the PDF's text colours.
+- **Rule 6'** - do not start from a textbox anchor at all. **Locate the stamp in the PDF first**, then
+  remove every anchor that overlaps it, of any kind. That covers 10 and 12, where there is no textbox
+  to start from, and it makes rule 6's overlap test the only locator rather than a follow-up.
+
+### The batch, as it stands
+
+    ok      01 02 03 04 06 07 08 09 11 13 15 312 43          thirteen
+    open    10 12 14                                          three, both generalisations above
+
+**Do not claim the stamp set is fixed while those three are open.** Thirteen of sixteen is not sixteen,
+and the three that fail are not random - they are the three shapes the current flow cannot enter.
+
+### What this cost and what it bought
+
+Running one document produced a method that looked complete. Running three produced two corrections.
+Running sixteen produced two more. **The defects are in the shapes the sample did not contain, and there
+is no way to find them except to run the whole set.**
