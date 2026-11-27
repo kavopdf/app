@@ -474,6 +474,12 @@ def watchdog():
         prog = ""
         if v.get("done") is not None and v.get("of"):
             prog = "%d of %d" % (v["done"], v["of"])
+            # A FILE ON DISK IS NOT A MEASUREMENT, AND THIS CELL SAID IT WAS. On 27 Nov the matrix row
+            # read "213 of 214" - one document short - while only 37 of those results carried the engine
+            # in the tree and the other 176 were an engine old. health.py now reports that count, and a
+            # report that hides it sends the reader to look for one missing file instead of a stale half.
+            if v.get("on_engine") is not None and v["on_engine"] < v["done"]:
+                prog += " (%d on the engine in the tree)" % v["on_engine"]
         elif v.get("clean") is not None:
             prog = "%d clean, %d failing" % (v["clean"], v.get("failing") or 0)
         elif v.get("attempts_3h") is not None:
