@@ -9679,3 +9679,127 @@
 {"t": 1795793992.0218318, "ist": "21:09:52", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795793992.4678082, "ist": "21:09:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795793994.9271445, "ist": "21:09:54", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795794419.842551, "ist": "21:16:59", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795794420.0148401, "ist": "21:17:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795794420.107243, "ist": "21:17:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795794424.710486, "ist": "21:17:04", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795794430.7162726, "ist": "21:17:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795794976.4433348, "ist": "21:26:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795794976.614588, "ist": "21:26:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795794983.7830095, "ist": "21:26:23", "ev": "beat", "d": "relay: agents A/B deploying, measuring corpus state"}
+{"t": 1795794983.9601924, "ist": "21:26:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795794984.096329, "ist": "21:26:24", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795794984.8426218, "ist": "21:26:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795794984.982806, "ist": "21:26:24", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795795264.0401344, "ist": "21:31:04", "ev": "beat", "d": "relay: corpus pass 1 on current engine a05b20eb (unblocks landing); agents landed"}
+{"t": 1795795508.9329953, "ist": "21:35:08", "ev": "beat", "d": "p2w.py: scoring 02_stamp_rotated_15deg_uplef (2 in this pass)"}
+{"t": 1795795519.0239658, "ist": "21:35:19", "ev": "beat", "d": "relay: corpus pass 1 chunk 2"}
+{"t": 1795795670.0490732, "ist": "21:37:50", "ev": "beat", "d": "p2w.py: scoring 04_stamp_180deg_upside_down (2 in this pass)"}
+{"t": 1795795675.8086345, "ist": "21:37:55", "ev": "beat", "d": "p2w.py: scoring 06_rect_paid_stamp_red_trans (4 in this pass)"}
+{"t": 1795795681.6987193, "ist": "21:38:01", "ev": "beat", "d": "p2w.py: scoring 08_two_overlapping_stamps (6 in this pass)"}
+{"t": 1795795686.9026375, "ist": "21:38:06", "ev": "beat", "d": "p2w.py: scoring 10_stamp_as_image (8 in this pass)"}
+{"t": 1795795693.2630136, "ist": "21:38:13", "ev": "beat", "d": "p2w.py: scoring 13_stamp_non_english (10 in this pass)"}
+{"t": 1795795699.821153, "ist": "21:38:19", "ev": "beat", "d": "p2w.py: scoring 15_stamp_on_scanned_page (12 in this pass)"}
+{"t": 1795795725.375235, "ist": "21:38:45", "ev": "beat", "d": "p2w.py: scoring 17_three_column_widths_txtpo (2 in this pass)"}
+{"t": 1795795734.358395, "ist": "21:38:54", "ev": "beat", "d": "p2w.py: scoring 19_hanging_indent_txtpos (4 in this pass)"}
+{"t": 1795795744.5419602, "ist": "21:39:04", "ev": "beat", "d": "p2w.py: scoring 21_form_labels_x60_values_x3 (6 in this pass)"}
+{"t": 1795795779.0676916, "ist": "21:39:39", "ev": "beat", "d": "relay: corpus pass 1 chunk 3-4"}
+{"t": 1795795953.8886714, "ist": "21:42:33", "ev": "beat", "d": "p2w.py: scoring 23_timetable_grid_txtpos (2 in this pass)"}
+{"t": 1795795960.703161, "ist": "21:42:40", "ev": "beat", "d": "p2w.py: scoring 25_signature_block_underscor (4 in this pass)"}
+{"t": 1795795967.601532, "ist": "21:42:47", "ev": "beat", "d": "p2w.py: scoring 27_two_column_left_short_txt (6 in this pass)"}
+{"t": 1795795974.8730173, "ist": "21:42:54", "ev": "beat", "d": "p2w.py: scoring 29_dot_leaders_txtpos (8 in this pass)"}
+{"t": 1795795983.1870854, "ist": "21:43:03", "ev": "beat", "d": "p2w.py: scoring 301_lab_report_panel (10 in this pass)"}
+{"t": 1795795989.9839673, "ist": "21:43:09", "ev": "beat", "d": "p2w.py: scoring 303_discharge_summary (12 in this pass)"}
+{"t": 1795796019.1371326, "ist": "21:43:39", "ev": "beat", "d": "p2w.py: scoring 305_vaccination_certificate (2 in this pass)"}
+{"t": 1795796026.5420299, "ist": "21:43:46", "ev": "beat", "d": "p2w.py: scoring 30_mixed_font_sizes_one_base (4 in this pass)"}
+{"t": 1795796268.6775649, "ist": "21:47:48", "ev": "beat", "d": "relay: corpus pass 1, ~37/213 measured, chunking to completion (unblocks the stamp that has blocked 6 runs)"}
+{"t": 1795796407.94251, "ist": "21:50:07", "ev": "beat", "d": "p2w.py: scoring 312_affidavit_stamp_paper (2 in this pass)"}
+{"t": 1795796412.6307805, "ist": "21:50:12", "ev": "beat", "d": "p2w.py: scoring 314_tender_rfp_boq (4 in this pass)"}
+{"t": 1795796417.481514, "ist": "21:50:17", "ev": "beat", "d": "p2w.py: scoring 316_contract_with_schedules (6 in this pass)"}
+{"t": 1795796422.5958867, "ist": "21:50:22", "ev": "beat", "d": "p2w.py: scoring 318_court_summons_form (8 in this pass)"}
+{"t": 1795796428.0740395, "ist": "21:50:28", "ev": "beat", "d": "p2w.py: scoring 320_balance_sheet_statutory (10 in this pass)"}
+{"t": 1795796433.8067846, "ist": "21:50:33", "ev": "beat", "d": "p2w.py: scoring 322_mutual_fund_factsheet (12 in this pass)"}
+{"t": 1795796458.6981807, "ist": "21:50:58", "ev": "beat", "d": "p2w.py: scoring 325_demat_holdings_statement (2 in this pass)"}
+{"t": 1795796466.7566469, "ist": "21:51:06", "ev": "beat", "d": "p2w.py: scoring 32_serif_nondefault_body (4 in this pass)"}
+{"t": 1795796473.2226346, "ist": "21:51:13", "ev": "beat", "d": "p2w.py: scoring 331_pid_diagram (6 in this pass)"}
+{"t": 1795796480.1301978, "ist": "21:51:20", "ev": "beat", "d": "p2w.py: scoring 333_datasheet_spec_tables (8 in this pass)"}
+{"t": 1795796486.515043, "ist": "21:51:26", "ev": "beat", "d": "p2w.py: scoring 335_msds_safety_data_sheet (10 in this pass)"}
+{"t": 1795796491.9326372, "ist": "21:51:31", "ev": "beat", "d": "p2w.py: scoring 340_bill_of_lading (12 in this pass)"}
+{"t": 1795796549.7355928, "ist": "21:52:29", "ev": "beat", "d": "relay: corpus pass 1, 62/213, chunking"}
+{"t": 1795796575.2986233, "ist": "21:52:55", "ev": "beat", "d": "p2w.py: scoring 343_air_waybill (2 in this pass)"}
+{"t": 1795796581.0562787, "ist": "21:53:01", "ev": "beat", "d": "p2w.py: scoring 34_monospace_document (4 in this pass)"}
+{"t": 1795796586.341595, "ist": "21:53:06", "ev": "beat", "d": "p2w.py: scoring 351_omr_answer_sheet (6 in this pass)"}
+{"t": 1795796592.4247708, "ist": "21:53:12", "ev": "beat", "d": "p2w.py: scoring 353_admit_card (8 in this pass)"}
+{"t": 1795796599.8315156, "ist": "21:53:19", "ev": "beat", "d": "p2w.py: scoring 360_restaurant_menu (10 in this pass)"}
+{"t": 1795796607.5642238, "ist": "21:53:27", "ev": "beat", "d": "p2w.py: scoring 362_price_list_dense (12 in this pass)"}
+{"t": 1795796641.907482, "ist": "21:54:01", "ev": "beat", "d": "p2w.py: scoring 364_event_ticket (2 in this pass)"}
+{"t": 1795796648.3631713, "ist": "21:54:08", "ev": "beat", "d": "p2w.py: scoring 36_embedded_subset_font (4 in this pass)"}
+{"t": 1795796654.7157297, "ist": "21:54:14", "ev": "beat", "d": "p2w.py: scoring 371_experience_certificate (6 in this pass)"}
+{"t": 1795796663.3222244, "ist": "21:54:23", "ev": "beat", "d": "p2w.py: scoring 373_leave_application_form (8 in this pass)"}
+{"t": 1795796668.9320068, "ist": "21:54:28", "ev": "beat", "d": "p2w.py: scoring 375_attendance_register (10 in this pass)"}
+{"t": 1795796673.9799058, "ist": "21:54:33", "ev": "beat", "d": "p2w.py: scoring 380_runbook_terminal_output (12 in this pass)"}
+{"t": 1795796700.8891575, "ist": "21:55:00", "ev": "beat", "d": "p2w.py: scoring 382_architecture_diagram (2 in this pass)"}
+{"t": 1795796705.8643904, "ist": "21:55:05", "ev": "beat", "d": "p2w.py: scoring 38_faux_bold_italic_synthesi (4 in this pass)"}
+{"t": 1795796711.4341924, "ist": "21:55:11", "ev": "beat", "d": "p2w.py: scoring 391_survey_questionnaire_gri (6 in this pass)"}
+{"t": 1795796717.690665, "ist": "21:55:17", "ev": "beat", "d": "p2w.py: scoring 393_spectrum_peak_table (8 in this pass)"}
+{"t": 1795796723.5309885, "ist": "21:55:23", "ev": "beat", "d": "p2w.py: scoring 39_small_caps_letter_spacing (10 in this pass)"}
+{"t": 1795796729.2209177, "ist": "21:55:29", "ev": "beat", "d": "p2w.py: scoring 401_trifold_brochure (12 in this pass)"}
+{"t": 1795796751.7704158, "ist": "21:55:51", "ev": "beat", "d": "p2w.py: scoring 403_crossword_puzzle (2 in this pass)"}
+{"t": 1795796756.999093, "ist": "21:55:56", "ev": "beat", "d": "p2w.py: scoring 405_sheet_music_lyrics (4 in this pass)"}
+{"t": 1795796762.7355695, "ist": "21:56:02", "ev": "beat", "d": "p2w.py: scoring 407_id_card_front_back (6 in this pass)"}
+{"t": 1795796768.3457556, "ist": "21:56:08", "ev": "beat", "d": "p2w.py: scoring 410_form_xobject_reused (8 in this pass)"}
+{"t": 1795796773.2654743, "ist": "21:56:13", "ev": "beat", "d": "p2w.py: scoring 413_tagged_pdf_actualtext (10 in this pass)"}
+{"t": 1795796778.8717752, "ist": "21:56:18", "ev": "beat", "d": "p2w.py: scoring 415_inline_images (12 in this pass)"}
+{"t": 1795796828.8314621, "ist": "21:57:08", "ev": "beat", "d": "relay: corpus pass 1, 110/213, ~10 min left"}
+{"t": 1795796843.9603124, "ist": "21:57:23", "ev": "beat", "d": "p2w.py: scoring 42_table_coloured_header_alt (2 in this pass)"}
+{"t": 1795796849.5730567, "ist": "21:57:29", "ev": "beat", "d": "p2w.py: scoring 44_coloured_underlined_hyper (4 in this pass)"}
+{"t": 1795796855.354208, "ist": "21:57:35", "ev": "beat", "d": "p2w.py: scoring 46_chart_coloured_labels_bod (6 in this pass)"}
+{"t": 1795796865.22107, "ist": "21:57:45", "ev": "beat", "d": "p2w.py: scoring 48_form_coloured_border_colo (8 in this pass)"}
+{"t": 1795796872.0542836, "ist": "21:57:52", "ev": "beat", "d": "p2w.py: scoring 50_invoice_coloured_total_ro (10 in this pass)"}
+{"t": 1795796879.8691986, "ist": "21:57:59", "ev": "beat", "d": "p2w.py: scoring 52_one_cm_margin_wide_body (12 in this pass)"}
+{"t": 1795796887.2117653, "ist": "21:58:07", "ev": "beat", "d": "p2w.py: scoring 54_two_column_body_full_widt (2 in this pass)"}
+{"t": 1795796895.178722, "ist": "21:58:15", "ev": "beat", "d": "p2w.py: scoring 56_table_indented_from_margi (4 in this pass)"}
+{"t": 1795796904.590153, "ist": "21:58:24", "ev": "beat", "d": "p2w.py: scoring 601_fillable_admission_form (6 in this pass)"}
+{"t": 1795796911.572926, "ist": "21:58:31", "ev": "beat", "d": "p2w.py: scoring 61_two_col_abstract_spanning (8 in this pass)"}
+{"t": 1795796918.623327, "ist": "21:58:38", "ev": "beat", "d": "p2w.py: scoring 63_three_column_brochure (10 in this pass)"}
+{"t": 1795796925.9193497, "ist": "21:58:45", "ev": "beat", "d": "p2w.py: scoring 65_two_col_full_width_figure (12 in this pass)"}
+{"t": 1795796949.0548258, "ist": "21:59:09", "ev": "beat", "d": "p2w.py: scoring 67_two_col_with_sidebar (2 in this pass)"}
+{"t": 1795796954.387263, "ist": "21:59:14", "ev": "beat", "d": "p2w.py: scoring 69_two_col_legal_numbered_cl (4 in this pass)"}
+{"t": 1795796959.3507426, "ist": "21:59:19", "ev": "beat", "d": "p2w.py: scoring 71_invoice_space_aligned_no_ (6 in this pass)"}
+{"t": 1795796964.336683, "ist": "21:59:24", "ev": "beat", "d": "p2w.py: scoring 73_marksheet_subject_marks_g (8 in this pass)"}
+{"t": 1795796969.2495813, "ist": "21:59:29", "ev": "beat", "d": "p2w.py: scoring 75_merged_header_cell_three_ (10 in this pass)"}
+{"t": 1795796974.0808225, "ist": "21:59:34", "ev": "beat", "d": "p2w.py: scoring 77_arabic_rtl_document (12 in this pass)"}
+{"t": 1795796995.0466778, "ist": "21:59:55", "ev": "beat", "d": "p2w.py: scoring 79_inr_indian_digit_grouping (2 in this pass)"}
+{"t": 1795797000.0043435, "ist": "22:00:00", "ev": "beat", "d": "p2w.py: scoring admission-form-labels-left-b (4 in this pass)"}
+{"t": 1795797005.0305746, "ist": "22:00:05", "ev": "beat", "d": "p2w.py: scoring annual-review-2col-uneven-co (6 in this pass)"}
+{"t": 1795797009.8578436, "ist": "22:00:09", "ev": "beat", "d": "p2w.py: scoring bank-statement-horizontal-ru (8 in this pass)"}
+{"t": 1795797014.7670248, "ist": "22:00:14", "ev": "beat", "d": "p2w.py: scoring boq-tender-bill-of-quantitie (10 in this pass)"}
+{"t": 1795797019.8373923, "ist": "22:00:19", "ev": "beat", "d": "p2w.py: scoring bus-timetable-station-left-t (12 in this pass)"}
+{"t": 1795797041.1367035, "ist": "22:00:41", "ev": "beat", "d": "p2w.py: scoring electricity-bill (2 in this pass)"}
+{"t": 1795797046.8244483, "ist": "22:00:46", "ev": "beat", "d": "p2w.py: scoring gst-invoice-3line-items (4 in this pass)"}
+{"t": 1795797051.938602, "ist": "22:00:51", "ev": "beat", "d": "p2w.py: scoring gst-invoice-with-qr-code (6 in this pass)"}
+{"t": 1795797057.0672452, "ist": "22:00:57", "ev": "beat", "d": "p2w.py: scoring invoice-line-items-qty-rate- (8 in this pass)"}
+{"t": 1795797062.4139886, "ist": "22:01:02", "ev": "beat", "d": "p2w.py: scoring journal-2col-with-footnotes (10 in this pass)"}
+{"t": 1795797068.1887283, "ist": "22:01:08", "ev": "beat", "d": "p2w.py: scoring marksheet-subject-left-marks (12 in this pass)"}
+{"t": 1795797108.6917326, "ist": "22:01:48", "ev": "beat", "d": "relay: corpus pass 1, 170/213, final chunk"}
+{"t": 1795797131.5755167, "ist": "22:02:11", "ev": "beat", "d": "p2w.py: scoring mobile-bill (2 in this pass)"}
+{"t": 1795797137.5992134, "ist": "22:02:17", "ev": "beat", "d": "p2w.py: scoring newspaper-2col-fullwidth-hea (4 in this pass)"}
+{"t": 1795797143.9368095, "ist": "22:02:23", "ev": "beat", "d": "p2w.py: scoring policy-2col-spanning-section (6 in this pass)"}
+{"t": 1795797150.2031925, "ist": "22:02:30", "ev": "beat", "d": "p2w.py: scoring price-list-right-aligned-amo (8 in this pass)"}
+{"t": 1795797155.9682372, "ist": "22:02:35", "ev": "beat", "d": "p2w.py: scoring property-tax-receipt (10 in this pass)"}
+{"t": 1795797161.3101432, "ist": "22:02:41", "ev": "beat", "d": "p2w.py: scoring question-paper-marks-right-m (12 in this pass)"}
+{"t": 1795797178.481479, "ist": "22:02:58", "ev": "beat", "d": "p2w.py: scoring salary-slip-corporate (2 in this pass)"}
+{"t": 1795797183.9865935, "ist": "22:03:03", "ev": "beat", "d": "p2w.py: scoring table-inside-two-column-page (4 in this pass)"}
+{"t": 1795797189.769878, "ist": "22:03:09", "ev": "beat", "d": "p2w.py: scoring table-with-merged-cells (6 in this pass)"}
+{"t": 1795797195.235931, "ist": "22:03:15", "ev": "beat", "d": "p2w.py: scoring table-with-rotated-header (8 in this pass)"}
+{"t": 1795797200.656044, "ist": "22:03:20", "ev": "beat", "d": "p2w.py: scoring two-tables-stacked-with-no-g (10 in this pass)"}
+{"t": 1795797208.474906, "ist": "22:03:28", "ev": "beat", "d": "p2w.py: scoring 417_rotate180_and_mirrored (12 in this pass)"}
+{"t": 1795797237.0782828, "ist": "22:03:57", "ev": "beat", "d": "p2w.py: scoring 58_header_rule_footer_rule (2 in this pass)"}
+{"t": 1795797246.6763945, "ist": "22:04:06", "ev": "beat", "d": "p2w.py: scoring academic-paper-ieee-2col-abs (4 in this pass)"}
+{"t": 1795797257.316565, "ist": "22:04:17", "ev": "beat", "d": "p2w.py: scoring form16-part-b (6 in this pass)"}
+{"t": 1795797268.586517, "ist": "22:04:28", "ev": "beat", "d": "p2w.py: scoring one-page-rotated-180-degrees (8 in this pass)"}
+{"t": 1795797281.4915597, "ist": "22:04:41", "ev": "beat", "d": "p2w.py: scoring landscape-page-inside-portra (10 in this pass)"}
+{"t": 1795797299.9307244, "ist": "22:04:59", "ev": "beat", "d": "p2w.py: scoring very-long-single-column-tabl (12 in this pass)"}
+{"t": 1795797390.0933502, "ist": "22:06:30", "ev": "beat", "d": "relay: corpus pass 1, 206/213, last 7"}
+{"t": 1795797711.410696, "ist": "22:11:51", "ev": "beat", "d": "relay: corpus pass 1, last 7 documents refuse to render - retrying"}
+{"t": 1795798008.164431, "ist": "22:16:48", "ev": "beat", "d": "attempt.py: recording an attempt"}

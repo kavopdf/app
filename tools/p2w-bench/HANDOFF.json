@@ -1,29 +1,6 @@
 {
  "agents": [
   {
-   "angle": "B",
-   "class": "18_displacement",
-   "deployed": "16:18",
-   "deployed_at": "2026-11-26T16:18",
-   "expected": "15:28",
-   "finding": "FINDINGS/18-displacement-SINGLE-PAGE-SPACER-MEASURED-26NOV-explore.md",
-   "id": "18_dB-01",
-   "landed_at": "2026-11-26T16:18",
-   "question": "single-page half: is the exact-line spacer charged proportionally by Google",
-   "status": "landed"
-  },
-  {
-   "id": "44_hA-01",
-   "class": "44_header_footer",
-   "angle": "A",
-   "question": "is flowFromBox the second anchor site and does the foot-band guard transfer to it",
-   "expected": "17:39",
-   "deployed": "17:43",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-26T17:43"
-  },
-  {
    "id": "--he-01",
    "class": "--help",
    "angle": "",
@@ -272,6 +249,28 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-27T16:45"
+  },
+  {
+   "id": "18_dA-01",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "Which of the 41 docs failing 18_displacement share ONE row-shortfall construct, and which engine path sets it - does 18-small-dy-cellbefore.patch cover them all?",
+   "expected": "22:20",
+   "deployed": "21:26",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-27T21:26"
+  },
+  {
+   "id": "18_dB-01",
+   "class": "18_displacement",
+   "angle": "B",
+   "question": "Is the 11:57 landing 33863086 real in Google, and how many neighbouring docs sit 1-4 pt short of their row (the same shortfall) without being fixed by it?",
+   "expected": "22:20",
+   "deployed": "21:26",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-27T21:26"
   }
  ],
  "history": [
@@ -378,10 +377,6 @@
  ],
  "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "15:12",
-   "text": "attempt 88 on 18_displacement -> lead"
-  },
   {
    "at": "15:12",
    "text": "attempt 89 on 18_displacement -> lead"
@@ -613,12 +608,20 @@
   {
    "at": "21:08",
    "text": "attempt 116 on 18_displacement -> lead (0/4 moved)"
+  },
+  {
+   "at": "21:26",
+   "text": "agent deployed: 18_displacement / A - Which of the 41 docs failing 18_displacement share ONE row-shortfall construct, "
+  },
+  {
+   "at": "21:26",
+   "text": "agent deployed: 18_displacement / B - Is the 11:57 landing 33863086 real in Google, and how many neighbouring docs sit"
   }
  ],
  "plan": "",
  "run": {
-  "started": "20:09",
-  "ended": "21:09",
-  "ended_how": "forced"
+  "started": "21:17",
+  "ended": null,
+  "ended_how": null
  }
 }

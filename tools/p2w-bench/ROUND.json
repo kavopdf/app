@@ -1,5 +1,5 @@
 {
-  "baseline_started": 1795797939.5850444,
+  "baseline_started": 0,
   "classifier_started": 0,
   "fixer": {
     "agents": [
@@ -17,9 +17,11 @@
       }
     ]
   },
+  "fixer_doing": "relay: corpus pass 1, last 7 documents refuse to render - retrying",
+  "fixer_doing_since": 1795797711.4135892,
   "fixer_engine_at_claim": "33863086",
-  "fixer_last_beat": 1795793833.2234018,
-  "fixer_started": 1795796997.7430224,
+  "fixer_last_beat": 1795797711.4135902,
+  "fixer_started": 1795794416.9772112,
   "history": [
     {
       "at": "2026-11-12 09:46",
