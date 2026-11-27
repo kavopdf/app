@@ -9477,3 +9477,8 @@
 {"t": 1795786083.9405925, "ist": "18:58:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795786084.0799425, "ist": "18:58:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795786085.0369453, "ist": "18:58:05", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795786107.134725, "ist": "18:58:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795786111.830203, "ist": "18:58:31", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795786112.121495, "ist": "18:58:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795786112.3091216, "ist": "18:58:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795786113.276908, "ist": "18:58:33", "ev": "killed", "d": "dead claim cleared by force release"}
