@@ -4688,19 +4688,22 @@ def _engine_head():
     Provenance, not a score: nothing here changes a check. Falls back to the commit so a pod without
     the engine sources still answers something.
     """
-    import hashlib as _h
+    # 27 Nov: the writer and the reader disagreed by one file. corpus-convert.py stamps the corpus
+    # with engine_sources("docx"), which excludes TxtWriter.java (fixer commit 571f5b7c, 27 Nov), and
+    # gvbatch.py writes the Google verdicts from that stamp. This function hashed EVERY .java, so the
+    # LibreOffice half written here carried 74a152e7d3fb3d26 while the Google half carried
+    # d28ca7516c3f9165 - measured this run, "LibreOffice on it: 0 of 212 pairs" on a corpus measured
+    # end to end today. Same quantity as the store: regress.engine_fingerprint("docx").
     _root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    _d = os.path.join(_root, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
     try:
-        if os.path.isdir(_d):
-            _s = _h.sha256()
-            for _n in sorted(os.listdir(_d)):
-                if not _n.endswith(".java"):
-                    continue
-                _s.update(_n.encode())
-                with open(os.path.join(_d, _n), "rb") as _f:
-                    _s.update(_f.read())
-            return _s.hexdigest()[:16]
+        import sys as _sys
+        _b = os.path.join(_root, "tools", "p2w-bench")
+        if _b not in _sys.path:
+            _sys.path.insert(0, _b)
+        import regress as _rg
+        _fp = _rg.engine_fingerprint("docx")
+        if _fp and _fp != "NO-ENGINE-DIR":
+            return _fp
     except Exception:
         pass
     import subprocess as _sp
