@@ -198,3 +198,4 @@
 | 27 Nov 18:58 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 27 Nov 19:15 | fixer | slot claimed - fixer running |
 | 27 Nov 19:56 | fixer | attempt t01_word_accuracy -> kept (3/6 moved) |
+| 27 Nov 20:01 | fixer | slot FORCED released - see INCIDENTS.md for why |
