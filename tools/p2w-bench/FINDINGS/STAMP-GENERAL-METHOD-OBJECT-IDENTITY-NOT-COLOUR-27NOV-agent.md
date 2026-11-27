@@ -286,3 +286,43 @@ corrected.
 **What to do first, before anything else in this file:** rebuild the stamp rect as the ink box, re-measure
 one document, and check the size delta goes to zero. If it does, every geometry problem in this work was
 this one line.
+
+## The ink-box fix works. 06 is now within half a point.
+
+Rebuilt the stamp rect as the ink box - path box expanded by half the stroke width on every side - and
+measured again through Google.
+
+**Local check first, before spending a Google export:** the render's ink bounding box against the new
+rect came out within **0.09, 0.12, 0.02 and 0.15 pt** on 01, 02, 06 and 07, against errors of -1.2, -3.4,
+-5.0 and -2.2 before. The line does what it was expected to do.
+
+**Then through Google:**
+
+    06  offset +0.5, +0.2   size -1.0, -0.5   ink  -7%    OK
+        (was +2.9, +2.9, size -5.5, -5.8, ink +32%)
+
+**06 is fixed** - position, size and ink all inside tolerance, and PAID's opacity measured at 0.55 and
+applied, which is the semi-transparency the source actually has.
+
+    07  offset +0.0, +1.9   size +0.0, +3.8   ink -52%   still wrong
+
+### What is left on 07, and it is the opacity estimator again
+
+The estimator returned **0.88** for both of 07's text spans, and 07's text is fully opaque in the source.
+The span's bounding box includes background pixels, so the median of the covered pixels is dragged below
+1.0 - and drawing fully-opaque text at 0.88 makes it lighter, which is the -52 percent ink.
+
+**Clamp it:** if the median comes out above about 0.85, the text is opaque and the estimate is measuring
+its own background. Use 1.0. The clamp is needed because the estimator cannot tell "text drawn at 88
+percent" from "opaque text in a box that is 12 percent background", and the second is far more common.
+
+### Where the stamp work now stands
+
+    proved     object identity removes foreign content - 06 and 07 both clean of ghost and holes
+    proved     the ink-box rect - local error under 0.15 pt on all four documents
+    proved     measured opacity - 06's PAID at 0.55, applied, ink -7%
+    fixed      06 end to end through Google: +0.5/+0.2, size -1.0/-0.5, ink -7%
+    open       07: opacity over-estimated at 0.88 against a true 1.0; clamp and re-run
+    open       02: font-metric drift, about 4 pt
+    open       10, 12, 14: the three shapes the flow cannot enter
+    open       the count of affected documents
