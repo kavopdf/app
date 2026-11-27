@@ -584,7 +584,15 @@ measured, and changing constructs for it risks the paginated render that is the 
 breaks**; ours carries **none** (`w:br` = 0, `sectPr` = 1). Breaks give a reflowing viewer something to hold
 on to. That is an observation, not a recommendation.
 
-## `SETTLED.md` is 495 lines, not 87
+## `SETTLED.md` is far longer than the brief says, and that matters
 
-The brief says it is 87 lines and takes two minutes. **That has not been true for some time.** A run that
-budgets two minutes for it will skim it, and everything above is in the part it skims.
+The brief tells a run that this file is 87 lines and takes two minutes. **It has not been true for a long time.**
+A run that budgets two minutes for it will skim exactly the sections that cost the most to learn - the stamp
+method, the `lineRule` clipping, the tab-stop overlap, and the pageless decision.
+
+**The brief now carries the real number, and it says to read the newest sections first.** Everything added on
+27 November sits at the bottom of the file, after 400 lines of older material, so a run that reads top-down and
+stops early misses all of it.
+
+**Read the last six sections before anything else in this file.** They are the ones a run will otherwise
+rediscover the hard way.
