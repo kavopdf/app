@@ -17,11 +17,9 @@
       }
     ]
   },
-  "fixer_doing": "corpus-slice: 6 of 7 converted",
-  "fixer_doing_since": 1795778874.1220315,
   "fixer_engine_at_claim": "8fb4f503",
   "fixer_last_beat": 1795778874.1220322,
-  "fixer_started": 1795778423.2175019,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
