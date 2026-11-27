@@ -139,7 +139,28 @@ Nothing in it touches `app/`.
 
 ---
 
-## The stamp method is solved and proved. It needs applying, not deriving.
+## The stamp method is proved in principle, NOT solved in practice. Read SETTLED.md first.
+
+**This section is superseded.** The seven entries under "Stamps:" in `SETTLED.md` are the current state.
+What changed since this section was written:
+
+- **The six rules below are still correct** and still worth reading, but rule 1 ("the most common non-black
+  colour among the drawings near the anchor") is **not enough** - a stamp's ink is a **set** of colours, and
+  rule 1 breaks on any two-tone stamp.
+- **"Solved and proved" is not true.** Colour cannot locate a stamp at all; three discriminators were measured
+  and all three failed. The locator is geometric now: rotated text (14 of 16), an image (1), a closed tall
+  path (1).
+- **Five colour masks were built and all five failed.** They are listed in `SETTLED.md` so none is rebuilt.
+- **The rect is the ink box, not the stroke's centre path** - that single line was every geometry error.
+- **12_stamp_across_page_break is one stamp drawn across a page boundary**, at y -16.4 on page 1. Locating it
+  works; rendering it needs stitching and is not built.
+- **The count is 16, not 52.** The locator returns 52 candidates and includes rotated tables, page borders,
+  photographs and callout boxes.
+
+**Read `SETTLED.md` for the numbers. Read
+`FINDINGS/STAMP-GENERAL-METHOD-OBJECT-IDENTITY-NOT-COLOUR-27NOV-agent.md` for the measurements.**
+
+### The original section, kept for the rules that still hold
 
 Written 27 Nov by the agent, after proving it end to end on one real document.
 
