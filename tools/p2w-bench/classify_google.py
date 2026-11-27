@@ -35,25 +35,24 @@ def _engine_now():
     """The engine the corpus is built from right now - THE SAME QUANTITY THE STORE IS STAMPED WITH.
 
     THE STAMP IS NOT A COMMIT. Every verdict in benchmarks/gverify/ is keyed on
-    `sha256(name+bytes of every app/.../engine/*.java)[:16]` (gvbatch.py:26-76, the same quantity as
-    regress.py:engine_fingerprint()). This function answered `git log -1 --format=%h -- engine/`, an
+    `sha256(name+bytes of the .docx engine sources)[:16]` (gvbatch.py:26-76, the same quantity as
+    regress.py:engine_fingerprint("docx"), TxtWriter.java excluded - it cannot change a .docx byte). This function answered `git log -1 --format=%h -- engine/`, an
     8-char abbreviation, so the coverage paragraph below compared it with a 16-char source hash and
     printed "HEAD is 85b8735f and 0 of the 212 Google results were measured on it" over 212 rows that
     were all measured on this tree's engine (981ff1fa35e2cf67). Measured 25 Nov; report.py carried the
     identical defect in engine_now(), and it is fixed the same way there.
     """
-    import hashlib as _h
-    _d = os.path.join(ROOT, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
+    # THE SCOPE, NOT EVERY .java. 27 Nov: this hashed EVERY file in engine/, so on a tree whose
+    # store was stamped `a05b20eb05fe0fc8` (the .docx sources, TxtWriter.java excluded) it printed
+    # `HEAD is 72ff003db5871587 and 0 of the 206 Google results were measured on it` - a hash that
+    # differed from the stamp by one file the .docx pipeline never reads. gverify._engine_now() and
+    # report.engine_now() were corrected the same way the same day; this reader was missed. The
+    # quantity is the one the store is stamped with: regress.engine_fingerprint("docx").
     try:
-        if os.path.isdir(_d):
-            _s = _h.sha256()
-            for _n in sorted(os.listdir(_d)):
-                if not _n.endswith(".java"):
-                    continue
-                _s.update(_n.encode())
-                with open(os.path.join(_d, _n), "rb") as _f:
-                    _s.update(_f.read())
-            return _s.hexdigest()[:16]
+        import regress as _rg
+        _fp = _rg.engine_fingerprint("docx")
+        if _fp and _fp != "NO-ENGINE-DIR":
+            return _fp
     except Exception:
         pass
     try:
