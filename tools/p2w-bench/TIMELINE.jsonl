@@ -8428,3 +8428,5 @@
 {"t": 1795738216.0486636, "ist": "05:40:16", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
 {"t": 1795738216.2361724, "ist": "05:40:16", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
 {"t": 1795738262.5120244, "ist": "05:41:02", "ev": "beat", "d": "corpus-slice: 6 of 7 converted"}
+{"t": 1795738325.551494, "ist": "05:42:05", "ev": "beat", "d": "txt reader: patching _txt_lines to keep the form feed, then full txt re-measure"}
+{"t": 1795738493.4334304, "ist": "05:44:53", "ev": "beat", "d": "attempt.py: recording an attempt"}

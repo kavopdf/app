@@ -2147,7 +2147,7 @@
   "status": "OPEN"
  },
  "t09_page_furniture": {
-  "attempts": 2,
+  "attempts": 3,
   "first_seen": null,
   "history": [
    {
@@ -2167,18 +2167,31 @@
     "outcome": "lead",
     "reason": "the band arm the FINDINGS patch uses reads 0 of 29 (the .txt has no form feeds: segs=1), and dropping one-char keys alone leaves Date 6 vs 3; a correct fix needs an aligner plus a full 213-doc .txt re",
     "total": null
+   },
+   {
+    "at": "2026-11-27 05:44",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "gate: restore DocxWriter to 9f0a8207, the engine both tables were measured on"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "txt reader: verify_txt.py _txt_lines dropped the form-feed separator line (l.strip() is empty for U+000C), so every multi-page .txt was read as one segment. Patched to keep it and re-scored the whole ",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "aa496ebe",
+  "last_engine": "ee5a00d6",
   "outcomes": [
    "kept",
+   "lead",
    "lead"
   ],
-  "reason": "the band arm the FINDINGS patch uses reads 0 of 29 (the .txt has no form feeds: segs=1), and dropping one-char keys alone leaves Date 6 vs 3; a correct fix needs an aligner plus a full 213-doc .txt re-measure, which did not fit",
+  "reason": "txt reader: verify_txt.py _txt_lines dropped the form-feed separator line (l.strip() is empty for U+000C), so every multi-page .txt was read as one segment. Patched to keep it and re-scored the whole corpus with txt_rank.py --all: 213 documents, 12 failing check-instances before, 12 after, 0 worse 0 better. The reader is now truthful but no check consumes segmentation, so this unblocks nothing on its own - it corrects the t09 lead's premise ('blocked on an aligner plus a full txt re-measure'): the band arm needs a segment-consuming check that does not exist yet. See FINDINGS/TXT-READER-DROPS-THE-PAGE-SEPARATOR-27NOV-fixer.md",
   "reasons": [
    "verify_txt.py only, no engine change: a furniture key with no letter in it is not furniture (_furniture_key folds digits to '#', so 324's numeric table cells invented 18 owed and 1437 present - 66/1485 -> 48/48), and owed is now counted per drawn occurrence, not per page (gst-invoice-multipage-item-table draws 'Page N of 4' twice per page: 39/43 -> 43/43). Full 213 re-scored with the real verify_txt.compare() on a fresh conversion: head 197 clean, each fault alone 198, zero ok->fail flips on any check of any document. The two landed together; the combination was bounded but not re-scored - 324 can only hold or stay failing. RANKING-TXT.csv is now stale and needs restamp_txt.py.",
-   "the band arm the FINDINGS patch uses reads 0 of 29 (the .txt has no form feeds: segs=1), and dropping one-char keys alone leaves Date 6 vs 3; a correct fix needs an aligner plus a full 213-doc .txt re-measure, which did not fit"
+   "the band arm the FINDINGS patch uses reads 0 of 29 (the .txt has no form feeds: segs=1), and dropping one-char keys alone leaves Date 6 vs 3; a correct fix needs an aligner plus a full 213-doc .txt re-measure, which did not fit",
+   "txt reader: verify_txt.py _txt_lines dropped the form-feed separator line (l.strip() is empty for U+000C), so every multi-page .txt was read as one segment. Patched to keep it and re-scored the whole corpus with txt_rank.py --all: 213 documents, 12 failing check-instances before, 12 after, 0 worse 0 better. The reader is now truthful but no check consumes segmentation, so this unblocks nothing on its own - it corrects the t09 lead's premise ('blocked on an aligner plus a full txt re-measure'): the band arm needs a segment-consuming check that does not exist yet. See FINDINGS/TXT-READER-DROPS-THE-PAGE-SEPARATOR-27NOV-fixer.md"
   ],
   "requeues": 0,
   "status": "OPEN"

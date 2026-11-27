@@ -1,11 +1,24 @@
 {
- "started_ts": 1795737700.1372125,
- "started": "05:31",
- "window_for_claim": 1795737700.1372125,
- "ended_ts": null,
+ "agents": [
+  {
+   "delegated": "2026-11-27T05:20",
+   "result": "refuted the .docx half of t09; found verify_txt.py:939 drops the form-feed separator (confirmed by the fixer)",
+   "returned": "FINDINGS/t09-PAGE-FURNITURE-RELAY-27NOV-relay.md",
+   "title": "t09 page furniture lead"
+  },
+  {
+   "delegated": "2026-11-27T05:22",
+   "result": "16 refuted hypotheses + the row-rung pair patch, which the fixer measured and refused as a trade",
+   "returned": "FINDINGS/18-displacement-RELAY-CENSUS-27NOV-relay.md",
+   "title": "18_displacement next test"
+  }
+ ],
+ "attempts": 2,
+ "docs_improved": 0,
  "ended": null,
- "attempts": 1,
+ "ended_ts": null,
  "kept": 0,
- "agents": [],
- "docs_improved": 0
+ "started": "05:31",
+ "started_ts": 1795737700.1372125,
+ "window_for_claim": 1795737700.1372125
 }
