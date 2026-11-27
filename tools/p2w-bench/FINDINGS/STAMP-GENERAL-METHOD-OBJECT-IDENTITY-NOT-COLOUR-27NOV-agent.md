@@ -142,3 +142,75 @@ rediscovering that.
 
 That a stamp image is clean of foreign content until test 1 above passes on that document. On documents
 where body text or rules cross the stamp, the current build is not clean, and no mask will make it so.
+
+## The method built and measured, four documents
+
+The general method above was implemented as a proof of concept in Python/PyMuPDF, replacing step 2's
+object-level render with a reconstruction of the stamp's own objects onto a blank page. It is not the
+final implementation - the engine should copy the operator subset - but it is enough to prove the
+principle and to find what breaks.
+
+**Result, measured through a real Google export against each source PDF:**
+
+| document | ghost | holes | position | size | colour |
+|---|---|---|---|---|---|
+| 01 red 15 degree | none | none | dx +0.0 dy +0.2 | exact | exact |
+| 02 green 15 degree | none | none | dx +0.2 dy +2.4 | -0.7, -3.4 | exact |
+| 06 PAID | **none** (was ghosted) | none | **+2.2/+2.2 -> +0.2/+0.2** | **-4.6/-5.0 -> -0.7/-0.2** | **PAID too dark** |
+| 07 QUALITY APPROVED | **none** | **none** (was holed) | **+0.0/-4.1 -> +0.0/+1.9** | -2.2 -> +3.1 | exact |
+
+**The two documents that every colour mask failed on - 06 ghosted, 07 holed - are clean under object
+reconstruction.** No ghost, no hole, because the body text is not on the page the stamp is drawn on.
+That is the whole point of the method and it holds.
+
+## Two things still wrong, and both are named precisely
+
+### 1. Position and size are not exact - fix by not trusting the reconstruction
+
+The reconstruction draws the objects approximately: line caps, joins and font metrics differ from the
+PDF's own renderer, so the image's ink lands a few points off and a few points short. Measured: 07 came
+out 3.1 pt taller than its source, 02 4.3 pt short.
+
+**Do not correct these by tuning. Crop the rendered image to its own ink bounding box and place that
+box at the stamp's rect with the stamp rect's exact size.** Then the ink lands on the stamp rect by
+construction, whatever the reconstruction did:
+
+    render the objects on a blank page
+    find the ink bbox inside that render
+    crop the image to that bbox
+    place the cropped image at (stamp.x0, stamp.y0) with extent (stamp.width, stamp.height)
+
+This is self-correcting and it is general - it assumes nothing about which objects were drawn or how
+well. It removes reconstruction error from position and size entirely, leaving only colour to get right.
+
+### 2. Colour saturation - the text's opacity is not in `get_text()`
+
+`06`'s **PAID** comes out fully opaque when the source draws it at about 67 percent. `PyMuPDF` does not
+report the alpha: `get_texttrace()` returns `alpha=None` for every span on that page, including PAID at
+44 pt. The alpha lives in the content stream's `ExtGState`, which is not exposed per span.
+
+**The opacity has to be measured from the render, not read from the API.** The stamp's ink colour is
+known, so a pixel's coverage along the paper-to-ink line *is* the opacity it was drawn at:
+
+    t = (255 - pixel) . (255 - ink) / |255 - ink|^2
+
+For PAID that gives about 0.67. Apply it with `fill_opacity` when the text is drawn.
+
+**A first attempt at this returned 1.0 for every span and was wrong.** The estimator took the 90th
+percentile of `t` inside the span's bounding box, and PAID's box is close enough to the border that the
+border's fully-opaque pixels dominated that percentile. **Use the median of the covered pixels, not a
+high percentile**, so a mostly-opaque neighbour cannot outvote the text.
+
+## What this proves and what it does not
+
+**Proved:** separating by object identity removes foreign content completely, on the two documents where
+five colour masks all failed. That was the open question and it is answered.
+
+**Not proved:** that the reconstruction is pixel-exact. It is not, and it does not need to be - the
+self-correcting placement absorbs the geometry error, and the measured opacity absorbs the colour error.
+But neither of those corrections has been run end to end yet.
+
+**The engine should still do the real thing** - copy the stamp's operators into a fresh page and render
+that - rather than reconstructing from `get_drawings()` and `get_text()`. Reconstruction loses whatever
+the API does not expose, and this work has now found two things it does not expose: the text's alpha,
+and the exact stroke cap and join. Operator copying loses nothing.

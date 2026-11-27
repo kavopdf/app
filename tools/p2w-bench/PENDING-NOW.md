@@ -226,3 +226,27 @@ Still proved and unchanged: the crop is the union of the stamp's drawings and it
 in **points** not pixels; every anchor overlapping the stamp rect belongs to it, of any kind; never
 redact; RGBA, one floating anchor, `wrapNone`; position through a real Google export at 0.0 to 0.7 pt on
 ten documents.
+
+---
+
+## Stamp work: the method is proved, two corrections are named and not yet run
+
+`FINDINGS/STAMP-GENERAL-METHOD-OBJECT-IDENTITY-NOT-COLOUR-27NOV-agent.md` - read the last section first.
+
+Object reconstruction was built as a proof of concept and measured through Google on four documents.
+**The two that every colour mask failed on - 06 ghosted, 07 holed - are clean under it.** No ghost, no
+hole, because the body text is not on the page the stamp is drawn on. That was the open question.
+
+Two things are still wrong and both have a named fix, neither of which has been run end to end:
+
+1. **Position and size drift a few points** because the reconstruction draws approximately. **Do not tune
+   it.** Crop the rendered image to its own ink bbox and place that box at the stamp rect with the stamp
+   rect's exact size - then the ink lands on the rect by construction.
+2. **06's PAID comes out fully opaque against a source opacity of about 0.67.** `get_texttrace()` returns
+   `alpha=None` for every span, so the opacity must be measured from the render: the coverage along the
+   paper-to-ink line. **Use the median of covered pixels, not a high percentile** - a first attempt used
+   the 90th percentile and the border's opaque pixels outvoted the text, returning 1.0 for everything.
+
+**The engine should copy the stamp's operators into a fresh page rather than reconstructing from
+`get_drawings()` and `get_text()`.** Reconstruction has now lost two things the API does not expose: the
+text's alpha, and the exact stroke cap and join. Operator copying loses nothing.
