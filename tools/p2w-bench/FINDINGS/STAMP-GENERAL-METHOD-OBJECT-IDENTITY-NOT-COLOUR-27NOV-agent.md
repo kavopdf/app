@@ -549,3 +549,48 @@ one it is nearest.
 
 **What is settled: all three are enterable, and the reason 14 was never enterable is that its ink is two
 colours and the rules were written for one.**
+
+## The rarity rule is disproved. Measured across sixteen documents, it does not separate anything.
+
+The section above proposed that the stamp's ink is every colour that is rare and is not the body text
+colour. That was a guess dressed as a rule. It was then measured on every stamp document in the corpus, and
+it fails.
+
+    stamp colour counts:  2 2 2 3 4 4 4 4 4 4 4 4 5 5 5 5 5 5
+    body  colour counts:  4 4 5 5 5 6 7 8 8 8 8 9 11 16 18 18 32 32
+
+**The two ranges overlap completely.** A stamp colour can appear five times; a body colour can appear four.
+No threshold drawn anywhere separates them.
+
+**Two documents break the rule outright:**
+
+    15_stamp_on_scanned_page   body colour (0.75,0.05,0.05) x4   - the same as the stamp
+    43_red_stamp_over_black_text  body colour (0.85,0.08,0.08) x5 - the same as the stamp
+
+On those, the stamp's colour **is** the most common colour on the page. "Not the body text colour" cannot
+identify it, because it is the body text colour.
+
+**Saturation does not rescue it either.** 312's body text is `(0.25,0.25,0.55)`, saturation 0.30, against a
+stamp at `(0.48,0.12,0.12)`, saturation 0.36. Six hundredths apart. Any threshold between them would be a
+number fitted to one document.
+
+### What this means
+
+**Colour cannot locate the stamp. Not by rarity, not by saturation, not by hue.** Sixteen documents is
+enough to say so with confidence, and it is the same conclusion this whole file keeps arriving at from
+different directions: **appearance does not identify the stamp, because every stamp's appearance is
+different and some stamps look exactly like the text around them.**
+
+### The locator has to be geometric
+
+What actually distinguishes a stamp on every one of the sixteen:
+
+- it is **rotated**, or its glyphs sit off the document's baseline grid
+- it **overlaps** body text rather than flowing with it
+- it is painted **after** the text it covers
+
+None of those is a colour. The locator should be: find the objects that are rotated or off-grid, and take
+the cluster. That has not been built and it has not been measured - it is the next thing to try, and unlike
+the rarity rule it is testable against the same sixteen documents.
+
+**Do not build on the rarity rule. It was measured and it is wrong.**
