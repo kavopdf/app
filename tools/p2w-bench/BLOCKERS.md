@@ -1387,3 +1387,37 @@ mechanism that survives a zombie, and both check the same `round.py --claim-fixe
 Trend, from `progress.py`: docx open 60 to 59, txt failing 8 to 8, google 205 to 205, google clean 47 to
 47. One column moved. txt failing has now read 8 on two consecutive rows and google clean 47 on two, with
 the fixer's 3 attempts in 3 h beside it - the fixer is attempting and the corpus is not moving.
+
+## 27 Nov 09:28 - the ruled-row sub-construct of `18_displacement` is PARKED, with the measurement
+
+**What was believed.** A ruled row's horizontal rule costs 0.75 pt of row height in Google and nothing in
+LibreOffice, and the 27 Nov 09:13 probe found that a `w:pBdr` on the cell paragraph reads 15.00 in BOTH
+renderers where `tblBorders/insideH` and `tcBorders/bottom` read 15.75. It was recommended as "the
+exception" that the LibreOffice gate cannot refuse.
+
+**What was measured.** Three builds of that construct on `303_discharge_summary`, the document the probe
+named as its first proof target, rendered with LibreOffice and compared against the source PDF's own rule
+boxes. The source draws five stroked rectangles at 273.38/288.38/303.38/318.38/333.37/348.37 and the
+**unmodified engine already reproduces them exactly** (273.2/288.2/303.2/318.2/333.2/348.2). The pBdr
+builds put the rule on the PARAGRAPH's box instead: 3.9 pt high for `w:bottom`, 10.45 pt low for `w:top`,
+and `w:after` sized to reach the row's bottom edge makes the row grow (table bottom 348.2 -> 350.0) before
+the border arrives, because `trHeight` is `atLeast`.
+
+**Why the probe could not see it.** It measured the PITCH between the new rules, not their position.
+Three rules at 15.00/15.00/15.00 read "pitch 15.00" wherever they sit. A uniform offset has zero pitch
+error. This is a method correction, not a class note: **when a construct moves a rule, measure the rule's
+absolute y against the page's, never the pitch between rules.**
+
+**The reach.** The change would have moved 177 `insideH` rules across 77 of the 213 built documents.
+And the construct is only placeable at all where the cell paragraph's box fills the row: of those 77
+documents, **2** have any such row (8 rows each, `041122-Account_Opening_Form` and its fillable twin).
+So the construct cannot carry the corpus's common cell paragraph - `w:before=209 w:line=11 exact` inside a
+15 pt row - in either edge.
+
+**Status: parked for the ruled-row branch, not for the class.** Do not spend another slot on `w:pBdr` in
+the cell paragraph without a different placement mechanism. `18_displacement` is still open on 55.5 clean
+documents and the next run should take a non-ruled branch or another check.
+
+Evidence: `FINDINGS/18_displacement-PBDR-IN-CELL-PARAGRAPH-REFUTED-IN-LIBREOFFICE-27NOV-relay.md` and the
+patch beside it (87 lines, `-Dp2w.pbdr=true`, inert). Engine byte-identical to HEAD; `regress.py --check`
+PASS; nothing kept.

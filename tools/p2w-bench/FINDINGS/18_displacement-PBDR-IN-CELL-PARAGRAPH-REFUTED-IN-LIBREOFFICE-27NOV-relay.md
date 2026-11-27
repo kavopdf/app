@@ -106,6 +106,16 @@ its `18_displacement` failure is the rule charge, the construct is still availab
 patch beside this file is the starting point. What is now measured is that it is **not** available for
 the corpus's common cell paragraph, which is the one with `before=209 line=11 exact`.
 
+## 7b. Where the construct could still be placed at all, counted
+
+A `w:pBdr` on the cell paragraph can only land on the row's edges where the paragraph's box **is** the
+row's box. Counted over the 213 built `.docx`: of the 77 documents that carry an `insideH` rule, **2**
+have any ruled row whose cell paragraph satisfies that (`w:before` <= 2 twips and `before + line` >=
+98 % of `trHeight`) - `041122-Account_Opening_Form` and its fillable twin, 8 rows each of 88. So the
+construct cannot carry the corpus's common cell paragraph, which is `w:before=209 w:line=11 exact`
+inside a 15 pt row, on either edge. That census is why this is parked for the ruled-row branch rather
+than retried with a different edge.
+
 ## 8. What this run did not do
 
 No Google call. None was needed: the proxy refuses all three builds on the document the lead named, and
