@@ -2,21 +2,22 @@
  "name": "22_invoice_four_columns_txtpos",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-27T15:23:20",
- "passed": 41,
+ "at": "2026-11-27T15:58:44",
+ "passed": 40,
  "total": 42,
  "failed": [
-  "18_displacement"
+  "18_displacement",
+  "46_text_crossing_rule"
  ],
  "displacement": {
-  "med_dy": -3.6,
-  "worst_dy": 6.3,
+  "med_dy": -1.1,
+  "worst_dy": 5.2,
   "med_dx": -0.4,
   "bad_pages": [
    0
   ],
   "runs_matched": 71
  },
- "engine": "f4ce54f257d15f1c",
- "checks": "377699-1795790091"
+ "engine": "a05b20eb05fe0fc8",
+ "checks": "377699-1795794744"
 }
