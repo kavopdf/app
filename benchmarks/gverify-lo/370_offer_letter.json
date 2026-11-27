@@ -1,11 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/370_offer_letter.pdf",
-  "render": "/scratch/tmp/lo-one-adjq8_1g/370_offer_letter.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-t492ad4i/370_offer_letter.pdf",
+  "passed": 46,
   "total": 47,
-  "failed": [],
-  "engine": "a4d8fca469bba636",
-  "ok": true,
+  "failed": [
+    "18_displacement"
+  ],
+  "engine": "d28ca7516c3f9165",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,19 +51,21 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": -0.0,
-        "worst_dy": 0.5,
+        "med_dy": -1.0,
+        "worst_dy": 3.5,
         "med_dx": 0.1,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 37
       }
     },
     "23_line_pitch": {
       "source": 18.3,
-      "render": 18.3,
+      "render": 17.8,
       "ok": true
     },
     "25_invisible_text": {
@@ -276,5 +280,5 @@
   },
   "document": "370_offer_letter",
   "source_file": "/scratch/work/p2w/corpus/370_offer_letter.pdf",
-  "render_file": "/scratch/tmp/lo-one-adjq8_1g/370_offer_letter.pdf"
+  "render_file": "/scratch/tmp/lo-one-t492ad4i/370_offer_letter.pdf"
 }

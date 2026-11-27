@@ -1,11 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/table-with-merged-cells.pdf",
-  "render": "/scratch/tmp/lo-one-n__yqkgp/table-with-merged-cells.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-ucspdzdu/table-with-merged-cells.pdf",
+  "passed": 46,
   "total": 47,
-  "failed": [],
-  "engine": "025fe9deda5ac7b1",
-  "ok": true,
+  "failed": [
+    "18_displacement"
+  ],
+  "engine": "d28ca7516c3f9165",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,13 +51,15 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 0.5,
-        "worst_dy": 0.7,
+        "med_dy": -1.0,
+        "worst_dy": 2.6,
         "med_dx": 0.6,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 87
       }
     },
@@ -276,5 +280,5 @@
   },
   "document": "table-with-merged-cells",
   "source_file": "/scratch/work/p2w/corpus/table-with-merged-cells.pdf",
-  "render_file": "/scratch/tmp/lo-one-n__yqkgp/table-with-merged-cells.pdf"
+  "render_file": "/scratch/tmp/lo-one-ucspdzdu/table-with-merged-cells.pdf"
 }

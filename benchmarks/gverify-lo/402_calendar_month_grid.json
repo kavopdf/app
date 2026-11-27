@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/402_calendar_month_grid.pdf",
-  "render": "/scratch/tmp/lo-one-hs2ev3m0/402_calendar_month_grid.pdf",
+  "render": "/scratch/tmp/lo-one-0whynpof/402_calendar_month_grid.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "a4d8fca469bba636",
+  "engine": "d28ca7516c3f9165",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.1,
-        "worst_dy": 0.8,
+        "med_dy": -0.9,
+        "worst_dy": 2.3,
         "med_dx": 0.6,
         "bad_pages": [],
         "runs_matched": 46
@@ -61,7 +61,7 @@
     },
     "23_line_pitch": {
       "source": 62.0,
-      "render": 62.0,
+      "render": 61.5,
       "ok": true
     },
     "25_invisible_text": {
@@ -276,5 +276,5 @@
   },
   "document": "402_calendar_month_grid",
   "source_file": "/scratch/work/p2w/corpus/402_calendar_month_grid.pdf",
-  "render_file": "/scratch/tmp/lo-one-hs2ev3m0/402_calendar_month_grid.pdf"
+  "render_file": "/scratch/tmp/lo-one-0whynpof/402_calendar_month_grid.pdf"
 }

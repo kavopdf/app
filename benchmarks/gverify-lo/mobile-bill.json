@@ -1,11 +1,14 @@
 {
   "source": "/scratch/work/p2w/corpus/mobile-bill.pdf",
-  "render": "/scratch/tmp/lo-one-1816n5xq/mobile-bill.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-3ah2qomi/mobile-bill.pdf",
+  "passed": 45,
   "total": 47,
-  "failed": [],
-  "engine": "025fe9deda5ac7b1",
-  "ok": true,
+  "failed": [
+    "18_displacement",
+    "59_shape_anchor"
+  ],
+  "engine": "d28ca7516c3f9165",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,19 +52,21 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 1.0,
-        "worst_dy": 2.0,
+        "med_dy": -3.5,
+        "worst_dy": 9.1,
         "med_dx": 0.6,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 112
       }
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 18.4,
+      "render": 17.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -227,8 +232,8 @@
     },
     "59_shape_anchor": {
       "source": 101,
-      "render": 101,
-      "ok": true
+      "render": 100,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 0,
@@ -276,5 +281,5 @@
   },
   "document": "mobile-bill",
   "source_file": "/scratch/work/p2w/corpus/mobile-bill.pdf",
-  "render_file": "/scratch/tmp/lo-one-1816n5xq/mobile-bill.pdf"
+  "render_file": "/scratch/tmp/lo-one-3ah2qomi/mobile-bill.pdf"
 }

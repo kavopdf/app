@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/373_leave_application_form.pdf",
-  "render": "/scratch/tmp/lo-one-ghc2xn6b/373_leave_application_form.pdf",
+  "render": "/scratch/tmp/lo-one-ks7qpv3r/373_leave_application_form.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "a4d8fca469bba636",
+  "engine": "d28ca7516c3f9165",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.4,
-        "worst_dy": 0.5,
+        "med_dy": -0.6,
+        "worst_dy": 1.1,
         "med_dx": 0.4,
         "bad_pages": [],
         "runs_matched": 32
@@ -276,5 +276,5 @@
   },
   "document": "373_leave_application_form",
   "source_file": "/scratch/work/p2w/corpus/373_leave_application_form.pdf",
-  "render_file": "/scratch/tmp/lo-one-ghc2xn6b/373_leave_application_form.pdf"
+  "render_file": "/scratch/tmp/lo-one-ks7qpv3r/373_leave_application_form.pdf"
 }

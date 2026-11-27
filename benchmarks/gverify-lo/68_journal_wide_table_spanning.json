@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/68_journal_wide_table_spanning.pdf",
-  "render": "/scratch/tmp/lo-one-9sl7iv50/68_journal_wide_table_spanning.pdf",
+  "render": "/scratch/tmp/lo-one-sp651u9g/68_journal_wide_table_spanning.pdf",
   "passed": 40,
   "total": 42,
   "failed": [
     "18_displacement",
     "59_shape_anchor"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -256,5 +256,5 @@
   },
   "document": "68_journal_wide_table_spanning",
   "source_file": "/scratch/work/p2w/corpus/68_journal_wide_table_spanning.pdf",
-  "render_file": "/scratch/tmp/lo-one-9sl7iv50/68_journal_wide_table_spanning.pdf"
+  "render_file": "/scratch/tmp/lo-one-sp651u9g/68_journal_wide_table_spanning.pdf"
 }

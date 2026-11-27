@@ -1,15 +1,14 @@
 {
   "source": "/scratch/work/p2w/corpus/text-held-twice-shadow-text.pdf",
-  "render": "/scratch/tmp/lo-one-3qzkch0v/text-held-twice-shadow-text.pdf",
-  "passed": 43,
+  "render": "/scratch/tmp/lo-one-rsa7x4bm/text-held-twice-shadow-text.pdf",
+  "passed": 44,
   "total": 47,
   "failed": [
     "13_text_colours",
-    "18_displacement",
     "25_invisible_text",
     "60_text_column_right_edge"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,21 +54,19 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 1,
-      "ok": false,
+      "render": 0,
+      "ok": true,
       "detail": {
-        "med_dy": 2.5,
-        "worst_dy": 2.9,
+        "med_dy": 0.3,
+        "worst_dy": 2.5,
         "med_dx": 0.6,
-        "bad_pages": [
-          0
-        ],
+        "bad_pages": [],
         "runs_matched": 47
       }
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 18.4,
+      "render": 17.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -284,5 +281,5 @@
   },
   "document": "text-held-twice-shadow-text",
   "source_file": "/scratch/work/p2w/corpus/text-held-twice-shadow-text.pdf",
-  "render_file": "/scratch/tmp/lo-one-3qzkch0v/text-held-twice-shadow-text.pdf"
+  "render_file": "/scratch/tmp/lo-one-rsa7x4bm/text-held-twice-shadow-text.pdf"
 }

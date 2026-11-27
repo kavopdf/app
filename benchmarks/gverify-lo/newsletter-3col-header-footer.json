@@ -1,26 +1,20 @@
 {
   "source": "/scratch/work/p2w/corpus/newsletter-3col-header-footer.pdf",
-  "render": "/scratch/tmp/lo-one-evcl7wph/newsletter-3col-header-footer.pdf",
-  "passed": 33,
+  "render": "/scratch/tmp/lo-one-q6l5fb0_/newsletter-3col-header-footer.pdf",
+  "passed": 39,
   "total": 42,
   "failed": [
-    "01_page_count",
-    "14_filled_shapes",
     "18_displacement",
-    "25_invisible_text",
-    "27_text_off_page",
-    "32_stroke_lines",
-    "44_header_footer",
-    "55_orientation_mix",
+    "26_text_overlap",
     "59_shape_anchor"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
-      "render": 2,
-      "ok": false
+      "render": 1,
+      "ok": true
     },
     "04_chars_missing": {
       "source": 0,
@@ -50,11 +44,11 @@
     "14_filled_shapes": {
       "source": 101728,
       "render": 103022,
-      "ok": false
+      "ok": true
     },
     "17_matched_runs": {
       "source": 129,
-      "render": 127,
+      "render": 129,
       "ok": true
     },
     "18_displacement": {
@@ -63,12 +57,12 @@
       "ok": false,
       "detail": {
         "med_dy": -0.2,
-        "worst_dy": 33.7,
+        "worst_dy": 28.4,
         "med_dx": 0.1,
         "bad_pages": [
           0
         ],
-        "runs_matched": 127
+        "runs_matched": 129
       }
     },
     "23_line_pitch": {
@@ -78,18 +72,23 @@
     },
     "25_invisible_text": {
       "source": 0,
-      "render": 2,
-      "ok": false
-    },
-    "26_text_overlap": {
-      "source": 0,
       "render": 0,
       "ok": true
     },
+    "26_text_overlap": {
+      "source": 0,
+      "render": 4,
+      "ok": false,
+      "detail": {
+        "wrap": 0,
+        "line_on_line": 4,
+        "anchored": 0
+      }
+    },
     "27_text_off_page": {
       "source": 0,
-      "render": 2,
-      "ok": false
+      "render": 0,
+      "ok": true
     },
     "28_clipped_at_edge": {
       "source": 0,
@@ -103,8 +102,8 @@
     },
     "32_stroke_lines": {
       "source": 3,
-      "render": 3,
-      "ok": false
+      "render": 0,
+      "ok": true
     },
     "34a_span_size_match": {
       "source": 100,
@@ -166,8 +165,8 @@
     },
     "44_header_footer": {
       "source": 9,
-      "render": 7,
-      "ok": false
+      "render": 9,
+      "ok": true
     },
     "45_char_accuracy": {
       "source": 100,
@@ -233,13 +232,13 @@
       ],
       "render": [
         0,
-        2
+        1
       ],
-      "ok": false
+      "ok": true
     },
     "59_shape_anchor": {
       "source": 9,
-      "render": 0,
+      "render": 5,
       "ok": false
     },
     "60_text_column_right_edge": {
@@ -263,5 +262,5 @@
   },
   "document": "newsletter-3col-header-footer",
   "source_file": "/scratch/work/p2w/corpus/newsletter-3col-header-footer.pdf",
-  "render_file": "/scratch/tmp/lo-one-evcl7wph/newsletter-3col-header-footer.pdf"
+  "render_file": "/scratch/tmp/lo-one-q6l5fb0_/newsletter-3col-header-footer.pdf"
 }

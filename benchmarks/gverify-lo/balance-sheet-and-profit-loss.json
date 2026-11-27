@@ -1,12 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/balance-sheet-and-profit-loss.pdf",
-  "render": "/scratch/tmp/lo-one-7jq6uxbq/balance-sheet-and-profit-loss.pdf",
-  "passed": 46,
+  "render": "/scratch/tmp/lo-one-h7qsrqy7/balance-sheet-and-profit-loss.pdf",
+  "passed": 45,
   "total": 47,
   "failed": [
+    "18_displacement",
     "60_text_column_right_edge"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -51,19 +52,22 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 2,
+      "ok": false,
       "detail": {
-        "med_dy": 0.5,
-        "worst_dy": 0.9,
+        "med_dy": -5.0,
+        "worst_dy": 11.6,
         "med_dx": 0.6,
-        "bad_pages": [],
+        "bad_pages": [
+          0,
+          1
+        ],
         "runs_matched": 173
       }
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 18.4,
+      "render": 17.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -278,5 +282,5 @@
   },
   "document": "balance-sheet-and-profit-loss",
   "source_file": "/scratch/work/p2w/corpus/balance-sheet-and-profit-loss.pdf",
-  "render_file": "/scratch/tmp/lo-one-7jq6uxbq/balance-sheet-and-profit-loss.pdf"
+  "render_file": "/scratch/tmp/lo-one-h7qsrqy7/balance-sheet-and-profit-loss.pdf"
 }

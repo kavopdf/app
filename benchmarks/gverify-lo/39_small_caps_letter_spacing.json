@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/39_small_caps_letter_spacing.pdf",
-  "render": "/scratch/tmp/lo-one-nssuj09y/39_small_caps_letter_spacing.pdf",
+  "render": "/scratch/tmp/lo-one-6ma4so3z/39_small_caps_letter_spacing.pdf",
   "passed": 40,
   "total": 42,
   "failed": [
     "43_within_10pt_x",
     "47_margins"
   ],
-  "engine": "a4d8fca469bba636",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -260,5 +260,5 @@
   },
   "document": "39_small_caps_letter_spacing",
   "source_file": "/scratch/work/p2w/corpus/39_small_caps_letter_spacing.pdf",
-  "render_file": "/scratch/tmp/lo-one-nssuj09y/39_small_caps_letter_spacing.pdf"
+  "render_file": "/scratch/tmp/lo-one-6ma4so3z/39_small_caps_letter_spacing.pdf"
 }

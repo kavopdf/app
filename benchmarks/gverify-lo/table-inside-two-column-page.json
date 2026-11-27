@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/table-inside-two-column-page.pdf",
-  "render": "/scratch/tmp/lo-one-xuraegvx/table-inside-two-column-page.pdf",
+  "render": "/scratch/tmp/lo-one-nhfthbf2/table-inside-two-column-page.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "18_displacement"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -5.2,
-        "worst_dy": 35.4,
+        "med_dy": -7.7,
+        "worst_dy": 87.3,
         "med_dx": 0.1,
         "bad_pages": [
           0
@@ -280,5 +280,5 @@
   },
   "document": "table-inside-two-column-page",
   "source_file": "/scratch/work/p2w/corpus/table-inside-two-column-page.pdf",
-  "render_file": "/scratch/tmp/lo-one-xuraegvx/table-inside-two-column-page.pdf"
+  "render_file": "/scratch/tmp/lo-one-nhfthbf2/table-inside-two-column-page.pdf"
 }

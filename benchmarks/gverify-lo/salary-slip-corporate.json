@@ -1,13 +1,14 @@
 {
   "source": "/scratch/work/p2w/corpus/salary-slip-corporate.pdf",
-  "render": "/scratch/tmp/lo-one-cfgjlw9i/salary-slip-corporate.pdf",
-  "passed": 45,
+  "render": "/scratch/tmp/lo-one-76o_7j71/salary-slip-corporate.pdf",
+  "passed": 44,
   "total": 47,
   "failed": [
     "18_displacement",
-    "53_embedded_faces"
+    "53_embedded_faces",
+    "59_shape_anchor"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,8 +56,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": 1.4,
-        "worst_dy": 4.0,
+        "med_dy": -1.9,
+        "worst_dy": 70.0,
         "med_dx": 0.5,
         "bad_pages": [
           0
@@ -66,7 +67,7 @@
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 18.4,
+      "render": 17.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -174,7 +175,7 @@
     },
     "47_margins": {
       "source": 0.6,
-      "render": 0,
+      "render": 2,
       "ok": true
     },
     "48_image_area": {
@@ -232,8 +233,8 @@
     },
     "59_shape_anchor": {
       "source": 94,
-      "render": 94,
-      "ok": true
+      "render": 85,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 0,
@@ -274,12 +275,12 @@
   "detail": {
     "47_margins": {
       "worst_median_pt": 0.6,
-      "worst_unregistered": 0,
+      "worst_unregistered": 2,
       "margin_bad": [],
       "indent_bad": []
     }
   },
   "document": "salary-slip-corporate",
   "source_file": "/scratch/work/p2w/corpus/salary-slip-corporate.pdf",
-  "render_file": "/scratch/tmp/lo-one-cfgjlw9i/salary-slip-corporate.pdf"
+  "render_file": "/scratch/tmp/lo-one-76o_7j71/salary-slip-corporate.pdf"
 }

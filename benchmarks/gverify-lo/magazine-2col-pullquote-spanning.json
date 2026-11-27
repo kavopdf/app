@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/magazine-2col-pullquote-spanning.pdf",
-  "render": "/scratch/tmp/lo-one-semr5ugw/magazine-2col-pullquote-spanning.pdf",
+  "render": "/scratch/tmp/lo-one-25rrcsf9/magazine-2col-pullquote-spanning.pdf",
   "passed": 40,
   "total": 42,
   "failed": [
     "43_within_10pt_x",
     "47_margins"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -260,5 +260,5 @@
   },
   "document": "magazine-2col-pullquote-spanning",
   "source_file": "/scratch/work/p2w/corpus/magazine-2col-pullquote-spanning.pdf",
-  "render_file": "/scratch/tmp/lo-one-semr5ugw/magazine-2col-pullquote-spanning.pdf"
+  "render_file": "/scratch/tmp/lo-one-25rrcsf9/magazine-2col-pullquote-spanning.pdf"
 }

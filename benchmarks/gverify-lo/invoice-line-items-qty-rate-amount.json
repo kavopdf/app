@@ -1,11 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/invoice-line-items-qty-rate-amount.pdf",
-  "render": "/scratch/tmp/lo-one-smptz_kt/invoice-line-items-qty-rate-amount.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-jq8jwuxh/invoice-line-items-qty-rate-amount.pdf",
+  "passed": 46,
   "total": 47,
-  "failed": [],
-  "engine": "025fe9deda5ac7b1",
-  "ok": true,
+  "failed": [
+    "18_displacement"
+  ],
+  "engine": "d28ca7516c3f9165",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,19 +51,21 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 0.4,
-        "worst_dy": 1.1,
+        "med_dy": -1.6,
+        "worst_dy": 5.1,
         "med_dx": 0.5,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 87
       }
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 18.4,
+      "render": 17.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -276,5 +280,5 @@
   },
   "document": "invoice-line-items-qty-rate-amount",
   "source_file": "/scratch/work/p2w/corpus/invoice-line-items-qty-rate-amount.pdf",
-  "render_file": "/scratch/tmp/lo-one-smptz_kt/invoice-line-items-qty-rate-amount.pdf"
+  "render_file": "/scratch/tmp/lo-one-jq8jwuxh/invoice-line-items-qty-rate-amount.pdf"
 }

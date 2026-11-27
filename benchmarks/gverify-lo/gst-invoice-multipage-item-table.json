@@ -1,11 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/gst-invoice-multipage-item-table.pdf",
-  "render": "/scratch/tmp/lo-one-mvcrfbfn/gst-invoice-multipage-item-table.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-uz89kmxj/gst-invoice-multipage-item-table.pdf",
+  "passed": 46,
   "total": 47,
-  "failed": [],
-  "engine": "025fe9deda5ac7b1",
-  "ok": true,
+  "failed": [
+    "18_displacement"
+  ],
+  "engine": "d28ca7516c3f9165",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 4,
@@ -49,19 +51,23 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 3,
+      "ok": false,
       "detail": {
-        "med_dy": 0.6,
-        "worst_dy": 2.0,
+        "med_dy": -1.4,
+        "worst_dy": 5.4,
         "med_dx": 0.6,
-        "bad_pages": [],
+        "bad_pages": [
+          0,
+          1,
+          2
+        ],
         "runs_matched": 373
       }
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 18.4,
+      "render": 17.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -276,5 +282,5 @@
   },
   "document": "gst-invoice-multipage-item-table",
   "source_file": "/scratch/work/p2w/corpus/gst-invoice-multipage-item-table.pdf",
-  "render_file": "/scratch/tmp/lo-one-mvcrfbfn/gst-invoice-multipage-item-table.pdf"
+  "render_file": "/scratch/tmp/lo-one-uz89kmxj/gst-invoice-multipage-item-table.pdf"
 }

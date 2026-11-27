@@ -1,11 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/bank-statement-5-pages.pdf",
-  "render": "/scratch/tmp/lo-one-x53s7bhh/bank-statement-5-pages.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-1qi6dzu2/bank-statement-5-pages.pdf",
+  "passed": 46,
   "total": 47,
-  "failed": [],
-  "engine": "025fe9deda5ac7b1",
-  "ok": true,
+  "failed": [
+    "18_displacement"
+  ],
+  "engine": "d28ca7516c3f9165",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 5,
@@ -49,19 +51,25 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 5,
+      "ok": false,
       "detail": {
-        "med_dy": 0.6,
-        "worst_dy": 1.0,
+        "med_dy": -4.9,
+        "worst_dy": 29.3,
         "med_dx": 0.6,
-        "bad_pages": [],
+        "bad_pages": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
         "runs_matched": 585
       }
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 18.4,
+      "render": 17.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -227,7 +235,7 @@
     },
     "59_shape_anchor": {
       "source": 520,
-      "render": 520,
+      "render": 440,
       "ok": true
     },
     "60_text_column_right_edge": {
@@ -276,5 +284,5 @@
   },
   "document": "bank-statement-5-pages",
   "source_file": "/scratch/work/p2w/corpus/bank-statement-5-pages.pdf",
-  "render_file": "/scratch/tmp/lo-one-x53s7bhh/bank-statement-5-pages.pdf"
+  "render_file": "/scratch/tmp/lo-one-1qi6dzu2/bank-statement-5-pages.pdf"
 }

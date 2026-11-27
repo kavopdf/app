@@ -1,11 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/admit-card.pdf",
-  "render": "/scratch/tmp/lo-one-6brld5xt/admit-card.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-_y2pribp/admit-card.pdf",
+  "passed": 46,
   "total": 47,
-  "failed": [],
-  "engine": "025fe9deda5ac7b1",
-  "ok": true,
+  "failed": [
+    "18_displacement"
+  ],
+  "engine": "d28ca7516c3f9165",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,19 +51,21 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 1.1,
-        "worst_dy": 1.5,
+        "med_dy": -1.3,
+        "worst_dy": 3.5,
         "med_dx": 0.6,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 75
       }
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 18.4,
+      "render": 17.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -276,5 +280,5 @@
   },
   "document": "admit-card",
   "source_file": "/scratch/work/p2w/corpus/admit-card.pdf",
-  "render_file": "/scratch/tmp/lo-one-6brld5xt/admit-card.pdf"
+  "render_file": "/scratch/tmp/lo-one-_y2pribp/admit-card.pdf"
 }

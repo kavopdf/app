@@ -1,12 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/gst-invoice-with-qr-code.pdf",
-  "render": "/scratch/tmp/lo-one-b4crf2le/gst-invoice-with-qr-code.pdf",
-  "passed": 46,
+  "render": "/scratch/tmp/lo-one-75u0hdjg/gst-invoice-with-qr-code.pdf",
+  "passed": 45,
   "total": 47,
   "failed": [
+    "18_displacement",
     "66_table_cell_width"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -51,19 +52,21 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 0.4,
-        "worst_dy": 1.4,
+        "med_dy": -0.8,
+        "worst_dy": 3.2,
         "med_dx": 0.5,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 98
       }
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 18.4,
+      "render": 17.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -278,5 +281,5 @@
   },
   "document": "gst-invoice-with-qr-code",
   "source_file": "/scratch/work/p2w/corpus/gst-invoice-with-qr-code.pdf",
-  "render_file": "/scratch/tmp/lo-one-b4crf2le/gst-invoice-with-qr-code.pdf"
+  "render_file": "/scratch/tmp/lo-one-75u0hdjg/gst-invoice-with-qr-code.pdf"
 }

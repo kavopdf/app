@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/gst-invoice-horizontal-rules-only.pdf",
-  "render": "/scratch/tmp/lo-one-zed_6yuj/gst-invoice-horizontal-rules-only.pdf",
+  "render": "/scratch/tmp/lo-one-jrl8k2ju/gst-invoice-horizontal-rules-only.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "60_text_column_right_edge"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -253,5 +253,5 @@
   },
   "document": "gst-invoice-horizontal-rules-only",
   "source_file": "/scratch/work/p2w/corpus/gst-invoice-horizontal-rules-only.pdf",
-  "render_file": "/scratch/tmp/lo-one-zed_6yuj/gst-invoice-horizontal-rules-only.pdf"
+  "render_file": "/scratch/tmp/lo-one-jrl8k2ju/gst-invoice-horizontal-rules-only.pdf"
 }

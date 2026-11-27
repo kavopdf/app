@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/price-list-right-aligned-amounts.pdf",
-  "render": "/scratch/tmp/lo-one-lai2yy83/price-list-right-aligned-amounts.pdf",
+  "render": "/scratch/tmp/lo-one-hz7azzyc/price-list-right-aligned-amounts.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "53_embedded_faces"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -253,5 +253,5 @@
   },
   "document": "price-list-right-aligned-amounts",
   "source_file": "/scratch/work/p2w/corpus/price-list-right-aligned-amounts.pdf",
-  "render_file": "/scratch/tmp/lo-one-lai2yy83/price-list-right-aligned-amounts.pdf"
+  "render_file": "/scratch/tmp/lo-one-hz7azzyc/price-list-right-aligned-amounts.pdf"
 }

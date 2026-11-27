@@ -1,16 +1,17 @@
 {
   "source": "/scratch/work/p2w/corpus/one-page-rotated-180-degrees.pdf",
-  "render": "/scratch/tmp/lo-one-jp8z1g63/one-page-rotated-180-degrees.pdf",
-  "passed": 42,
+  "render": "/scratch/tmp/lo-one-47ltvbtt/one-page-rotated-180-degrees.pdf",
+  "passed": 41,
   "total": 47,
   "failed": [
+    "18_displacement",
     "43_within_10pt_x",
     "59_shape_anchor",
     "60_text_column_right_edge",
     "62_table_columns",
     "63_table_rows"
   ],
-  "engine": "025fe9deda5ac7b1",
+  "engine": "d28ca7516c3f9165",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,19 +56,21 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
         "med_dy": 0.2,
-        "worst_dy": 1.0,
+        "worst_dy": 4.7,
         "med_dx": 0.2,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 122
       }
     },
     "23_line_pitch": {
       "source": 18.4,
-      "render": 18.4,
+      "render": 17.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -282,5 +285,5 @@
   },
   "document": "one-page-rotated-180-degrees",
   "source_file": "/scratch/work/p2w/corpus/one-page-rotated-180-degrees.pdf",
-  "render_file": "/scratch/tmp/lo-one-jp8z1g63/one-page-rotated-180-degrees.pdf"
+  "render_file": "/scratch/tmp/lo-one-47ltvbtt/one-page-rotated-180-degrees.pdf"
 }
