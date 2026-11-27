@@ -151,3 +151,40 @@ and which of the two depends on whether the object can be moved without recomput
 `benchmarks/corpus-extra/Prakashan_Print_Fidelity_Handbook.pdf` - 10 pages, all A4, uniform margins of 33.6 pt
 top and 39.7 pt left on pages 2 to 10, digital throughout, 30 images per page, four fonts. It is the document
 every measurement in this file was taken from.
+
+## Where the non-editable text actually is: 53 percent of it is inside textboxes
+
+Counted the containers in the `.docx`:
+
+    wps:txbx                     352
+    characters inside them    12,050   -> 53.2 percent of all text in the document
+    size spread: 0 chars = 0, under 20 = 132, 20 to 100 = 214, over 100 = 6
+
+**More than half the document's text sits inside a textbox, and Google rasterises `wps:txbx` - which was proved
+earlier in this work on a matched export, where the textboxes' text vanished and images appeared in its place.**
+
+**So the user's "much of the text is not editable" is 53.2 percent, and it is not the stamps.** Of the 352
+textboxes, **214 hold between 20 and 100 characters** - that is a label, a value, a short line of body text, not
+a stamp and not a decorative mark. Those are the ones costing editability.
+
+**The engine is putting ordinary content into textboxes rather than into paragraphs.** That single choice is
+what makes half the document uneditable, and it is the same choice that puts 505 `wp:anchor` elements into a
+10-page file.
+
+### This is not a separate defect from the overflow one
+
+A textbox is an absolutely positioned object. **The same property that makes Google rasterise it is the property
+that makes it impossible to move when the page overflows** - which is why the checklist and the code listing
+were deleted rather than shifted, and why the paragraphs that could move did.
+
+**One decision - put content in a textbox instead of a paragraph - produces both the rasterisation and the
+deletion.**
+
+## Still to do, and what it needs
+
+- **The same test on the other multi-page documents in `benchmarks/`** - three of them, 9, 9 and 3 pages - to
+  confirm the shift-plus-deletion mechanism is not specific to this one file. **Not run: the JDK and the built
+  engine were lost when the sandbox was recycled, and both must be fetched and rebuilt first** (the build script
+  fetches javac from Adoptium itself, so this is a two-command job).
+- **Which PDF objects became the five page-sized images.** The extent query did not match the drawing structure
+  and returned nothing, so this is unmeasured rather than empty.
