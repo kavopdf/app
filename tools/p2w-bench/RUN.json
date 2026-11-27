@@ -1,15 +1,14 @@
 {
- "agents": [
-  "18dA18_displacement-01",
-  "60tB60_text_column_right_edge-01"
- ],
- "attempts": 2,
- "docs_improved": 0,
- "ended": null,
+ "started_ts": 1795760641.5028195,
+ "started": "11:54",
+ "window_for_claim": 1795760641.5028195,
  "ended_ts": null,
+ "ended": null,
+ "attempts": 0,
  "kept": 0,
- "started": "11:15",
- "started_ts": 1795758318.9998863,
- "window_for_claim": 1795758318.9998863,
- "class": "18_displacement"
+ "agents": [
+  "18_dA-04",
+  "18_dB-02"
+ ],
+ "docs_improved": 0
 }
