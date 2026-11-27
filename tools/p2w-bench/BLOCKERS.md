@@ -1274,3 +1274,36 @@ the commit and stage.py therefore still prints measure-google with sixteen to go
 Also this pass: the LibreOffice half was refreshed with `--lo-stale` onto the current engine, 71 of 205
 pairs now, from 0. That backlog is not finished - the rest is picked up by the next pass, and the table
 prints its own coverage so no row is read as a statement about HEAD until its pair is on it.
+
+## 27 Nov 00:40 UTC - watchdog: nothing stopped; a fixer claimed at 00:26 and has been silent since
+
+Five stages, none stopped: measure-google moving at 197 of 213 (1.9 h), matrix done at 213 of 213
+(1.0 h), classify waiting (3.8 h - correct, the measurement it waits on is not committed), fix moving
+with 6 attempts in 3 h (0.2 h), txt moving at 205 clean and 8 failing (0.4 h).
+
+Today's trend row against yesterday: docx open 60 -> 59, txt failing 8 -> 8 no change, google
+205 -> 205 no change, google clean 47 -> 47 no change. `docx open` is the column that moved; `txt
+failing` has now read 8 on two consecutive rows and `google clean` 47 on two. The fixer's count beside
+that: 6 attempts in 3 h, RUN.json showing 3 attempts and 0 kept for the run that ended at 00:17 UTC.
+
+The google column cannot move while the sixteen held-back documents stand. The committed measurement is
+197 of 213, and every re-measurement of those sixteen is refused by the commit gate for the
+reverted-engine reason recorded in the two entries above (their headings say UTC but the times are IST -
+04:14 and 05:11 IST). That wall is about six hours old, not twenty-four, so it is not parked and no
+class is exhausted; the fixer is the stage that owns it and it is still attempting.
+
+**The fixer slot.** fixer_started 00:26:26 UTC; the newest beat is 00:15:36 UTC, which belongs to the
+run before it; no attempt and no RUN.json write since the claim commit at 00:26:27. `status.py` reads
+SILENT, claim 16 minutes old. CLAIM_STALE_MIN["fixer"] is 45, so the claim expires by itself at 01:11 UTC
+and the :50 slot at 01:50 UTC takes it. **I did not force-release it.** At 17 minutes the evidence is "no
+beacon", not "dead", and round.py's own record is that 48 of 60 force-reaped runs kept nothing. What
+would overturn that: the 01:50 slot also standing down, or the claim still holding after 01:11.
+
+**This watchdog has no `cron` tool**, so a paused or zombie cron cannot be moved by automation, and this
+run could not read the cron list at all. The calls I would have made: `cron(action="list")`, then
+`cron(action="runs", cron_id="<id from HEALTH-BRIEF's table>")` for the fix stage, and for a zombie
+`cron(action="delete", cron_id="<id>")` followed by `cron(action="create", name=<same>,
+schedule=<same>, prompt=<same>)`. What is unchecked as a result: whether the :50 fixer and :10 relay pair
+both exist and are enabled, whether either has a stale next_fire_at, and whether the 00:26 claim belongs
+to a live run or a zombie. The evidence for "moving" above therefore rests on the files in git, not on
+the scheduler.
