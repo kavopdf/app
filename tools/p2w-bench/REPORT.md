@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-27 23:17
+# Fixer report - 2026-11-28 01:27
 
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 23:17 → running IST · 39 min**
+**28 Nov 2026 · slot 01:27 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 3 code commit(s) in this window, first: p2w relay 27nov: beacon and round state vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 2 deployed vs no FINDINGS filename carries 63_tA-01, 63_tB-01 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - run window: RUN.json says this run began at 01:27 vs TIMELINE.jsonl records the claim at 00:18, so the window was reset and the duration is short |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,16 +26,26 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `63_table_rows` - taken from the pending list (62 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `63_table_rows` by hand instead |
+| Working on | `-` - taken from the pending list (65 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 23:55 | **lead** | 0/None | Root cause proved, not landed: table row placement IS ROW_RUNG_UNDER_TW (DocxWriter.java:54, from 8fb4f503). rung=0 reproduces RANKING.csv digit for digit on 4 docs (table-with-no-header-row 47.48->0. |
+| 01:27 | **reverted** | 0/0 | ROW_RUNG_UNDER_TW=0 reproduces four published table values digit for digit (table-with-no-header-row 47.48->0.61, boq 0.62, mobile-bill 1.55, electricity-bill 1.33) but the full 213-document measure i |
 
 ## Why nothing moved, in this run's own words
+
+> The 27 Nov run's claim was that `ROW_RUNG_UNDER_TW` is one constant whose deletion restores 84-96 documents. The four documents it named do come back, digit for digit, and I reproduced that on my own build. But the full corpus says the constant is a per-document trade, not a defect: 4 documents better, **63 worse**, 146 unchanged, measured on one engine, one conversion pass, 213 documents scored.
+>
+> The worst case is a dense two-column price list: `price-list-2col-dense-right-aligned` goes 2.69 -> 27.89. I converted that one document again on its own and scored it again, and got 27.89 - the regression is in the render, not in the table.
+>
+> The reason is mechanical. The rung subtracts a fixed 10 twips from every row that has 5 pt of foot room. On a long ruled table whose source pitch equals the page pitch, that subtraction is pure accumulated error and removing it is right. On a dense price list the rows are shorter than the pitch and the shortfall is what keeps each row's ink inside its own band; removing it lays every row low and the ink crosses the rules. One constant cannot be right for both. The correct fix computes the per-row difference between the source pitch and the room that row's own text needs - a real change, not a one-line edit, and the next run's build.
+>
+> So the change was reverted and nothing went into the engine. The measured table for the whole corpus at rung=0 is committed beside the finding so the next run does not pay the hour again, and the falsifier the previous run wrote for itself has fired and is recorded.
+
+### The run before this one said
 
 > The 84-96 table regressions are one constant, and it is proved on four documents but not landed.
 >
@@ -56,17 +66,18 @@
 > no JDK on the pod, so the first 40 minutes went on fetching one and getting the engine to compile at
 > all, and `corpus-convert.py` then needed about 5 minutes for 214 documents. The one-line change and the
 > full instructions are in `FINDINGS/table-row-placement-IS-THE-RUNG-PROVEN-27NOV-relay.md`.
+>
+>
+>
+> Accounts share 2% of their significant words - a different account (the cut is 50%).
 
-### The run before this one said
-
-
-Accounts share 2% of their significant words - a different account (the cut is 50%).
+Accounts share 13% of their significant words - a different account (the cut is 50%).
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **3.9 h ago** |
+| Measured | **5.5 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -75,20 +86,16 @@ Accounts share 2% of their significant words - a different account (the cut is 5
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `63_tA-01` | which engine commit between d28ca7516c3f9165 and a05 | 23:17 | - | - |
-| `63_tB-01` | what exactly differs in the docx for table-with-no-h | 23:17 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 23:17 → running · 39 min |
+| Slot window | 01:27 → running · 0 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 25 |
-| Longest silence | **22.4 min** — from 23:17:54, after `handoff.py: reading or writing the handoff` |
-| Silences over 2 min | 3 |
+| Tool beats | 7 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -96,14 +103,7 @@ Accounts share 2% of their significant words - a different account (the cut is 5
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **35 min** | `####################` |
-| other - not attributed to a tool | **3 min** | `##` |
-
-The unattributed row is 5 distinct beat(s) that matched no phase. They said:
-
-- `relay: checking gates`
-- `relay: agent A landed root cause, testing falsifier`
-- `relay: fetching corpus (6 min)`
+| report - the report and the chain | **0 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -116,7 +116,7 @@ The unattributed row is 5 distinct beat(s) that matched no phase. They said:
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
