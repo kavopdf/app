@@ -196,10 +196,32 @@ different reason than "the guard is in the way".*
 `w:pgMar w:top="0"` is the identity the patch's own comment describes, so `sectionTopTw()` returned 0 and
 **the page is laid out exactly as before**. `22`, `71`, `74` and `price-list` all take that path.
 
-Which guard refuses is **not determined by this run** and must not be guessed. The patch has two, and both
-are live on these four: `hasColumnBands(page)` (guard 1) and the room check (guard 2). All four are
-column-layout documents, which makes guard 1 the prime suspect, but the measurement that would settle it —
-instrumenting which `return 0` fired — was not run. That is the first thing the next run should do, because
-until it is answered the page-level-offset lead has no construct behind it.
+### Which guard refuses, measured
+
+The question was left open above when the patch was first run, so it was instrumented: a `System.err`
+print at each `return 0` in `sectionTopTw`, recompiled, same shard. Measured:
+
+    TOPGAP guard2 room lowest=813.89 ph=841.89 top=59.4812   22_invoice_four_columns_txtpos
+    TOPGAP guard2 room lowest=813.89 ph=841.89 top=61.4812   71_invoice_space_aligned_no_rules
+    TOPGAP guard1 columnbands 595.276x841.89                 74_balance_sheet_indented_subitems
+    TOPGAP guard2 room lowest=817.51 ph=841.89 top=49.1663   price-list-2col-dense-right-aligned
+
+**Guard 2, the room check, refuses three of the four** (74 takes guard 1). The margin the patch wants to
+claim is **49-61 pt**; the room left below the last band is **24-28 pt**. So the refusal is not a defect in
+the guard — it is the patch asking for the page's **whole** top gap.
+
+### And that is the real answer: this construct is the wrong one for these documents
+
+The residual measured on `22` and `71` is **4-6 pt**. The patch claims **49-61 pt**. Those are not the
+same quantity, and they should not be: `w:before` is **honoured by Google at the top of page 0** (the
+`412_page_labels_roman` measurement in the patch's own comment says page 0 reads +2.3 pt — honoured —
+while pages 1-4 read −58.8 pt — dropped). A single-page document has only page 0, so there is no dropped
+gap for this construct to move. The patch is right to refuse.
+
+**So the page-level-offset lead is closed as a dead end for single-page documents**, and it is closed by
+measurement, not by inference. The 4-6 pt residual on `22` and `71` is a *different, smaller* error whose
+construct is unidentified. The next run should not start from the page-top gap: census the first band's
+`w:before` against the rendered `ry` on `22` and look for a constant 4.01 pt, because a constant that size
+on every run including the footer smells like a rounding of the flow origin, not a gap at all.
 
 The engine is reverted. `pagetop-guarded-27NOV.patch` is unchanged in `PATCHES/`.

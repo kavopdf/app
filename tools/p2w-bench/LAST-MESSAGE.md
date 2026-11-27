@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 20:09 → running IST · 48 min**
+**27 Nov 2026 · slot 20:09 → running IST · 49 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -85,11 +85,23 @@ the patch is inert on a single-page document and the page-offset lead is wrong f
 
     <w:sectPr><w:pgSz .../><w:pgMar w:top="0" w:right="0" w:bottom="0" w:left="0" .../>
 
-`sectionTopTw()` returned 0, so the page is laid out exactly as before. Which of the patch's two guards
-refuses — `hasColumnBands(page)` or the room check — is **not determined**, and I have not guessed it. All
-four are column-layout documents, which makes the column-band guard the suspect, but the measurement that
-settles it (instrumenting which `return 0` fires) was not run. Until it is, the page-offset lead has no
-construct behind it, and that is the first thing the next run should do.
+`sectionTopTw()` returned 0, so the page is laid out exactly as before. Rather than leave "which guard"
+open, the two guards were instrumented and the shard re-converted:
+
+    TOPGAP guard2 room lowest=813.89 ph=841.89 top=59.4812   22_invoice_four_columns_txtpos
+    TOPGAP guard2 room lowest=813.89 ph=841.89 top=61.4812   71_invoice_space_aligned_no_rules
+    TOPGAP guard1 columnbands 595.276x841.89                 74_balance_sheet_indented_subitems
+    TOPGAP guard2 room lowest=817.51 ph=841.89 top=49.1663   price-list-2col-dense-right-aligned
+
+**Guard 2, the room check, refuses three of the four.** The margin it wants is **49-61 pt**; the room left
+below the last band is **24-28 pt**. And that is the finding, not the obstacle: the residual measured on
+`22` and `71` is **4-6 pt**, while the patch claims the page's **whole** top gap. Those are different
+quantities and they should be — `w:before` is honoured by Google at the top of **page 0**, so a
+single-page document has no dropped gap to move and the patch is right to refuse.
+
+**The page-offset lead is closed as a dead end for single-page documents, by measurement.** The 4-6 pt
+residual on `22` and `71` is a smaller, different error and its construct is unidentified — the next run
+should census `22`'s first band, not start from the page-top gap.
 
 The engine is reverted; both patches are unchanged in `PATCHES/`.
 
@@ -116,7 +128,7 @@ FINDINGS reproduce recipe so no run pays it again.
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 2 code commit(s) in this window, first: 18-cellbefore findings: store keeps the tree-eng vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 3 code commit(s) in this window, first: second attempt: pagetop-guarded-27NOV.patch is I vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -181,7 +193,7 @@ FINDINGS reproduce recipe so no run pays it again.
 
 | | |
 |:--|:--|
-| Measured | **57 min ago** |
+| Measured | **58 min ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -196,7 +208,7 @@ FINDINGS reproduce recipe so no run pays it again.
 
 | | |
 |:--|:--|
-| Slot window | 20:09 → running · 48 min |
+| Slot window | 20:09 → running · 49 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
 | Tool beats | 47 |
 | Longest silence | **23.6 min** — from 20:10:11, after `pending.py: reading the pending gate` |
@@ -211,9 +223,9 @@ FINDINGS reproduce recipe so no run pays it again.
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **4 min** | `##` |
 | build - compiling the engine | **0 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `###########` |
+| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `##########` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
+| report - the report and the chain | **3 min** | `##` |
 | other - not attributed to a tool | **15 min** | `#######` |
 
 The unattributed row is 8 distinct beat(s) that matched no phase. They said:
