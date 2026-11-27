@@ -10149,3 +10149,34 @@
 {"t": 1795814077.8392563, "ist": "02:44:37", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795814078.224737, "ist": "02:44:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795814080.214563, "ist": "02:44:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795815217.4001937, "ist": "03:03:37", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795815217.6014464, "ist": "03:03:37", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795815217.7822607, "ist": "03:03:37", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795815217.9914773, "ist": "03:03:37", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795815218.17854, "ist": "03:03:38", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795815218.4340043, "ist": "03:03:38", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795815218.622499, "ist": "03:03:38", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795815218.8031907, "ist": "03:03:38", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
+{"t": 1795815440.9713902, "ist": "03:07:20", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795815442.3689885, "ist": "03:07:22", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795815446.2922966, "ist": "03:07:26", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795815446.7797709, "ist": "03:07:26", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795815446.9407582, "ist": "03:07:26", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795815447.1310756, "ist": "03:07:27", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795815447.3091311, "ist": "03:07:27", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795815447.483203, "ist": "03:07:27", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795815449.6683683, "ist": "03:07:29", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795815449.8242633, "ist": "03:07:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795815449.9257936, "ist": "03:07:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795815452.0418553, "ist": "03:07:32", "ev": "beat", "d": "claimed, reading handoff"}
+{"t": 1795815662.1992166, "ist": "03:11:02", "ev": "beat", "d": "baseline reproduce: scoring table-with-no-header-row on current engine"}
+{"t": 1795815711.398705, "ist": "03:11:51", "ev": "beat", "d": "probe: converting + scoring the six worst table regressors on the current engine"}
+{"t": 1795815800.6219184, "ist": "03:13:20", "ev": "beat", "d": "A/B: cell-at-row-height OFF on the three worst table regressors"}
+{"t": 1795815876.557522, "ist": "03:14:36", "ev": "beat", "d": "bisect: building the engine at ff060d4c to find the commit that took table-with-no-header-row 0.61 -> 47.48"}
+{"t": 1795815954.782481, "ist": "03:15:54", "ev": "beat", "d": "bisect: 0.61 at ff060d4c, narrowing 98be7c3c..33863086"}
+{"t": 1795816044.6044843, "ist": "03:17:24", "ev": "beat", "d": "bisect: 9f0a8207 is 0.61; testing 8fb4f503"}
+{"t": 1795816134.9334445, "ist": "03:18:54", "ev": "beat", "d": "measuring 6 top table regressors on the pre-8fb4f503 engine (ee5a00d6)"}
+{"t": 1795816275.210596, "ist": "03:21:15", "ev": "beat", "d": "A/B: isolating which part of 8fb4f503 causes the table ramp"}
+{"t": 1795816420.8962934, "ist": "03:23:40", "ev": "beat", "d": "widening the rung evidence to four more documents"}
+{"t": 1795816485.0106702, "ist": "03:24:45", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795816493.1779916, "ist": "03:24:53", "ev": "beat", "d": "attempt.py: recording an attempt"}

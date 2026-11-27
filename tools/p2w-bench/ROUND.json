@@ -17,9 +17,11 @@
       }
     ]
   },
+  "fixer_doing": "widening the rung evidence to four more documents",
+  "fixer_doing_since": 1795816420.896659,
   "fixer_engine_at_claim": "33863086",
-  "fixer_last_beat": 1795813982.991192,
-  "fixer_started": 1795816120.9582016,
+  "fixer_last_beat": 1795816420.8966596,
+  "fixer_started": 1795815228.2737725,
   "history": [
     {
       "at": "2026-11-12 09:46",

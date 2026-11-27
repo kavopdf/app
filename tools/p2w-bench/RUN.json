@@ -1,13 +1,13 @@
 {
  "agents": [],
- "attempts": 2,
- "class": "63_table_rows",
+ "attempts": 1,
+ "class": "",
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
  "needs_human": 0,
  "obstacles_cleared": 0,
- "started": "02:24",
- "started_ts": 1795812899.2872112
+ "started": "03:07",
+ "started_ts": 1795815450.4385073
 }
