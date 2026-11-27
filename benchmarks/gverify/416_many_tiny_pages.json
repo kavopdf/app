@@ -2,7 +2,7 @@
  "name": "416_many_tiny_pages",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-27T08:05:11",
+ "at": "2026-11-27T13:43:18",
  "passed": 40,
  "total": 42,
  "failed": [
@@ -10,8 +10,8 @@
   "27_text_off_page"
  ],
  "displacement": {
-  "med_dy": -87.2,
-  "worst_dy": 87.3,
+  "med_dy": -89.0,
+  "worst_dy": 89.1,
   "med_dx": -0.2,
   "bad_pages": [
    1,
@@ -316,6 +316,6 @@
   ],
   "runs_matched": 900
  },
- "engine": "d28ca7516c3f9165",
- "checks": "376065-1795765948"
+ "engine": "a05b20eb05fe0fc8",
+ "checks": "377699-1795785088"
 }
