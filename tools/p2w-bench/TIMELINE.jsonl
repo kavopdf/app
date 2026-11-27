@@ -9482,3 +9482,19 @@
 {"t": 1795786112.121495, "ist": "18:58:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795786112.3091216, "ist": "18:58:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795786113.276908, "ist": "18:58:33", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795787661.9330754, "ist": "19:24:21", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795787671.8679793, "ist": "19:24:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795787672.9858537, "ist": "19:24:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795788100.0463912, "ist": "19:31:40", "ev": "beat", "d": "pod-prep: fetching corpus"}
+{"t": 1795788347.836461, "ist": "19:35:47", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795788348.0775032, "ist": "19:35:48", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795788348.3362129, "ist": "19:35:48", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795788348.5669975, "ist": "19:35:48", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795788348.7807467, "ist": "19:35:48", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795788348.992991, "ist": "19:35:48", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795788349.2462685, "ist": "19:35:49", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795788349.5193708, "ist": "19:35:49", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795788370.6957812, "ist": "19:36:10", "ev": "beat", "d": "converting 3 target docs at HEAD for a Google 18_displacement baseline"}
+{"t": 1795788512.9064038, "ist": "19:38:32", "ev": "beat", "d": "patched build converted; uploading the 3 to Google"}
+{"t": 1795788563.2218173, "ist": "19:39:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795788572.0406625, "ist": "19:39:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
