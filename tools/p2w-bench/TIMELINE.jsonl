@@ -8919,3 +8919,15 @@
 {"t": 1795752947.4581165, "ist": "09:45:47", "ev": "beat", "d": "relay: taking the .txt half - 8 documents, t12_word_invention on 3"}
 {"t": 1795752987.2513275, "ist": "09:46:27", "ev": "beat", "d": "relay: txt half - t12 root-caused on all 3 documents"}
 {"t": 1795752992.4675515, "ist": "09:46:32", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795752996.0159101, "ist": "09:46:36", "ev": "attempt", "d": "t12_word_invention -> lead"}
+{"t": 1795752996.1109104, "ist": "09:46:36", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795752996.199541, "ist": "09:46:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795752996.8080678, "ist": "09:46:36", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795753000.5752528, "ist": "09:46:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795753002.7315078, "ist": "09:46:42", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795753003.0910256, "ist": "09:46:43", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795753005.0000913, "ist": "09:46:45", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795753009.049761, "ist": "09:46:49", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795753011.126064, "ist": "09:46:51", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795753011.4814231, "ist": "09:46:51", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795753013.4020503, "ist": "09:46:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

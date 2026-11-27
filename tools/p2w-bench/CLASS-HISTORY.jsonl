@@ -241,3 +241,4 @@
 {"at": "2026-11-27 07:44", "attempt": 103, "class": "18_displacement", "outcome": "kept", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-27 09:13", "attempt": 104, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-27 09:42", "attempt": 105, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
+{"at": "2026-11-27 09:46", "attempt": 13, "class": "t12_word_invention", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
