@@ -90,3 +90,40 @@ against non-negotiable 5's spirit even when it is a move and not a delete.
 
 **What would settle it:** a second fixer run on a cold pod, capturing `regress.py --check` at the moment
 `corpus-slice.py` reports "N to go" — that run has the rc-3 state for free.
+
+## Fixed: the corpus cache was keyed on the .txt engine
+
+`corpus-convert.engine_sources()` hashed **every** `.java` in the engine, and the only thing that cache
+holds is 213 `.docx`. A one-line edit to `TxtWriter.java` therefore made every `.docx` stale and the next
+gate call paid a two-slice, ~10 minute rebuild for a change that cannot reach a `.docx` byte.
+
+**This is the identical defect `regress.py` fixed for the RANKING table on 20 Nov** and wrote down at
+`regress.py:60-68` (`DOCX_EXCLUDES = ("TxtWriter.java",)`): the docx path never calls `TxtWriter`;
+`DocxWriter.write()` reads the `Result` that `PdfToWord.convert()` built and `TxtWriter.write()` is its only
+caller. The table was fixed; the corpus cache was left with it, one layer out.
+
+**Measured, before and after, on this pod** (`app/src/main/java/.../TxtWriter.java` given a one-line comment
+and then restored):
+
+| | key after touching `TxtWriter.java` | what happens to the 213 `.docx` |
+|:--|:--|:--|
+| before | `44e9113125a109fa` | all stale - rebuild, 2 slices, ~10 min |
+| after | `d28ca7516c3f9165` | unchanged - cache stays warm |
+
+**Independent cross-check, not the tool I edited:** `regress.engine_fingerprint("docx")` computes
+`d28ca7516c3f9165` on the same tree, and `corpus-convert.engine_now()` now returns exactly that. Two tools,
+one number. `DocxWriter.java` stays in the key, because `DocxWriter.orderStamps()` reorders `page.blocks`
+and `TxtWriter` walks them - the one place a docx-side method can move the `.txt`.
+
+The stamp on disk was **not** rewritten. The 213 `.docx` in the cache were built from the previous engine
+(`a4d8fca469bba636`); they are genuinely stale and the next run should rebuild them rather than inherit a
+certificate they did not earn.
+
+### Correction to §"What was measured this run", and it matters
+
+While this run was working, the **:10 fixer landed a kept engine change** (`8fb4f503`, `18_displacement`,
+"table gap spent as `w:before`"). So the engine moved under the measurement above: the all-`.java`
+fingerprint is now `74a152e7d3fb3d26`, not `a4d8fca469bba636`. **The gate PASS at `a4d8fca469bba636` was true
+when it was taken and is not the current engine's verdict.** Anyone reading it should re-run
+`regress.py --check`; it will need the 213-document rebuild first, which is now three `corpus-slice.py`
+calls and about ten minutes.

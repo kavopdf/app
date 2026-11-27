@@ -106,8 +106,25 @@ def engine_now():
         return "unknown"
 
 
-def engine_sources():
-    """A hash of the ENGINE SOURCES - the same quantity regress.py:engine_fingerprint() uses.
+# THE CACHE IS .docx, SO THE KEY MUST BE THE .docx ENGINE.
+#
+# regress.py learned this on 20 Nov and wrote it down at regress.py:60-68: "It hashed every .java in
+# the engine, so an edit to TxtWriter.java moved the hash the DOCX table was stamped with. The docx
+# path never calls TxtWriter - DocxWriter.write() reads the Result that PdfToWord.convert() built, and
+# TxtWriter.write() is the only caller of that class - so the docx table was being refused as
+# 'measured on another engine' by a change that cannot reach a docx byte." It fixed the table
+# (DOCX_EXCLUDES) and left the corpus cache with the same defect, one layer out: engine_sources()
+# below hashed all 60-odd .java, so a one-line edit to TxtWriter.java made all 213 .docx stale and the
+# next gate call paid a ~10 minute rebuild - two slices - for a change that cannot reach a .docx byte.
+#
+# DocxWriter.java STAYS in the hash: DocxWriter.orderStamps() reorders page.blocks and TxtWriter walks
+# them, so a docx-side method can move the .txt. Only TxtWriter.java is excluded, and only for the
+# docx cache, which is the only cache there is.
+DOCX_EXCLUDES = ("TxtWriter.java",)
+
+
+def engine_sources(fmt="docx"):
+    """A hash of the ENGINE SOURCES - the same quantity regress.py:engine_fingerprint(fmt) uses.
 
     WHY NOT THE COMMIT. This used to key the cache on `git rev-parse HEAD`, so EVERY commit moved the
     key: a commit that only adds a FINDINGS file, or a claim, or a report, made all 213 .docx stale and
@@ -125,6 +142,8 @@ def engine_sources():
     h = hashlib.sha256()
     for name in sorted(os.listdir(d)):
         if not name.endswith(".java"):
+            continue
+        if fmt == "docx" and name in DOCX_EXCLUDES:
             continue
         h.update(name.encode())
         with open(os.path.join(d, name), "rb") as f:
