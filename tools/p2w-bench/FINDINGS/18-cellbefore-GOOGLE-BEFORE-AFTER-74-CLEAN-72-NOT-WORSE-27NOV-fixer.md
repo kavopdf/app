@@ -26,7 +26,12 @@ branch — it multiplies by 0.8 every `w:before` that branch already writes.
 | `22_invoice_four_columns_txtpos` | 41/42 (stored) | **41/42**, fails `18_displacement` | unmoved |
 | `price-list-2col-dense-right-aligned` | 41/42 (stored) | **41/42**, fails `18_displacement` | unmoved |
 
-All five rows are in `benchmarks/gverify/` with `engine: f4ce54f257d15f1c`.
+**Where these rows live, and a corroboration worth having.** The `:20 gverify` cron re-measured
+`74`, `72`, `71` and `price-list` on the tree engine `a05b20eb05fe0fc8` at 20:14-20:17 IST and got
+**41/42 on all four** — an independent confirmation of every "before" in the table above, made by a
+different run with a different upload. Those tree-engine rows are what the store holds, because a store
+row should describe the engine in the tree; the "after" numbers here are on `f4ce54f257d15f1c` and are
+recorded in this file, which is the durable record of a patch that did not land.
 
 ## The prediction, written before the run, and where it was wrong
 

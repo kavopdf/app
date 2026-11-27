@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 20:09 → running IST · 46 min**
+**27 Nov 2026 · slot 20:09 → running IST · 47 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -23,8 +23,11 @@ with live Google round trips on a document it should help and a document it was 
 | `price-list-2col-dense-right-aligned` | 41/42 | **41/42** | unmoved |
 
 Every number is a live round trip this run made: `upload` → `GOOGLEDRIVE_CREATE_FILE` as a Google Doc →
-`GOOGLEDRIVE_DOWNLOAD_FILE` (pdf) → `gverify.py --collect`. All five rows are committed in
-`benchmarks/gverify/` stamped `engine: f4ce54f257d15f1c`.
+`GOOGLEDRIVE_DOWNLOAD_FILE` (pdf) → `gverify.py --collect`. The "after" rows are on engine
+`f4ce54f257d15f1c` and are recorded in the FINDINGS, because the patch did not land. The `:20 gverify`
+cron independently re-measured four of the five on the tree engine `a05b20eb` at 20:14-20:17 IST and got
+**41/42 on all four**, which corroborates every "before" above from a different run and a different
+upload. The store keeps the tree-engine rows, as it should.
 
 ## Why it did not land
 
@@ -87,25 +90,25 @@ FINDINGS reproduce recipe so no run pays it again.
 
 ## Progress
 
-| Check-instances passing | **5559** of 5891 (94.4%) on 141 documents |
-| Check-instances still failing | **332** |
-| Kept attempts vs documents clean | **16** classes with a kept attempt, **49** documents clean - a kept attempt is progress inside a class, not a finished document |
+| Check-instances passing | **8437** of 8969 (94.1%) on 212 documents |
+| Check-instances still failing | **532** |
+| Kept attempts vs documents clean | **16** classes with a kept attempt, **54** documents clean - a kept attempt is progress inside a class, not a finished document |
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - .txt scored: RANKING-TXT says 214 vs corpus says 213 |
+| **Self-check** | **1 disagreement(s)** - kept change: 1 code commit(s) in this window, first: 18_displacement cell-before: measured live in Go vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
-| Documents improved, round total | **61** of the 212 compared (corpus 213) |
+| Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
 | Exempt from the LibreOffice comparison | **0** — none |
-| **Fixed - Google, every applicable check** | **37** of the **136** re-measured on this engine - **71** of the 207 scored are still on an older engine, and **6** of those were clean on the engine they were measured with |
-| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **2** run(s) for the 71 outstanding. Until then "fixed" means fixed on an engine that is not this one |
+| **Fixed - Google, every applicable check** | **46** of the **205** re-measured on this engine - **1** of the 206 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
+| Who re-measures them | the **:20 gverify** cron, up to 60 documents a run - about **1** run(s) for the 1 outstanding. Until then "fixed" means fixed on an engine that is not this one |
 | Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
-| Not scored - page count did not match | **6** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
+| Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (60 still open), not a new class |
+| Working on | `-` - taken from the pending list (57 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## What was tried
@@ -158,7 +161,7 @@ FINDINGS reproduce recipe so no run pays it again.
 
 | | |
 |:--|:--|
-| Measured | **55 min ago** |
+| Measured | **56 min ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -173,12 +176,13 @@ FINDINGS reproduce recipe so no run pays it again.
 
 | | |
 |:--|:--|
-| Slot window | 20:09 → running · 46 min |
+| Slot window | 20:09 → running · 47 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
 | Tool beats | 42 |
 | Longest silence | **23.6 min** — from 20:10:11, after `pending.py: reading the pending gate` |
 | Silences over 2 min | 5 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | same refusal as 17:55 and 18:45: `ENGINE CHANGED (docx): table measured on `d28ca7516c3f9165`, the tree is `a0 |
 
 
 ### Where the time went
@@ -189,7 +193,7 @@ FINDINGS reproduce recipe so no run pays it again.
 | build - compiling the engine | **0 min** | `#` |
 | measure or build - a conversion, screen or compile writes no beacon | **23 min** | `###########` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `#` |
 | other - not attributed to a tool | **15 min** | `#######` |
 
 The unattributed row is 8 distinct beat(s) that matched no phase. They said:
