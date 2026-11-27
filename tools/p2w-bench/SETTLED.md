@@ -493,3 +493,73 @@ Reconstruction from `get_drawings()` and `get_text()` has now lost three things 
 **the text's alpha**, **the exact stroke cap and join**, and **the font metrics**. Each cost a run to
 discover. Copying the stamp's operators into a fresh page loses nothing - that is the engine's job and it is
 not to be done by rebuilding the stamp from the XML.
+
+## Every document's text is clipped at the bottom, and it is `w:lineRule="exact"`
+
+**213 of 213 docx use `w:lineRule="exact"`. None use `atLeast`, none use `auto`, none omit it.**
+
+The paragraph that clips reads:
+
+    <w:spacing w:before="262" w:after="0" w:line="12" w:lineRule="exact"/>
+    <w:sz w:val="17"/>            <- 8.5 pt of text
+
+`w:line="12"` with `lineRule="exact"` is **0.6 pt of line box** around **8.5 pt of text**. The part of the glyph
+outside the box is cut, and that is the descender - `p`, `y`, `g` lose their tails.
+
+**Settled by measurement, not assumption:**
+
+    exact,   line 0.6   body text  -> line contributes 0.6 pt
+    exact,   line 0.6   table cell -> line contributes 6.3 pt   (a floor, still short of the 11.07 pt glyph)
+    atLeast, line 0.6   either     -> 9.8 pt, the natural height for 8.5 pt Times
+
+**`exact` clips. `atLeast` does not, and gives the same natural height in body text and in a cell.** The cost
+is about 3.5 pt of extra advance per line, so `before` must come down by the same amount.
+
+**Do not simply switch `exact` to `atLeast` and stop** - tried, and the document grew from one page to two.
+
+## Text overlapping itself: the tab stop sits at the cell edge
+
+**FIXED AND MEASURED.** A label and its value are one paragraph already; the tab between them was wrong:
+
+    <w:tabs><w:tab w:val="left" w:pos="2747"/></w:tabs>
+    <w:tcW w:w="2747"/>          <- the cell is the same width
+
+The tab sat exactly at the cell's right edge, so the value had no room, **wrapped to the next line**, and with
+a 0.6 pt line box printed almost on top of the label. Four tabs in that row, all wrong: 2747 equal to the cell
+width, 2889 twice which is outside the cell, 2562 which is inside but still leaves no room. **The cell itself
+was too narrow** - the source PDF needs 183 pt of content in a 137 pt cell.
+
+**The fix, measured through Google: cell 2747 -> 3660 twips and all four tabs -> right at 3660. Overlaps go
+from 4 to 0, page count unchanged.**
+
+**Rule:** a tab stop must leave room for what follows it. A label/value pair needs a **right** tab inside the
+cell at least the value's width from the label's end - never a left tab at the cell edge - and the cell must be
+wide enough for both.
+
+**And measure x as well as y.** An earlier reading of this defect compared y only and reported two overlaps
+between two different table columns that never touch.
+
+## The engine drops table rules and shading, and rasterises content
+
+Measured on one invoice page:
+
+                        banner  drawings  filled  lines  shade-rects  images
+    source PDF            yes      19        3      16       2          0
+    engine .docx export   yes       2        1       1       0         17
+
+- **16 line segments become 1** - the table reads as an unruled list
+- **`<w:shd` appears zero times** - the header banner's and the `Grand Total` row's shading are both absent
+- **the banner text is invisible** - `TAX INVOICE` is in the document and text extraction finds it, but it is
+  white on a background with no shading, so it is white on white. **Text that exists and cannot be seen is
+  worse than text that is missing, because every text-layer check reports it as present.**
+- **17 images in a document that had none** - vector content is being rasterised, and that plausibly explains
+  the other three
+
+**Settled: do not measure a document by text extraction alone.** All four defects are invisible to a text-layer
+check and visible only in a render. Compare the count of line segments, of filled regions, and of rasterised
+regions against the source's, before comparing text.
+
+## `SETTLED.md` is 495 lines, not 87
+
+The brief says it is 87 lines and takes two minutes. **That has not been true for some time.** A run that
+budgets two minutes for it will skim it, and everything above is in the part it skims.
