@@ -9,19 +9,21 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 03:18 |
-| ended | still running |
-| how it ended | - |
+| started | 03:07 |
+| ended | 03:27 |
+| how it ended | forced |
 | plan | - |
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
+| --he-01 | --help |  |  | 19:43 |  | running |  |
+| t09_A-01 | t09_page_furniture | A | is the 125 single-char present a TxtWriter line-assembly defect or a t | 20:47 | 19:45 | running |  |
 | 18_dA-02 | 18_displacement | A | find the single construct behind the displaced runs on the 25 document | 22:14 | 16:10 | landed | FINDINGS/18-displacement-DOMINANT-SUBCAUSE-27NOV-agent.md |
 | commA-01 | commit_gate | A | which clause of aa496ebe moves itr-computation and can it be split fro | 23:19 | 17:33 | running |  |
 | triaA-01 | triage | A | which of the 113 failing checks buys the most clean documents, with th | 01:12 | 18:55 | running |  |
@@ -44,14 +46,13 @@ unfinished work, not as a result.
 | txtform-feed lead-01 | txt | form-feed lead | is _txt_lines dropping page separators, and how many documents does it | 16:45 | a fixture proving the bug and a count of verdicts moved | running |  |
 | 63_tA-01 | 63_table_rows | A | which engine commit between d28ca7516c3f9165 and a05b20eb05fe0fc8 brok | 23:17 | root cause by 00:00 | running |  |
 | 63_tB-01 | 63_table_rows | B | what exactly differs in the docx for table-with-no-header-row: per-row | 23:17 | mechanism by 00:00 | running |  |
-| row_A-01 | row_rung | A | which of the 84 docx regressions vs the 15 Nov baseline does ROW_RUNG_ | 03:38 | 03:55 | running |  |
-| commB-01 | commit_gate | B | is the gate's 84 a real quality loss or an inflated count - baseline p | 03:38 | 04:10 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
+- `12:08` agent deployed: 18_displacement / A - Does the +2.70 pt charge on 31_times come from the baseline's placement in a hai
 - `12:08` agent deployed: 18_displacement / B - Is 18_displacement's dy an ascent artifact - bbox top vs baseline origin - and h
 - `12:08` agent landed: 18_displacement / A -> FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md
 - `12:08` agent landed: 18_displacement / B -> FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md
@@ -75,8 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `23:56` attempt 2 on 63_table_rows -> lead
 - `01:27` attempt 3 on 63_table_rows -> reverted
 - `02:43` attempt 4 on 63_table_rows -> lead
-- `03:38` agent deployed: row_rung / A - which of the 84 docx regressions vs the 15 Nov baseline does ROW_RUNG_UNDER_TW a
-- `03:38` agent deployed: commit_gate / B - is the gate's 84 a real quality loss or an inflated count - baseline provenance,
+- `03:24` attempt 120 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 
