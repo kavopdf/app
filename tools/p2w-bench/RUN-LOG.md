@@ -1,9 +1,3 @@
-| 23 Nov 18:58 | fixer | slot claimed - fixer running |
-| 23 Nov 19:31 | fixer | attempt 18_displacement -> reverted (0/? moved) |
-| 23 Nov 19:34 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
-| 23 Nov 19:36 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
-| 23 Nov 19:39 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
-| 23 Nov 19:57 | fixer | slot claimed - fixer running |
 | 23 Nov 20:44 | fixer | attempt 18_displacement -> reverted (0/16 moved) |
 | 23 Nov 20:54 | fixer | slot claimed - fixer running |
 | 23 Nov 21:29 | fixer | attempt 18_displacement -> lead (0/? moved) |
@@ -200,3 +194,7 @@
 | 27 Nov 03:01 | fixer | slot claimed - fixer running |
 | 27 Nov 03:28 | fixer | attempt 18_displacement -> lead (0/? moved) |
 | 27 Nov 04:17 | fixer | attempt 18_displacement -> reverted |
+| 27 Nov 05:13 | fixer | slot claimed - fixer running |
+| 27 Nov 05:49 | fixer | attempt t12_word_invention -> lead (0/? moved) |
+| 27 Nov 05:49 | fixer | attempt 18_displacement -> reverted (0/? moved) |
+| 27 Nov 05:50 | fixer | attempt t01_word_accuracy -> reverted (0/? moved) |

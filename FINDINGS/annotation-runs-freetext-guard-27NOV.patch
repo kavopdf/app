@@ -1,0 +1,18 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index ad56dac..bd806f9 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -2460,6 +2460,13 @@ public final class PdfToWord {
+                 if (ann == null || ann.isHidden()) continue;
+                 if (ann instanceof com.tom_roush.pdfbox.pdmodel.interactive.annotation
+                         .PDAnnotationWidget) continue;      // its /V was already read
++                // ONLY A FREE-TEXT BOX PRINTS ITS /Contents - the same rule annotationContentsOf()
++                // has carried since 25 Nov, and this function never got it. A note, a comment, a
++                // highlight's remark and a stamp's caption are METADATA: the reader shows them in
++                // a panel and the page prints nothing of them. Hoisting them here put them in the
++                // body as real paragraphs, and 600_reviewed_invoice_with_annotations paid 83
++                // invented characters for it (t12_word_invention, measured 27 Nov).
++                if (!"FreeText".equals(ann.getSubtype())) continue;
+                 String c = ann.getContents();
+                 if (c == null || c.trim().isEmpty()) continue;
+                 float[] style = appearanceStyle(ann);

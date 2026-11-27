@@ -1,0 +1,41 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 80c91ee..b55be2f 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -6543,12 +6543,34 @@ public final class DocxWriter {
+                 rowHeightTw = Math.max(typeFloorTw, twScale(rowHeightTw, ctx.squeeze));
+                 rowLineTw = Math.max(typeFloorTw, twScale(rowLineTw, ctx.squeeze));
+             }
++            // WHAT THE RENDERER WILL ACTUALLY LAY FOR THIS ROW.
++            //
++            // Measured on 12 documents (FINDINGS/18DISPLACEMENT-COUNT-0125-27NOV.md 5, fitted r
++            // = 0.975 over 10 trHeight-bound documents): the renderer takes
++            //     max(w:trHeight, content + rule)
++            // and then snaps the RESULT onto a 15-twip (0.75 pt) grid, paying a ruled row's rule
++            // OUTSIDE that snap:
++            //     laid = 15 * round((trHeight + rule) / 15)
++            // So a declaration only survives the round trip when (declared + rule) is already on a
++            // rung. On 303_discharge_summary the box was 300 twips - exactly 20 rungs - and the
++            // renderer laid 315 (+0.75 pt): the rule, not rounding. On 16_right_aligned the box was
++            // 380 and the renderer laid 375 (-0.25 pt): the snap goes down as well as up.
++            //
++            // Two things follow, and both are done here. Declare the rung NEAREST what the row must
++            // occupy, NET OF THE RULE, so the number the renderer lays is the number the page drew;
++            // and charge the page budget that same laid number, because the flow after the table is
++            // placed from it and a row that lays taller than it was charged pushes everything below.
++            // The residual is then at most half a rung (0.375 pt) per row instead of accumulating
++            // the declaration's own rounding down the whole table.
++            final int RUNG_TW = 15;
++            int wantTw = Math.max(rowTwHere, Math.max(rowHeightTw, rowLineTw) + ruleTwHere);
++            int laidTw = RUNG_TW * Math.round(wantTw / (float) RUNG_TW);
++            rowHeightTw = Math.max(typeFloorTw, laidTw - ruleTwHere);
+             // The budget is charged what the renderer will LAY OUT, which is the content plus
+             // the rule - not the content alone. Charging the content alone under-measures every
+             // ruled table by one rule a row, and this is the number the flow after the table is
+             // placed from.
+-            writtenRowsTw += Math.max(0, Math.max(pitchTwHere,
+-                    Math.max(rowTwHere, rowLineTw) + ruleTwHere));
++            writtenRowsTw += Math.max(0, laidTw);
+             // THE ROW'S OWN TOP EDGE IN THE PAGE'S COORDINATES, when the pass that built the
+             // table measured the row edges. The cells below are placed from it.
+             //
