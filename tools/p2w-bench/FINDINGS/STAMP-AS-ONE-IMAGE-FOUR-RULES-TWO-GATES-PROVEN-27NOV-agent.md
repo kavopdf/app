@@ -465,3 +465,67 @@ not move at all, and its ink fell to -33 percent.**
 **The lesson worth keeping:** the user spotted that the failures were the easy cases, and that was the
 fastest route to the cause. A regression against a known-good state localises a bug better than any
 amount of looking at the broken output.
+
+## The user caught the real defect: the image carried the body text with it
+
+The user selected the stamp in Google Docs and dragged it. **The body text moved with it.** On `06` the
+box held `D.Pharm - Reg. No. 44712` and `0:00 PM, all days`; on `07` it held table rules and
+`63 inch width`; on `02` it held `Total quantity: 572 Nos`.
+
+That is the one thing the user asked for from the start - **a stamp must never bring anything else with
+it** - and it was broken by my own previous "fix".
+
+### Why it broke
+
+Withdrawing the saturation floor (see the correction above) left the mask as pure coverage: how far a
+pixel has travelled from paper toward the ink colour. Black body text travels **further** than red ink
+in every channel, so it projects to full coverage:
+
+    black (0,0,0) against red (191,242,242) from white:
+    t = 255 * (191+242+242) / (191^2+242^2+242^2) = 1.12  -> clipped to 1.0
+
+**Full alpha. Fully opaque black text inside the stamp image.** The fix for the pale PAID lettering
+brought the body text in behind it.
+
+### What is better now
+
+The test is **distance to the paper-to-ink line**, not distance to the ink point:
+
+    t       = (255 - pixel) . (255 - ink) / |255 - ink|^2      clamped 0..1
+    blend   = 255 - t * (255 - ink)                            where a true blend would sit
+    keep    = |pixel - blend| < 55
+
+A pale PAID pixel sits on that line and is kept at its true alpha. A black pixel is far off the line and
+is rejected. Measured: 95.0, 97.4 and 96.3 percent of the stamp's ink kept on 06, 02 and 07, with the
+stamp complete and the body text no longer opaque.
+
+### But a faint ghost remains, and it is the honest state
+
+At low coverage every ink converges on white, so a light grey body-text pixel is nearly indistinguishable
+from a light red stamp pixel:
+
+    grey (204,204,204) -> blend (212,201,201) -> residual 14   passes a 55 tolerance
+
+The three images still carry a **pale trace** of the text beneath them. It is not the opaque black of the
+previous build, but it is there and it is visible.
+
+### Why the geometry gate cannot fix this
+
+The body text is **under** the stamp, so the two overlap. Subtracting the body text's boxes from the
+footprint would cut holes in the stamp wherever the text crosses it - the wrong result, since the stamp
+is the thing on top.
+
+### The clean answer, not yet built
+
+**Render the page twice and take the difference.** Once with the stamp present and once with the stamp's
+own content removed; every pixel that differs belongs to the stamp, exactly, with no colour reasoning at
+all. That separates overlapping objects because it asks what each object contributes rather than what
+colour it happens to be.
+
+Nothing else tried so far can do that, and this is the next thing to build rather than another threshold.
+
+### The lesson
+
+I fixed a real problem - pale ink being discarded - and in doing so reintroduced the exact defect the
+user had already named as the requirement. **The user found it by dragging the stamp, which is a test I
+should have run: move the thing and see what moves with it.**
