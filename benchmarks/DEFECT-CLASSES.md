@@ -1,5 +1,5 @@
 # Defect classes - round 1
-Documents measured: **212 of 212** - 1 exempt (`416_many_tiny_pages`), counted in the total and never scored.
+Documents measured: **213 of 213** - 1 exempt (`416_many_tiny_pages`), counted in the total and never scored.
 
 
 Grouped and ranked from `benchmarks/RANKING.csv` only: `signature` and `problem` are the
@@ -12,11 +12,12 @@ dominates it.
 | signature | problem | open | fixed |
 |---|---|---|---|
 | content-loss | content-missing-partly-replaced | 13 | 1 |
-| content-loss | content-missing-nothing-in-its-place | 6 | 16 |
-| mixed | content-partly-lost | 6 | 0 |
-| mixed | content-partly-lost-and-displaced | 4 | 4 |
-| displacement | content-present-partly-displaced | 23 | 0 |
-| displacement | content-present-wholly-displaced | 7 | 2 |
+| content-loss | content-missing-nothing-in-its-place | 3 | 1 |
+| mixed | content-partly-lost-and-displaced | 5 | 4 |
+| mixed | content-partly-lost | 4 | 0 |
+| displacement | content-present-wholly-displaced | 26 | 2 |
+| displacement | content-present-partly-displaced | 22 | 0 |
+| clean | single-element-far-out | 1 | 0 |
 | clean | none | 0 | 130 |
 
 `single-element-far-out` is closed: it held one document, `newsletter-3col-header-footer`, and
@@ -38,183 +39,183 @@ only a work queue.
 | # | document | problem | share5 | max_pt | worst_page | status | note |
 |---|---|---|---|---|---|---|---|
 | 1 | `415_inline_images` | content-missing-nothing-in-its-place | 0.00 | 0.00 | 1 | FIXED | share@5 0.00 |
-| 2 | `mobile-bill` | content-present-partly-displaced | 1.55 | 16.80 | 1 | OPEN | share@5 1.55 |
-| 3 | `salary-slip-factory-wages` | content-missing-nothing-in-its-place | 0.73 | 8.16 | 1 | FIXED | share@5 0.73 |
-| 4 | `two-tables-stacked-with-no-gap` | content-missing-nothing-in-its-place | 0.77 | 5.28 | 1 | FIXED | share@5 0.77 |
-| 5 | `marksheet-university-consolidated` | content-missing-nothing-in-its-place | 0.64 | 4.80 | 1 | FIXED | share@5 0.64 |
-| 6 | `electricity-bill` | content-present-partly-displaced | 1.33 | 14.40 | 1 | OPEN | share@5 1.33 |
-| 7 | `insurance-policy-schedule` | content-missing-nothing-in-its-place | 0.53 | 8.64 | 1 | FIXED | share@5 0.53 |
-| 8 | `landscape-page-inside-portrait-document` | content-present-partly-displaced | 1.02 | 14.40 | 2 | OPEN | share@5 0.62 |
-| 9 | `form16-part-b` | content-missing-nothing-in-its-place | 0.77 | 5.76 | 2 | FIXED | share@5 0.77 |
-| 10 | `mutual-fund-statement` | content-missing-nothing-in-its-place | 0.21 | 5.76 | 1 | FIXED | share@5 0.21 |
-| 11 | `property-tax-receipt` | content-missing-nothing-in-its-place | 0.96 | 14.88 | 1 | FIXED | share@5 0.96 |
-| 12 | `admit-card` | content-present-partly-displaced | 1.89 | 14.88 | 1 | OPEN | share@5 1.89 |
-| 13 | `gst-invoice-multipage-item-table` | content-missing-nothing-in-its-place | 0.40 | 10.08 | 1 | FIXED | share@5 0.40 |
-| 14 | `delivery-challan` | content-missing-nothing-in-its-place | 0.84 | 12.96 | 1 | FIXED | share@5 0.84 |
-| 15 | `table-across-page-break-repeated-header` | content-missing-nothing-in-its-place | 0.53 | 12.00 | 3 | FIXED | share@5 0.53 |
-| 16 | `gst-invoice-3line-items` | content-missing-nothing-in-its-place | 0.54 | 9.60 | 1 | FIXED | share@5 0.54 |
-| 17 | `boq-tender-bill-of-quantities` | content-missing-nothing-in-its-place | 0.62 | 12.96 | 1 | FIXED | share@5 0.62 |
-| 18 | `table-with-rotated-header` | content-missing-nothing-in-its-place | 0.12 | 3.36 | 1 | FIXED | share@5 0.12 |
-| 19 | `balance-sheet-and-profit-loss` | content-missing-nothing-in-its-place | 0.21 | 6.72 | 1 | FIXED | share@5 0.21 |
+| 2 | `mobile-bill` | content-present-wholly-displaced | 30.09 | 18.72 | 1 | OPEN | share@5 1.55 |
+| 3 | `salary-slip-factory-wages` | content-present-wholly-displaced | 35.15 | 11.52 | 1 | OPEN | share@5 0.73 |
+| 4 | `two-tables-stacked-with-no-gap` | content-present-wholly-displaced | 21.93 | 6.24 | 1 | OPEN | share@5 0.77 |
+| 5 | `marksheet-university-consolidated` | content-present-wholly-displaced | 27.14 | 8.64 | 1 | OPEN | share@5 0.64 |
+| 6 | `electricity-bill` | content-present-wholly-displaced | 36.78 | 16.32 | 1 | OPEN | share@5 1.33 |
+| 7 | `insurance-policy-schedule` | content-present-wholly-displaced | 22.66 | 8.64 | 1 | OPEN | share@5 0.53 |
+| 8 | `landscape-page-inside-portrait-document` | content-present-partly-displaced | 7.15 | 7.20 | 2 | OPEN | share@5 0.62 |
+| 9 | `form16-part-b` | content-present-wholly-displaced | 26.45 | 7.20 | 2 | OPEN | share@5 0.77 |
+| 10 | `mutual-fund-statement` | content-present-wholly-displaced | 27.80 | 9.60 | 1 | OPEN | share@5 0.21 |
+| 11 | `property-tax-receipt` | content-present-wholly-displaced | 27.45 | 18.24 | 1 | OPEN | share@5 0.96 |
+| 12 | `admit-card` | content-present-partly-displaced | 9.31 | 15.36 | 1 | OPEN | share@5 1.89 |
+| 13 | `gst-invoice-multipage-item-table` | content-present-partly-displaced | 11.56 | 7.20 | 1 | OPEN | share@5 0.40 |
+| 14 | `delivery-challan` | content-present-partly-displaced | 3.20 | 12.96 | 1 | OPEN | share@5 0.84 |
+| 15 | `table-across-page-break-repeated-header` | content-present-wholly-displaced | 33.52 | 10.08 | 3 | OPEN | share@5 0.53 |
+| 16 | `gst-invoice-3line-items` | content-present-partly-displaced | 1.12 | 9.60 | 1 | OPEN | share@5 0.54 |
+| 17 | `boq-tender-bill-of-quantities` | content-partly-lost-and-displaced | 41.95 | 15.84 | 1 | OPEN | share@5 0.62 |
+| 18 | `table-with-rotated-header` | content-present-wholly-displaced | 9.56 | 6.72 | 1 | OPEN | share@5 0.12 |
+| 19 | `balance-sheet-and-profit-loss` | content-partly-lost-and-displaced | 36.69 | 11.52 | 1 | OPEN | share@5 0.21 |
 | 20 | `annual-review-2col-uneven-columns` | content-present-partly-displaced | 3.00 | 13.92 | 1 | OPEN | - |
-| 21 | `purchase-order` | content-missing-nothing-in-its-place | 0.90 | 13.44 | 1 | FIXED | share@5 0.90 |
-| 22 | `23_timetable_grid_txtpos` | content-missing-nothing-in-its-place | 5.16 | 46.56 | 1 | OPEN | - |
-| 23 | `invoice-line-items-qty-rate-amount` | none | 0.66 | 12.96 | 1 | FIXED | no defect |
-| 24 | `marksheet-subject-left-marks-right` | none | 0.32 | 6.72 | 1 | FIXED | no defect |
-| 25 | `bank-statement-5-pages` | none | 0.56 | 10.08 | 2 | FIXED | no defect |
+| 21 | `purchase-order` | content-present-wholly-displaced | 14.34 | 13.92 | 1 | OPEN | share@5 0.90 |
+| 22 | `23_timetable_grid_txtpos` | content-missing-partly-replaced | 5.58 | 46.56 | 1 | OPEN | - |
+| 23 | `invoice-line-items-qty-rate-amount` | none | 12.06 | 13.92 | 1 | FIXED | no defect |
+| 24 | `marksheet-subject-left-marks-right` | none | 2.15 | 6.72 | 1 | FIXED | no defect |
+| 25 | `bank-statement-5-pages` | none | 14.14 | 14.88 | 2 | FIXED | no defect |
 | 26 | `69_two_col_legal_numbered_clauses` | content-missing-nothing-in-its-place | 2.53 | 12.48 | 1 | OPEN | - |
-| 27 | `35_four_typefaces_one_page` | content-missing-nothing-in-its-place | 2.19 | 36.48 | 1 | OPEN | - |
+| 27 | `35_four_typefaces_one_page` | content-present-wholly-displaced | 9.10 | 36.48 | 1 | OPEN | - |
 | 28 | `31_times_body_arial_headings` | content-partly-lost-and-displaced | 1.04 | 17.76 | 1 | OPEN | - |
-| 29 | `07_stamp_over_table` | content-missing-partly-replaced | 1.82 | 66.24 | 1 | OPEN | - |
+| 29 | `07_stamp_over_table` | content-partly-lost-and-displaced | 2.75 | 66.24 | 1 | OPEN | - |
 | 30 | `312_affidavit_stamp_paper` | content-missing-nothing-in-its-place | 1.07 | 53.76 | 1 | OPEN | - |
 | 31 | `041122-Account_Opening_Form` | content-missing-partly-replaced | 98.65 | 937.92 | 9 | OPEN | - |
 | 32 | `Account_Opening_Form_Fillable_filled` | content-missing-partly-replaced | 97.62 | 358.08 | 7 | OPEN | - |
 | 33 | `one-page-rotated-180-degrees` | content-missing-partly-replaced | 81.64 | 177.60 | 2 | OPEN | - |
-| 34 | `600_reviewed_invoice_with_annotations` | content-missing-partly-replaced | 62.46 | 62.88 | 1 | OPEN | - |
+| 34 | `600_reviewed_invoice_with_annotations` | content-missing-partly-replaced | 61.86 | 63.84 | 1 | OPEN | - |
 | 35 | `601_fillable_admission_form` | content-missing-partly-replaced | 52.39 | 27.84 | 1 | OPEN | - |
-| 36 | `table-inside-two-column-page` | content-present-wholly-displaced | 35.87 | 21.60 | 1 | OPEN | - |
-| 37 | `360_restaurant_menu` | content-missing-partly-replaced | 34.43 | 45.60 | 1 | OPEN | - |
-| 38 | `text-held-twice-shadow-text` | content-missing-partly-replaced | 30.29 | 60.48 | 1 | OPEN | - |
-| 39 | `77_arabic_rtl_document` | content-missing-partly-replaced | 11.89 | 19.68 | 1 | OPEN | - |
-| 40 | `academic-paper-ieee-2col-abstract` | content-present-partly-displaced | 5.66 | 17.28 | 2 | OPEN | - |
+| 36 | `table-inside-two-column-page` | content-present-wholly-displaced | 30.72 | 23.52 | 1 | OPEN | - |
+| 37 | `360_restaurant_menu` | content-missing-partly-replaced | 50.18 | 46.08 | 1 | OPEN | - |
+| 38 | `text-held-twice-shadow-text` | content-missing-partly-replaced | 29.15 | 60.00 | 1 | OPEN | - |
+| 39 | `77_arabic_rtl_document` | content-missing-partly-replaced | 11.57 | 18.72 | 1 | OPEN | - |
+| 40 | `academic-paper-ieee-2col-abstract` | content-present-partly-displaced | 5.92 | 17.28 | 2 | OPEN | - |
 | 41 | `journal-2col-with-footnotes` | content-missing-partly-replaced | 6.34 | 35.04 | 1 | OPEN | - |
-| 42 | `370_offer_letter` | content-partly-lost-and-displaced | 2.70 | 31.68 | 1 | OPEN | - |
+| 42 | `370_offer_letter` | single-element-far-out | 7.63 | 31.20 | 1 | OPEN | - |
 | 43 | `352_certificate_ornate_border` | content-missing-partly-replaced | 3.00 | 5.28 | 1 | OPEN | - |
 | 44 | `11_stamp_with_signature_image` | content-missing-partly-replaced | 2.77 | 25.92 | 1 | OPEN | - |
 | 45 | `317_rti_response` | content-missing-partly-replaced | 0.65 | 15.84 | 1 | FIXED | share@5 0.65 |
-| 46 | `gst-invoice-with-qr-code` | none | 0.07 | 8.16 | 1 | FIXED | no defect |
-| 47 | `itr-computation-with-slab-table` | content-missing-partly-replaced | 42.33 | 53.28 | 1 | OPEN | - |
-| 48 | `table-with-merged-cells` | none | 0.67 | 11.04 | 1 | FIXED | no defect |
-| 49 | `14_stamp_chars_positioned_td` | content-partly-lost-and-displaced | 3.89 | 25.44 | 1 | OPEN | - |
+| 46 | `gst-invoice-with-qr-code` | none | 0.86 | 8.16 | 1 | FIXED | no defect |
+| 47 | `itr-computation-with-slab-table` | content-partly-lost-and-displaced | 38.49 | 13.92 | 1 | OPEN | - |
+| 48 | `table-with-merged-cells` | none | 1.31 | 11.04 | 1 | FIXED | no defect |
+| 49 | `14_stamp_chars_positioned_td` | content-present-wholly-displaced | 5.45 | 25.44 | 1 | OPEN | - |
 | 50 | `newspaper-2col-fullwidth-headline` | content-partly-lost-and-displaced | 0.42 | 12.00 | 1 | FIXED | share@5 0.01 |
 | 51 | `321_auditors_report` | content-partly-lost-and-displaced | 0.37 | 6.72 | 1 | FIXED | share@5 0.37 |
 | 52 | `313_power_of_attorney` | content-partly-lost-and-displaced | 0.11 | 3.36 | 1 | FIXED | share@5 0.11 |
 | 53 | `310_court_judgment` | content-partly-lost-and-displaced | 0.85 | 14.88 | 1 | FIXED | share@5 0.85 |
 | 54 | `411_nested_xobject_transforms` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
-| 55 | `40_devanagari_shaping_font` | content-partly-lost | 10.48 | 24.00 | 1 | OPEN | - |
-| 56 | `76_devanagari_table` | content-partly-lost | 7.91 | 15.36 | 1 | OPEN | - |
-| 57 | `very-long-single-column-table` | content-present-partly-displaced | 2.38 | 5.76 | 3 | OPEN | share@5 2.38 |
+| 55 | `40_devanagari_shaping_font` | content-partly-lost | 11.23 | 24.00 | 1 | OPEN | - |
+| 56 | `76_devanagari_table` | content-partly-lost | 6.25 | 14.88 | 1 | OPEN | - |
+| 57 | `very-long-single-column-table` | content-present-wholly-displaced | 41.14 | 14.88 | 3 | OPEN | share@5 2.38 |
 | 58 | `policy-2col-spanning-section-heading` | content-present-wholly-displaced | 2.36 | 14.40 | 1 | OPEN | - |
-| 59 | `salary-slip-corporate` | content-present-partly-displaced | 1.28 | 5.76 | 1 | OPEN | share@5 1.28 |
-| 60 | `33_sans_nondefault_body` | content-partly-lost | 4.49 | 36.00 | 1 | OPEN | - |
+| 59 | `salary-slip-corporate` | content-present-partly-displaced | 2.45 | 5.28 | 1 | OPEN | share@5 1.28 |
+| 60 | `33_sans_nondefault_body` | content-present-partly-displaced | 10.73 | 36.00 | 1 | OPEN | - |
 | 61 | `magazine-2col-pullquote-spanning` | content-partly-lost | 2.58 | 17.76 | 1 | OPEN | - |
 | 62 | `304_package_insert_small_print` | content-present-partly-displaced | 2.47 | 12.96 | 1 | OPEN | - |
 | 63 | `61_two_col_abstract_spanning` | content-partly-lost | 2.01 | 15.84 | 1 | OPEN | - |
-| 64 | `80_gstin_pan_cin_ifsc_table` | content-partly-lost | 2.01 | 13.44 | 1 | OPEN | - |
-| 65 | `75_merged_header_cell_three_columns` | content-partly-lost-and-displaced | 7.62 | 20.16 | 1 | OPEN | - |
-| 66 | `71_invoice_space_aligned_no_rules` | content-present-wholly-displaced | 26.88 | 9.12 | 1 | OPEN | - |
-| 67 | `report-2col-table-spanning-both-columns` | none | 0.76 | 12.00 | 1 | FIXED | no defect |
-| 68 | `03_stamp_vertical_90deg` | content-present-wholly-displaced | 16.98 | 5.76 | 1 | OPEN | - |
+| 64 | `80_gstin_pan_cin_ifsc_table` | content-present-wholly-displaced | 6.45 | 13.44 | 1 | OPEN | - |
+| 65 | `75_merged_header_cell_three_columns` | content-present-wholly-displaced | 26.77 | 20.16 | 1 | OPEN | - |
+| 66 | `71_invoice_space_aligned_no_rules` | content-present-wholly-displaced | 26.99 | 11.52 | 1 | OPEN | - |
+| 67 | `report-2col-table-spanning-both-columns` | none | 1.18 | 11.52 | 1 | FIXED | no defect |
+| 68 | `03_stamp_vertical_90deg` | content-present-partly-displaced | 34.38 | 8.16 | 1 | OPEN | - |
 | 69 | `78_mixed_english_devanagari_line` | content-present-partly-displaced | 1.73 | 18.24 | 1 | OPEN | - |
 | 70 | `66_two_col_footnotes_bottom` | content-present-partly-displaced | 2.92 | 8.16 | 1 | OPEN | - |
-| 71 | `68_journal_wide_table_spanning` | content-present-wholly-displaced | 12.09 | 8.64 | 1 | OPEN | - |
-| 72 | `363_warranty_card` | content-present-wholly-displaced | 10.58 | 4.32 | 1 | OPEN | - |
+| 71 | `68_journal_wide_table_spanning` | content-present-wholly-displaced | 5.29 | 8.64 | 1 | OPEN | - |
+| 72 | `363_warranty_card` | content-present-wholly-displaced | 13.29 | 5.76 | 1 | OPEN | - |
 | 73 | `brochure-3col-with-sidebar-box` | content-present-partly-displaced | 2.45 | 12.96 | 1 | OPEN | - |
 | 74 | `gst-invoice-horizontal-rules-only` | none | 0.38 | 9.12 | 1 | FIXED | no defect |
-| 75 | `374_org_chart` | content-present-partly-displaced | 5.92 | 4.80 | 1 | OPEN | - |
-| 76 | `payslip-label-left-amount-right` | content-present-partly-displaced | 5.59 | 4.32 | 1 | OPEN | - |
+| 75 | `374_org_chart` | content-present-wholly-displaced | 8.84 | 6.24 | 1 | OPEN | - |
+| 76 | `payslip-label-left-amount-right` | content-present-wholly-displaced | 10.47 | 5.76 | 1 | OPEN | - |
 | 77 | `417_rotate180_and_mirrored` | content-present-wholly-displaced | 5.50 | 5.76 | 2 | OPEN | - |
 | 78 | `product-catalogue-code-left-price-right` | content-present-wholly-displaced | 0.47 | 3.84 | 1 | FIXED | no defect |
 | 79 | `316_contract_with_schedules` | content-present-wholly-displaced | 0.26 | 7.20 | 1 | FIXED | share@5 0.26 |
 | 80 | `table-of-contents-dot-leaders` | content-present-partly-displaced | 4.97 | 26.40 | 1 | OPEN | - |
-| 81 | `64_newspaper_uneven_columns_ad_boxes` | content-present-partly-displaced | 3.46 | 6.72 | 1 | OPEN | - |
+| 81 | `64_newspaper_uneven_columns_ad_boxes` | content-present-partly-displaced | 3.00 | 6.72 | 1 | OPEN | - |
 | 82 | `bank-statement-horizontal-rules-only` | none | 0.10 | 3.36 | 1 | FIXED | no defect |
 | 83 | `330_cad_drawing_sheet` | content-present-partly-displaced | 4.91 | 14.88 | 1 | OPEN | - |
 | 84 | `65_two_col_full_width_figure_caption` | content-present-partly-displaced | 1.75 | 8.64 | 1 | OPEN | - |
-| 85 | `406_passport_mrz_page` | content-missing-nothing-in-its-place | 3.45 | 15.84 | 1 | OPEN | - |
-| 86 | `price-list-2col-dense-right-aligned` | content-present-partly-displaced | 2.69 | 7.20 | 1 | OPEN | - |
+| 85 | `406_passport_mrz_page` | content-missing-partly-replaced | 6.79 | 15.84 | 1 | OPEN | - |
+| 86 | `price-list-2col-dense-right-aligned` | content-present-wholly-displaced | 27.89 | 8.64 | 1 | OPEN | - |
 | 87 | `315_gazette_notification` | content-present-partly-displaced | 1.91 | 8.64 | 1 | OPEN | - |
-| 88 | `price-list-right-aligned-amounts` | content-present-partly-displaced | 1.79 | 5.76 | 1 | OPEN | - |
+| 88 | `price-list-right-aligned-amounts` | content-present-partly-displaced | 12.37 | 6.24 | 1 | OPEN | - |
 | 89 | `27_two_column_left_short_txtpos` | content-present-partly-displaced | 1.62 | 7.68 | 1 | OPEN | - |
 | 90 | `392_statistical_console_output` | content-missing-nothing-in-its-place | 1.61 | 4.32 | 1 | OPEN | - |
 | 91 | `70_magazine_drop_cap_photo_caption` | content-present-partly-displaced | 1.16 | 10.56 | 1 | OPEN | - |
-| 92 | `newsletter-3col-header-footer` | none | 0.20 | 172.80 | 1 | FIXED | no defect |
+| 92 | `newsletter-3col-header-footer` | none | 0.33 | 7.68 | 1 | FIXED | no defect |
 | 93 | `34_monospace_document` | none | 0.93 | 4.80 | 1 | FIXED | no defect |
-| 94 | `eway-bill` | none | 0.05 | 4.80 | 1 | FIXED | no defect |
+| 94 | `eway-bill` | none | 4.08 | 7.20 | 1 | FIXED | no defect |
 | 95 | `67_two_col_with_sidebar` | none | 0.80 | 11.52 | 1 | FIXED | no defect |
 | 96 | `28_value_overflows_cell_txtpos` | none | 0.72 | 15.36 | 1 | FIXED | no defect |
-| 97 | `79_inr_indian_digit_grouping_table` | none | 0.74 | 9.12 | 1 | FIXED | no defect |
+| 97 | `79_inr_indian_digit_grouping_table` | none | 7.77 | 9.12 | 1 | FIXED | no defect |
 | 98 | `39_small_caps_letter_spacing` | none | 0.70 | 4.80 | 1 | FIXED | no defect |
-| 99 | `326_itr_computation` | none | 0.63 | 13.92 | 1 | FIXED | no defect |
-| 100 | `344_customs_declaration` | none | 0.61 | 49.92 | 1 | FIXED | no defect |
-| 101 | `table-with-no-header-row` | none | 0.61 | 11.52 | 1 | FIXED | no defect |
+| 99 | `326_itr_computation` | none | 1.36 | 13.92 | 1 | FIXED | no defect |
+| 100 | `344_customs_declaration` | none | 0.98 | 49.92 | 1 | FIXED | no defect |
+| 101 | `table-with-no-header-row` | none | 47.48 | 15.84 | 1 | FIXED | no defect |
 | 102 | `37_font_not_embedded_substitution` | none | 0.58 | 14.40 | 1 | FIXED | no defect |
-| 103 | `balance-sheet-two-columns-of-figures` | none | 0.57 | 5.76 | 1 | FIXED | no defect |
-| 104 | `question-paper-marks-right-margin` | none | 0.44 | 14.88 | 1 | FIXED | no defect |
+| 103 | `balance-sheet-two-columns-of-figures` | none | 1.61 | 5.76 | 1 | FIXED | no defect |
+| 104 | `question-paper-marks-right-margin` | none | 0.62 | 14.88 | 1 | FIXED | no defect |
 | 105 | `413_tagged_pdf_actualtext` | none | 0.38 | 3.84 | 1 | FIXED | no defect |
-| 106 | `383_api_docs_page` | none | 0.30 | 19.68 | 1 | FIXED | no defect |
-| 107 | `404_sudoku_grid` | none | 0.27 | 3.36 | 1 | FIXED | no defect |
-| 108 | `bus-timetable-station-left-times-right` | none | 0.27 | 12.96 | 1 | FIXED | no defect |
-| 109 | `364_event_ticket` | none | 0.25 | 2.88 | 1 | FIXED | no defect |
-| 110 | `343_air_waybill` | none | 0.23 | 14.88 | 1 | FIXED | no defect |
+| 106 | `383_api_docs_page` | none | 0.80 | 19.68 | 1 | FIXED | no defect |
+| 107 | `404_sudoku_grid` | none | 3.63 | 3.36 | 1 | FIXED | no defect |
+| 108 | `bus-timetable-station-left-times-right` | none | 11.40 | 12.96 | 1 | FIXED | no defect |
+| 109 | `364_event_ticket` | none | 1.64 | 5.76 | 1 | FIXED | no defect |
+| 110 | `343_air_waybill` | none | 0.23 | 15.36 | 1 | FIXED | no defect |
 | 111 | `admission-form-labels-left-boxes-right` | none | 0.21 | 4.32 | 1 | FIXED | no defect |
 | 112 | `05_round_company_seal_curved_text` | none | 0.19 | 5.28 | 1 | FIXED | no defect |
 | 113 | `boq-horizontal-rules-only` | none | 0.13 | 8.64 | 1 | FIXED | no defect |
-| 114 | `08_two_overlapping_stamps` | none | 0.11 | 11.04 | 1 | FIXED | no defect |
+| 114 | `08_two_overlapping_stamps` | none | 1.12 | 11.04 | 1 | FIXED | no defect |
 | 115 | `350_question_paper` | none | 0.11 | 16.80 | 1 | FIXED | no defect |
 | 116 | `391_survey_questionnaire_grid` | none | 0.11 | 4.32 | 1 | FIXED | no defect |
-| 117 | `333_datasheet_spec_tables` | none | 0.07 | 6.24 | 1 | FIXED | no defect |
+| 117 | `333_datasheet_spec_tables` | none | 1.23 | 6.72 | 1 | FIXED | no defect |
 | 118 | `340_bill_of_lading` | none | 0.07 | 3.36 | 1 | FIXED | no defect |
-| 119 | `300_prescription_rx` | none | 0.06 | 21.60 | 1 | FIXED | no defect |
+| 119 | `300_prescription_rx` | none | 0.51 | 21.60 | 1 | FIXED | no defect |
 | 120 | `60_page_border` | none | 0.06 | 8.16 | 1 | FIXED | no defect |
 | 121 | `12_stamp_across_page_break` | none | 0.04 | 3.36 | 2 | FIXED | no defect |
 | 122 | `45_coloured_callout_box` | none | 0.05 | 3.36 | 1 | FIXED | no defect |
 | 123 | `15_stamp_on_scanned_page` | none | 0.03 | 3.36 | 1 | FIXED | no defect |
-| 124 | `25_signature_block_underscores_txtpos` | none | 0.03 | 10.08 | 1 | FIXED | no defect |
-| 125 | `362_price_list_dense` | none | 0.03 | 3.36 | 1 | FIXED | no defect |
-| 126 | `390_wide_data_appendix` | none | 0.03 | 3.36 | 1 | FIXED | no defect |
+| 124 | `25_signature_block_underscores_txtpos` | none | 0.04 | 10.08 | 1 | FIXED | no defect |
+| 125 | `362_price_list_dense` | none | 0.82 | 4.80 | 1 | FIXED | no defect |
+| 126 | `390_wide_data_appendix` | none | 3.23 | 4.80 | 1 | FIXED | no defect |
 | 127 | `401_trifold_brochure` | none | 0.03 | 10.56 | 1 | FIXED | no defect |
-| 128 | `74_balance_sheet_indented_subitems` | none | 0.03 | 3.36 | 1 | FIXED | no defect |
+| 128 | `74_balance_sheet_indented_subitems` | none | 4.80 | 5.28 | 1 | FIXED | no defect |
 | 129 | `20_numbered_list_separate_column_txtpos` | none | 0.02 | 2.88 | 1 | FIXED | no defect |
 | 130 | `301_lab_report_panel` | none | 0.02 | 7.20 | 1 | FIXED | no defect |
-| 131 | `365_recipe_card` | none | 0.02 | 2.88 | 1 | FIXED | no defect |
+| 131 | `365_recipe_card` | none | 1.30 | 2.88 | 1 | FIXED | no defect |
 | 132 | `44_coloured_underlined_hyperlinks` | none | 0.02 | 3.84 | 1 | FIXED | no defect |
-| 133 | `13_stamp_non_english` | none | 0.01 | 3.84 | 1 | FIXED | no defect |
+| 133 | `13_stamp_non_english` | none | 3.00 | 4.80 | 1 | FIXED | no defect |
 | 134 | `26_footnote_marker_bottom_note_txtpos` | none | 0.01 | 3.84 | 1 | FIXED | no defect |
-| 135 | `375_attendance_register` | none | 0.01 | 3.84 | 1 | FIXED | no defect |
-| 136 | `38_faux_bold_italic_synthesised` | none | 0.01 | 2.88 | 1 | FIXED | no defect |
+| 135 | `375_attendance_register` | none | 1.07 | 6.24 | 1 | FIXED | no defect |
+| 136 | `38_faux_bold_italic_synthesised` | none | 1.86 | 4.80 | 1 | FIXED | no defect |
 | 137 | `393_spectrum_peak_table` | none | 0.01 | 3.36 | 1 | FIXED | no defect |
 | 138 | `46_chart_coloured_labels_body_text` | none | 0.01 | 2.88 | 1 | FIXED | no defect |
-| 139 | `01_stamp_rotated_15deg_upright` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 140 | `02_stamp_rotated_15deg_upleft` | none | 0.00 | 2.88 | 1 | FIXED | no defect |
-| 141 | `04_stamp_180deg_upside_down` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
-| 142 | `06_rect_paid_stamp_red_transparent` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
+| 139 | `01_stamp_rotated_15deg_upright` | none | 1.27 | 4.80 | 1 | FIXED | no defect |
+| 140 | `02_stamp_rotated_15deg_upleft` | none | 3.68 | 5.28 | 1 | FIXED | no defect |
+| 141 | `04_stamp_180deg_upside_down` | none | 0.96 | 4.32 | 1 | FIXED | no defect |
+| 142 | `06_rect_paid_stamp_red_transparent` | none | 6.90 | 4.32 | 1 | FIXED | no defect |
 | 143 | `09_stamp_font_not_embedded` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
-| 144 | `10_stamp_as_image` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 145 | `16_right_aligned_amounts_txtpos` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
+| 144 | `10_stamp_as_image` | none | 4.68 | 4.80 | 1 | FIXED | no defect |
+| 145 | `16_right_aligned_amounts_txtpos` | none | 3.83 | 4.80 | 1 | FIXED | no defect |
 | 146 | `17_three_column_widths_txtpos` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
 | 147 | `18_centred_heading_left_body_txtpos` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
 | 148 | `19_hanging_indent_txtpos` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
 | 149 | `21_form_labels_x60_values_x300_txtpos` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 150 | `22_invoice_four_columns_txtpos` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
+| 150 | `22_invoice_four_columns_txtpos` | none | 3.49 | 4.32 | 1 | FIXED | no defect |
 | 151 | `24_address_block_indents_txtpos` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
-| 152 | `29_dot_leaders_txtpos` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 153 | `302_radiology_report` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
+| 152 | `29_dot_leaders_txtpos` | none | 0.89 | 3.84 | 1 | FIXED | no defect |
+| 153 | `302_radiology_report` | none | 1.36 | 3.84 | 1 | FIXED | no defect |
 | 154 | `303_discharge_summary` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
 | 155 | `305_vaccination_certificate` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
-| 156 | `306_clinical_protocol_synopsis` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 157 | `30_mixed_font_sizes_one_baseline_txtpos` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
-| 158 | `311_fir_police_form` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 159 | `314_tender_rfp_boq` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 160 | `318_court_summons_form` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
+| 156 | `306_clinical_protocol_synopsis` | none | 1.11 | 4.32 | 1 | FIXED | no defect |
+| 157 | `30_mixed_font_sizes_one_baseline_txtpos` | none | 1.90 | 4.32 | 1 | FIXED | no defect |
+| 158 | `311_fir_police_form` | none | 5.59 | 3.84 | 1 | FIXED | no defect |
+| 159 | `314_tender_rfp_boq` | none | 1.59 | 4.80 | 1 | FIXED | no defect |
+| 160 | `318_court_summons_form` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
 | 161 | `320_balance_sheet_statutory` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
 | 162 | `322_mutual_fund_factsheet` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
-| 163 | `323_credit_card_statement` | none | 0.00 | 2.88 | 1 | FIXED | no defect |
+| 163 | `323_credit_card_statement` | none | 0.09 | 4.32 | 1 | FIXED | no defect |
 | 164 | `324_loan_amortisation_schedule` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
 | 165 | `325_demat_holdings_statement` | none | 0.00 | 2.88 | 1 | FIXED | no defect |
 | 166 | `32_serif_nondefault_body` | none | 0.00 | 0.96 | 1 | FIXED | no defect |
 | 167 | `331_pid_diagram` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 168 | `332_bom_on_drawing` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
+| 168 | `332_bom_on_drawing` | none | 2.83 | 14.88 | 1 | FIXED | no defect |
 | 169 | `334_patent_document` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
 | 170 | `335_msds_safety_data_sheet` | none | 0.00 | 2.88 | 1 | FIXED | no defect |
 | 171 | `341_shipping_manifest` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 172 | `342_packing_list` | none | 0.00 | 3.36 | 1 | FIXED | no defect |
-| 173 | `351_omr_answer_sheet` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
+| 172 | `342_packing_list` | none | 0.00 | 2.88 | 1 | FIXED | no defect |
+| 173 | `351_omr_answer_sheet` | none | 0.01 | 2.88 | 1 | FIXED | no defect |
 | 174 | `353_admit_card` | none | 0.00 | 2.88 | 1 | FIXED | no defect |
 | 175 | `361_product_catalogue_grid` | none | 0.00 | 0.00 | 1 | FIXED | no defect |
-| 176 | `36_embedded_subset_font` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
+| 176 | `36_embedded_subset_font` | none | 4.91 | 4.32 | 1 | FIXED | no defect |
 | 177 | `371_experience_certificate` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
-| 178 | `372_timesheet_grid` | none | 0.00 | 0.96 | 1 | FIXED | no defect |
+| 178 | `372_timesheet_grid` | none | 0.22 | 3.36 | 1 | FIXED | no defect |
 | 179 | `373_leave_application_form` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
 | 180 | `380_runbook_terminal_output` | none | 0.00 | 0.96 | 1 | FIXED | no defect |
 | 181 | `381_incident_report_timeline` | none | 0.00 | 2.88 | 1 | FIXED | no defect |
@@ -222,33 +223,33 @@ only a work queue.
 | 183 | `394_map_with_legend` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
 | 184 | `400_comic_page_speech_bubbles` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
 | 185 | `402_calendar_month_grid` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 186 | `403_crossword_puzzle` | none | 0.00 | 2.88 | 1 | FIXED | no defect |
+| 186 | `403_crossword_puzzle` | none | 0.38 | 4.80 | 1 | FIXED | no defect |
 | 187 | `405_sheet_music_lyrics` | none | 0.00 | 0.96 | 1 | FIXED | no defect |
 | 188 | `407_id_card_front_back` | none | 0.00 | 3.36 | 1 | FIXED | no defect |
 | 189 | `410_form_xobject_reused` | none | 0.00 | 0.96 | 1 | FIXED | no defect |
 | 190 | `412_page_labels_roman` | none | 0.00 | 0.00 | 1 | FIXED | no defect |
 | 191 | `414_transparency_softmask` | none | 0.00 | 0.00 | 1 | FIXED | no defect |
-| 192 | `41_coloured_headings_white_bg` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
-| 193 | `42_table_coloured_header_alternating_rows` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
+| 192 | `41_coloured_headings_white_bg` | none | 2.16 | 4.32 | 1 | FIXED | no defect |
+| 193 | `42_table_coloured_header_alternating_rows` | none | 2.39 | 4.80 | 1 | FIXED | no defect |
 | 194 | `43_red_stamp_over_black_text` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
 | 195 | `47_grey_body_black_headings` | none | 0.00 | 0.96 | 1 | FIXED | no defect |
 | 196 | `48_form_coloured_border_coloured_values` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
 | 197 | `49_coloured_background_block_paragraph` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
-| 198 | `50_invoice_coloured_total_row` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
+| 198 | `50_invoice_coloured_total_row` | none | 0.75 | 4.32 | 1 | FIXED | no defect |
 | 199 | `51_two_cm_margins` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 200 | `52_one_cm_margin_wide_body` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
+| 200 | `52_one_cm_margin_wide_body` | none | 1.59 | 4.32 | 1 | FIXED | no defect |
 | 201 | `53_single_space_body_15_headings` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
 | 202 | `54_two_column_body_full_width_header_footer` | none | 0.00 | 0.96 | 1 | FIXED | no defect |
 | 203 | `55_sidebar_box_beside_body` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 204 | `56_table_indented_from_margin` | none | 0.00 | 3.36 | 1 | FIXED | no defect |
+| 204 | `56_table_indented_from_margin` | none | 4.13 | 4.80 | 1 | FIXED | no defect |
 | 205 | `57_centred_title_page_left_body_pages` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
 | 206 | `58_header_rule_footer_rule` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
-| 207 | `59_landscape_mixed_portrait` | none | 0.00 | 1.92 | 1 | FIXED | no defect |
+| 207 | `59_landscape_mixed_portrait` | none | 3.47 | 4.32 | 1 | FIXED | no defect |
 | 208 | `602_bookmarked_annual_report` | none | 0.00 | 0.96 | 1 | FIXED | no defect |
 | 209 | `62_two_col_newsletter_pull_quote` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
 | 210 | `63_three_column_brochure` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 211 | `72_bank_statement_no_rules_right_amounts` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
-| 212 | `73_marksheet_subject_marks_grade` | none | 0.00 | 1.44 | 1 | FIXED | no defect |
+| 211 | `72_bank_statement_no_rules_right_amounts` | none | 1.57 | 4.32 | 1 | FIXED | no defect |
+| 212 | `73_marksheet_subject_marks_grade` | none | 7.95 | 4.32 | 1 | FIXED | no defect |
 
 ## Parked
 

@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-28 01:27
+# Fixer report - 2026-11-28 00:58
 
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 01:27 → running IST · 0 min**
+**28 Nov 2026 · slot 00:58 → running IST · 1h 15m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,35 +15,28 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - run window: RUN.json says this run began at 01:27 vs TIMELINE.jsonl records the claim at 00:18, so the window was reset and the duration is short |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
-| Documents improved, round total | **61** of the 212 compared (corpus 214) |
-| Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
-| Regressions | **none** |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; .txt age: measured 6.2 h ago vs nothing re-measures it on a schedule |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Documents improved, round total | **43** of the 212 compared (corpus 214) |
+| Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
+| Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
 | Exempt from the LibreOffice comparison | **0** — none |
 | **Fixed - Google, every applicable check** | **46** of the **206** re-measured on this engine - **0** of the 206 scored are still on an older engine, and **0** of those were clean on the engine they were measured with |
-| Fixed - LibreOffice proxy | 33 of the 212 compared - a renderer the user does not open |
+| Fixed - LibreOffice proxy | 13 of the 212 compared - a renderer the user does not open |
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
-| Moved but still open | **28** — improved, not fixed |
+| Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (65 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `18_displacement` - taken from the pending list (66 still open), not a new class |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 01:27 | **reverted** | 0/0 | ROW_RUNG_UNDER_TW=0 reproduces four published table values digit for digit (table-with-no-header-row 47.48->0.61, boq 0.62, mobile-bill 1.55, electricity-bill 1.33) but the full 213-document measure i |
+| 02:13 | **lead** | None/None | gate unblocked instead: full 213/213 re-measure on engine a05b20eb committed and stamped; the table it replaced described d28ca751 and was 82 documents optimistic - table-with-no-header-row 0.61 vs 47 |
 
 ## Why nothing moved, in this run's own words
 
-> The 27 Nov run's claim was that `ROW_RUNG_UNDER_TW` is one constant whose deletion restores 84-96 documents. The four documents it named do come back, digit for digit, and I reproduced that on my own build. But the full corpus says the constant is a per-document trade, not a defect: 4 documents better, **63 worse**, 146 unchanged, measured on one engine, one conversion pass, 213 documents scored.
->
-> The worst case is a dense two-column price list: `price-list-2col-dense-right-aligned` goes 2.69 -> 27.89. I converted that one document again on its own and scored it again, and got 27.89 - the regression is in the render, not in the table.
->
-> The reason is mechanical. The rung subtracts a fixed 10 twips from every row that has 5 pt of foot room. On a long ruled table whose source pitch equals the page pitch, that subtraction is pure accumulated error and removing it is right. On a dense price list the rows are shorter than the pitch and the shortfall is what keeps each row's ink inside its own band; removing it lays every row low and the ink crosses the rules. One constant cannot be right for both. The correct fix computes the per-row difference between the source pitch and the room that row's own text needs - a real change, not a one-line edit, and the next run's build.
->
-> So the change was reverted and nothing went into the engine. The measured table for the whole corpus at rung=0 is committed beside the finding so the next run does not pay the hour again, and the falsifier the previous run wrote for itself has fired and is recorded.
+*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
 
 ### The run before this one said
 
@@ -71,13 +64,11 @@
 >
 > Accounts share 2% of their significant words - a different account (the cut is 50%).
 
-Accounts share 13% of their significant words - a different account (the cut is 50%).
-
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **5.5 h ago** |
+| Measured | **6.2 h ago** - nothing re-measures this on a schedule; run `txt_gate.py --score 60` |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -92,10 +83,11 @@ Accounts share 13% of their significant words - a different account (the cut is 
 
 | | |
 |:--|:--|
-| Slot window | 01:27 → running · 0 min |
+| Slot window | 00:58 → running · 1h 15m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 7 |
-| Silences over 2 min | 0 |
+| Tool beats | 124 |
+| Longest silence | **38.8 min** — from 00:58:41, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -103,20 +95,29 @@ Accounts share 13% of their significant words - a different account (the cut is 
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **0 min** | `######################` |
+| build - compiling the engine | **1 min** | `#` |
+| fix - diagnose and change the engine | **4 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **1h 04m** | `###################` |
+| other - not attributed to a tool | **4 min** | `#` |
+
+The unattributed row is 4 distinct beat(s) that matched no phase. They said:
+
+- `measuring corpus on HEAD engine to test whether the gate can be satisfied in a slot`
+- `measuring corpus on HEAD engine: 72/213 done, ~5.9s/doc`
+- `measuring corpus on HEAD engine: 169/213, 44 left`
 ## Best results this round
 
 | Document | Before | After | Change |
 |:--|--:|--:|--:|
 | `415_inline_images` | 89.04 | 0.00 | -89.04 |
 | `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
-| `itr-computation-with-slab-table` | 68.82 | 42.33 | -26.49 |
-| `report-2col-table-spanning-both-columns` | 22.58 | 0.76 | -21.82 |
-| `75_merged_header_cell_three_columns` | 27.62 | 7.62 | -20.00 |
+| `itr-computation-with-slab-table` | 68.82 | 38.49 | -30.33 |
+| `report-2col-table-spanning-both-columns` | 22.58 | 1.18 | -21.40 |
+| `78_mixed_english_devanagari_line` | 13.51 | 1.73 | -11.78 |
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 39 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
