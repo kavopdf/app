@@ -539,25 +539,50 @@ wide enough for both.
 **And measure x as well as y.** An earlier reading of this defect compared y only and reported two overlaps
 between two different table columns that never touch.
 
-## The engine drops table rules and shading, and rasterises content
+## What is and is not wrong in the exported PDF - a correction
 
-Measured on one invoice page:
+An earlier version of this section claimed the engine drops table rules and shading and rasterises content.
+**Two of those three claims were wrong and are withdrawn.** They came from counting drawings in the *exported
+PDF* and treating those counts as if they described the `.docx`.
 
-                        banner  drawings  filled  lines  shade-rects  images
-    source PDF            yes      19        3      16       2          0
-    engine .docx export   yes       2        1       1       0         17
+Measured on the `.docx` itself and confirmed by eye in Google Docs with print layout on:
 
-- **16 line segments become 1** - the table reads as an unruled list
-- **`<w:shd` appears zero times** - the header banner's and the `Grand Total` row's shading are both absent
-- **the banner text is invisible** - `TAX INVOICE` is in the document and text extraction finds it, but it is
-  white on a background with no shading, so it is white on white. **Text that exists and cannot be seen is
-  worse than text that is missing, because every text-layer check reports it as present.**
-- **17 images in a document that had none** - vector content is being rasterised, and that plausibly explains
-  the other three
+    w:lineRule="exact"      79 of 79 paragraphs
+    w:before (absolute Y)   79 of 79 paragraphs
+    wp:anchor               17, all relativeFrom="page", zero inline
+    w:br (breaks)            0        <- Adobe's output has section and column breaks; ours has none
+    sectPr                   1
+    w:tcBorders              6        <- table borders ARE present, and visible in the render
+    w:shd                    0        <- but the Grand Total row IS shaded, so shading comes from elsewhere
+    images in package        1        <- only the stamp. The 17 images in the export are Google's doing.
 
-**Settled: do not measure a document by text extraction alone.** All four defects are invisible to a text-layer
-check and visible only in a render. Compare the count of line segments, of filled regions, and of rasterised
-regions against the source's, before comparing text.
+**So: table borders are present and render correctly. The Grand Total row's shading is present and renders
+correctly.** Both claims in the earlier version were wrong.
+
+**What IS wrong, confirmed by eye in print layout on:**
+
+- **The totals block prints on top of itself** - `Total job work charges` over `2,81,120.00`, `CGST @ 6%` over
+  `16,867.20`, `SGST @ 6%` over `16,867.20`, `Grand Total` over `3,14,854.40`. **This is the tab-stop defect
+  described above, and it is visible in the default view, not only in pageless mode.**
+- **The header banner's text does not render** - `TAX INVOICE — JOB WORK` is in the document and text
+  extraction finds it, but the dark red bar renders empty.
+
+**And the 17 images are not ours.** The package contains one image, the stamp. Whatever rasterisation appears in
+the export is done by Google on the way out, not written by the engine. **That distinction matters: it means
+there is nothing to fix in the `.docx` for it.**
+
+## Pageless mode is not a defect to chase
+
+With print layout **off**, Google Docs reflows the document and our output looks worse than Adobe's or
+iLovePDF's. **Adobe and iLovePDF show the same class of breakage there** - section and column break markers
+become visible and content shifts - so this is a property of the viewer, not of any one converter.
+
+**Do not change the output to suit pageless mode.** It is not the default view, the default view is what is
+measured, and changing constructs for it risks the paginated render that is the official one.
+
+**One difference is worth knowing, though it is not a task:** Adobe's output carries **section and column
+breaks**; ours carries **none** (`w:br` = 0, `sectPr` = 1). Breaks give a reflowing viewer something to hold
+on to. That is an observation, not a recommendation.
 
 ## `SETTLED.md` is 495 lines, not 87
 
