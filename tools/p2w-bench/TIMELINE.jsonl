@@ -8752,3 +8752,7 @@
 {"t": 1795751768.9895458, "ist": "09:26:08", "ev": "beat", "d": "right tab measured: honoured to 2.5pt, but splits the line in extraction; storing control row"}
 {"t": 1795751854.1136146, "ist": "09:27:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795751856.9773424, "ist": "09:27:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795751860.9798074, "ist": "09:27:40", "ev": "attempt", "d": "60_text_column_right_edge -> lead"}
+{"t": 1795751861.1622903, "ist": "09:27:41", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795751861.2842014, "ist": "09:27:41", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795751862.5341187, "ist": "09:27:42", "ev": "beat", "d": "classrow.py: refreshing the class file"}
