@@ -828,3 +828,59 @@ window contained body text.**
     open        12's stitching across a page boundary
     open        the ink metric, which needs the same object separation as everything else
     open        the count of affected documents
+
+## The count, and the locator has false positives. Do not quote 52.
+
+The three-branch locator was run across all 213 documents:
+
+    branch 1  rotated text spans   31 documents
+    branch 2  the page has an image 12 documents
+    branch 3  a closed tall path     9 documents
+    none                           161 documents
+
+**52 is not the number of documents with a stamp, and quoting it would be wrong.** Reading the lists shows
+what the branches actually catch:
+
+    branch 1 includes  table-with-rotated-header      11 rotated spans
+                      60_page_border                  49 rotated spans
+                      one-page-rotated-180-degrees    61 rotated spans
+                      417_rotate180_and_mirrored       4 rotated spans
+                      411_nested_xobject_transforms    2 rotated spans
+
+    branch 2 includes  300_prescription_rx, 70_magazine_drop_cap_photo_caption,
+                       407_id_card_front_back, 361_product_catalogue_grid ...
+                       - photographs and logos, not stamps
+
+    branch 3 includes  45_coloured_callout_box, 55_sidebar_box_beside_body,
+                       51_two_cm_margins, 80_gstin_pan_cin_ifsc_table ...
+                       - callout boxes and table borders, not stamps
+
+**Rotated text is not a stamp. An image is not a stamp. A tall rectangle is not a stamp.** The branches find
+the *candidate* region correctly - every one of the sixteen known stamp documents is inside them - but they
+also find rotated tables, page borders, photographs and callout boxes.
+
+**The corpus has 16 documents with a stamp. It has 52 with a rotated object, an image, or a tall box.** The
+difference is the discrimination the locator does not yet make.
+
+### What would separate a stamp from the other three
+
+Not colour - disproved. Not rarity - disproved. What is left, and it is untested:
+
+- a stamp **overlaps body text** rather than sitting in its own space. A rotated table header sits above its
+  table; a callout box sits in the margin; a photograph has its own column. A stamp is laid *over* the text
+  it marks.
+- a stamp's rotated spans are **few and short** - a few words - where a rotated table header or a 180-degree
+  page has many and long ones. 60_page_border gives 49 spans, one-page-rotated-180-degrees gives 61;
+  the stamp documents give 1 to 4, with 312's seal at 26 and 05's curved seal at 69 as the two exceptions.
+
+**The overlap test is the more promising of the two**, and it is the one the whole method already depends on:
+the stamp is the thing painted over other content.
+
+### So the honest count
+
+**16 documents in the corpus carry a stamp.** That is measured - they were identified individually. **How many
+of the other 197 might also carry one that the locator would miss is not known**, and the 161 "none" figure is
+only as good as the branches are, which is to say it is a lower bound on nothing and an upper bound on
+nothing.
+
+**Do not report 52. Report 16, and report that discrimination is the open problem.**
