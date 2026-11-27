@@ -612,5 +612,32 @@
   ],
   "docs_improved": 0,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "08:34",
+  "started_ts": 1795748648.322708,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "18-d-01"
+  ],
+  "attempts": 2,
+  "class": "18_displacement",
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "needs_human": 0,
+  "obstacles_cleared": 0,
+  "started": "08:34",
+  "started_ts": 1795748651.9435802,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

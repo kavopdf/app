@@ -79,8 +79,8 @@
 {"at": "2026-11-21 14:42", "attempt": 18, "class": "t01_word_accuracy", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-21 14:49", "attempt": 19, "class": "t01_word_accuracy", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-21 15:48", "attempt": 15, "class": "47_margins", "outcome": "partial", "requeues": 0, "round": 1, "status": "OPEN"}
-{"at": "2026-11-21 17:25", "attempt": 16, "class": "47_margins", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-21 17:00", "attempt": 2, "class": "t02_position", "outcome": "partial", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-21 17:25", "attempt": 16, "class": "47_margins", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-21 17:39", "attempt": 3, "class": "32_stroke_lines", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-21 19:04", "attempt": 3, "class": "32_stroke_lines", "outcome": "error", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-21 19:10", "attempt": 3, "class": "32_stroke_lines", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
@@ -218,11 +218,8 @@
 {"at": "2026-11-26 11:49", "attempt": 83, "class": "18_displacement", "outcome": "reverted", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-26 11:50", "attempt": 84, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-26 11:53", "attempt": 85, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
-<<<<<<< HEAD
-{"at": "2026-11-26 13:35", "attempt": 11, "class": "t12_word_invention", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
-=======
 {"at": "2026-11-26 13:11", "attempt": 86, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
->>>>>>> origin/main
+{"at": "2026-11-26 13:35", "attempt": 11, "class": "t12_word_invention", "outcome": "reverted", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-26 14:59", "attempt": 87, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-26 15:12", "attempt": 88, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-26 15:12", "attempt": 89, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
@@ -242,4 +239,5 @@
 {"at": "2026-11-27 05:46", "attempt": 101, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-27 06:19", "attempt": 102, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-27 07:44", "attempt": 103, "class": "18_displacement", "outcome": "kept", "requeues": 0, "round": 1, "status": "PARKED"}
+{"at": "2026-11-27 09:13", "attempt": 104, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-27 09:27", "attempt": 8, "class": "60_text_column_right_edge", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
