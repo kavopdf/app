@@ -1,7 +1,7 @@
 {
  "agents": [],
- "attempts": 1,
- "class": "",
+ "attempts": 2,
+ "class": "t12_word_invention",
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
