@@ -65,3 +65,19 @@ behind six runs in a row that measured a fix and could not land it.
   reproduces on the 11:57 engine was never re-measured.
 - Of the eight patches in `PATCHES/`, none is applied at HEAD; the refused-spacer -> `w:before` work
   (the 59-of-62-document lead) already landed at `9f0a8207` and `8fb4f503`, so it is not a candidate.
+
+## Why the last 7 are not a rendering problem, and why the fast path does not rescue them
+
+`out/` holds 214 `.docx` and `pre/` holds 213 `.pdf`, so every document except the exempt
+`416_many_tiny_pages` has a render. The seven are therefore failing at **scoring**, not at conversion:
+`benchmarks/p2w.py:1604` builds `todo` from documents with no `dist/<name>.json`, and these seven never
+get one, so every call renders them again (55 s and 15 s each, measured at 16:52) and throws the result
+away. That is the loop - a slot spent on them buys nothing, and the pass cannot publish however long it
+runs.
+
+`p2w.py` does have a fast path for exactly this shape - `P2W_CHANGED_ONLY=1` with
+`benchmarks/DOCX-CHANGED.json` (see the comment at `benchmarks/p2w.py:1615`) - but the list on disk is
+`{"changed": [], "unmeasured": [], "todo": [], "of": 213, "at": "2026-11-25T03:37:02"}`: four days stale
+and empty. It would not help after an engine change anyway, because an engine change moves every `.docx`
+byte, which is the 213 again. It helps a restamp after a non-engine change, and it is worth regenerating
+before anyone tries one.
