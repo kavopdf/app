@@ -8543,3 +8543,42 @@
 {"t": 1795740991.802701, "ist": "06:26:31", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795740992.140525, "ist": "06:26:32", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795740994.3057332, "ist": "06:26:34", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795741363.7285092, "ist": "06:32:43", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795741363.8768814, "ist": "06:32:43", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795741364.048156, "ist": "06:32:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795741364.2321615, "ist": "06:32:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795741364.3727334, "ist": "06:32:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795741364.5386972, "ist": "06:32:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795741364.720502, "ist": "06:32:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795741364.8770514, "ist": "06:32:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
+{"t": 1795741473.0139554, "ist": "06:34:33", "ev": "beat", "d": "heartbeat before any claim: gverify: staging last Google doc + LibreOffice stale backlog"}
+{"t": 1795741617.0389383, "ist": "06:36:57", "ev": "beat", "d": "heartbeat before any claim: gverify: converting corpus docx (53 to 213) for the last Google documents"}
+{"t": 1795741809.7101173, "ist": "06:40:09", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795741811.2154284, "ist": "06:40:11", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795741813.937537, "ist": "06:40:13", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795741814.716007, "ist": "06:40:14", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795741815.332806, "ist": "06:40:15", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795741815.6514914, "ist": "06:40:15", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795741815.8147287, "ist": "06:40:15", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795741815.9701266, "ist": "06:40:15", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
+{"t": 1795741818.8637862, "ist": "06:40:18", "ev": "beat", "d": "heartbeat before any claim: gverify: converting corpus docx, second slice"}
+{"t": 1795741995.4120402, "ist": "06:43:15", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795741995.585995, "ist": "06:43:15", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795741995.7532322, "ist": "06:43:15", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795741995.9436734, "ist": "06:43:15", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795741996.0900848, "ist": "06:43:16", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795741996.2514544, "ist": "06:43:16", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795741996.435821, "ist": "06:43:16", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795741996.5816061, "ist": "06:43:16", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
+{"t": 1795741998.332088, "ist": "06:43:18", "ev": "beat", "d": "heartbeat before any claim: gverify: converting corpus docx, third slice"}
+{"t": 1795742263.8651562, "ist": "06:47:43", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795742264.0332446, "ist": "06:47:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795742264.230004, "ist": "06:47:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795742264.424317, "ist": "06:47:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795742264.6349988, "ist": "06:47:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795742264.8181255, "ist": "06:47:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795742264.9839218, "ist": "06:47:44", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795742265.1622622, "ist": "06:47:45", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
+{"t": 1795742750.0690947, "ist": "06:55:50", "ev": "beat", "d": "heartbeat before any claim: gverify: LibreOffice stale backlog, --lo-stale 40"}
+{"t": 1795743239.4688337, "ist": "07:03:59", "ev": "beat", "d": "heartbeat before any claim: gverify: LibreOffice stale backlog, pass 2"}
+{"t": 1795743518.8686035, "ist": "07:08:38", "ev": "beat", "d": "heartbeat before any claim: gverify: LibreOffice stale backlog, pass 3"}
