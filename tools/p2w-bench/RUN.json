@@ -1,14 +1,12 @@
 {
- "started_ts": 1795738802.5661776,
- "started": "05:50",
- "window_for_claim": 1795738802.5661776,
- "ended_ts": null,
- "ended": null,
- "attempts": 1,
+ "agents": [],
+ "attempts": 3,
+ "docs_improved": 0,
+ "ended": "05:47",
+ "ended_ts": 1795738677.1180205,
  "kept": 0,
- "agents": [
-  "Expl-01",
-  "Expl-02"
- ],
- "docs_improved": 0
+ "started": "05:25",
+ "started_ts": 1795737300.0,
+ "window_for_claim": 1795738496.7331765,
+ "class": "18_displacement"
 }

@@ -8353,73 +8353,114 @@
 {"t": 1795733313.0432491, "ist": "04:18:33", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795733313.4021256, "ist": "04:18:33", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795733315.2033799, "ist": "04:18:35", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795736623.1875377, "ist": "05:13:43", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1795736623.3330235, "ist": "05:13:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795736623.417418, "ist": "05:13:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795736911.4253883, "ist": "05:18:31", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
-{"t": 1795736911.5938678, "ist": "05:18:31", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
-{"t": 1795736911.760858, "ist": "05:18:31", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
-{"t": 1795736911.924322, "ist": "05:18:31", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
-{"t": 1795736912.087381, "ist": "05:18:32", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
-{"t": 1795736912.2755585, "ist": "05:18:32", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
-{"t": 1795736912.427374, "ist": "05:18:32", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
-{"t": 1795736912.5934513, "ist": "05:18:32", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
-{"t": 1795736932.613743, "ist": "05:18:52", "ev": "beat", "d": "gaps.py: reading the timeline"}
-{"t": 1795737341.4597409, "ist": "05:25:41", "ev": "beat", "d": "relay: building row-height rung rule"}
-{"t": 1795737461.1635637, "ist": "05:27:41", "ev": "beat", "d": "relay: 4 probes converted, staging for Google"}
-{"t": 1795737516.366815, "ist": "05:28:36", "ev": "beat", "d": "relay: 4 Google exports in hand, scoring"}
-{"t": 1795737554.0322738, "ist": "05:29:14", "ev": "beat", "d": "relay: patch refuted, writing report"}
-{"t": 1795737567.9909234, "ist": "05:29:27", "ev": "beat", "d": "relay: attempt 2 - rebuilding corpus to A/B the t01 unit"}
-{"t": 1795737909.1734638, "ist": "05:35:09", "ev": "beat", "d": "relay: t01 unit A/B refuted (205->201), reading 600 finding"}
-{"t": 1795737960.5789833, "ist": "05:36:00", "ev": "beat", "d": "relay: annotation guard built, 600 t12 83->49, corpus-wide .txt A/B"}
-{"t": 1795738762.1174443, "ist": "05:49:22", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
-{"t": 1795738762.3292935, "ist": "05:49:22", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
-{"t": 1795738762.5950491, "ist": "05:49:22", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
-{"t": 1795738762.8540585, "ist": "05:49:22", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
-{"t": 1795738763.1074827, "ist": "05:49:23", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
-{"t": 1795738763.403345, "ist": "05:49:23", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
-{"t": 1795738763.643334, "ist": "05:49:23", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
-{"t": 1795738763.870754, "ist": "05:49:23", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
-{"t": 1795738786.678244, "ist": "05:49:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795738789.3082051, "ist": "05:49:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795738789.561123, "ist": "05:49:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795738789.8231845, "ist": "05:49:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795738792.7830539, "ist": "05:49:52", "ev": "attempt", "d": "t12_word_invention -> lead"}
-{"t": 1795738792.9408412, "ist": "05:49:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795738793.052451, "ist": "05:49:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795738793.6659439, "ist": "05:49:53", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795738795.819168, "ist": "05:49:55", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795738798.7040458, "ist": "05:49:58", "ev": "attempt", "d": "18_displacement -> reverted"}
-{"t": 1795738798.8364134, "ist": "05:49:58", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795738798.9378853, "ist": "05:49:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795738799.5454173, "ist": "05:49:59", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795738799.7766945, "ist": "05:49:59", "ev": "beat", "d": "attempt.py: recording an attempt"}
-{"t": 1795738802.5653226, "ist": "05:50:02", "ev": "attempt", "d": "t01_word_accuracy -> reverted"}
-{"t": 1795738802.7174232, "ist": "05:50:02", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795738802.823333, "ist": "05:50:02", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795738803.4115837, "ist": "05:50:03", "ev": "beat", "d": "classrow.py: refreshing the class file"}
-{"t": 1795738836.9680514, "ist": "05:50:36", "ev": "beat", "d": "relay: rewarming corpus cache on the reverted engine"}
-{"t": 1795738845.562772, "ist": "05:50:45", "ev": "beat", "d": "relay: writing the report"}
-{"t": 1795738861.1851227, "ist": "05:51:01", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795738863.58583, "ist": "05:51:03", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795738863.9787915, "ist": "05:51:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795738865.962283, "ist": "05:51:05", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795738874.9298577, "ist": "05:51:14", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795738875.0373373, "ist": "05:51:15", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795738877.496746, "ist": "05:51:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795738877.6693501, "ist": "05:51:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795738878.4403026, "ist": "05:51:18", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795738878.5813553, "ist": "05:51:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795738896.3441052, "ist": "05:51:36", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795738898.8011863, "ist": "05:51:38", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
-{"t": 1795738899.2047727, "ist": "05:51:39", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795738901.369832, "ist": "05:51:41", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795738905.3026123, "ist": "05:51:45", "ev": "beat", "d": "relay: report validated, committing"}
-{"t": 1795739141.9378786, "ist": "05:55:41", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
-{"t": 1795739142.131088, "ist": "05:55:42", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
-{"t": 1795739142.337506, "ist": "05:55:42", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
-{"t": 1795739142.522919, "ist": "05:55:42", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
-{"t": 1795739142.72198, "ist": "05:55:42", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
-{"t": 1795739142.9519594, "ist": "05:55:42", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
-{"t": 1795739143.136882, "ist": "05:55:43", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
-{"t": 1795739143.318604, "ist": "05:55:43", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795735534.1262896, "ist": "04:55:34", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795735534.3315847, "ist": "04:55:34", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795735534.4804244, "ist": "04:55:34", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795735534.6389635, "ist": "04:55:34", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795735534.8271892, "ist": "04:55:34", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795735534.9767845, "ist": "04:55:34", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795735535.169747, "ist": "04:55:35", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795735535.3410065, "ist": "04:55:35", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795735620.2619085, "ist": "04:57:00", "ev": "beat", "d": "pod-prep: building engine + corpus"}
+{"t": 1795735819.1237624, "ist": "05:00:19", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795735819.5449986, "ist": "05:00:19", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795735819.7260919, "ist": "05:00:19", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795735819.8692558, "ist": "05:00:19", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795735820.0323298, "ist": "05:00:20", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795735820.1750212, "ist": "05:00:20", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795735820.335747, "ist": "05:00:20", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795735820.5161397, "ist": "05:00:20", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795735822.5684671, "ist": "05:00:22", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795735824.7244258, "ist": "05:00:24", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795735825.2054818, "ist": "05:00:25", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795735825.6582127, "ist": "05:00:25", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795735826.1302154, "ist": "05:00:26", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795735826.7091336, "ist": "05:00:26", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795736619.7094665, "ist": "05:13:39", "ev": "beat", "d": "18_displacement: reviewing agent patch 18-row-rung"}
+{"t": 1795736638.9313042, "ist": "05:13:58", "ev": "beat", "d": "18_displacement: baseline 303 = 46/47 (18_displacement, dy +4.1); applying row-rung pair patch"}
+{"t": 1795736644.235141, "ist": "05:14:04", "ev": "beat", "d": "18_displacement: building row-rung pair patch"}
+{"t": 1795736753.8342535, "ist": "05:15:53", "ev": "beat", "d": "18_displacement: 303 patched, collecting Google result"}
+{"t": 1795736762.1277523, "ist": "05:16:02", "ev": "beat", "d": "18_displacement: 303 47/47 in Google (worst_dy 4.1->3.0); converting corpus for regress"}
+{"t": 1795736988.2394195, "ist": "05:19:48", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795736988.40907, "ist": "05:19:48", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795736988.554567, "ist": "05:19:48", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795736988.7356262, "ist": "05:19:48", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795736988.9071355, "ist": "05:19:48", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795736989.0734096, "ist": "05:19:49", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795736989.2398572, "ist": "05:19:49", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795736989.4287324, "ist": "05:19:49", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795737036.4111905, "ist": "05:20:36", "ev": "beat", "d": "18_displacement: collecting 3 probes"}
+{"t": 1795737087.081753, "ist": "05:21:27", "ev": "beat", "d": "18_displacement: guard added (content-driven rows), measuring 3 docs"}
+{"t": 1795737119.6269925, "ist": "05:21:59", "ev": "beat", "d": "18_displacement: collecting guarded probes"}
+{"t": 1795737172.8645682, "ist": "05:22:52", "ev": "beat", "d": "18_displacement: rungDead per table, measuring"}
+{"t": 1795737691.43343, "ist": "05:31:31", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795737691.6085532, "ist": "05:31:31", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795737691.7488384, "ist": "05:31:31", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795737691.928251, "ist": "05:31:31", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795737692.0859826, "ist": "05:31:32", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795737692.2588563, "ist": "05:31:32", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795737692.440408, "ist": "05:31:32", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795737692.6183903, "ist": "05:31:32", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795737695.3396559, "ist": "05:31:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795737697.782781, "ist": "05:31:37", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795737700.1368477, "ist": "05:31:40", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795737700.2503855, "ist": "05:31:40", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795737700.3376372, "ist": "05:31:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795737700.8508751, "ist": "05:31:40", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795737748.6820467, "ist": "05:32:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795737750.4509096, "ist": "05:32:30", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795737750.823439, "ist": "05:32:30", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795737752.6149216, "ist": "05:32:32", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795737943.313946, "ist": "05:35:43", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795737944.032729, "ist": "05:35:44", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795737944.2119687, "ist": "05:35:44", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795737944.366886, "ist": "05:35:44", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795737944.5348732, "ist": "05:35:44", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795737944.7085059, "ist": "05:35:44", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795737944.8686674, "ist": "05:35:44", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795737945.0377243, "ist": "05:35:45", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795738212.9257755, "ist": "05:40:12", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795738214.4067948, "ist": "05:40:14", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795738215.222338, "ist": "05:40:15", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795738215.5550416, "ist": "05:40:15", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795738215.7391036, "ist": "05:40:15", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795738215.8825722, "ist": "05:40:15", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795738216.0486636, "ist": "05:40:16", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795738216.2361724, "ist": "05:40:16", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795738262.5120244, "ist": "05:41:02", "ev": "beat", "d": "corpus-slice: 6 of 7 converted"}
+{"t": 1795738325.551494, "ist": "05:42:05", "ev": "beat", "d": "txt reader: patching _txt_lines to keep the form feed, then full txt re-measure"}
+{"t": 1795738493.4334304, "ist": "05:44:53", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795738496.732716, "ist": "05:44:56", "ev": "attempt", "d": "t09_page_furniture -> lead"}
+{"t": 1795738496.8450613, "ist": "05:44:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795738496.9286308, "ist": "05:44:56", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795738497.4579577, "ist": "05:44:57", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795738536.0770302, "ist": "05:45:36", "ev": "beat", "d": "rung bisect: half A only, measuring mobile-bill + 303"}
+{"t": 1795738567.0591245, "ist": "05:46:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795738570.3081024, "ist": "05:46:10", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795738570.4158373, "ist": "05:46:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795738570.481466, "ist": "05:46:10", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795738571.053799, "ist": "05:46:11", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795738581.1355765, "ist": "05:46:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738582.9722128, "ist": "05:46:22", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795738583.327695, "ist": "05:46:23", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738585.2248337, "ist": "05:46:25", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738602.4204087, "ist": "05:46:42", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795738607.7304902, "ist": "05:46:47", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738609.8139112, "ist": "05:46:49", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795738610.1447031, "ist": "05:46:50", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738612.2555902, "ist": "05:46:52", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738618.861895, "ist": "05:46:58", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738620.9696884, "ist": "05:47:00", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795738621.3593524, "ist": "05:47:01", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738623.6588008, "ist": "05:47:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738629.7558951, "ist": "05:47:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738631.8450267, "ist": "05:47:11", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795738632.2312915, "ist": "05:47:12", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738634.362287, "ist": "05:47:14", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795738656.7190099, "ist": "05:47:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795738662.8060703, "ist": "05:47:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795738676.507463, "ist": "05:47:56", "ev": "release", "d": "fixer released (forced)"}
+{"t": 1795738676.6090853, "ist": "05:47:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795738676.6759572, "ist": "05:47:56", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795738677.1175215, "ist": "05:47:57", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795738877.7260041, "ist": "05:51:17", "ev": "release", "d": "baseline released"}

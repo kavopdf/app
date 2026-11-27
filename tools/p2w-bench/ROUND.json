@@ -1,5 +1,5 @@
 {
-  "baseline_started": 1795736578.5152516,
+  "baseline_started": 0,
   "classifier_started": 0,
   "fixer": {
     "agents": [
@@ -17,11 +17,9 @@
       }
     ]
   },
-  "fixer_doing": "corpus-slice: 48 of 53 converted",
-  "fixer_doing_since": 1795739143.3190517,
-  "fixer_engine_at_claim": "3462086",
-  "fixer_last_beat": 1795739143.3190525,
-  "fixer_started": 1795738802.5661776,
+  "fixer_engine_at_claim": "ee5a00d6",
+  "fixer_last_beat": 1795738536.0773938,
+  "fixer_started": 1795739186.7121718,
   "history": [
     {
       "at": "2026-11-12 09:46",
