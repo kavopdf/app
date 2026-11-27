@@ -214,3 +214,34 @@ But neither of those corrections has been run end to end yet.
 that - rather than reconstructing from `get_drawings()` and `get_text()`. Reconstruction loses whatever
 the API does not expose, and this work has now found two things it does not expose: the text's alpha,
 and the exact stroke cap and join. Operator copying loses nothing.
+
+## Both corrections were built and both failed. Do not apply them blind.
+
+The two corrections named above were implemented and measured through Google. Neither worked.
+
+    06  offset +0.2,+0.2 -> +2.9,+2.9     size -0.7,-0.2 -> -5.5,-5.8     WORSE
+    07  offset +0.0,+1.9 -> +0.0,+1.9     size +3.1 -> +3.1               unchanged
+
+**06 got worse, not better** - the size deficit grew from 0.7 pt to 5.5 pt. And **07's numbers came back
+identical to the run before it**, which is suspicious in itself: either the rebuilt file did not reach
+Google, or the measurement read the same output twice. That has not been established.
+
+**What is suspected, and is only a suspicion:** the self-correcting placement crops the render to its own
+ink bounding box using a coverage threshold of 0.05. If that threshold clips the faint outer edge of a
+thin stroke, the box comes out too small - and stretching a too-small box up to the stamp rect's size
+magnifies the error instead of removing it. That would explain 06 going from 0.7 pt short to 5.5 pt short
+while 07, whose strokes are heavier, did not move.
+
+**What must happen before either correction is trusted:**
+
+1. Verify the rebuilt file actually reaches Google and the export is new. 07 returning byte-identical
+   measurements before and after is not credible on its own.
+2. Measure the ink bounding box of the render against the stamp rect directly, in points, before any
+   placement maths. If the box is short, the crop threshold is the cause and the answer is to lower it,
+   not to stretch.
+3. Only then re-run the placement.
+
+**The honest position:** the method is proved - object identity removes foreign content where five colour
+masks failed, on 06 and 07 both. **The geometry corrections are not proved and one of them made a
+document worse.** Anyone picking this up should start from the render-vs-rect measurement, not from the
+placement code.
