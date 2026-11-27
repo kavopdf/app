@@ -371,3 +371,44 @@ font metrics either.
     open       02 needs the embedded font; both need the operator-copy path
     open       10, 12, 14
     open       the count
+
+## The reconstruction is exact to 0.15 pt. The error is in the placement, and 06 proves it can work.
+
+Two suspicions were tested and both were wrong, which is worth recording so neither is chased again.
+
+**Suspicion 1 - the substituted font's metrics cause the shortfall.** Measured by rendering the same text
+with the system `LiberationSerif-Bold` and with the PDF's own embedded subset, then comparing against the
+span bbox the PDF reports:
+
+    02  system font 137.01 x 16.61   embedded subset 129.56 x 20.43   PDF reports 136.64 x 51.50
+    07  system font 120.19 x 14.39   embedded subset 112.48 x 17.71   PDF reports 120.55 x 39.06
+
+The system font is **closer** to the PDF's width than the embedded subset is. Embedding the PDF's font
+would make the fit worse, not better. **The font is not the cause.**
+
+**Suspicion 2 - the rotated text's axis-aligned bbox inflates the stamp rect.** The reported bbox height
+is 51.50 pt for 15 pt text, which looked like the answer. Measured against a rect built from the drawings
+alone:
+
+    01  with text bbox 206.0 x 104.7   drawings only 207.5 x 106.2
+    02  with text bbox 162.9 x  95.7   drawings only 164.6 x  97.3
+    06  with text bbox 147.6 x 114.1   drawings only 152.5 x 119.0
+    07  with text bbox 159.7 x  82.9   drawings only 161.2 x  84.3
+
+The border already encloses the text on all four, so the text bbox changes nothing. **Also not the cause.**
+
+### What the measurements do say
+
+**The reconstruction itself is accurate to 0.15 pt on all four documents**, once the rect is the ink box:
+
+    rendered ink vs ink box:  +0.09  +0.07  +0.01  +0.12 pt
+
+And yet through Google, 06 lands at +0.5/+0.2 with size -1.0/-0.5 while 02 sits at +0.7/+4.6 and 07 at
++0.0/+1.9 with size +3.8.
+
+**So the image is right and the placement is not, for 02 and 07 but not for 06.** That is the shape of the
+remaining problem and it is the next thing to measure: compare the anchor's `posOffset` and `extent` in
+the .docx against the ink box in points, for 06 (which works) and 02 and 07 (which do not), and find what
+differs. It is a two-minute comparison and it has not been done.
+
+**Do not chase the font and do not chase the rotated bbox.** Both were measured and both are innocent.
