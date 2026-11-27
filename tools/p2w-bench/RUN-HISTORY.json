@@ -1,17 +1,5 @@
 [
  {
-  "started_ts": 1795578938.0537274,
-  "started": "09:25",
-  "window_for_claim": 1795578938.0537274,
-  "ended_ts": null,
-  "ended": "(never)",
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started": "09:59",
   "started_ts": 1795580966.4406104,
   "ended": "(never)",
@@ -796,5 +784,16 @@
   "started": "16:06",
   "started_ts": 1795775815.0087092,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "17:11",
+  "started_ts": 1795779682.7837336,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
