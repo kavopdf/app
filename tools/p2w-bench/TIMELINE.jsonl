@@ -9267,3 +9267,21 @@
 {"t": 1795770833.2619584, "ist": "14:43:53", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795770834.0701265, "ist": "14:43:54", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795770837.6918876, "ist": "14:43:57", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795771954.5818415, "ist": "15:02:34", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795771954.908435, "ist": "15:02:34", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795771955.2034004, "ist": "15:02:35", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795771955.4226742, "ist": "15:02:35", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795771955.6328912, "ist": "15:02:35", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795771955.8405507, "ist": "15:02:35", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795771956.0624175, "ist": "15:02:36", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795771956.2952332, "ist": "15:02:36", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795771969.525516, "ist": "15:02:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795771973.7507102, "ist": "15:02:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795772622.3264716, "ist": "15:13:42", "ev": "beat", "d": "building corpus for gate"}
+{"t": 1795773087.9915986, "ist": "15:21:27", "ev": "beat", "d": "corpus-slice: 6 of 30 converted"}
+{"t": 1795773103.3558266, "ist": "15:21:43", "ev": "beat", "d": "corpus-slice: 12 of 30 converted"}
+{"t": 1795773104.6136935, "ist": "15:21:44", "ev": "beat", "d": "corpus-slice: 18 of 30 converted"}
+{"t": 1795773106.0658374, "ist": "15:21:46", "ev": "beat", "d": "corpus-slice: 24 of 30 converted"}
+{"t": 1795773118.378662, "ist": "15:21:58", "ev": "beat", "d": "corpus-slice: 30 of 30 converted"}
+{"t": 1795773259.789445, "ist": "15:24:19", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795773263.3911583, "ist": "15:24:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
