@@ -1,15 +1,13 @@
 {
- "agents": [
-  "row_A-01",
-  "commB-01"
- ],
- "attempts": 3,
+ "agents": [],
+ "attempts": 1,
+ "class": "",
  "docs_improved": 0,
- "ended": "03:28",
- "ended_ts": 1795816684.5753293,
+ "ended": null,
+ "ended_ts": null,
  "kept": 0,
- "started": "03:24",
- "started_ts": 1795816495.500418,
- "window_for_claim": 1795816495.500418,
- "class": "63_table_rows"
+ "needs_human": 0,
+ "obstacles_cleared": 0,
+ "started": "04:00",
+ "started_ts": 1795818649.2767327
 }

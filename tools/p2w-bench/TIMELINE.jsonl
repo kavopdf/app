@@ -10227,3 +10227,60 @@
 {"t": 1795817485.9428844, "ist": "03:41:25", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795817486.2822576, "ist": "03:41:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795817488.1410306, "ist": "03:41:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795818408.6891327, "ist": "03:56:48", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795818408.9150357, "ist": "03:56:48", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795818409.08201, "ist": "03:56:49", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795818409.2343316, "ist": "03:56:49", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795818409.4301074, "ist": "03:56:49", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795818409.593171, "ist": "03:56:49", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795818409.775941, "ist": "03:56:49", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795818409.912298, "ist": "03:56:49", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795818640.982553, "ist": "04:00:40", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795818642.4028177, "ist": "04:00:42", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795818644.404876, "ist": "04:00:44", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795818645.1731896, "ist": "04:00:45", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795818645.8129308, "ist": "04:00:45", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795818646.0354252, "ist": "04:00:46", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795818646.2061234, "ist": "04:00:46", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795818646.3842099, "ist": "04:00:46", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795818648.5783296, "ist": "04:00:48", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795818648.7241046, "ist": "04:00:48", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795818648.8238435, "ist": "04:00:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795818651.1854944, "ist": "04:00:51", "ev": "beat", "d": "pod warm, installing gate"}
+{"t": 1795818829.1785374, "ist": "04:03:49", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795818829.3432305, "ist": "04:03:49", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795818829.5029876, "ist": "04:03:49", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795818829.6791031, "ist": "04:03:49", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795818829.8851137, "ist": "04:03:49", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795818830.0274382, "ist": "04:03:50", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795818830.2095485, "ist": "04:03:50", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795818830.3525593, "ist": "04:03:50", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795818933.6134028, "ist": "04:05:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795818935.943806, "ist": "04:05:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795819458.642815, "ist": "04:14:18", "ev": "beat", "d": "corpus-slice: 6 of 41 converted"}
+{"t": 1795819458.8198087, "ist": "04:14:18", "ev": "beat", "d": "corpus-slice: 12 of 41 converted"}
+{"t": 1795819459.0067978, "ist": "04:14:19", "ev": "beat", "d": "corpus-slice: 18 of 41 converted"}
+{"t": 1795819459.1888382, "ist": "04:14:19", "ev": "beat", "d": "corpus-slice: 24 of 41 converted"}
+{"t": 1795819459.4090476, "ist": "04:14:19", "ev": "beat", "d": "corpus-slice: 30 of 41 converted"}
+{"t": 1795819459.5886874, "ist": "04:14:19", "ev": "beat", "d": "corpus-slice: 36 of 41 converted"}
+{"t": 1795819831.5509994, "ist": "04:20:31", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795819855.7760046, "ist": "04:20:55", "ev": "beat", "d": "verifying the rung0 CSV independently on 8 documents"}
+{"t": 1795819906.6996062, "ist": "04:21:46", "ev": "beat", "d": "p2w.py: scoring boq-tender-bill-of-quantitie (2 in this pass)"}
+{"t": 1795819911.2917345, "ist": "04:21:51", "ev": "beat", "d": "p2w.py: scoring marksheet-subject-left-marks (4 in this pass)"}
+{"t": 1795819915.7270262, "ist": "04:21:55", "ev": "beat", "d": "p2w.py: scoring table-inside-two-column-page (6 in this pass)"}
+{"t": 1795819920.2587461, "ist": "04:22:00", "ev": "beat", "d": "p2w.py: scoring balance-sheet-and-profit-los (8 in this pass)"}
+{"t": 1795819929.0019536, "ist": "04:22:09", "ev": "beat", "d": "rung=0, rebuilding engine"}
+{"t": 1795820167.183003, "ist": "04:26:07", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795820167.3380551, "ist": "04:26:07", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795820167.5172236, "ist": "04:26:07", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795820167.6969287, "ist": "04:26:07", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795820167.842253, "ist": "04:26:07", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795820168.0131483, "ist": "04:26:08", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795820168.198457, "ist": "04:26:08", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795820168.3557203, "ist": "04:26:08", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795820220.6068285, "ist": "04:27:00", "ev": "beat", "d": "p2w.py: scoring boq-tender-bill-of-quantitie (2 in this pass)"}
+{"t": 1795820225.1744428, "ist": "04:27:05", "ev": "beat", "d": "p2w.py: scoring marksheet-subject-left-marks (4 in this pass)"}
+{"t": 1795820229.6880224, "ist": "04:27:09", "ev": "beat", "d": "p2w.py: scoring table-inside-two-column-page (6 in this pass)"}
+{"t": 1795820234.206666, "ist": "04:27:14", "ev": "beat", "d": "p2w.py: scoring balance-sheet-and-profit-los (8 in this pass)"}
+{"t": 1795820253.7534375, "ist": "04:27:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795820255.6816144, "ist": "04:27:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
