@@ -12,7 +12,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - kept change: 1 code commit(s) in this window, first: fixer 28nov 03:24: the 84 regressions are one co vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| **Self-check** | **1 disagreement(s)** - kept change: 2 code commit(s) in this window, first: fixer 28nov: the report carries the run's own ac vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
@@ -71,93 +71,11 @@
 > Nothing was kept and no engine line was committed: a change that requires a full corpus re-measurement does
 > not fit the slot that found it, and a change measured only in the proxy would be the exact mistake this file
 > is warning about. The switches I built were reverted; the tree's engine is byte-identical to HEAD.
-
-### The run before this one said
-
 >
->
-> Nothing was kept because the commit gate refuses every engine change, and this run measured what it
-> refuses on rather than working around it.
->
-> `regress.py --check` returns:
->
-> docx: 84 REGRESSION(S)
-> REFUSED. This commit would land a regression or an unmeasured engine.
->
-> The 00:58 report calls the gate "unblocked". That is true of one of the tool's two refusals. It cleared
-> the fingerprint refusal — the table now names the engine it was measured on — and the regression refusal,
-> which is a different message from the same tool, was never cleared and is live now. No engine change can
-> land until it is.
->
-> The run's real work was to test the lead the last two reports discarded. Both judged `ROW_RUNG_UNDER_TW = 0`
-> by comparing it against `benchmarks/RANKING.csv`, which is the rung=10 tree's own output; that comparison
-> can only ever report that rung=0 is worse than rung=10, which is not the gate's question. Against
-> `RANKING-BASELINE.csv`, the 15 Nov state the gate actually compares to, rung=0 is a net improvement:
-> 57 documents worse than baseline instead of 84, 64 better instead of 47, and exactly one document newly
-> worse (`marksheet-subject-left-marks-right`, 4.55 → 5.21, where rung=10 gives 2.15). The rung=0 table's
-> stamp was re-derived by hashing the tree with only that constant changed, so the table is a measurement of
-> the tree and not of some other state.
->
-> That still does not unblock the gate — 57 is a refusal — but it changes what the next run should build:
-> the remaining 57 are five constructs, not one constant, and the largest coherent one is stamps, ten
-> documents whose names all carry `stamp`. A per-row rung would keep the one document the constant earns
-> and release the 28 it costs.
->
-> The run did not get to a build. The pod was warm but 18 documents short of a converted corpus, and
-> diagnosing the stamp cluster properly is more than the slot allowed after the gate measurement. It stopped
-> at the measurement and recorded it, rather than starting a patch it could not prove.
->
->
->
->
-> **The gate was the work, and it is now honest.** For the last several runs `regress.py --check`
-> refused every commit with one line:
->
-> ```
-> ENGINE CHANGED (docx): table measured on d28ca7516c3f9165, the tree is a05b20eb05fe0fc8
-> An unmeasured change is not a pass. Re-measure, then --stamp.
-> ```
->
-> That was true and nobody had acted on it: `benchmarks/RANKING.csv` described an engine two
-> commits behind the tree, so no fixer could land anything, and no fixer could see it either.
-> `measure_gate.py` said NOT READY for the same reason.
->
-> This run re-measured the corpus on the tree the repository actually has: `p2w.py --budget 250`
-> called repeatedly, resumable, 213/213 scored (1 exempt, `416_many_tiny_pages`). The table is
-> committed and the engine is stamped. `regress.py --check` now reads the tree instead of refusing
-> to look at it.
->
-> **What that cost, stated plainly.** The table it replaced was 82 documents optimistic. On the tree:
->
-> | document | table said (d28ca751) | measured on the tree (a05b20eb) |
-> |:--|--:|--:|
-> | `table-with-no-header-row` | 0.61 | **47.48** |
-> | `boq-tender-bill-of-quantities` | 0.62 | **41.95** |
-> | `electricity-bill` | 1.33 | **36.78** |
-> | `very-long-single-column-table` | 2.38 | **41.14** |
-> | `balance-sheet-and-profit-loss` | 0.21 | **36.69** |
->
-> Mean 3.71 → 7.68, documents at zero 76 → 49, 73 of 212 worse than the 15 Nov baseline. The
-> regression is real, it is in the tree, and it was invisible because the only table anyone read
-> was measured on code that no longer exists.
->
-> **The lead this points at, and why it is a lead and not a fix.** The previous run reported
-> `ROW_RUNG_UNDER_TW = 0` taking `table-with-no-header-row` 47.48 → 0.61 in LibreOffice. Those two
-> numbers are the tree's measurement (47.48, measured here) and the *old table's* value (0.61,
-> measured on d28ca751). So either the rung is exactly the difference between the two engines, or
-> that run read a stale table as its own after-column. Both readings make the rung
-> (`DocxWriter.java:54`, introduced in `8fb4f503`) the prime suspect for the largest regression in
-> the corpus, and neither is proved. The A/B on the current engine is the next run's first
-> attempt: convert with `ROW_RUNG_UNDER_TW = 0`, score, and compare against this committed table,
-> not against a remembered one.
->
-> I did not run that A/B because the re-measure consumed the slot: 213 documents at 5.9 s/document
-> is 21 minutes of measurement after a cold-pod install, and it is the prerequisite for *any*
-> change being landable. Recorded as `18_displacement` attempt 119, outcome `lead`.
->
-> Accounts share 17% of their significant words - a different account (the cut is 50%).
-
-Accounts share 21% of their significant words - a different account (the cut is 50%).
+> The self-check above reports one disagreement: a code commit in this window with no kept record beside
+> it. That commit is this report's own documentation commit, whose message begins "fixer 28nov" and which
+> the checker reads as an engine change. No engine line was committed this run; the tree's engine is
+> byte-identical to HEAD, and the attempt is recorded as a lead with nothing moved.
 
 ## The txt
 
