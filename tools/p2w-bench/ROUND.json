@@ -17,11 +17,11 @@
       }
     ]
   },
-  "fixer_doing": "txt reader: patching _txt_lines to keep the form feed, then full txt re-measure",
-  "fixer_doing_since": 1795738325.5519338,
+  "fixer_doing": "rung bisect: half A only, measuring mobile-bill + 303",
+  "fixer_doing_since": 1795738536.0773928,
   "fixer_engine_at_claim": "ee5a00d6",
-  "fixer_last_beat": 1795738325.5519345,
-  "fixer_started": 1795737700.1372125,
+  "fixer_last_beat": 1795738536.0773938,
+  "fixer_started": 1795738496.7331765,
   "history": [
     {
       "at": "2026-11-12 09:46",
