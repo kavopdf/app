@@ -9568,3 +9568,40 @@
 {"t": 1795789890.7708611, "ist": "20:01:30", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795789891.1757412, "ist": "20:01:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795789892.6847732, "ist": "20:01:32", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795790356.9682837, "ist": "20:09:16", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795790359.6710646, "ist": "20:09:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795790360.8672068, "ist": "20:09:20", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795790393.9181097, "ist": "20:09:53", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795790396.5397463, "ist": "20:09:56", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795790397.4808357, "ist": "20:09:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795790407.7480984, "ist": "20:10:07", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795790408.3553886, "ist": "20:10:08", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795790409.0161667, "ist": "20:10:09", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795790409.6601927, "ist": "20:10:09", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795790411.9187405, "ist": "20:10:11", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795791826.7456174, "ist": "20:33:46", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795791852.284326, "ist": "20:34:12", "ev": "beat", "d": "pod-prep: corpus+jdk+libs+engine build"}
+{"t": 1795792056.6309133, "ist": "20:37:36", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795792058.2349055, "ist": "20:37:38", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795792071.1635149, "ist": "20:37:51", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795792071.3764746, "ist": "20:37:51", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795792071.6069732, "ist": "20:37:51", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795792071.8247416, "ist": "20:37:51", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795792072.0445585, "ist": "20:37:52", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795792072.2547646, "ist": "20:37:52", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795792081.1186132, "ist": "20:38:01", "ev": "beat", "d": "corpus slice 2/4 for the gate"}
+{"t": 1795792295.3439121, "ist": "20:41:35", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795792295.5235739, "ist": "20:41:35", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795792295.7964623, "ist": "20:41:35", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795792296.0626693, "ist": "20:41:36", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795792296.251846, "ist": "20:41:36", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795792296.465828, "ist": "20:41:36", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795792296.643505, "ist": "20:41:36", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795792296.8315036, "ist": "20:41:36", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795792320.1962743, "ist": "20:42:00", "ev": "beat", "d": "collecting Google scores for HEAD probes 74 and 72"}
+{"t": 1795792350.2484612, "ist": "20:42:30", "ev": "beat", "d": "rebuilding engine with cell-before patch"}
+{"t": 1795792416.1869328, "ist": "20:43:36", "ev": "beat", "d": "collecting Google scores for PATCHED probes"}
+{"t": 1795792643.6251097, "ist": "20:47:23", "ev": "beat", "d": "corpus rebuild on patched engine for the gate"}
+{"t": 1795792888.639905, "ist": "20:51:28", "ev": "beat", "d": "running the commit gate on the patched corpus"}
+{"t": 1795792918.8520892, "ist": "20:51:58", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795792935.0518906, "ist": "20:52:15", "ev": "beat", "d": "attempt.py: recording an attempt"}
