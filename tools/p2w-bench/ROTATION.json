@@ -2,10 +2,10 @@
  "exhausted": {
   "18_displacement": "2026-11-25 21:07 - watchdog STEP 5, 25 Nov: 20 recorded attempts have moved 1 document of this class's 122, and the last two measured attempts (20:36 and 20:42) moved none, while 59_shape_anchor (52 documents) and 17_matched_runs (36 documents) have no attempt at all. The fixer took this class four times today and kept nothing. Overturned by: one measured attempt that moves a document under this class on the current engine."
  },
- "next": "docx",
+ "next": "txt",
  "docx": {
   "class": "05_chars_extra",
-  "since": "2026-11-27 14:00"
+  "since": "2026-11-27 17:06"
  },
  "txt": {
   "class": "t09_page_furniture",
