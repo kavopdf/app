@@ -169,3 +169,49 @@ identified and it is the one remaining unknown.**
 
 **The next measurement is the real document's `<w:tr>`: its `trHeight`, `hRule`, and how many rows the totals
 block actually spans. That is one lookup in a file already in hand.**
+
+## Found: the row is forced to an exact height, and that is what compresses the lines
+
+The lookup that was promised, on the document already in hand:
+
+    <w:tr>
+      <w:trPr>
+        <w:cantSplit/>
+        <w:trHeight w:val="1649" w:hRule="exact"/>
+      </w:trPr>
+      3 cells, 8 paragraphs, one cell holding 4 of them
+
+**1649 twips is 82.45 pt, and `hRule="exact"` means the row is that height whether or not its content fits.
+`cantSplit` means it cannot be broken across pages.** So the row is a fixed 82.45 pt box with 8 paragraphs
+crammed into it.
+
+**This is the difference between the real document and the sweep.** The sweep had no `trHeight` at all, and
+inside it the same `before`/`line` combination advanced 18.3 pt. Here the advance is 7.6 pt. **The row is
+pushing the paragraphs together to make them fit a height that was fixed in advance.**
+
+And it is not the table's normal behaviour: of the document's 12 rows, **9 carry `trHeight ... hRule="atLeast"`
+(360 twips, a minimum) and 3 carry `hRule="exact"`** - 1649, 1000 and 6318. **The three exact rows are the
+ones at risk**, and the totals block is one of them.
+
+### So the defect has two independent causes stacked on each other
+
+1. **`w:lineRule="exact"` with a 0.6 pt line** - a line box smaller than the 11.07 pt glyph. Gives a 6.3 pt
+   floor inside a cell, which is still 4.8 pt short of the glyph. **Clips descenders, and crowds lines.**
+2. **`w:trHeight w:hRule="exact"`** - the row is a fixed height and the content is fitted into it, which
+   compresses the paragraphs further, from 18.3 pt of advance down to 7.6.
+
+**Fixing only the first would still leave the second.** That is why the arithmetic fix made the document
+longer instead of correct: it raised every line's box while the row stayed pinned at 82.45 pt, so the content
+overflowed and the row was re-fitted - and the page count went from one to two.
+
+### The fix, now that both are known
+
+- **`w:lineRule="exact"` -> `"atLeast"`**, with `before` reduced by the measured 3.5 pt so positions hold.
+- **`w:trHeight w:hRule="exact"` -> `"atLeast"`**, so the row grows to fit its content instead of compressing
+  it.
+
+**Both are the same mistake in two places: a fixed height that is smaller than what has to go inside it.**
+Neither is a number to tune; both are a rule to stop using.
+
+**Neither has been applied and measured yet.** The next step is one document with both changes, one Google
+export, and the same measurement: glyph tops of the totals block, and the page count.
