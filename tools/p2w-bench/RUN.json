@@ -1,20 +1,14 @@
 {
- "agents": [],
- "attempts": 2,
- "class": "18_displacement",
- "docs_improved": 2,
- "ended": null,
+ "started_ts": 1795745660.7751477,
+ "started": "07:44",
+ "window_for_claim": 1795745660.7751477,
  "ended_ts": null,
- "kept": 1,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "07:03",
- "started_ts": 1795743228.6860747,
- "ratchets": 1,
- "counted": [
-  [
-   "18_displacement",
-   2
-  ]
- ]
+ "ended": null,
+ "attempts": 2,
+ "kept": 0,
+ "agents": [
+  "60_tA-02",
+  "gateB-02"
+ ],
+ "docs_improved": 0
 }

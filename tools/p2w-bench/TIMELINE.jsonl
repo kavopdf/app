@@ -8653,3 +8653,43 @@
 {"t": 1795745714.8955271, "ist": "07:45:14", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795745715.2748976, "ist": "07:45:15", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795745717.4077423, "ist": "07:45:17", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795746977.2910035, "ist": "08:06:17", "ev": "beat", "d": "attempt 2: right-tab construct in flowFromBox"}
+{"t": 1795746986.9485362, "ist": "08:06:26", "ev": "beat", "d": "relay: measure_gate"}
+{"t": 1795747315.4189095, "ist": "08:11:55", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795747315.8975017, "ist": "08:11:55", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795747316.3053424, "ist": "08:11:56", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795747316.6555574, "ist": "08:11:56", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795747316.988097, "ist": "08:11:56", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795747317.3250618, "ist": "08:11:57", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795747317.6528044, "ist": "08:11:57", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795747318.0804455, "ist": "08:11:58", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795747332.8466203, "ist": "08:12:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795747334.6354952, "ist": "08:12:14", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795747340.2729685, "ist": "08:12:20", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795747343.6267018, "ist": "08:12:23", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795747344.0649176, "ist": "08:12:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795747346.732573, "ist": "08:12:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795747352.8679404, "ist": "08:12:32", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795747352.9815035, "ist": "08:12:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795747353.5557506, "ist": "08:12:33", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795747353.6724877, "ist": "08:12:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795747354.2906952, "ist": "08:12:34", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795747354.4051769, "ist": "08:12:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795747355.035801, "ist": "08:12:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795747355.169389, "ist": "08:12:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795747358.250201, "ist": "08:12:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795747360.833714, "ist": "08:12:40", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795747361.322208, "ist": "08:12:41", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795747364.9417675, "ist": "08:12:44", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795747371.3207865, "ist": "08:12:51", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795747376.397705, "ist": "08:12:56", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795747376.9196703, "ist": "08:12:56", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795747380.6214504, "ist": "08:13:00", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795747605.9178464, "ist": "08:16:45", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795747607.274889, "ist": "08:16:47", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795747613.3745742, "ist": "08:16:53", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795747613.6688392, "ist": "08:16:53", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795747613.966199, "ist": "08:16:53", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795747614.2237864, "ist": "08:16:54", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795747614.4622679, "ist": "08:16:54", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795747614.7205122, "ist": "08:16:54", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
