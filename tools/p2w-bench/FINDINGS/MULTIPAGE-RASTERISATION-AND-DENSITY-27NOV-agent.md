@@ -109,3 +109,45 @@ iLovePDF's, and it is why theirs degrades in pageless mode while ours destroys c
 
 **Every document long enough to overflow is affected. That is not a class of documents; it is any document with
 more content than one page holds.**
+
+## What actually happens to the lost page: a shift plus two deletions
+
+Traced each block of the blank page through the render.
+
+    google page 9     35 chars   only the footer, "8 / 10 | 27 November 2026"
+    google page 10  2168 chars   "Process and specification"      <- this is SOURCE page 9
+    google page 11  1096 chars   "Forms, seals and colophon"      <- this is SOURCE page 10
+
+**So most of the page did not vanish - it moved down by one page, and page 9 was left holding nothing but its
+footer.** That is the extra page: content shifted, nothing replaced it.
+
+**But two blocks are gone entirely.** Searched every page of the render for them:
+
+    PRE-PRESS CHECKLIST   ->  NOWHERE
+    SOURCE LISTING        ->  NOWHERE
+
+Both are on source page 9 - the checklist is a table and the listing is a shaded code block, and both are
+visible in the source render.
+
+### So the mechanism has two halves
+
+1. **Plain paragraphs shift by one page.** Their `w:before` moves and they reappear on the next page. Nothing is
+   lost, but a page is left empty and the document grows.
+2. **Tables and textboxes are dropped.** They cannot shift, because moving a table means recomputing its row
+   heights and cell positions, which an absolutely positioned document has no machinery for. So they are
+   deleted.
+
+**Half of this is recoverable by pagination and half is permanent.** That is why 46 percent of the text reaches
+the render while the page count goes *up* rather than down - content is moving out and being deleted at the same
+time.
+
+### The rule, stated once
+
+**In a flowing document an overflow paginates. In an absolutely positioned one it either shifts or is destroyed,
+and which of the two depends on whether the object can be moved without recomputing its layout.**
+
+## The source PDF is now in the repository
+
+`benchmarks/corpus-extra/Prakashan_Print_Fidelity_Handbook.pdf` - 10 pages, all A4, uniform margins of 33.6 pt
+top and 39.7 pt left on pages 2 to 10, digital throughout, 30 images per page, four fonts. It is the document
+every measurement in this file was taken from.
