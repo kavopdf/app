@@ -1411,7 +1411,7 @@
   "status": "OPEN"
  },
  "63_table_rows": {
-  "attempts": 4,
+  "attempts": 5,
   "first_seen": null,
   "history": [
    {
@@ -1457,6 +1457,17 @@
     "outcome": "lead",
     "reason": "Gate state measured: regress.py --check refuses on 84 docx regressions vs the 15 Nov baseline (fingerprint refusal already cleared at 00:58 - different message, same tool). Judged the rung on the gate",
     "total": null
+   },
+   {
+    "at": "2026-11-28 03:40",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": null,
+    "outcome": "lead",
+    "reason": "gate refuses main itself (84 with no engine change); rung=0 recomputed from the committed full-corpus table: 84 -> 57, 28 released, 1 cost, net 27; 27 of the 84 have a baseline of 0.00 and 6 are alrea",
+    "total": null
    }
   ],
   "last": null,
@@ -1465,14 +1476,16 @@
    "lead",
    "lead",
    "reverted",
+   "lead",
    "lead"
   ],
-  "reason": "Gate state measured: regress.py --check refuses on 84 docx regressions vs the 15 Nov baseline (fingerprint refusal already cleared at 00:58 - different message, same tool). Judged the rung on the gate's own reference for the first time: ROW_RUNG_UNDER_TW=0 gives 57 worse / 64 better vs baseline, against 84 worse / 47 better on the current tree - it fixes 28 and introduces exactly 1 (marksheet-subject-left-marks-right 4.55 -> 5.21, where rung=10 gives 2.15). Both prior runs compared rung=0 against RANKING.csv, which is rung=10's own output, so their '63 worse' could only ever say that. Verified the rung=0 table's stamp b648594972a7682b by re-hashing the tree with only :54 set to 0. Still not committable: 57 is a refusal. Remaining 57 cluster into stamps (10 docs, worst 03_stamp_vertical_90deg +17.40), amounts (6), fonts (5), txtpos (5). Also: txt half is 3 documents from 99% and the two Account_Opening_Form failures are one construct - 127 U+FFFD where the source has 0, missing chars are ligature glyphs (H-circumflex 89, H-stroke 23, g-cedilla 13). See FINDINGS/GATE-84-REGRESSIONS-ARE-FIVE-CONSTRUCTS-AND-THE-RUNG-WAS-JUDGED-AGAINST-THE-WRONG-TABLE-28NOV-relay.md",
+  "reason": "gate refuses main itself (84 with no engine change); rung=0 recomputed from the committed full-corpus table: 84 -> 57, 28 released, 1 cost, net 27; 27 of the 84 have a baseline of 0.00 and 6 are already inside the 99% bar",
   "reasons": [
    "GATE STATE, NOT A FIX: full 212-doc re-measurement on engine a05b20eb shows the commit gate refuses on 96 REAL regressions vs the 15 Nov baseline (84 on share@5, recomputed independently from the two CSVs), not on a stale table as the last nine runs assumed. The regressions are table row placement: table-with-no-header-row 0.61->47.48, boq-tender-bill-of-quantities 7.10->41.95, very-long-single-column-table 6.87->41.14. Measured on the p2w share@5 axis, not on a Google check. Did NOT run regress.py --stamp: stamping would ratify the 84 as the new floor. Evidence: FINDINGS/GATE-BLOCKED-BY-84-REAL-REGRESSIONS-NOT-A-STALE-TABLE-27NOV.md",
    "Root cause proved, not landed: table row placement IS ROW_RUNG_UNDER_TW (DocxWriter.java:54, from 8fb4f503). rung=0 reproduces RANKING.csv digit for digit on 4 docs (table-with-no-header-row 47.48->0.61, boq 0.62, electricity-bill 1.33, mobile-bill 1.55). Full-corpus measure did not fit the slot; one-line change + FINDINGS/table-row-placement-IS-THE-RUNG-PROVEN-27NOV-relay.md",
    "ROW_RUNG_UNDER_TW=0 reproduces four published table values digit for digit (table-with-no-header-row 47.48->0.61, boq 0.62, mobile-bill 1.55, electricity-bill 1.33) but the full 213-document measure is 63 documents WORSE than the committed table and only 4 better (price-list-2col-dense-right-aligned 2.69->27.89, reproduced independently on a fresh single-document conversion). The rung is a per-document trade, not one constant to delete; reverted, nothing committed.",
-   "Gate state measured: regress.py --check refuses on 84 docx regressions vs the 15 Nov baseline (fingerprint refusal already cleared at 00:58 - different message, same tool). Judged the rung on the gate's own reference for the first time: ROW_RUNG_UNDER_TW=0 gives 57 worse / 64 better vs baseline, against 84 worse / 47 better on the current tree - it fixes 28 and introduces exactly 1 (marksheet-subject-left-marks-right 4.55 -> 5.21, where rung=10 gives 2.15). Both prior runs compared rung=0 against RANKING.csv, which is rung=10's own output, so their '63 worse' could only ever say that. Verified the rung=0 table's stamp b648594972a7682b by re-hashing the tree with only :54 set to 0. Still not committable: 57 is a refusal. Remaining 57 cluster into stamps (10 docs, worst 03_stamp_vertical_90deg +17.40), amounts (6), fonts (5), txtpos (5). Also: txt half is 3 documents from 99% and the two Account_Opening_Form failures are one construct - 127 U+FFFD where the source has 0, missing chars are ligature glyphs (H-circumflex 89, H-stroke 23, g-cedilla 13). See FINDINGS/GATE-84-REGRESSIONS-ARE-FIVE-CONSTRUCTS-AND-THE-RUNG-WAS-JUDGED-AGAINST-THE-WRONG-TABLE-28NOV-relay.md"
+   "Gate state measured: regress.py --check refuses on 84 docx regressions vs the 15 Nov baseline (fingerprint refusal already cleared at 00:58 - different message, same tool). Judged the rung on the gate's own reference for the first time: ROW_RUNG_UNDER_TW=0 gives 57 worse / 64 better vs baseline, against 84 worse / 47 better on the current tree - it fixes 28 and introduces exactly 1 (marksheet-subject-left-marks-right 4.55 -> 5.21, where rung=10 gives 2.15). Both prior runs compared rung=0 against RANKING.csv, which is rung=10's own output, so their '63 worse' could only ever say that. Verified the rung=0 table's stamp b648594972a7682b by re-hashing the tree with only :54 set to 0. Still not committable: 57 is a refusal. Remaining 57 cluster into stamps (10 docs, worst 03_stamp_vertical_90deg +17.40), amounts (6), fonts (5), txtpos (5). Also: txt half is 3 documents from 99% and the two Account_Opening_Form failures are one construct - 127 U+FFFD where the source has 0, missing chars are ligature glyphs (H-circumflex 89, H-stroke 23, g-cedilla 13). See FINDINGS/GATE-84-REGRESSIONS-ARE-FIVE-CONSTRUCTS-AND-THE-RUNG-WAS-JUDGED-AGAINST-THE-WRONG-TABLE-28NOV-relay.md",
+   "gate refuses main itself (84 with no engine change); rung=0 recomputed from the committed full-corpus table: 84 -> 57, 28 released, 1 cost, net 27; 27 of the 84 have a baseline of 0.00 and 6 are already inside the 99% bar"
   ],
   "requeues": 0,
   "status": "OPEN"
