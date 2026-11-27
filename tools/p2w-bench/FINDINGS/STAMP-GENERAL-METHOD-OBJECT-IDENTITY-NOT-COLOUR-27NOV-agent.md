@@ -594,3 +594,42 @@ the cluster. That has not been built and it has not been measured - it is the ne
 the rarity rule it is testable against the same sixteen documents.
 
 **Do not build on the rarity rule. It was measured and it is wrong.**
+
+## The geometric locator, measured: rotated text finds the stamp on fourteen of sixteen
+
+Colour was disproved. Geometry was then measured on the same sixteen documents, and it works.
+
+Every line of text carries a direction vector. Body text is `(1, 0)`. A stamp's text almost never is.
+Counting spans whose direction is not `(1, 0)`:
+
+    01  2      02  2      03  3      04  2      06  1      07  2
+    08  4      09  2      11  3      13  4      14  2      15  2
+    312 26     43  3
+
+    **10  0**    stamp is already an image, so there is no stamp text to find
+    **12  0**    stamp is shapes only, so there is no stamp text to find
+
+**Fourteen of sixteen, from one signal that makes no assumption about colour, font, shape or position.**
+
+The directions are also informative on their own: `(0.97,-0.26)` is 15 degrees up, `(0.97,0.26)` is 15
+degrees down, `(0,-1)` is 90 degrees, `(-1,0)` is 180, and 312's seal gives `(-0.34,-0.94)` and friends,
+which is per-letter placement around a circle.
+
+### The rule, in order
+
+1. **Rotated text spans** - if any exist, they are the stamp. This covers fourteen of sixteen.
+2. **No rotated text, but the page carries an image** - the stamp is that image. Nothing to rebuild; it
+   needs anchoring, not reconstructing. This is 10.
+3. **No rotated text and no image** - the stamp is drawn as bare shapes. Locate it by drawings whose
+   bounding box does not align to any text line's baseline. This is 12, and it is the only document in the
+   sixteen that needs this branch.
+
+**Branch 2 is worth noticing on its own:** if the stamp is already an image in the source PDF, the whole
+reconstruction problem disappears. Copy the image, anchor it, done - no alpha to measure, no font to
+substitute, no crop to get wrong. **Check for it first, before any of the hard work.**
+
+### What remains unbuilt
+
+The three branches are measured, not implemented. Branch 1 is straightforward. Branch 2 is easier than
+what has been built so far. Branch 3 is the only one with real work in it, and it affects one document of
+sixteen - which is the right thing to know before spending a day on it.
