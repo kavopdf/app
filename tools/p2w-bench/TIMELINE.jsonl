@@ -9082,3 +9082,24 @@
 {"t": 1795757405.1499922, "ist": "11:00:05", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795757405.2881157, "ist": "11:00:05", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795757406.1170602, "ist": "11:00:06", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795758640.0093915, "ist": "11:20:40", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795758646.8254418, "ist": "11:20:46", "ev": "beat", "d": "relay: claimed, reading brief and prep"}
+{"t": 1795758658.0018914, "ist": "11:20:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795758658.914384, "ist": "11:20:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795758660.1859593, "ist": "11:21:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795758661.1897888, "ist": "11:21:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795758662.3682513, "ist": "11:21:02", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795758672.4382722, "ist": "11:21:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795758672.6081934, "ist": "11:21:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795758673.99172, "ist": "11:21:13", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795758682.3454735, "ist": "11:21:22", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795758682.6038427, "ist": "11:21:22", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795758684.1685047, "ist": "11:21:24", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795758684.4919527, "ist": "11:21:24", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795760437.0835352, "ist": "11:50:37", "ev": "beat", "d": "relay: agent A landed REFUTED, verifying its claim in the instrument"}
+{"t": 1795760629.4400804, "ist": "11:53:49", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795760629.9417748, "ist": "11:53:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795760630.1863217, "ist": "11:53:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795760634.2467623, "ist": "11:53:54", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795760634.5447617, "ist": "11:53:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795760635.847239, "ist": "11:53:55", "ev": "beat", "d": "attempt.py: recording an attempt"}
