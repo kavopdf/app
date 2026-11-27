@@ -6,7 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 23 Nov 15:58 | fixer | build-engine | engine unchanged, compile skipped |
 | 23 Nov 16:03 | fixer | build-engine | started |
 | 23 Nov 16:03 | fixer | build-engine | engine unchanged, compile skipped |
 | 23 Nov 16:10 | fixer | build-engine | started |
@@ -406,3 +405,4 @@
 | 27 Nov 09:46 | fixer | attempt | t12_word_invention -> lead (0/? moved) |
 | 27 Nov 10:05 | fixer | claim | fixer claimed the slot |
 | 27 Nov 10:56 | fixer | attempt | 18_displacement -> lead (0/? moved) |
+| 27 Nov 11:54 | fixer | attempt | 18_displacement -> lead (0/? moved) |
