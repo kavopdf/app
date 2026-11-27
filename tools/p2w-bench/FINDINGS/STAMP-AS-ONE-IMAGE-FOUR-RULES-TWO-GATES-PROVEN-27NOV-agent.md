@@ -116,3 +116,34 @@ document to Google and check whether the stamp words are extractable.**
   missed and reappeared in the image. The colour mask plus the geometry gate has no such hole.
 - **Cropping the anchor extent**: correct on two documents by coincidence and eight times too small on
   a third. Rule 2 exists because of that.
+
+## Rule 5 - the image is RGBA, so only the stamp's own shape is opaque
+
+**Emit RGBA with alpha = the mask. Everything that is not stamp ink is transparent, not white.**
+
+This is not cosmetic. A rectangular crop of a stamp carries 86 to 91 percent of its area as opaque
+white that is not the stamp, and that white hides whatever is behind it. Measured on the four stamps:
+
+    312_affidavit_stamp_paper      ink 14.1%   transparent 85.9%   (the four corners of the box)
+    01_stamp_rotated_15deg_upright ink  9.0%   transparent 91.0%   (the triangles outside the rotation)
+    03_stamp_vertical_90deg        ink 13.1%   transparent 86.9%
+
+On the circular seal the difference is plainest: a rectangle puts an opaque square around a circle.
+
+**Google keeps the alpha.** A hand-built .docx carrying an RGBA PNG (colour type 6) was uploaded,
+converted and exported; the image in the export is `874x452, bpc=8, cs=ICCBased, smask=7`. The alpha
+mask survived.
+
+**And the alpha does not move anything.** Alpha is visibility, not geometry: the anchor and the extent
+are unchanged, so the position measured above - dx +0.7, dy +0.6 pt - was measured with an RGBA image
+and stands.
+
+### The interior is transparent because the PDF's is
+
+All eleven stamp documents were checked for a fill on their stamp drawings: **every one is unfilled**,
+so the area inside the border is transparent in the source and must stay transparent in the image -
+body text behind a stamp is meant to show through it. Making it opaque would be a change, not a copy.
+
+**If a stamp ever carries a fill, this rule inverts for that stamp:** the filled interior must be
+opaque. No such stamp exists in the corpus, so that branch is unproven and must not be written until
+one appears - the same standing as the black-stamp fallback.
