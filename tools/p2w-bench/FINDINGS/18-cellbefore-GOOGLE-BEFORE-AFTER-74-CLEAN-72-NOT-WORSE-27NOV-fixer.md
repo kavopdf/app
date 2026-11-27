@@ -225,3 +225,18 @@ construct is unidentified. The next run should not start from the page-top gap: 
 on every run including the footer smells like a rounding of the flow origin, not a gap at all.
 
 The engine is reverted. `pagetop-guarded-27NOV.patch` is unchanged in `PATCHES/`.
+
+## The relay's "next run: the .txt half" is already answered — the .txt is clean on all of them
+
+`benchmarks/RANKING-TXT.csv` at HEAD, read this run:
+
+| document | applicable | passed | failed |
+|:--|--:|--:|--:|
+| `74_balance_sheet_indented_subitems` | 10 | **10** | 0 |
+| `71_invoice_space_aligned_no_rules` | 10 | **10** | 0 |
+| `22_invoice_four_columns_txtpos` | 10 | **10** | 0 |
+
+So there is no `.txt` half left for this lead. `74` is a **one-check document in both formats**: once
+`18_displacement` passes in Google its `.txt` already describes the same document, and it is clean by the
+charter's definition rather than by the `.docx` alone. That makes the `+1` this patch is worth a real
+document, not half of one.

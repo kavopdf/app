@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 20:09 → running IST · 49 min**
+**27 Nov 2026 · slot 20:09 → running IST · 50 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,7 +15,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 3 code commit(s) in this window, first: second attempt: pagetop-guarded-27NOV.patch is I vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 4 code commit(s) in this window, first: which guard refuses the page-top gap, measured:  vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -80,7 +80,7 @@
 
 | | |
 |:--|:--|
-| Measured | **58 min ago** |
+| Measured | **59 min ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -95,7 +95,7 @@
 
 | | |
 |:--|:--|
-| Slot window | 20:09 → running · 49 min |
+| Slot window | 20:09 → running · 50 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
 | Tool beats | 47 |
 | Longest silence | **23.6 min** — from 20:10:11, after `pending.py: reading the pending gate` |
@@ -112,7 +112,7 @@
 | build - compiling the engine | **0 min** | `#` |
 | measure or build - a conversion, screen or compile writes no beacon | **23 min** | `##########` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **3 min** | `##` |
+| report - the report and the chain | **4 min** | `##` |
 | other - not attributed to a tool | **15 min** | `#######` |
 
 The unattributed row is 8 distinct beat(s) that matched no phase. They said:
