@@ -1421,3 +1421,48 @@ documents and the next run should take a non-ruled branch or another check.
 Evidence: `FINDINGS/18_displacement-PBDR-IN-CELL-PARAGRAPH-REFUTED-IN-LIBREOFFICE-27NOV-relay.md` and the
 patch beside it (87 lines, `-Dp2w.pbdr=true`, inert). Engine byte-identical to HEAD; `regress.py --check`
 PASS; nothing kept.
+
+## 27 Nov 12:09 IST - watchdog: nothing stopped, today's row amended from 47 to 42 clean, and the drop is the row not the corpus
+
+**The picture, from `health.py`.** measure-google moving at 191 of 213, 1.2 h. matrix done at 213 of
+213. classify waiting at 9.8 h - correct, it cannot start while measure-google is short. fix moving,
+6 attempts in 3 h, last activity 0.2 h ago. txt moving at 205 clean of 213. `health.py --json` reports
+`blockers: []`. Nothing is stopped, so STEP 4 C does not fire: `round.py --phase` is `fix`, not a
+finished phase.
+
+**The slot is held by a live run, not a dead one.** ROUND.json reads fixer_started 11:54 IST and
+fixer_last_beat 11:50 IST, a beat 0.37 h old, doing "relay: agent A landed REFUTED, verifying its
+claim in the instrument". `round.py --release-fixer --force` was NOT run: the heartbeat is fresh and
+the claim expires on its own. Releasing a live claim would hand the same document to a second fixer.
+
+**Today's row, amended, and why the -5 is not a regression.** `progress.py --amend` rewrote today's
+row from google clean 47 to 42, naming what it used to say. The trend then reads docx open 60 to 59,
+txt failing 8 to 8, google 205 to 205, google clean 47 to 42. That last column is an artifact of the
+row, not of the corpus: reading `benchmarks/gverify` at HEAD and at twelve commits back both give 42
+clean of 205, with no document that was clean then failing now. Yesterday's row carries the opposite
+amendment in its own note - it was moved from 42 up to 47 by an earlier pass. **The history row for
+26 Nov is not edited here** (past rows are append-only); this note is where the disagreement is
+recorded, and a reader comparing 47 to 42 should read this line first.
+
+**txt failing has now read 8 on three consecutive rows** (25 Nov 9, 26 Nov 8, 27 Nov 8) with 6 fixer
+attempts in the last 3 h beside it. The fixer is working and the corpus is not moving on that axis, but
+docx open moved 60 to 59 today and the attempts are landing findings, not repeating: 18_displacement's
+ruled-row branch was refuted and parked at 09:28 with its measurement, and the ink-box rect landed as a
+finding this morning. STEP 5 does not fire - this is not a stall older than 24 h in which nothing moved,
+and the approach is being changed on evidence rather than re-run.
+
+**No cron tool in this pass.** This watchdog has no `cron` tool, so a paused or zombie cron cannot be
+moved by automation, and STEP 3 and STEP 4 A and B did not run - nothing in this report claims they
+did. The calls it would have made, exactly:
+
+    cron(action="list")
+    cron(action="runs", cron_id="<id read from the HEALTH-BRIEF table, never from memory>")
+
+and, only for a zombie run (newest run `running`, `ended_at` null, started over an hour ago, slot
+free) or a stale `next_fire_at`:
+
+    cron(action="delete", cron_id="<id>"); cron(action="create", name=<same>, schedule=<same>, prompt=<same>)
+    cron(action="pause", cron_id="<id>"); cron(action="resume", cron_id="<id>")
+
+Both are unreachable from here. On this pass neither was needed on the evidence available: the fixer
+slot has a fresh beat, so no zombie is indicated by the only state file this run can read.
