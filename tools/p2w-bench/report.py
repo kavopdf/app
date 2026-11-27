@@ -507,11 +507,24 @@ def engine_now():
     """
     import hashlib as _h
     d = os.path.join(ROOT, "app", "src", "main", "java", "com", "kavopdf", "app", "engine")
+    # THE HASH HAS TO BE THE ONE THE STORE IS STAMPED WITH, AND THAT ONE LEAVES TxtWriter.java OUT.
+    # regress.py:DOCX_EXCLUDES and corpus-convert.py:DOCX_EXCLUDES both skip it for the docx form -
+    # the .txt writer cannot change a converted .docx byte - and `.stamp`, which gvbatch.py stamps
+    # every Google verdict from, is written with that docx form. This function hashed EVERY .java, so
+    # on 27 Nov the store held 212 rows stamped d28ca7516c3f9165 while this returned 74a152e7d3fb3d26:
+    # `_same_engine` matched nothing and the report printed "could not be read - 0 of 212 scored were
+    # read as current" over a store that was entirely current, and check_instances() printed
+    # "0 of 0 (0.0%) on 0 documents" from the same read. gverify.py:_engine_now() was corrected for
+    # this exact one-file disagreement on 27 Nov; this is its twin, and two readers of one store must
+    # answer the same quantity or one of them will always read zero.
+    _DOCX_EXCLUDES = ("TxtWriter.java",)
     try:
         if os.path.isdir(d):
             _s = _h.sha256()
             for _n in sorted(os.listdir(d)):
                 if not _n.endswith(".java"):
+                    continue
+                if _n in _DOCX_EXCLUDES:
                     continue
                 _s.update(_n.encode())
                 with open(os.path.join(d, _n), "rb") as _f:
