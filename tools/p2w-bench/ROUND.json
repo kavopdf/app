@@ -17,11 +17,9 @@
       }
     ]
   },
-  "fixer_doing": "relay: txt half - t12 root-caused on all 3 documents",
-  "fixer_doing_since": 1795752987.2516782,
   "fixer_engine_at_claim": "8fb4f503",
   "fixer_last_beat": 1795752987.2516792,
-  "fixer_started": 1795752996.0164938,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
