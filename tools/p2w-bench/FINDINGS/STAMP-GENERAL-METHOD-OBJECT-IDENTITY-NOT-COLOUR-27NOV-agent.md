@@ -501,3 +501,51 @@ metric that can be trusted across documents.
     ink metric          still threshold-based and still unreliable - switch to coverage sum
     open                10, 12, 14: the three shapes the flow cannot enter
     open                the count of affected documents
+
+## The three documents the flow cannot enter, and the one rule that opens all three
+
+Measured what is actually on those pages:
+
+    10_stamp_as_image            stamp (0.85, 0.36, 0.05)   1 drawing, 1 text span
+    12_stamp_across_page_break   stamp (0.45, 0.03, 0.10)   2 drawings and 2-3 spans per page
+    14_stamp_chars_positioned_td stamp drawing (0.06, 0.12, 0.32)
+                                 stamp text    (0.05, 0.15, 0.55)   <- two different blues
+
+    body text on all three: (0.35, 0.35, 0.35), appearing 5 to 7 times
+
+**The pattern is the same on all three: the stamp's colour is rare, the body text's colour is common.**
+The stamp appears one to three times per page; the body text appears five to seven.
+
+So the locator does not need a container to start from, and does not need to guess which colour is the
+stamp's. **The stamp's ink is every colour on the page that is rare and is not the body text colour.**
+
+### And 14 explains why one colour was never enough
+
+14's border is `(0.06,0.12,0.32)` and its text is `(0.05,0.15,0.55)`. Those are **two different blues**, a
+Euclidean distance of 0.23 apart. Rule 1 takes the single most common drawing colour near the anchor -
+correctly, the border - and then matches text spans within 0.02 per channel. **0.23 is not within 0.02, so
+the text is never found, and the stamp looks like a border with nothing in it.**
+
+**A stamp's ink is a set, not a colour.** Rules 1 and 4 both assume one colour and both break on any stamp
+that draws its border and its lettering in different shades - which 14 does, and which any two-tone stamp
+will.
+
+    stamp inks = every colour C on the page such that
+                   count(C) is small, and
+                   C is not the body text colour
+
+Everything downstream then runs per ink colour instead of for one: the crop is the union of the objects
+drawn in any of them, the mask accepts a pixel matching any of them, and the alpha comes from whichever
+one it is nearest.
+
+### What this does not settle
+
+- 12 spans a **page break**, so its stamp is split across two pages. That is a placement question, not a
+  locator one, and it has not been looked at.
+- 10's stamp is **already an image** - `1 image` on the page. Nothing needs rebuilding; the existing image
+  needs to become the anchored stamp. Also not looked at.
+- The rarity threshold is a judgement, not a measurement. It needs a number picked from the corpus, not
+  guessed here.
+
+**What is settled: all three are enterable, and the reason 14 was never enterable is that its ink is two
+colours and the rules were written for one.**
