@@ -1,30 +1,6 @@
 {
  "agents": [
   {
-   "angle": "what makes a page break land in the wrong place",
-   "class": "Explore: page-break construct audit on the 8 largest worst_dy documents",
-   "deployed": "15:10",
-   "deployed_at": "2026-11-26T15:10",
-   "expected": "an explicit break",
-   "finding": "FINDINGS/18-displacement-PAGE-BREAK-IS-UNEARNED-26NOV-relay.md - blocks at 97% of usable height with ~25 pt slack, explicit <w:br type=page>, every row atLeast+cantSplit, no tblHeader; row growth eats the slack and the renderer breaks first",
-   "id": "R-02",
-   "landed_at": "2026-11-26T15:19",
-   "question": "explicit break or renderer flow?",
-   "status": "landed"
-  },
-  {
-   "angle": "A",
-   "class": "18_displacement",
-   "deployed": "16:18",
-   "deployed_at": "2026-11-26T16:18",
-   "expected": "15:10",
-   "finding": "FINDINGS/18-displacement-PAGE-SCALE-IS-THE-DROPPED-PAGE-TOP-26NOV-explore.md",
-   "id": "18_dA-01",
-   "landed_at": "2026-11-26T16:18",
-   "question": "page-scale half: is the page-top gap the dropped w:before, and what does pgMar w:top do to it",
-   "status": "landed"
-  },
-  {
    "angle": "B",
    "class": "18_displacement",
    "deployed": "16:18",
@@ -274,6 +250,28 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-27T13:31"
+  },
+  {
+   "id": "18_dsmall-dy cluster of 15-01",
+   "class": "18_displacement",
+   "angle": "small-dy cluster of 15",
+   "question": "which code site places a run's baseline, and is the small dy an ascent artefact or a displacement",
+   "expected": "the mechanical cause with a falsifiable claim and the exact file:line",
+   "deployed": "16:45",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-27T16:45"
+  },
+  {
+   "id": "txtform-feed lead-01",
+   "class": "txt",
+   "angle": "form-feed lead",
+   "question": "is _txt_lines dropping page separators, and how many documents does it clear",
+   "expected": "a fixture proving the bug and a count of verdicts moved",
+   "deployed": "16:45",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-27T16:45"
   }
  ],
  "history": [
@@ -579,6 +577,14 @@
   {
    "at": "16:43",
    "text": "attempt 109 on 18_displacement -> lead"
+  },
+  {
+   "at": "16:45",
+   "text": "agent deployed: 18_displacement / small-dy cluster of 15 - which code site places a run's baseline, and is the small dy an ascent artefact "
+  },
+  {
+   "at": "16:45",
+   "text": "agent deployed: txt / form-feed lead - is _txt_lines dropping page separators, and how many documents does it clear"
   }
  ],
  "plan": "",

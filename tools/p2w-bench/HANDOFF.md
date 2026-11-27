@@ -22,8 +22,6 @@ unfinished work, not as a result.
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| R-02 | Explore: page-break construct audit on the 8 largest worst_dy documents | what makes a page break land in the wrong place | explicit break or renderer flow? | 15:10 | an explicit break | landed | FINDINGS/18-displacement-PAGE-BREAK-IS-UNEARNED-26NOV-relay.md - blocks at 97% of usable height with ~25 pt slack, explicit <w:br type=page>, every row atLeast+cantSplit, no tblHeader; row growth eats the slack and the renderer breaks first |
-| 18_dA-01 | 18_displacement | A | page-scale half: is the page-top gap the dropped w:before, and what do | 16:18 | 15:10 | landed | FINDINGS/18-displacement-PAGE-SCALE-IS-THE-DROPPED-PAGE-TOP-26NOV-explore.md |
 | 18_dB-01 | 18_displacement | B | single-page half: is the exact-line spacer charged proportionally by G | 16:18 | 15:28 | landed | FINDINGS/18-displacement-SINGLE-PAGE-SPACER-MEASURED-26NOV-explore.md |
 | 44_hA-01 | 44_header_footer | A | is flowFromBox the second anchor site and does the foot-band guard tra | 17:43 | 17:39 | running |  |
 | --he-01 | --help |  |  | 19:43 |  | running |  |
@@ -46,14 +44,14 @@ unfinished work, not as a result.
 | 18_dA-04 | 18_displacement | A | Does the +2.70 pt charge on 31_times come from the baseline's placemen | 12:08 | 12:35 | running |  |
 | 18_dB-02 | 18_displacement | B | Is 18_displacement's dy an ascent artifact - bbox top vs baseline orig | 12:08 | 12:35 | landed | FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md |
 | corp-01 | corpus-cache-per-document-27NOV |  |  | 13:31 |  | running |  |
+| 18_dsmall-dy cluster of 15-01 | 18_displacement | small-dy cluster of 15 | which code site places a run's baseline, and is the small dy an ascent | 16:45 | the mechanical cause with a falsifiable claim and the exact file:line | running |  |
+| txtform-feed lead-01 | txt | form-feed lead | is _txt_lines dropping page separators, and how many documents does it | 16:45 | a fixture proving the bug and a count of verdicts moved | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `07:44` attempt 103 on 18_displacement -> kept
-- `08:12` agent deployed: 60_text_column_right_edge / A - which engine construct sets a body line's right edge, and which fixes are alread
 - `08:12` agent deployed: gate / B - why does regress.py --check refuse on unmodified HEAD
 - `08:12` agent landed: 60_text_column_right_edge / A -> FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md
 - `08:12` agent landed: gate / B -> FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md
@@ -77,6 +75,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:42` attempt 21 on t01_word_accuracy -> lead (0/3 moved)
 - `15:24` attempt 108 on 18_displacement -> lead
 - `16:43` attempt 109 on 18_displacement -> lead
+- `16:45` agent deployed: 18_displacement / small-dy cluster of 15 - which code site places a run's baseline, and is the small dy an ascent artefact 
+- `16:45` agent deployed: txt / form-feed lead - is _txt_lines dropping page separators, and how many documents does it clear
 
 ## Where the rest of the state lives
 
