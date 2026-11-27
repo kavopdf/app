@@ -1276,7 +1276,7 @@
   "status": "OPEN"
  },
  "60_text_column_right_edge": {
-  "attempts": 6,
+  "attempts": 7,
   "first_seen": null,
   "history": [
    {
@@ -1324,10 +1324,21 @@
     "outcome": "reverted",
     "reason": "right-edge pin (w:jc=distribute + w:ind w:right) on 302: Google 41/42 -> 39/42, 60 unchanged (0,1,False), 17 33->21, 26 wrap 2->28; LO identical 42/42 both arms. Reverted; FINDINGS/RIGHT-PIN-WRAPS-IN-",
     "total": null
+   },
+   {
+    "at": "2026-11-27 08:04",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "gate: restore DocxWriter to 9f0a8207, the engine both tables were measured on"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "the gate now PASSes on this pod (unmodified engine a4d8fca469bba636, exit 0) after corpus-fetch + pod-prep + 2 corpus-slice calls - the four prior refusals were missing pod prerequisites, not the tree",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "85b8735f",
+  "last_engine": "ee5a00d6",
   "last_moved": 0,
   "last_total": 5,
   "outcomes": [
@@ -1336,16 +1347,18 @@
    "lead",
    "lead",
    "lead",
-   "reverted"
+   "reverted",
+   "lead"
   ],
-  "reason": "right-edge pin (w:jc=distribute + w:ind w:right) on 302: Google 41/42 -> 39/42, 60 unchanged (0,1,False), 17 33->21, 26 wrap 2->28; LO identical 42/42 both arms. Reverted; FINDINGS/RIGHT-PIN-WRAPS-IN-GOOGLE-INERT-IN-LO-0126-relay.md",
+  "reason": "the gate now PASSes on this pod (unmodified engine a4d8fca469bba636, exit 0) after corpus-fetch + pod-prep + 2 corpus-slice calls - the four prior refusals were missing pod prerequisites, not the tree. Landed FINDINGS: 60_edge cause settled (DocxWriter:4444 never writes a line's right extent); three fixes refuted in the record; the surviving proposal is a right tab stop at the source edge (flowRow:3805-3809), ceiling 5 CLEAN, prediction 302_radiology_report 41/42 -> 42/42 edge 543.74 +-1.0. Not built this slot: 27 min of the slot went to two inline agents and 10 to the cold corpus. No document moved.",
   "reasons": [
    "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one.",
    "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect.",
    "font family swap measured: declaring Verdana/Georgia instead of DejaVuSans/DejaVuSerif moved the render's widest line on 316_contract_with_schedules from 480.1 to 518.1 against the source's 538.6 - the gap closes from -58.5 to -20.5 - but the deciding column stays 66.8 pt narrow and the document is still 41/42. Right direction, not enough, and the family is not the whole story.",
    "measured all 5 single-check documents: 4 are 42/42 in LibreOffice and fail only in Google, and both probes (font name, embedded face) are refuted - Google has no DejaVu and ignores an embedded face. 79 is the only engine defect and its failing column is named. FINDINGS/60_text_column_right_edge-GOOGLE-HAS-NO-DEJAVU-0830-fixer.md",
    "Measured, not guessed, and it is not an engine class: the column's right edge is left + k x (line width) where k is the ratio of the substituted face's advance widths - measured k 1.0019 (DejaVu, r 0.9952), 0.7998 (Arial, r 0.9983), 0.9221 (Noto, r 0.9998), and per line the measured k equals the font files' own advance ratio to 4 decimals. Four of the five sole-failure documents declare DejaVu, which Google does not have, so they are Google-cannot; the fifth is the check reading the widest extractor line's bbox, an instrument fault. Zero engine defects, so the 19.8 leverage is fractional (sum 1/len(failed)) and the class should leave the table.",
-   "right-edge pin (w:jc=distribute + w:ind w:right) on 302: Google 41/42 -> 39/42, 60 unchanged (0,1,False), 17 33->21, 26 wrap 2->28; LO identical 42/42 both arms. Reverted; FINDINGS/RIGHT-PIN-WRAPS-IN-GOOGLE-INERT-IN-LO-0126-relay.md"
+   "right-edge pin (w:jc=distribute + w:ind w:right) on 302: Google 41/42 -> 39/42, 60 unchanged (0,1,False), 17 33->21, 26 wrap 2->28; LO identical 42/42 both arms. Reverted; FINDINGS/RIGHT-PIN-WRAPS-IN-GOOGLE-INERT-IN-LO-0126-relay.md",
+   "the gate now PASSes on this pod (unmodified engine a4d8fca469bba636, exit 0) after corpus-fetch + pod-prep + 2 corpus-slice calls - the four prior refusals were missing pod prerequisites, not the tree. Landed FINDINGS: 60_edge cause settled (DocxWriter:4444 never writes a line's right extent); three fixes refuted in the record; the surviving proposal is a right tab stop at the source edge (flowRow:3805-3809), ceiling 5 CLEAN, prediction 302_radiology_report 41/42 -> 42/42 edge 543.74 +-1.0. Not built this slot: 27 min of the slot went to two inline agents and 10 to the cold corpus. No document moved."
   ],
   "requeues": 0,
   "status": "OPEN"
