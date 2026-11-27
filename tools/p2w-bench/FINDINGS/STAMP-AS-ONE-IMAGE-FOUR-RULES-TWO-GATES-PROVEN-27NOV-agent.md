@@ -529,3 +529,57 @@ Nothing else tried so far can do that, and this is the next thing to build rathe
 I fixed a real problem - pale ink being discarded - and in doing so reintroduced the exact defect the
 user had already named as the requirement. **The user found it by dragging the stamp, which is a test I
 should have run: move the thing and see what moves with it.**
+
+## STOP - colour masking cannot do this. Five variants, five failures, and the reason.
+
+The requirement is that a stamp image carries nothing but the stamp. On these three documents the
+stamp sits **on top of** body text and table rules, so the two are drawn in the same pixels. Five
+different masks were built and every one of them fails, each in a different way. This is the whole
+record, so none of them is tried again.
+
+| # | mask | what went wrong |
+|---|---|---|
+| 1 | colour distance < 170, saturation >= max(25, sat*0.45) | the pale PAID lettering was discarded entirely - saturation 76 against a floor of 80 |
+| 2 | coverage only, no colour test | **the whole black body text came through at full alpha** - black travels further from paper than red in every channel, so t = 1.12, clipped to 1.0 |
+| 3 | residual to the paper-to-ink line | correct for pale ink, but a **pale ghost** of the body text remained - grey (204,204,204) sits 14 from the red blend (212,201,201) |
+| 4 | + a small absolute saturation floor of 4 | **02 and 07 clean, 06 still ghosted** - on 06 the body text is visible *through* the semi-transparent stamp, so those pixels are a black+red+paper blend that is genuinely reddish and clears any floor |
+| 5 | + reject any pixel darker than the pure ink | **07 got holes punched in its own letters** - where a black table rule crosses a green letter the blend is darker than the pure green, so rejecting it deletes stamp ink |
+
+Variant 5 is the clearest illustration: rejecting foreign ink and deleting stamp ink are the **same
+operation** when the two share a pixel. The count of pixels it rejected was 0.03 to 0.25 percent, which
+is exactly the damage it did.
+
+### Why no colour test can work here
+
+Where two inks overlap, the rendered pixel is a single blend. **A blend does not record how much of each
+component contributed.** No distance, no saturation, no residual and no ordering test can recover that,
+because the information is not in the pixel. Every mask above is guessing at a decomposition that the
+image does not contain.
+
+### The only correct answer, and it is not a mask
+
+**Render the stamp from the PDF's own object stream, not by masking a page render.**
+
+The stamp's drawings and text runs are separate objects in the content stream. Rendered onto a blank
+page they carry no body text at all, so no blend can form - no ghost and no hole, by construction rather
+than by threshold.
+
+`PyMuPDF` cannot do this: it renders pages, not individual objects. It needs object-level filtering in
+the engine - `PDFBox` or MuPDF's own object API.
+
+**This is engine work.** The standing instruction is that the engine is not to be touched directly by
+this work, so it belongs to the fixer, and the fixer should be told plainly that the five mask variants
+above are dead ends rather than left to rediscover them.
+
+### What is still true and useful
+
+Everything before this section stands and is not affected:
+
+- rules 1 to 7, including the corrected rule 6 (every anchor kind inside the stamp rect, overlap >= half
+  the smaller rect) and rule 7 (never redact)
+- the geometry gate padded in **points**, not pixels - this was a real bug and it is fixed
+- ten of thirteen documents at under 1 pt of offset through a real Google export
+- `06` fixed from offset +2.2/+2.2 to +0.0/+0.0 and size -4.6/-5.0 to +0.0/-0.5
+
+What is **not** true, and must not be claimed: that a stamp image is clean of foreign content. On the
+three documents where body text or rules cross the stamp, it is not, and no mask will make it so.
