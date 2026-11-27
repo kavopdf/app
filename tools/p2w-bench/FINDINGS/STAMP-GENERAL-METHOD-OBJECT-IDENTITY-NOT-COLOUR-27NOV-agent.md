@@ -672,3 +672,45 @@ Fourteen of fifteen are clean; 312 is the exception and it is known.
 That is a locator that holds for a tool rather than for a sample, which is what was asked for. It needs the
 312 condition and it needs implementing in the engine, but the question of *how a stamp is found* is
 answered.
+
+## The 312 caveat resolved, and it was my measurement that was wrong again
+
+Spatial clustering was added - join rotated spans whose gap is under 30 pt - and it changed nothing on 312.
+All 26 of its spans are already within 30 pt of each other, because a circular seal puts every letter close
+to its neighbours. The clustering is harmless but it is not the answer.
+
+**The answer came from looking at what those 26 spans actually are.** Their colour is `(0.25,0.25,0.55)`.
+Earlier in this file that same colour was recorded as 312's **body text** colour, appearing 32 times, and the
+stamp was recorded as `(0.48,0.12,0.12)`.
+
+**Both of those readings were wrong, and the reason is arithmetic:** the count of 32 for `(0.25,0.25,0.55)`
+includes **the seal's own 26 letters**. It is not the body text colour at all - it is the seal's lettering
+colour, plus a handful of body spans that happen to share it. And `(0.48,0.12,0.12)` is the seal's ring.
+
+**312's seal is two colours: blue lettering and a dark red ring. Both are the stamp.** The locator was right
+and the ink set was too narrow, because it was taken from the rotated spans alone and the ring is a drawing,
+not a span.
+
+### The correction
+
+**After the stamp rect is located, its ink is every colour of every drawing and every text span inside that
+rect** - not the colours of the rotated spans that found it. The rotated spans locate the stamp; they do not
+define it.
+
+That is one line and it fixes 312 without any special case. It also makes the two-tone problem in 14 fall
+out for free, which was previously going to need its own rule.
+
+### And the lesson, which is the same one as five times before
+
+**A count of 32 was read as "the body text colour" when 26 of those 32 were the stamp.** The measurement
+was of the right page and the right colour and it still described the wrong thing, because it did not ask
+*which objects* the colour belonged to. **Counting colours cannot answer a question about objects.**
+
+### Locator, final state
+
+    branch 1  rotated text spans        14 documents, locates the rect correctly
+    branch 2  the page carries an image  1 document
+    branch 3  bare shapes                1 document, not built
+    ink set   every colour inside the located rect, after locating
+
+Fifteen of sixteen, with 312 now correct rather than excepted.
