@@ -245,3 +245,44 @@ while 07, whose strokes are heavier, did not move.
 masks failed, on 06 and 07 both. **The geometry corrections are not proved and one of them made a
 document worse.** Anyone picking this up should start from the render-vs-rect measurement, not from the
 placement code.
+
+## The geometry error is found, and it was never the threshold
+
+The suspicion recorded above - that the crop threshold was clipping the edge - is **wrong**. The threshold
+makes no difference at all: 0.05, 0.02 and 0.005 give the identical bounding box on both documents. The
+error is somewhere else entirely and it is exact.
+
+    document   stamp rect (SR)      rendered ink        error        stroke width
+    06         147.62 x 114.13      152.64 x 119.16     +5.02, +5.03    4.89
+    07         159.71 x  82.89      161.28 x  84.48     +1.57, +1.59    1.44
+
+**The error equals the stroke width, on both.**
+
+`get_drawings()` returns `rect` as the bounding box of the stroke's **centre path**, not of the ink. The
+ink extends half the stroke width beyond the path on every side, so the true ink box is the path box
+**plus the full stroke width** - half on each side.
+
+Which means **the stamp rect used everywhere in this work was too small by one stroke width**, and every
+size deficit measured today is that same error:
+
+    -4.6, -5.0   on 06   (stroke 4.89)
+    -3.4         on 02   (stroke 1.67)
+    -2.2         on 07   (stroke 1.44)
+
+**The fix is one line, and it belongs at the point where the stamp rect is built:**
+
+    SR = union of drawing rects and stamp text bboxes
+    SR = SR expanded by (max_stroke_width / 2) on every side      <-- the ink box, not the path box
+
+Then place the image at that rect with that rect's size, and the geometry is right by construction. No
+self-correcting placement, no crop-and-stretch, no threshold tuning - those were all attempts to repair a
+rect that was wrong at the source.
+
+**This also explains why the padding rule `(max stroke / 2) + 1 pt` helped but never made the size exact.**
+That padding was applied to the *crop* so the render would not clip the border. It was never applied to
+the *stamp rect* that the placement maths used. Two different numbers were needed and only one was
+corrected.
+
+**What to do first, before anything else in this file:** rebuild the stamp rect as the ink box, re-measure
+one document, and check the size delta goes to zero. If it does, every geometry problem in this work was
+this one line.
