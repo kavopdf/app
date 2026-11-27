@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-27 20:09
+# Fixer report - 2026-11-27 20:57
 
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 20:09 → running IST · 50 min**
+**27 Nov 2026 · slot 20:57 → running IST · 9 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -112,6 +112,25 @@ The relay left "next run: the `.txt` half". Read from `benchmarks/RANKING-TXT.cs
 `74` is a one-check document in **both** formats, so the `+1` is a whole document by the charter's
 definition, not half of one.
 
+## The gate's own state, checked, because a blocked pipeline looks like a dead one
+
+    $ python3 tools/p2w-bench/regress.py --check
+    engine fingerprint : 72ff003db5871587
+    scope of the change: docx, txt   (scope.py: both)
+    ENGINE CHANGED (docx): table measured on d28ca7516c3f9165, the tree is a05b20eb05fe0fc8
+    docx: no document worse than baseline
+    txt : no document worse than baseline
+    google-safe : SKIPPED - no .docx output directory
+    REFUSED.
+
+On a **clean tree at HEAD with nothing of mine in it**, both comparison tables pass and the gate still
+refuses, for the pre-existing reason that `RANKING.csv` was measured one engine back. This run's commits
+landed because they are data-only and the hook's scope skipped them. So the gate is **correctly blocked,
+not broken** — but two of its lines are worth the next run's attention: `google-safe` is `SKIPPED` because
+it cannot find the `.docx` output directory that `corpus-convert.py` actually writes, and `scope.py` reports
+`docx, txt` on a tree whose engine has not moved. Neither was changed by this run and neither was fixed by
+it.
+
 ## Subagents
 
 One, deployed in the first ten minutes: a read-only audit of which of the 46 documents failing
@@ -135,8 +154,8 @@ FINDINGS reproduce recipe so no run pays it again.
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 4 code commit(s) in this window, first: which guard refuses the page-top gap, measured:  vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - kept change: 3 code commit(s) in this window, first: the relay's '.txt half' of this lead is already  vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 20:57 vs TIMELINE.jsonl records the claim at 20:09, so the window was reset and the duration is short |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -147,13 +166,13 @@ FINDINGS reproduce recipe so no run pays it again.
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (57 still open), not a new class |
+| Working on | `-` - taken from the pending list (57 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 20:52 | **lead** | 1/2 | cell-before LINE_BASE rescale measured live in Google on 74 (41/42 -> 42/42 CLEAN) and 72 (41/42 -> 41/42, not worse); predicted net-zero, measured +1 clean and 0 worse. Cannot land: measure_gate NOT |
 | 20:57 | **lead** | 0/1 | pagetop-guarded-27NOV.patch applied, recompiled, converted 22/71/74/price-list: emits w:pgMar w:top=0 on all four, so sectionTopTw() returned 0 and the page is laid out exactly as before - the patch i |
 
 ## Why nothing moved, in this run's own words
@@ -200,7 +219,7 @@ FINDINGS reproduce recipe so no run pays it again.
 
 | | |
 |:--|:--|
-| Measured | **59 min ago** |
+| Measured | **1.1 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -215,31 +234,20 @@ FINDINGS reproduce recipe so no run pays it again.
 
 | | |
 |:--|:--|
-| Slot window | 20:09 → running · 50 min |
+| Slot window | 20:57 → running · 9 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 47 |
-| Longest silence | **23.6 min** — from 20:10:11, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 5 |
-| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | same refusal as 17:55 and 18:45: `ENGINE CHANGED (docx): table measured on `d28ca7516c3f9165`, the tree is `a0 |
+| Tool beats | 13 |
+| Longest silence | **7.7 min** — from 20:59:28, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 1 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `##` |
-| build - compiling the engine | **0 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **23 min** | `##########` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **4 min** | `##` |
-| other - not attributed to a tool | **15 min** | `#######` |
-
-The unattributed row is 8 distinct beat(s) that matched no phase. They said:
-
-- `corpus slice 2/4 for the gate`
-- `collecting Google scores for HEAD probes 74 and 72`
-- `rebuilding engine with cell-before patch`
+| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `##################` |
+| report - the report and the chain | **1 min** | `####` |
 ## Best results this round
 
 | Document | Before | After | Change |

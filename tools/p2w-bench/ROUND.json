@@ -17,10 +17,10 @@
       }
     ]
   },
-  "fixer_doing": "collecting 3 more patched probes",
-  "fixer_doing_since": 1795792994.9520364,
+  "fixer_doing": "corpus-slice: 48 of 53 converted",
+  "fixer_doing_since": 1795793833.2234006,
   "fixer_engine_at_claim": "33863086",
-  "fixer_last_beat": 1795792994.952037,
+  "fixer_last_beat": 1795793833.2234018,
   "fixer_started": 1795793259.7012837,
   "history": [
     {
