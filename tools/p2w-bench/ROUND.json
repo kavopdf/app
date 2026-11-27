@@ -17,11 +17,9 @@
       }
     ]
   },
-  "fixer_doing": "gverify: 5 probes autoflow+autoEm1.2207",
-  "fixer_doing_since": 1795780396.7004173,
   "fixer_engine_at_claim": "8fb4f503",
   "fixer_last_beat": 1795778874.1220322,
-  "fixer_started": 1795779682.7811568,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-12 09:46",
