@@ -9342,3 +9342,7 @@
 {"t": 1795778031.666397, "ist": "16:43:51", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
 {"t": 1795778032.1500819, "ist": "16:43:52", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
 {"t": 1795778036.6889, "ist": "16:43:56", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795778039.430564, "ist": "16:43:59", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795778039.5624256, "ist": "16:43:59", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795778039.6621466, "ist": "16:43:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795778040.3809092, "ist": "16:44:00", "ev": "beat", "d": "classrow.py: refreshing the class file"}

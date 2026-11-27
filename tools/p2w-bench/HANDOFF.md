@@ -9,14 +9,14 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 13:54 |
-| ended | 15:34 |
-| how it ended | forced |
+| started | 16:06 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `06:19` attempt 102 on 18_displacement -> lead
 - `07:44` attempt 103 on 18_displacement -> kept
 - `08:12` agent deployed: 60_text_column_right_edge / A - which engine construct sets a body line's right edge, and which fixes are alread
 - `08:12` agent deployed: gate / B - why does regress.py --check refuse on unmodified HEAD
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:31` agent deployed: corpus-cache-per-document-27NOV /  - 
 - `14:42` attempt 21 on t01_word_accuracy -> lead (0/3 moved)
 - `15:24` attempt 108 on 18_displacement -> lead
+- `16:43` attempt 109 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 

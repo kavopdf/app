@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-27 14:28
+# Fixer report - 2026-11-27 16:06
 
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 14:28 → 15:34 IST · 1h 05m**
+**27 Nov 2026 · slot 16:06 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 3 code commit(s) in this window, first: findings: the 25 near-clean documents are two co vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,14 +26,8 @@
 | Not scored - page count did not match | **1** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (52 still open), not a new class |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 14:42 | **lead** | 0/3 | t01's whitespace token unit charges the source's own bidi and letter-spacing extraction artefacts as lost words: 77_arabic_rtl_document and 39_small_caps_letter_spacing carry every alphanumeric charac |
-| 15:24 | **lead** | 0/None | no engine change landed. Instrument fix landed instead: report.py:engine_now() hashed every .java while the docx store stamp excludes TxtWriter.java, so the Google-truth read returned 0 of 0 on a stor |
+| Working on | `-` - taken from the pending list (53 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## Why nothing moved, in this run's own words
 
@@ -41,6 +35,8 @@
 
 ### The run before this one said
 
+>
+>
 > # Why nothing moved
 >
 > Because the slot was spent building the pod, and then on an instrument that stops the next run
@@ -108,7 +104,7 @@
 
 | | |
 |:--|:--|
-| Measured | **2.1 h ago** |
+| Measured | **2.6 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -123,31 +119,12 @@
 
 | | |
 |:--|:--|
-| Slot window | 14:28 → 15:34 · 1h 05m |
+| Slot window | 16:06 → running · 0 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 48 |
-| Longest silence | **18.6 min** — from 14:43:57, after `lastmessage.py: running report.py for the numbers` |
-| Silences over 2 min | 7 |
+| Tool beats | 3 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| build - compiling the engine | **2 min** | `#` |
-| fix - diagnose and change the engine | **9 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **42 min** | `###############` |
-| record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
-| other - not attributed to a tool | **4 min** | `##` |
-
-The unattributed row is 4 distinct beat(s) that matched no phase. They said:
-
-- `corpus slice 2`
-- `t01_word_accuracy -> lead`
-- `fixer released (forced)`
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -160,7 +137,7 @@ The unattributed row is 4 distinct beat(s) that matched no phase. They said:
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

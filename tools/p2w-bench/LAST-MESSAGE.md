@@ -1,8 +1,8 @@
 # P2W Fixer - Run Report
 
-**27 Nov 2026 - slot 14:28 -> 15:34 IST**
+**27 Nov 2026 · slot 16:06 → running IST · 0 min**
 
-> Two kept changes, both instruments: the pipeline can see its Google truth again, and the handoff note stopped growing 89 copies per file. No document moved, and that is the number.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
@@ -12,8 +12,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 3 code commit(s) in this window, first: findings: the 25 near-clean documents are two co vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -23,14 +23,8 @@
 | Not scored - page count did not match | **1** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (52 still open), not a new class |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 14:42 | **lead** | 0/3 | t01's whitespace token unit charges the source's own bidi and letter-spacing extraction artefacts as lost words: 77_arabic_rtl_document and 39_small_caps_letter_spacing carry every alphanumeric charac |
-| 15:24 | **lead** | 0/None | no engine change landed. Instrument fix landed instead: report.py:engine_now() hashed every .java while the docx store stamp excludes TxtWriter.java, so the Google-truth read returned 0 of 0 on a stor |
+| Working on | `-` - taken from the pending list (53 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## Why nothing moved, in this run's own words
 
@@ -38,6 +32,8 @@
 
 ### The run before this one said
 
+>
+>
 > # Why nothing moved
 >
 > Because the slot was spent building the pod, and then on an instrument that stops the next run
@@ -105,7 +101,7 @@
 
 | | |
 |:--|:--|
-| Measured | **2.1 h ago** |
+| Measured | **2.6 h ago** |
 | Scored | **213** of 213 |
 | Clean - every applicable check passes | **205** (96.2%) |
 | Failing at least one check | **8** |
@@ -120,31 +116,12 @@
 
 | | |
 |:--|:--|
-| Slot window | 14:28 → 15:34 · 1h 05m |
+| Slot window | 16:06 → running · 0 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 48 |
-| Longest silence | **18.6 min** — from 14:43:57, after `lastmessage.py: running report.py for the numbers` |
-| Silences over 2 min | 7 |
+| Tool beats | 3 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| build - compiling the engine | **2 min** | `#` |
-| fix - diagnose and change the engine | **9 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **42 min** | `###############` |
-| record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
-| other - not attributed to a tool | **4 min** | `##` |
-
-The unattributed row is 4 distinct beat(s) that matched no phase. They said:
-
-- `corpus slice 2`
-- `t01_word_accuracy -> lead`
-- `fixer released (forced)`
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -157,68 +134,7 @@ The unattributed row is 4 distinct beat(s) that matched no phase. They said:
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 31 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 32 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
-
-## The two kept changes
-
-**1. The Google-truth read was returning zero over a store that was entirely current.**
-`report.py:engine_now()` hashed every `.java` in the engine directory. The docx stamp that
-`gvbatch.py` writes into every Google verdict - and that `corpus-convert.py:engine_sources("docx")`
-and `regress.py:engine_fingerprint("docx")` both compute - leaves `TxtWriter.java` out, because the
-`.txt` writer cannot change a converted `.docx` byte. The store held 212 rows stamped
-`d28ca7516c3f9165`; the reader returned `74a152e7d3fb3d26`; `_same_engine` matched nothing.
-
-| | before | after |
-|:--|--:|--:|
-| Check-instances passing | 0 of 0 (0.0%) on 0 documents | 8681 of 9273 (93.6%) on 212 documents |
-| Check-instances failing | 0 | 592 |
-| Fixed - Google, every applicable check | could not be read | 42 of 212 |
-
-Confirmed without `report.py`: sha256 over the engine `.java` files is `74a152e7d3fb3d26` with all
-files and `d28ca7516c3f9165` without `TxtWriter.java`; the 213 store rows carry
-`d28ca7516c3f9165` (212) and `a4d8fca469bba636` (1); and the corpus rebuilt this run was stamped
-`d28ca7516c3f9165` by `corpus-slice.py`. `gverify.py` was corrected for this same one-file
-disagreement on 27 Nov; `report.py` was the unfixed twin.
-
-**2. The handoff note grew by one copy per run.** `handoff.py:save()` prepends READ_FIRST, CORPUS
-and PENDING FIRST, and each guard tests `startswith` on the whole string - but it prepends in that
-order, so after one run the value begins `READ FIRST`, the PENDING FIRST guard is false again, and
-the next run adds a whole new triple in front. Measured: `HANDOFF.json`'s `next` held 89 copies in a
-single 55,980-character line, and `LAST-MESSAGE.md` renders it verbatim - both previous reports
-shipped 62 KB of it. Peeling first makes the append idempotent: 55,980 -> 629 characters, 89 -> 1
-copy, and three consecutive `save()` calls stay at 629.
-
-## The class, decided on the fixed read
-
-40 documents fail exactly one check. **25 fail only `18_displacement`** - four times the next
-population (`60_text_column_right_edge`, 6) - worth 42 -> 67 clean outright, and a term in 12 more
-of the 2-check documents.
-
-The failure is vertical only: `med_dx` is within 0.8 pt of zero on all 25. It splits into two named
-engine constants.
-
-| documents | class | construct |
-|--:|:--|:--|
-| 12 | constant offset | `DocxWriter.java:220` `LINE_BASE = 0.8f` - baseline placed ~0.26 em too high in the line box |
-| 13 | accumulated drift | `DocxWriter.java:54` `ROW_RUNG_UNDER_TW` / `w:trHeight` at 6601 - Google renders each row 0.5-1.0 pt taller than declared |
-| 4 of the 12 | block-scale | `flowFromBox()` `edgeGap` branch - `med_dy` equals `worst_dy`, a whole table block moved |
-
-Detail, fit statistics and the experiment: `FINDINGS/18-displacement-TWO-CONSTRUCTS-27NOV.md`.
-
-**Not claimed:** per-run Google `dy` was not measured this run. The split is inferred from stored
-Google `med_dy`/`worst_dy`, stored Google-side `23_line_pitch`, the declared `w:trHeight` and the
-engine source. LibreOffice is not evidence here - on `320_balance_sheet_statutory` it gives `med_dy`
-0.05 where Google gives 8.2.
-
-## Where the next run starts
-
-1. `31_times_body_arial_headings` - no tables, 29 runs, `med_dy` 2.6 against a 2.73 prediction.
-   `LINE_BASE` 0.8 -> 0.31, re-measure, guard `23_line_pitch` under 1.0 pt.
-2. `320_balance_sheet_statutory` - the drift twin. `w:trHeight` 14.0 -> 13.0, expect `worst_dy`
-   19.4 -> about 0.
-3. Both are one document and under ten minutes each. Neither has been run.
