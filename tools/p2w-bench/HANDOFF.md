@@ -9,7 +9,7 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 02:24 |
+| started | 03:07 |
 | ended | still running |
 | how it ended | - |
 | plan | - |
@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `11:54` attempt 107 on 18_displacement -> lead
 - `12:08` agent deployed: 18_displacement / A - Does the +2.70 pt charge on 31_times come from the baseline's placement in a hai
 - `12:08` agent deployed: 18_displacement / B - Is 18_displacement's dy an ascent artifact - bbox top vs baseline origin - and h
 - `12:08` agent landed: 18_displacement / A -> FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `23:56` attempt 2 on 63_table_rows -> lead
 - `01:27` attempt 3 on 63_table_rows -> reverted
 - `02:43` attempt 4 on 63_table_rows -> lead
+- `03:24` attempt 120 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 
