@@ -1,34 +1,64 @@
-# Google verify - run report
+# Google verification — the measurement is complete
 
-Stage **measure-google**: 143 of 214 documents now carry a Google result on the engine in the tree (137 scored, 6 refused on page count). Next: measure 20 more.
+**214 of 214 documents have a Google result: 206 scored, 8 refused on page count.** The stage moved from `measure-google` to `classify`.
 
-## What this run did
+This run converted the rest of the corpus and measured every document that had no current-engine result. Nothing was re-run to make a number agree, and no engine code was touched.
 
-Took the next 60 documents from the planner, imported each into Google Docs, exported the PDF and collected the 42-check verdict. All 60 result files are committed under `benchmarks/gverify/` on main. The pod is fresh every hour, so the corpus was converted in slices before any upload started.
+## The corpus, through the renderer the user opens
 
-Two things the next run should not have to rediscover:
+| | documents |
+|---|---:|
+| measured through Google | 214 |
+| scored on all checks offered | 206 |
+| refused (page count) | 8 |
+| pass every check offered | 46 |
+| fail at least one | 160 |
 
-- `GOOGLEDRIVE_CREATE_FILE` exists and does convert a docx into a Google Doc. The staging upload behind it failed on most files today ("the file does not exist in storage"), and re-trying the same key never worked.
-- So the docx were staged on a temporary branch of this repository and pulled into Drive with `GOOGLEDRIVE_UPLOAD_FROM_URL`. That branch is deleted; nothing was written to the Drive root and nothing in Drive was deleted.
-
-## Corpus (gverify.py --report)
-
-143 verified | 37 pass every check offered | 100 fail at least one | 6 refused (page count).
+## Which check costs how many documents
 
 | check | documents failing |
 |---|---:|
-| `18\_displacement` | 62 |
-| `59\_shape\_anchor` | 39 |
-| `60\_text\_column\_right\_edge` | 38 |
-| `04\_chars\_missing` | 37 |
-| `13\_text\_colours` | 23 |
-| `47\_margins` | 20 |
-| `45\_char\_accuracy` | 20 |
-| `17\_matched\_runs` | 18 |
-| `35\_rotation` | 12 |
+| `18\_displacement` | 108 |
+| `60\_text\_column\_right\_edge` | 62 |
+| `04\_chars\_missing` | 54 |
+| `59\_shape\_anchor` | 50 |
+| `45\_char\_accuracy` | 33 |
+| `13\_text\_colours` | 32 |
+| `17\_matched\_runs` | 30 |
+| `47\_margins` | 27 |
+| `26\_text\_overlap` | 19 |
+| `44\_header\_footer` | 19 |
 
-## Capability table (gverify.py --matrix)
+## The capability table
 
-207 documents compared: LibreOffice passes 107, Google passes 42.
+Google Docs vs LibreOffice, same source, same instrument, 206 documents:
 
-Read it as a single-renderer table for now. 0 pairs are measured on both renderers on the current engine (Google 137 of 207, LibreOffice 0 of 207), so the LibreOffice column still describes the docx an older engine wrote. The pair comparison becomes real when the matrix stage fills the LibreOffice side.
+| | pass every check offered |
+|---|---:|
+| LibreOffice | 107 |
+| Google Docs | 46 |
+
+| check | LibreOffice fails | Google fails |
+|---|---:|---:|
+| `18\_displacement` | 53 | 108 |
+| `04\_chars\_missing` | 2 | 54 |
+| `60\_text\_column\_right\_edge` | 18 | 62 |
+| `59\_shape\_anchor` | 16 | 50 |
+| `45\_char\_accuracy` | 2 | 33 |
+| `13\_text\_colours` | 1 | 32 |
+| `44\_header\_footer` | 0 | 19 |
+
+## What is next
+
+Stage is `classify`: 160 failing documents, and the class table is older than these results. Grouping them into classes is the classifier's slot, not this one.
+
+## The commit did not land, and the reason is not this run
+
+`regress.py --check` refuses at this tree with the results removed as well, so it is not a verdict on these measurements. It prints two things:
+
+- `ENGINE CHANGED (docx): table measured on d28ca7516c3f9165, the tree is a05b20eb05fe0fc8`
+- `ENGINE CHANGED (txt): table measured on 74a152e7d3fb3d26, the tree is 72ff003db5871587`
+
+The engine in the tree has never been stamped against the tables, so the gate refuses every in-scope commit — including a report. With these results in place it also lists documents that fail more of Google's checks than the committed results did; that list is the same engine drift seen from the other side, and it is the fixer's to resolve, not this cron's.
+
+The measurements are preserved outside the sandbox so the next run does not pay for them again.

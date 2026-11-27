@@ -1,0 +1,19 @@
+{
+ "name": "Prakashan_Print_Fidelity_Handbook",
+ "status": "page_count_refused",
+ "pages": 11,
+ "want": 10,
+ "at": "2026-11-27T15:08:34",
+ "extra_pages": [
+  {
+   "page": 11,
+   "words": 170,
+   "chars": 851,
+   "drawings": 27,
+   "images": 41
+  }
+ ],
+ "export": "Prakashan_Print_Fidelity_Handbook.refused.pdf",
+ "engine": "a05b20eb05fe0fc8",
+ "checks": "377699-1795789156"
+}
