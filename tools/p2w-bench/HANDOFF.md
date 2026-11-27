@@ -10,8 +10,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 16:06 |
-| ended | still running |
-| how it ended | - |
+| ended | 16:46 |
+| how it ended | forced |
 | plan | - |
 
 ## What the next run should do first

@@ -1,18 +1,5 @@
 [
  {
-  "agents": [],
-  "attempts": 4,
-  "class": "04_chars_missing",
-  "docs_improved": 0,
-  "ended": "(never)",
-  "ended_ts": null,
-  "kept": 0,
-  "started": "08:14",
-  "started_ts": 1795574665.9810188,
-  "window_for_claim": 1795574665.9810188,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started_ts": 1795578938.0537274,
   "started": "09:25",
   "window_for_claim": 1795578938.0537274,
@@ -792,5 +779,22 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "18_dsmall-dy cluster of 15-01",
+   "txtform-feed lead-01"
+  ],
+  "attempts": 2,
+  "class": "18_displacement",
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "needs_human": 0,
+  "obstacles_cleared": 0,
+  "started": "16:06",
+  "started_ts": 1795775815.0087092,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
