@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-27 19:15
+# Fixer report - 2026-11-27 19:56
 
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 19:15 → running IST · 0 min**
+**27 Nov 2026 · slot 19:56 → running IST · 3 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| Self-check | **every field agrees with its second source** |
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - .txt scored: RANKING-TXT says 214 vs corpus says 213; run window: RUN.json says this run began at 19:56 vs TIMELINE.jsonl records the claim at 19:15, so the window was reset and the duration is short |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 213) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -27,8 +27,14 @@
 | Not scored - page count did not match | **4** of the 213 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (61 still open), not a new class |
+| Working on | `-` - taken from the pending list (59 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `-` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 19:56 | **kept** | 3/6 | reader fault, not writer fault: t01 charged a regrouped word as lost text (zero character deficit) and t02 read the span bbox left edge instead of the first inked glyph. 205->208 of 214 .txt clean, 0 |
 
 ## Why nothing moved, in this run's own words
 
@@ -36,6 +42,8 @@
 
 ### The run before this one said
 
+>
+>
 > Nothing was kept because the change cannot be certified by the instrument this repo gates on, and
 > that is a measurement, not a shrug.
 >
@@ -73,12 +81,12 @@
 
 | | |
 |:--|:--|
-| Measured | **3.4 h ago** |
-| Scored | **213** of 213 |
-| Clean - every applicable check passes | **205** (96.2%) |
-| Failing at least one check | **8** |
+| Measured | **0 min ago** |
+| Scored | **214** of 213 |
+| Clean - every applicable check passes | **208** (97.2%) |
+| Failing at least one check | **6** |
 | Moved since the last commit | **none** - nothing changed |
-| Most common failure | `t12_word_invention` - 3 documents |
+| Most common failure | `t12_word_invention` - 4 documents |
 
 ## Subagents
 
@@ -88,12 +96,25 @@
 
 | | |
 |:--|:--|
-| Slot window | 19:15 → running · 0 min |
+| Slot window | 19:56 → running · 3 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 4 |
+| Tool beats | 8 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| report - the report and the chain | **2 min** | `##############` |
+| other - not attributed to a tool | **1 min** | `########` |
+
+The unattributed row is 3 distinct beat(s) that matched no phase. They said:
+
+- `t01_word_accuracy -> kept`
+- `regress.py --check before the report`
+- `writing the report`
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -106,7 +127,7 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 38 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
