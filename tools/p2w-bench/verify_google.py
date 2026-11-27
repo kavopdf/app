@@ -291,6 +291,12 @@ def runs(page, page_no=0, mirrored=False, page_angle=None):
                     "rx": round(rxbox, 2),
                     "rx1": round(rx1box, 2),
                     "ry": round(ryb, 2),
+                    # THE ORIGIN, projected into reading space. ry above is the bbox TOP (the
+                    # origin minus the rendered face's own ascent), which is the right key for
+                    # the matcher but charges a document for the ASCENT DIFFERENCE between the
+                    # source face and the substituted one - a font metric, not a layout move.
+                    # 18_displacement is about where the baseline sits, so it reads this one.
+                    "roy": round(rproj(ox, oy, fr)[1], 2),
                     "ry1": round(ryb + (b[3] - b[1]), 2),
                     "rxink": round(rxink, 2),
                     "rx1ink": round(rx1ink, 2),
@@ -5874,7 +5880,7 @@ def compare(src_path, gd_path, docx_path=None):
     for pg in sorted(set(r["page"] for r in s_runs)):
         flat_src = [r for r in s_runs
                     if r["page"] == pg and (r["page"], r["ry"], r["text"]) in flat]
-        ds = [(g["ry"] - r["ry"], r["size"]) for r, g in pairs
+        ds = [(g["roy"] - r["roy"], r["size"]) for r, g in pairs
               if r["page"] == pg and (r["page"], r["ry"], r["text"]) in flat]
         # No upright run on the page is not the same as no text on the page. A page whose
         # every line is rotated or curved lands here with ds empty, and it used to be scored
@@ -5904,6 +5910,20 @@ def compare(src_path, gd_path, docx_path=None):
     # accumulating drift. FINDINGS/18_displacement-PARTIAL-SPEND-IS-INERT-AND-COSTS-68-JOURNAL-2315-fixer.md
     # names this as the highest-value change available to the class. It is an instrument change:
     # no check's pass/fail can move because of it, only what the result says about itself.
+    # 18 MEASURES THE BASELINE, NOT THE INK TOP. ds above is built from roy, the origin projected
+    # into reading space, so the ascent cancels between the two sides. Until 27 Nov it used ry,
+    # the bbox top, and dy was baseline difference PLUS ascent difference: a document whose
+    # baselines coincide was still charged the difference between the source face's ascent and
+    # the substituted face's. Measured on Google renders this run (engine d28ca7516c3f9165):
+    #   31_times_body_arial_headings   dy(origin) med +0.07 max 0.96 pt   dy(bbox top) +2.70 pt
+    #   (source Helvetica-Bold@12 ascent 1.07 em, built LiberationSans-Bold 0.80 em)
+    #   mobile-bill                    same face both sides: unchanged, still PASS
+    # The reported med_dy/worst_dy are the same population ds scores, so the number a fixer steers
+    # by is the number the check judges.
+    dy18 = [g["roy"] - r["roy"] for r, g in pairs
+            if (r["page"], r["ry"], r["text"]) in flat]
+    med_dy = round(median(dy18), 1) if dy18 else 0.0
+    worst_dy = round(max((abs(d) for d in dy18), default=0), 1)
     checks["18_displacement"] = (0, len(bad_pages), not bad_pages, {
         "med_dy": med_dy, "worst_dy": worst_dy, "med_dx": med_dx,
         "bad_pages": bad_pages, "runs_matched": len(pairs),
