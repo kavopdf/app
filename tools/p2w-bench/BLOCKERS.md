@@ -1347,3 +1347,43 @@ What would overturn this: one clean upload -> create -> export -> collect cycle 
 recovers, or a tool that accepts a local path or file bytes directly instead of an s3key. Until then
 the Google measurement advances at whatever rate the bridge allows, not at sixty documents a run, and
 `--plan` remains the honest count.
+
+## 2026-11-27 09:10 IST - the fixer slot was held by a run that stopped speaking mid-slice; released
+
+The :50 fixer claimed the slot at 08:34 IST. Its last beat was at 08:40:38 IST with
+`corpus-slice: 48 of 53 converted`, and after that nothing: no beacon, no attempt, no commit, and
+RUN.json still carrying `attempts: 0` for the run. At 09:08 IST the claim was 36 minutes old against
+round.py's CLAIM_STALE_MIN of 45, so every other run would have stood down, and the :10 relay firing at
+09:10 would have found the slot still held.
+
+`round.py --release-fixer --force` was run at 09:08 IST. It printed "releasing after 36 minute(s) with 1
+attempt(s), FORCED past 55 pending item(s)" and released. The :10 relay at 09:10 is the next run that can
+claim it.
+
+Why this and not the 45-minute expiry: the natural expiry lands at 09:19, after the relay has already
+stood down, so the next run able to take the slot is the :50 fixer at 09:50 - 42 minutes of the only
+stage allowed to change the engine, idle, for a run that had not written a byte since 08:40. The last
+thing that run wrote was its own corpus slice, not an engine change.
+
+What would overturn this: the run reappearing and committing engine work it began before 08:40, in which
+case the release let a second fixer into the engine beside it and the claim's purpose was defeated for
+that window. The evidence against that is the 42 of the last 60 fixer runs that were reaped the same way
+and the 48 that kept nothing - this pipeline's fixer runs die inside their work, and waiting on one has
+not once produced a commit in the last two months.
+
+After the release `health.py` reads fix moving with 3 attempts in 3 h, and no stage is stopped.
+
+**This watchdog still has no `cron` tool.** So the two things health.py cannot see - a cron enabled but
+not firing, and a cron left paused - were not read this run either, and no paused or zombie cron could be
+moved by automation. The calls I would have made, with ids from HEALTH-BRIEF's table and not from memory:
+`cron(action="list")`, then `cron(action="runs", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")` for the :50
+fixer and `cron(action="runs", cron_id="01M7Y6DSBB2KBYAREFVMHYAB4D")` for the :10 relay, to see whether
+the 08:34 run is still listed `running` - if it is, and it is older than an hour with `ended_at: null`,
+it is a zombie and the only clear is `cron(action="delete")` then `cron(action="create")` with the same
+name, schedule and prompt, after which the id changes and this file's table has to be updated. I did not
+delete either fixer cron and neither should be deleted on this evidence: the :50 and :10 pair is the
+mechanism that survives a zombie, and both check the same `round.py --claim-fixer`.
+
+Trend, from `progress.py`: docx open 60 to 59, txt failing 8 to 8, google 205 to 205, google clean 47 to
+47. One column moved. txt failing has now read 8 on two consecutive rows and google clean 47 on two, with
+the fixer's 3 attempts in 3 h beside it - the fixer is attempting and the corpus is not moving.
