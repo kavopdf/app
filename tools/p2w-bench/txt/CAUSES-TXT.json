@@ -413,12 +413,10 @@
  },
  "332_bom_on_drawing": {
   "applicable": 8,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "333_datasheet_spec_tables": {
   "applicable": 7,
@@ -429,12 +427,10 @@
  },
  "334_patent_document": {
   "applicable": 7,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "335_msds_safety_data_sheet": {
   "applicable": 7,
@@ -697,12 +693,11 @@
  },
  "39_small_caps_letter_spacing": {
   "applicable": 9,
-  "baseline_failed": 2,
-  "cause": "t01_word_accuracy + t08_line_order",
-  "failed": 2,
+  "baseline_failed": 1,
+  "cause": "t01_word_accuracy",
+  "failed": 1,
   "failed_ids": [
-   "t01_word_accuracy",
-   "t08_line_order"
+   "t01_word_accuracy"
   ]
  },
  "400_comic_page_speech_bubbles": {
@@ -1391,12 +1386,10 @@
  },
  "price-list-2col-dense-right-aligned": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "price-list-right-aligned-amounts": {
   "applicable": 10,

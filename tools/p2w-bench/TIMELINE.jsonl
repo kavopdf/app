@@ -9255,3 +9255,7 @@
 {"t": 1795770629.883503, "ist": "14:40:29", "ev": "beat", "d": "corpus-slice: 48 of 50 converted"}
 {"t": 1795770703.6336014, "ist": "14:41:43", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795770729.7028084, "ist": "14:42:09", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795770732.7410655, "ist": "14:42:12", "ev": "attempt", "d": "t01_word_accuracy -> lead"}
+{"t": 1795770732.8911405, "ist": "14:42:12", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795770733.0381625, "ist": "14:42:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795770734.0816505, "ist": "14:42:14", "ev": "beat", "d": "classrow.py: refreshing the class file"}
