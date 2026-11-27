@@ -136,3 +136,62 @@ Nothing in it touches `app/`.
   were advisory because `t09_page_furniture` was blind. `t09` was fixed twenty minutes after that
   rule was written, re-tested, and now fails when a head is duplicated. The result is 12 of 12.
   The rule is withdrawn in that file, with its history, rather than deleted.
+
+---
+
+## The stamp method is solved and proved. It needs applying, not deriving.
+
+Written 27 Nov by the agent, after proving it end to end on one real document.
+
+**Read `FINDINGS/STAMP-AS-ONE-IMAGE-FOUR-RULES-TWO-GATES-PROVEN-27NOV-agent.md` before touching
+anything stamp-shaped.** It holds six rules, two gates, the corrections, and three approaches that
+already failed. Re-deriving any of it costs a run.
+
+**What is proved, on four structurally different stamps** (red 15 degree rectangular, green 15 degree
+the other way, blue vertical, and a circular navy notary seal with curved text):
+
+    position      dx +0.0, dy +0.0 pt on the seal, +0.4 / +0.6 pt on the 15 degree stamp
+    size          within 0.4 pt
+    ink           within 6 to 10 percent of the vector original
+    shape         only the stamp is opaque; the corners of the box are transparent
+    isolation     nothing but the stamp - measured foreign ink removed 553 / 748 / 1456 / 100 px
+    Google        keeps it as one image with the alpha intact (smask present)
+
+**The six rules, in one line each:**
+
+1. stamp ink = the most common non-black colour among the drawings near the anchor
+2. crop rect = the **union** of the drawings carrying that colour - **not** `wp:extent`; on one
+   document the extent is 10.0 x 8.6 pt against a 76 x 76 pt stamp
+3. pad the crop by `(max stroke width / 2) + 1 pt` - the union is the stroke's centre line
+4. mask = colour distance under 160 **and** saturation at least `max(25, target x 0.45)`; without the
+   saturation term dark body text comes through
+5. emit **RGBA**, alpha = the mask; the interior stays transparent because all eleven stamp documents
+   are unfilled
+6. **every anchor whose rect lies inside the stamp's rect belongs to the stamp - textbox, shape or
+   picture, every kind. Remove all of them, then place one image.**
+
+Rule 6 is the one that bites. On `312_affidavit_stamp_paper` the stamp is **30 anchors**: 28 textboxes,
+one per letter of the curved text, plus 2 shapes for the two circles. Removing only the textboxes leaves
+an empty circle on the page. On `01_stamp_rotated_15deg_upright` it is one anchor. The kind does not
+matter; the position inside the stamp's rect is the whole test.
+
+**Do not retry, all measured and all failed:** rebuilding the stamp from XML (loses borders, rotation
+and font), redacting non-stamp objects and rendering (a zero-height rule survives a degenerate
+redaction rect, and `get_drawings()` misses content inside Form XObjects), 300 DPI, 600 DPI, binary
+alpha, continuous alpha, and redact-then-render.
+
+**What is not done, and is yours:**
+
+1. **The count.** How many documents carry a stamp whose text Google rasterises is **not measured**.
+   Four local classification attempts were all wrong - by counting `wps:txbx`, by stamp-like words, by
+   whether words sit inside a textbox, and by comparing an export to the wrong docx. **The only
+   reliable measure is one Google export per document and a check of whether the stamp words are
+   extractable.** `stamp03.docx` against its matched export loses VERIFIED, AUDIT, INTERNAL and
+   31-03-2026 while keeping every body-text probe, and carries 22 images against 0 in the source.
+2. **A black stamp.** All eleven stamp documents are coloured. A pure black stamp has saturation 0 and
+   rule 4 would keep nothing. There is none in the corpus to test a fallback on - do not write one.
+3. **A filled stamp.** All eleven are unfilled, so the interior is transparent. If one ever carries a
+   fill, rule 5 inverts for it. Also unproven, also not to be written blind.
+
+**Close it by** applying the six rules to one stamp document, exporting to Google, and checking
+position, size, ink and isolation against the source PDF - the same four numbers above. Then widen.
