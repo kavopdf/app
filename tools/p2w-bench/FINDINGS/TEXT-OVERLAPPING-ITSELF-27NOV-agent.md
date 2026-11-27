@@ -1,56 +1,51 @@
-# Text overlaps itself in table cells - reported, not yet reproduced
+# Text overlapping itself - the supplied file does not reproduce it, and its spacing is adequate
 
-The user circled a region of a table where **two text runs sit on the same line and print over each other**:
-`Total` collides with a figure, `₹6,857@6%` appears twice at the same y, and `Grand Total` collides with a
-number. It is a different symptom from the clipping recorded in
-`TEXT-CLIPPED-AT-THE-BOTTOM-EXACT-LINE-HEIGHT-27NOV-agent.md`, and it may or may not share the cause.
+The user supplied `Z-07_2.docx` in response to the report. **It is not the document in the screenshot**, and
+its paragraph spacing is adequate, so it would not produce the overlap.
 
-## What could not be done
+## The file does not match the screenshot
 
-**The document in the screenshot could not be matched to anything in the corpus.** The numbers visible are
-`12000`, `6,857` and `6,54,40`. Searching every `.docx` in `p2w/out/` and every file built into
-`/scratch/output/` for any two of those strings returns **no match**.
+The screenshot's visible figures are `12000`, `6,857` and `6,54,40`. In `Z-07_2.docx`:
 
-`07_stamp_over_table.docx` - which the screenshot's title names, and whose stamp (`QUALITY APPROVED`,
-`KAVERI TEXTILES`) and column headings match - contains:
+    12000  -> not found
+    6,857  -> not found
+    6857   -> not found
 
-    CGST @ 6% 16,867.20
-    SGST @ 6% 16,867.20
-    Grand Total 3,14,854.40
+Its totals block reads `2,81,120.00`, `16,867.20`, `16,867.20`, `3,14,854.40`. **Same template, different
+figures.** The file in the screenshot is still not in hand.
 
-**Different figures in the same layout.** So either a different version of that document is in use, or a
-different document with the same template. **Until the actual file is supplied, this cannot be reproduced and
-must not be diagnosed.** Guessing at a cause from a screenshot is how five wrong hypotheses were produced
-earlier in this work.
+## And in this file the spacing is sufficient, so it would not overlap
 
-## What the screenshot does establish
+The `<w:tc>` containing `Grand Total` holds four paragraphs:
 
-The layout, the stamp and the column headings are document 07's. Two runs at the same y in the totals block
-means **two paragraphs starting at the same vertical position inside a table cell.**
+    'Total job work charges 2,81,120.00'  8.5 pt  before 11.9 pt  line 0.6 pt  advance 12.5 pt
+    'CGST @ 6% 16,867.20'                 8.5 pt  before 12.4 pt  line 0.6 pt  advance 13.0 pt
+    'SGST @ 6% 16,867.20'                 8.5 pt  before 12.4 pt  line 0.6 pt  advance 13.0 pt
+    'Grand Total 3,14,854.40'             9.0 pt  before 24.4 pt  line 0.7 pt  advance 25.0 pt
 
-`07_stamp_over_table.docx` is a real table - 36 rows, 63 cells - and its totals paragraphs carry:
+**8.5 pt of text needs about 6.4 pt of vertical room. Every advance here is 12.5 pt or more.** The vertical
+position comes from `w:before`, which is correct; `w:line` only sets the box height. **So these four lines
+sit apart and do not print over each other.**
 
-    Total job work charges   w:before="238" w:line="12" w:lineRule="exact"   8.5 pt
-    E. & O.E. Job work char  w:before="358" w:line="11" w:lineRule="exact"   8.0 pt
-    CGST @ 6%                w:before="248" w:line="12" w:lineRule="exact"   8.5 pt
-    SGST @ 6%                w:before="248" w:line="12" w:lineRule="exact"   8.5 pt
-    Grand Total              w:before="487" w:line="13" w:lineRule="exact"   9.0 pt
+**Four paragraphs in one cell is unusual but not itself the bug** - it is one cell holding a stacked totals
+block, which is a legitimate structure.
 
-**CGST and SGST carry the identical `w:before="248"` and `w:line="12"`.** If they ever land in the same cell
-rather than successive cells, they print on top of each other - and the screenshot shows `₹6,857@6%` twice at
-one y, which is exactly that shape.
+## What this file does confirm
 
-**So the most likely mechanism is a row-span or cell-assignment error: two paragraphs that belong in
-different cells are placed in the same cell, and the identical `w:before` puts them at the same y.**
+**The clipping, with exact numbers.** `w:line="12"` with `w:lineRule="exact"` is a **0.6 pt** box around
+**8.5 pt** text. The glyph extends well outside the box and the part outside is clipped - the descender. That
+is `TEXT-CLIPPED-AT-THE-BOTTOM-EXACT-LINE-HEIGHT-27NOV-agent.md` reproduced here in a second document with
+the same figures.
 
-**Most likely is not measured.** It needs the file.
+## So the overlap remains unexplained, and unexplained is the honest state
 
-## What to do when the file arrives
+Two candidates were proposed and neither survives this file:
 
-1. Find the two paragraphs that overlap, by text.
-2. Check whether they are in the **same** `<w:tc>` or in two different ones.
-3. If the same cell: the cell assignment is wrong, and the fix is in whatever maps PDF text to cells.
-4. If different cells: the table's grid is wrong - check `<w:tblGrid>` column widths against the cell widths,
-   because a cell narrower than its content can spill over its neighbour and produce this exact look.
+- **identical `w:before` putting two paragraphs at one y** - the values here are 11.9, 12.4, 12.4, 24.4, which
+  are distinct and adequate
+- **a table grid narrower than its content** - this table's grid is
+  `639 1012 5137 988 1315 700` twips, six columns, and the cell holding the totals carries no `gridSpan` and
+  no `vMerge`
 
-**Neither branch has been checked. Do not patch either until it is.**
+**Neither can be blamed without the actual document.** The next step is the file in the screenshot, not
+another hypothesis about it.
