@@ -17,8 +17,10 @@
       }
     ]
   },
-  "fixer_engine_at_claim": "8fb4f503",
-  "fixer_last_beat": 1795778874.1220322,
+  "fixer_doing": "relay: Google verify 362 after the fix",
+  "fixer_doing_since": 1795780600.9071953,
+  "fixer_engine_at_claim": "57c6462",
+  "fixer_last_beat": 1795780600.907196,
   "fixer_started": 1795779682.7811568,
   "history": [
     {

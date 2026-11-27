@@ -9438,3 +9438,20 @@
 {"t": 1795779186.928097, "ist": "17:03:06", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795779187.369998, "ist": "17:03:07", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795779188.160744, "ist": "17:03:08", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795779686.9295106, "ist": "17:11:26", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795779687.426667, "ist": "17:11:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795779687.601593, "ist": "17:11:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795779693.6402297, "ist": "17:11:33", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795779703.3082528, "ist": "17:11:43", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795779712.2186708, "ist": "17:11:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795779713.1272526, "ist": "17:11:53", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795779714.4051337, "ist": "17:11:54", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795779715.327837, "ist": "17:11:55", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795779717.2399504, "ist": "17:11:57", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795780262.9702861, "ist": "17:21:02", "ev": "beat", "d": "relay: fetching corpus + reading engine"}
+{"t": 1795780284.048952, "ist": "17:21:24", "ev": "beat", "d": "relay: building engine (JDK + javac)"}
+{"t": 1795780415.1197915, "ist": "17:23:35", "ev": "beat", "d": "relay: engine edit - single-line cell to row height"}
+{"t": 1795780489.325778, "ist": "17:24:49", "ev": "beat", "d": "relay: narrowing the rule to a deficit bound"}
+{"t": 1795780600.9068475, "ist": "17:26:40", "ev": "beat", "d": "relay: Google verify 362 after the fix"}
+{"t": 1795780650.1826186, "ist": "17:27:30", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795780651.8040373, "ist": "17:27:31", "ev": "beat", "d": "attempt.py: recording an attempt"}
