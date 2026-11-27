@@ -377,3 +377,24 @@ is not one the tool printed - re-run the generator, do not edit the numbers.
 **Never write the report by hand, and never paste this prompt into it.** The verifier refuses a message
 that contains its own instructions; that is what turned the 20 Nov gverify report into two pages of dark
 slab with the real report starting at the bottom of page three.
+
+## IF THE STAGING UPLOAD FAILS (measured 27 Nov)
+
+`GOOGLEDRIVE_CREATE_FILE` does exist - the older paragraph saying it does not was wrong. What did fail
+was the platform staging upload behind it: on most documents `file_to_upload` came back with "Failed to
+retrieve uploaded file content. The file does not exist in storage", and re-trying the same s3key never
+worked (3 attempts, 3 failures). Roughly one file in five staged successfully.
+
+The route that did work, on all sixty:
+
+    git checkout -b gverify-stage
+    cp /scratch/output/gv/*.docx benchmarks/gverify-stage/ && git add -f benchmarks/gverify-stage
+    git commit -m "gverify stage" && git push origin gverify-stage
+
+    GOOGLEDRIVE_UPLOAD_FROM_URL(source_url="https://raw.githubusercontent.com/kavopdf/app/gverify-stage/benchmarks/gverify-stage/<name>.docx",
+                                name="<name>", mime_type="application/vnd.google-apps.document",
+                                parent_folder_id="1OoSHtsv-qEUwk8CnNa9d5hsCKu8PFeij")
+    GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE(fileId=<id>, mimeType="application/pdf")
+
+The repository is public, so the raw URL is fetchable by Drive's server, and the whole batch of sixty
+runs in one program with `asyncio.gather`. Delete the branch when the collection is done.
