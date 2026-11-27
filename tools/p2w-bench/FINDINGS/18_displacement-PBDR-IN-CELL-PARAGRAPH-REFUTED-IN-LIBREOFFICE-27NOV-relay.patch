@@ -1,0 +1,87 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 959b2782..1942fe26 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -5849,6 +5849,30 @@ public final class DocxWriter {
+         int b = Math.round((rgb & 0xFF) * a + 255f * (1f - a));
+         return hex((r << 16) | (g << 8) | b);
+     }
++    /**
++     * THE ROW'S RULE AS A PARAGRAPH BORDER - {@code w:pBdr}, not {@code w:tblBorders}.
++     *
++     * <p>Google charges a ruled row for the row's own rule: a table border on the row's edge lays
++     * the row at {@code trHeight + the rule}, and LibreOffice lays it at {@code trHeight}. Measured
++     * 27 Nov on a three-variant probe, every row {@code trHeight 300 atLeast} (15.00 pt), 7 pt text:
++     * {@code tblBorders/insideH} lays 15.75 in Google, {@code tcBorders/bottom} 15.75, and
++     * {@code w:pBdr/w:bottom} on the cell paragraph 15.00 - with LibreOffice at 15.00 on all three.
++     * A paragraph border is not charged, and the rule is still drawn (five vector rules in each
++     * export), so the pitch is not bought by losing the line.
++     *
++     * <p>Emitted as {@code w:pBdr/w:bottom} on every cell paragraph but the last row, with
++     * {@code insideH} dropped from {@code w:tblBorders} and the table's own top and bottom left
++     * alone. The {@code w:top} form was built and measured first and is WORSE: a paragraph's top
++     * border is drawn at the top of the PARAGRAPH, and the corpus cell paragraph carries
++     * {@code w:spacing w:before=209} (10.45 pt), so the rule landed 10.35 pt below the row's top
++     * edge - five rules at the wrong y on 303_discharge_summary in LibreOffice, where the
++     * unmodified engine lays them on the page's own 15.00 pt pitch.
++     *
++     * <p>Off by default: {@code -Dp2w.pbdr=true}. This moves the rules of every ruled table in the
++     * corpus and a change of that size is measured across the corpus before it is committed.
++     */
++    private static final boolean RULES_AS_PBDR = Boolean.getBoolean("p2w.pbdr");
++
+     /** The six sides a {@code w:tblBorders} element carries. */
+     private static final String[] TABLE_SIDES =
+             {"top", "left", "bottom", "right", "insideH", "insideV"};
+@@ -6259,6 +6283,22 @@ public final class DocxWriter {
+             sideSz[i] = stroke == null ? TABLE_RULE_SZ : szOf(stroke[0]);
+             sideColour[i] = stroke == null ? TABLE_RULE_COLOUR : borderColour(stroke);
+         }
++        // THE ROW'S RULE LEAVES THE TABLE'S BORDERS AND BECOMES A PARAGRAPH BORDER (see
++        // RULES_AS_PBDR). Only the horizontal rule moves: insideV stays where it is, so a table
++        // that draws column rules keeps them and this change is one rule whose effect is
++        // measurable in isolation. The table's own bottom stays too - it is the last row's rule
++        // and it is charged once, not once a row.
++        boolean pbdrRules = RULES_AS_PBDR && ruledTable && sideDrawn[4];
++        String cellBottomBdr = null;
++        if (pbdrRules) {
++            cellBottomBdr = "<w:pBdr><w:bottom w:val=\"single\" w:sz=\"" + sideSz[4]
++                    + "\" w:space=\"0\" w:color=\"" + sideColour[4] + "\"/></w:pBdr>";
++            // ONLY insideH leaves the table's borders. The table's own top and bottom stay: they
++            // are its outer box, not a row separator, and the last row's rule is the table's
++            // bottom - charged once, not once a row.
++            sideDrawn = sideDrawn.clone();
++            sideDrawn[4] = false;
++        }
+         inner.append("<w:tbl><w:tblPr>")
+                 .append("<w:tblW w:w=\"").append(totalTw).append("\" w:type=\"dxa\"/>")
+                 // w:tblInd IS CELL-RELATIVE. The page's x belongs here only at body level: inside
+@@ -7016,9 +7056,25 @@ public final class DocxWriter {
+                     continue;
+                 }
+                 inner.append("</w:tcPr>")
+-                        .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>")
+-                        .append("<w:snapToGrid w:val=\"0\"/>")
+-                        .append(spacing(cellBeforeTw, cellBoxTw, cellSz, autoCellBoxes(), false));
++                        .append("<w:p><w:pPr><w:pStyle w:val=\"TableText\"/>");
++                // pBdr sits after pStyle and before snapToGrid/spacing, which is the order the
++                // schema defines - a reader that validates pPr drops what it cannot place.
++                boolean pbdrHere = cellBottomBdr != null && r < keepRows - 1;
++                if (pbdrHere) inner.append(cellBottomBdr);
++                String cellSpacing = spacing(cellBeforeTw, cellBoxTw, cellSz, autoCellBoxes(), false);
++                if (pbdrHere) {
++                    // A PARAGRAPH BORDER IS PLACED BY THE PARAGRAPH'S BOX, so a border on a
++                    // paragraph that stops above the row's bottom edge lands above it. Measured
++                    // on 303_discharge_summary: with w:after=0 the five rules came out at
++                    // 284.5/299.2/314.2/329.2 against the page's 288.38/303.38/318.38/333.37 -
++                    // 3.9 pt high, and five rules where the page draws four. The paragraph's box
++                    // is extended to the row's bottom edge with w:after, which sits BELOW the
++                    // text, so the text does not move.
++                    int linesHere = Math.max(1, cell.split("\n", -1).length);
++                    int afterTw = Math.max(0, rowHeightTw - cellBeforeTw - linesHere * cellBoxTw);
++                    cellSpacing = cellSpacing.replace("w:after=\"0\"", "w:after=\"" + afterTw + "\"");
++                }
++                inner.append("<w:snapToGrid w:val=\"0\"/>").append(cellSpacing);
+                 if (insetTw > 0) inner.append("<w:ind w:left=\"").append(insetTw).append("\"/>");
+                 inner.append("</w:pPr>");
+                 if (!cell.isEmpty()) {

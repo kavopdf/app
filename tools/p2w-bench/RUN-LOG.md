@@ -1,6 +1,3 @@
-| 24 Nov 00:25 | fixer | attempt content-present-partly-displaced -> lead (0/13 moved) |
-| 24 Nov 00:30 | fixer | attempt content-present-partly-displaced -> lead (0/13 moved) |
-| 24 Nov 00:32 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 24 Nov 00:56 | fixer | slot claimed - fixer running |
 | 24 Nov 01:42 | fixer | attempt t12_word_invention -> lead (0/213 moved) |
 | 24 Nov 01:43 | fixer | attempt 00_page_count -> lead (0/213 moved) |
@@ -199,3 +196,5 @@
 | 27 Nov 08:34 | fixer | slot claimed - fixer running |
 | 27 Nov 09:13 | fixer | attempt 18_displacement -> lead (0/? moved) |
 | 27 Nov 09:15 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 27 Nov 09:28 | fixer | slot claimed - fixer running |
+| 27 Nov 09:42 | fixer | attempt 18_displacement -> lead (0/? moved) |
