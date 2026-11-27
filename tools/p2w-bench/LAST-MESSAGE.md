@@ -37,6 +37,11 @@
 
 ## Why nothing moved, in this run's own words
 
+> The timing table below says 7 min and it is wrong about this run: `round.py --release-fixer --force`
+> closes a window at the release, and the heartbeats had already moved the claim to 22:16, so the run that
+> claimed at 21:16 and released at 22:24 is recorded as its own last seven minutes. The work below - nine
+> `--budget` calls of 240-260 s - happened inside the 68 minutes before that.
+>
 > Nothing moved because I spent the slot proving where the block actually is, and it is not in the engine.
 >
 > The last four runs each ended the same way: a fix measured live in Google, and `regress.py` refusing it
@@ -69,6 +74,43 @@
 >
 > The honest ledger for this run: 0 documents clean, 0 documents worse, 206 documents measured on an engine
 > that had 0 this morning, and the next run's first instruction written down with the minutes attached.
+
+### The run before this one said
+
+> Nothing moved because I spent the slot proving where the block actually is, and it is not in the engine.
+>
+> The last four runs each ended the same way: a fix measured live in Google, and `regress.py` refusing it
+> because `RANKING.csv` was not measured on the tree. The 20:09 run named that as "the measurement cron's
+> work, not something a fixer can do in a slot". This run tested that sentence instead of repeating it, and
+> it is wrong in one direction and right in the other.
+>
+> Wrong: a fixer CAN do the pass. `p2w.py --force` on this pod rendered and scored 206 of 213 documents in
+> 44 minutes across nine `--budget` calls. That is inside a 90-minute slot.
+>
+> Right: only if it starts at minute zero. `p2w.py` publishes nothing until the table is complete -
+> "PARTIAL: 170 of 213 measured - writing RANKING.partial.csv, the published RANKING.csv is untouched" -
+> and everything it renders lives in `/scratch/work/p2w/`, outside the repository. So a pass that starts at
+> minute 20 is 44 minutes of work that leaves the sandbox with nothing to show: no table, no stamp, no
+> landed patch. That is the arithmetic behind six runs with a measured fix and no document fixed, and
+> `18_displacement-FULL-PASS-DOES-NOT-FIT-A-SLOT-0650-fixer.md` reached the same conclusion at 06:50 today
+> with a different measurement. Two runs, same answer, so it is not a bad night.
+>
+> The seven documents that stop it at 206 are the part I could not finish, and the reason is not rendering:
+> `pre/` holds 213 PDFs and `out/` 214 docx, so every document but the exempt one has a render. They fail at
+> **scoring** - `p2w.py:1604` builds its work list from documents with no `dist/<name>.json`, and these seven
+> never get one, so each call re-renders them (55 s and 15 s, measured at 16:52) and throws the result away.
+> That loop is the next run's first job: a pass that reaches 213 publishes, and one that cannot never will,
+> however long the slot.
+>
+> What I did not do, and why: I did not land `PATCHES/18-small-dy-cellbefore.patch`, which two agents this
+> run confirmed is the best-evidenced unlanded change (+1 clean, 0 worse, live Google, one line at
+> `DocxWriter.java:7013`). Landing it needs a `RANKING.csv` measured on the patched tree - a second 44-minute
+> pass - and the slot did not have two. Recording it as kept would have been a claim no tool backs.
+>
+> The honest ledger for this run: 0 documents clean, 0 documents worse, 206 documents measured on an engine
+> that had 0 this morning, and the next run's first instruction written down with the minutes attached.
+
+Accounts share 89% of their significant words - **the same blocker, named twice** (the cut is 50%).
 
 ## The txt
 
