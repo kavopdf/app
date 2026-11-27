@@ -8522,3 +8522,15 @@
 {"t": 1795740609.1606658, "ist": "06:20:09", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795740609.5176227, "ist": "06:20:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795740611.4923842, "ist": "06:20:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795740884.0634918, "ist": "06:24:44", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795740884.3121283, "ist": "06:24:44", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795740884.4515576, "ist": "06:24:44", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795740884.624063, "ist": "06:24:44", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795740884.809013, "ist": "06:24:44", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795740884.9648037, "ist": "06:24:44", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795740885.142348, "ist": "06:24:45", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795740885.3234315, "ist": "06:24:45", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795740933.1640213, "ist": "06:25:33", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795740935.1837742, "ist": "06:25:35", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795740935.5455499, "ist": "06:25:35", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795740937.625469, "ist": "06:25:37", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

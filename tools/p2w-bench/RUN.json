@@ -1,13 +1,11 @@
 {
- "agents": [],
- "attempts": 2,
- "class": "18_displacement",
- "docs_improved": 0,
- "ended": null,
+ "started_ts": 1795740570.1311493,
+ "started": "06:19",
+ "window_for_claim": 1795740570.1311493,
  "ended_ts": null,
+ "ended": null,
+ "attempts": 1,
  "kept": 0,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "05:56",
- "started_ts": 1795739190.1326833
+ "agents": [],
+ "docs_improved": 0
 }

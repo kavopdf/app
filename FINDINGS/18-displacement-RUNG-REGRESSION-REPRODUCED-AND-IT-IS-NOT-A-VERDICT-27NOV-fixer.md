@@ -145,3 +145,31 @@ is a question about Google's row layout, not about this patch. It is the right n
 two hand-made docx, one row each, declared 350 and 360 with the same content, exported through Drive. Until
 that is measured, no guard derived from `rowLineTw`/`pitchTwHere` can help, because on this document both
 of them already agree with each other and disagree with the renderer.
+
+## 8. The four-file test, run: the rung law holds, and the declaration is amplified 1.5×
+
+Two hand-made `.docx`, identical except for one number — a two-row, one-column table, 10 pt Arial,
+`w:trHeight` declared **350** in one and **360** in the other, both `hRule="atLeast"`. Each uploaded to Drive,
+converted to a Google Doc, exported as PDF, and the two rows' tops read with PyMuPDF:
+
+| `w:trHeight` | row-1 top | row-2 top | **pitch Google lays** |
+|---|---|---|---|
+| 350 twips (17.50 pt) | 87.62 | 105.62 | **18.00 pt** (360 twips) |
+| 360 twips (18.00 pt) | 87.62 | 106.37 | **18.75 pt** (375 twips) |
+
+**A 10-twip declaration change moves the layout 15 twips.** The rung is real, it is 0.75 pt wide, and it is
+the thing Google snaps to — which is the whole premise of the patch, now measured on a document with no
+engine in it at all. The law measured on 12 corpus documents generalises to a file this run wrote by hand.
+
+**And it explains the size of the harm.** On mobile-bill the source pitch is 360 twips (18.00 pt). Declaring
+350 twips lays exactly 18.00 pt — the patch is *right*. Declaring 360 lays 18.75 pt, so HEAD's table is
+**0.75 pt too tall on every one of 18 rows = 13.5 pt**. The measured page movement below the table is
+−10.3 pt, which is that 13.5 pt less the 2 pt of `w:before` the patch adds back.
+
+So the remaining question is not "is the rung right" — it is — but **what was compensating for the 13.5 pt in
+HEAD**. Something below the table was charging the pre-patch row heights and hiding the error, and the patch
+removes the error without removing the compensation. That consumer is the flow anchor after the table
+(`writtenRowsTw` / `lastRowHeightTw`, `DocxWriter.java:6550` and its readers), and it is now the one place
+left to look. **Next run: fix the rows AND the anchor in the same patch, and measure both on mobile-bill.**
+
+The two probe `.docx` and their two Google Doc copies were trashed after measuring.
