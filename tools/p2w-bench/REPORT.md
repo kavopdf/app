@@ -15,7 +15,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 1 code commit(s) in this window, first: FINDINGS: the gate is blocked by 84 real regress vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 2 code commit(s) in this window, first: fixer run 22:00: gate state measured, 84 real re vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
@@ -41,6 +41,8 @@
 
 ### The run before this one said
 
+>
+>
 >
 >
 > Nothing was KEPT because the change is real but unlandable, and that is a gate verdict, not a diagnosis
@@ -116,6 +118,7 @@
 | fix - diagnose and change the engine | **4 min** | `#` |
 | measure or build - a conversion, screen or compile writes no beacon | **47 min** | `###############` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **0 min** | `#` |
 | other - not attributed to a tool | **10 min** | `###` |
 
 The unattributed row is 5 distinct beat(s) that matched no phase. They said:
