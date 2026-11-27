@@ -198,3 +198,4 @@
 | 27 Nov 16:50 | fixer | attempt 18_displacement -> kept (1/? moved) |
 | 27 Nov 17:11 | fixer | slot claimed - fixer running |
 | 27 Nov 17:27 | fixer | attempt 18_displacement -> kept (2/? moved) |
+| 27 Nov 17:28 | fixer | slot FORCED released - see INCIDENTS.md for why |
