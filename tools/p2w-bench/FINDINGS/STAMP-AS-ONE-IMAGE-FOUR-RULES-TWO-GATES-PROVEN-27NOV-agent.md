@@ -411,3 +411,57 @@ is the only thing of its kind in the region being measured.
     open      10_stamp_as_image, 12_stamp_across_page_break, 14_stamp_chars_positioned_td
               - the three shapes the flow cannot enter (rule 1' and rule 6' in the batch section)
     open      the count of affected documents
+
+## The root cause of the three failures, and why two of them used to pass
+
+The user's observation was the useful one: **these are the simple cases and they passed before.** So
+what changed. The answer is two things, and neither is subtle.
+
+### Cause 1 - the geometry gate was padded in PIXELS, and the DPI changed
+
+The earlier passing runs were at 300 DPI. This set was built at 600. The gate that confines the stamp to
+its own footprint was padded by a **fixed 3 pixels**:
+
+    300 DPI   3 px = 1.04 pt   stroke/2 = 0.72 pt   enough
+    600 DPI   3 px = 0.36 pt   stroke/2 = 2.45 pt   the border is cut
+
+Measured on the three failing documents: the stroke is 1.44 to 4.89 pt wide, so half of it is 0.72 to
+2.45 pt, and the gate was allowing 0.36 pt. **Every border lost between 0.36 and 2.1 pt**, which is
+exactly the size deficit that was measured (-2.2 to -5.0 pt). Nothing was wrong with the position; the
+edges were being clipped.
+
+**The padding is now computed in points and converted to pixels:** `(max_stroke / 2 + 1.5) * dpi / 72`.
+On the three documents that is 18 to 32 pixels instead of 3.
+
+### Cause 2 - the saturation floor rejected ink that is genuinely pale
+
+`06_rect_paid_stamp_red_transparent` lost its entire **PAID** lettering. Not a colour mismatch: the text
+is `(0.75,0.05,0.05)`, the same as its border, at 44 pt. But the stamp is drawn through a transparency
+group, so the rendered pixels are pale red with a saturation of about 76, and the floor was
+`max(25, 178 * 0.45)` = 80. **76 < 80, so all of PAID was discarded.**
+
+The floor was redundant in the first place: the geometry gate already excludes body text by position. It
+was duplicating work and killing pale ink as a side effect.
+
+**The mask is now coverage only.** `alpha = how far the pixel has travelled from paper toward the ink
+colour`, restricted to the footprint. No colour-distance threshold and no saturation floor.
+
+### What that bought, measured through Google
+
+    06   offset +2.2,+2.2 -> +0.0,+0.0    size -4.6,-5.0 -> +0.0,-0.5    FIXED
+    02   offset unchanged +0.2,+2.4        size -1.2,-3.4 -> -0.5,-2.6    improved
+    07   offset unchanged +0.0,-4.1        size unchanged                  not fixed
+
+**06 is fixed.** 02's size improved by 0.8 pt on each axis but its vertical offset is unchanged. **07 did
+not move at all, and its ink fell to -33 percent.**
+
+### Still open, with what is known
+
+- **02** sits 2.4 pt low and 2.6 pt short. The offset is a placement question, not a masking one.
+- **07** is 4.1 pt high and 33 percent light on ink, and neither fix touched either number. That points
+  at the crop rect rather than the mask: something about where the stamp's rect is taken from is wrong
+  for this document, and it was wrong before the mask ever ran.
+
+**The lesson worth keeping:** the user spotted that the failures were the easy cases, and that was the
+fastest route to the cause. A regression against a known-good state localises a bug better than any
+amount of looking at the broken output.
