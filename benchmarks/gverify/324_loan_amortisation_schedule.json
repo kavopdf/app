@@ -2,16 +2,17 @@
  "name": "324_loan_amortisation_schedule",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T11:15:56",
- "passed": 45,
+ "at": "2026-11-27T02:37:58",
+ "passed": 44,
  "total": 47,
  "failed": [
   "18_displacement",
-  "61_blank_not_filled"
+  "27_text_off_page",
+  "59_shape_anchor"
  ],
  "displacement": {
-  "med_dy": 7.8,
-  "worst_dy": 357.8,
+  "med_dy": -4.1,
+  "worst_dy": 276.6,
   "med_dx": 0.2,
   "bad_pages": [
    0,
@@ -19,10 +20,11 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "runs_matched": 1496
  },
- "engine": "025fe9deda5ac7b1",
- "checks": "375669-1795690267"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

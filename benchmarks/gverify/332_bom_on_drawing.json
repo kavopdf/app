@@ -2,24 +2,25 @@
  "name": "332_bom_on_drawing",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T18:14:20",
- "passed": 43,
+ "at": "2026-11-27T02:53:08",
+ "passed": 42,
  "total": 47,
  "failed": [
   "18_displacement",
   "26_text_overlap",
   "47_margins",
+  "59_shape_anchor",
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": -14.1,
-  "worst_dy": 17.1,
+  "med_dy": -8.1,
+  "worst_dy": 8.1,
   "med_dx": 0.0,
   "bad_pages": [
    0
   ],
   "runs_matched": 50
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

@@ -2,22 +2,21 @@
  "name": "30_mixed_font_sizes_one_baseline_txtpos",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T18:11:03",
- "passed": 40,
+ "at": "2026-11-27T02:36:47",
+ "passed": 41,
  "total": 42,
  "failed": [
-  "18_displacement",
-  "59_shape_anchor"
+  "18_displacement"
  ],
  "displacement": {
-  "med_dy": 4.2,
-  "worst_dy": 6.8,
+  "med_dy": 2.3,
+  "worst_dy": 4.2,
   "med_dx": -0.2,
   "bad_pages": [
    0
   ],
   "runs_matched": 38
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

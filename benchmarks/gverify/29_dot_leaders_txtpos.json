@@ -2,17 +2,17 @@
  "name": "29_dot_leaders_txtpos",
  "status": "ok",
  "rc": 0,
- "at": "2026-11-26T18:10:52",
+ "at": "2026-11-27T02:36:20",
  "passed": 42,
  "total": 42,
  "failed": [],
  "displacement": {
-  "med_dy": 1.1,
-  "worst_dy": 2.9,
+  "med_dy": 0.7,
+  "worst_dy": 3.3,
   "med_dx": -0.3,
   "bad_pages": [],
   "runs_matched": 52
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

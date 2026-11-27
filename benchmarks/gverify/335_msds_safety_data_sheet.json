@@ -2,19 +2,22 @@
  "name": "335_msds_safety_data_sheet",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T18:14:19",
- "passed": 46,
+ "at": "2026-11-27T02:53:17",
+ "passed": 45,
  "total": 47,
  "failed": [
+  "18_displacement",
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": -0.4,
-  "worst_dy": 3.0,
+  "med_dy": -1.2,
+  "worst_dy": 4.7,
   "med_dx": -0.6,
-  "bad_pages": [],
+  "bad_pages": [
+   0
+  ],
   "runs_matched": 47
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

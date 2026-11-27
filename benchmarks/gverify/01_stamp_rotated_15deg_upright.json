@@ -2,25 +2,21 @@
  "name": "01_stamp_rotated_15deg_upright",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:22:04",
- "passed": 37,
+ "at": "2026-11-27T02:32:09",
+ "passed": 39,
  "total": 42,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
-  "18_displacement",
-  "35_rotation",
-  "59_shape_anchor"
+  "35_rotation"
  ],
  "displacement": {
-  "med_dy": 2.7,
-  "worst_dy": 6.6,
+  "med_dy": 0.6,
+  "worst_dy": 3.3,
   "med_dx": -0.6,
-  "bad_pages": [
-   0
-  ],
+  "bad_pages": [],
   "runs_matched": 81
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

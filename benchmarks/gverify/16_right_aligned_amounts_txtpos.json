@@ -2,21 +2,21 @@
  "name": "16_right_aligned_amounts_txtpos",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T20:49:58",
+ "at": "2026-11-27T02:35:45",
  "passed": 41,
  "total": 42,
  "failed": [
   "18_displacement"
  ],
  "displacement": {
-  "med_dy": -1.6,
-  "worst_dy": 3.4,
+  "med_dy": -2.8,
+  "worst_dy": 4.6,
   "med_dx": -0.1,
   "bad_pages": [
    0
   ],
   "runs_matched": 64
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795724644"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

@@ -2,25 +2,21 @@
  "name": "314_tender_rfp_boq",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:22:47",
- "passed": 42,
+ "at": "2026-11-27T02:37:02",
+ "passed": 44,
  "total": 47,
  "failed": [
-  "18_displacement",
   "42_justification_edges",
-  "59_shape_anchor",
   "60_text_column_right_edge",
   "63_table_rows"
  ],
  "displacement": {
-  "med_dy": 2.8,
-  "worst_dy": 3.6,
+  "med_dy": -1.5,
+  "worst_dy": 3.0,
   "med_dx": -0.6,
-  "bad_pages": [
-   0
-  ],
+  "bad_pages": [],
   "runs_matched": 78
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

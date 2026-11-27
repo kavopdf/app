@@ -2,29 +2,24 @@
  "name": "305_vaccination_certificate",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:22:38",
- "passed": 38,
+ "at": "2026-11-27T02:36:39",
+ "passed": 41,
  "total": 47,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
   "17_matched_runs",
-  "18_displacement",
-  "34b_span_colour_match",
-  "34c_span_weight_match",
   "43_within_10pt_x",
   "45_char_accuracy",
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": -0.1,
-  "worst_dy": 7.4,
+  "med_dy": -1.8,
+  "worst_dy": 8.4,
   "med_dx": 0.1,
-  "bad_pages": [
-   0
-  ],
-  "runs_matched": 45
+  "bad_pages": [],
+  "runs_matched": 43
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

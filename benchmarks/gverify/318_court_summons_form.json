@@ -2,26 +2,28 @@
  "name": "318_court_summons_form",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:22:50",
+ "at": "2026-11-27T02:37:11",
  "passed": 39,
  "total": 47,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
   "17_matched_runs",
+  "18_displacement",
   "43_within_10pt_x",
   "45_char_accuracy",
   "47_margins",
-  "59_shape_anchor",
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": 0.8,
-  "worst_dy": 2.5,
+  "med_dy": -3.8,
+  "worst_dy": 4.5,
   "med_dx": -0.1,
-  "bad_pages": [],
+  "bad_pages": [
+   0
+  ],
   "runs_matched": 26
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

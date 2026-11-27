@@ -2,7 +2,7 @@
  "name": "25_signature_block_underscores_txtpos",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T18:10:41",
+ "at": "2026-11-27T02:36:10",
  "passed": 38,
  "total": 42,
  "failed": [
@@ -12,14 +12,14 @@
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": 0.2,
-  "worst_dy": 30.3,
+  "med_dy": -1.3,
+  "worst_dy": 15.0,
   "med_dx": -0.1,
   "bad_pages": [
    0
   ],
   "runs_matched": 37
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

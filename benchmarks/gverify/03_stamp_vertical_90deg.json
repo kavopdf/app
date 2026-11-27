@@ -2,27 +2,26 @@
  "name": "03_stamp_vertical_90deg",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:22:09",
- "passed": 37,
+ "at": "2026-11-27T02:35:09",
+ "passed": 38,
  "total": 44,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
   "18_displacement",
   "35_rotation",
-  "59_shape_anchor",
   "62_table_columns",
   "63_table_rows"
  ],
  "displacement": {
-  "med_dy": 2.7,
-  "worst_dy": 8.4,
+  "med_dy": -1.2,
+  "worst_dy": 3.9,
   "med_dx": -0.1,
   "bad_pages": [
    0
   ],
   "runs_matched": 95
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

@@ -2,22 +2,26 @@
  "name": "14_stamp_chars_positioned_td",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T18:14:04",
- "passed": 38,
+ "at": "2026-11-27T02:35:32",
+ "passed": 36,
  "total": 42,
  "failed": [
   "04_chars_missing",
   "13_text_colours",
+  "18_displacement",
   "45_char_accuracy",
+  "59_shape_anchor",
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": 0.8,
-  "worst_dy": 1.8,
+  "med_dy": -3.0,
+  "worst_dy": 4.2,
   "med_dx": -0.9,
-  "bad_pages": [],
+  "bad_pages": [
+   0
+  ],
   "runs_matched": 49
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795715685"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }

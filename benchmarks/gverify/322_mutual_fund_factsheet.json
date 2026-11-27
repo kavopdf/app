@@ -2,8 +2,8 @@
  "name": "322_mutual_fund_factsheet",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-26T21:22:55",
- "passed": 38,
+ "at": "2026-11-27T02:37:24",
+ "passed": 39,
  "total": 47,
  "failed": [
   "04_chars_missing",
@@ -13,18 +13,17 @@
   "26_text_overlap",
   "44_header_footer",
   "45_char_accuracy",
-  "59_shape_anchor",
   "60_text_column_right_edge"
  ],
  "displacement": {
-  "med_dy": 6.3,
-  "worst_dy": 20.5,
+  "med_dy": 1.9,
+  "worst_dy": 14.2,
   "med_dx": 0.2,
   "bad_pages": [
    0
   ],
   "runs_matched": 77
  },
- "engine": "a4d8fca469bba636",
- "checks": "375669-1795726746"
+ "engine": "74a152e7d3fb3d26",
+ "checks": "375669-1795746297"
 }
