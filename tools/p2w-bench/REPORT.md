@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-27 20:09
+# Fixer report - 2026-11-27 21:17
 
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 20:09 → 21:09 IST · 59 min**
+**27 Nov 2026 · slot 21:17 → running IST · 1h 01m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - kept change: 8 code commit(s) in this window, first: final: 3 attempts recorded, slot released --forc vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1 |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -33,11 +33,42 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 20:52 | **lead** | 1/2 | cell-before LINE_BASE rescale measured live in Google on 74 (41/42 -> 42/42 CLEAN) and 72 (41/42 -> 41/42, not worse); predicted net-zero, measured +1 clean and 0 worse. Cannot land: measure_gate NOT |
-| 20:57 | **lead** | 0/1 | pagetop-guarded-27NOV.patch applied, recompiled, converted 22/71/74/price-list: emits w:pgMar w:top=0 on all four, so sectionTopTw() returned 0 and the page is laid out exactly as before - the patch i |
-| 21:08 | **lead** | 0/4 | instrumented sectionTopTw's two return sites (System.err at guard1 hasColumnBands and guard2 room), recompiled, re-converted 22/71/74/price-list: guard2 refuses 22 (top 59.48 vs room 28.0), 71 (61.48 |
+| 22:16 | **lead** | None/213 | measured the tree instead of a construct: p2w --force reached 206/213 in 44 min, 7 documents give no render, so RANKING.csv could not be republished and measure_gate is still NOT READY. Next run must |
 
 ## Why nothing moved, in this run's own words
+
+> Nothing moved because I spent the slot proving where the block actually is, and it is not in the engine.
+>
+> The last four runs each ended the same way: a fix measured live in Google, and `regress.py` refusing it
+> because `RANKING.csv` was not measured on the tree. The 20:09 run named that as "the measurement cron's
+> work, not something a fixer can do in a slot". This run tested that sentence instead of repeating it, and
+> it is wrong in one direction and right in the other.
+>
+> Wrong: a fixer CAN do the pass. `p2w.py --force` on this pod rendered and scored 206 of 213 documents in
+> 44 minutes across nine `--budget` calls. That is inside a 90-minute slot.
+>
+> Right: only if it starts at minute zero. `p2w.py` publishes nothing until the table is complete -
+> "PARTIAL: 170 of 213 measured - writing RANKING.partial.csv, the published RANKING.csv is untouched" -
+> and everything it renders lives in `/scratch/work/p2w/`, outside the repository. So a pass that starts at
+> minute 20 is 44 minutes of work that leaves the sandbox with nothing to show: no table, no stamp, no
+> landed patch. That is the arithmetic behind six runs with a measured fix and no document fixed, and
+> `18_displacement-FULL-PASS-DOES-NOT-FIT-A-SLOT-0650-fixer.md` reached the same conclusion at 06:50 today
+> with a different measurement. Two runs, same answer, so it is not a bad night.
+>
+> The seven documents that stop it at 206 are the part I could not finish. They produce no soffice render;
+> `Account_Opening_Form_Fillable_filled` rendered alone in 64 s and the measured count still did not move,
+> so at least one fails after its render rather than before it. Naming them is the next run's first job,
+> because a pass that can reach 213 publishes, and a pass that cannot never will however long the slot.
+>
+> What I did not do, and why: I did not land `PATCHES/18-small-dy-cellbefore.patch`, which two agents this
+> run confirmed is the best-evidenced unlanded change (+1 clean, 0 worse, live Google, one line at
+> `DocxWriter.java:7013`). Landing it needs a `RANKING.csv` measured on the patched tree - a second 44-minute
+> pass - and the slot did not have two. Recording it as kept would have been a claim no tool backs.
+>
+> The honest ledger for this run: 0 documents clean, 0 documents worse, 206 documents measured on an engine
+> that had 0 this morning, and the next run's first instruction written down with the minutes attached.
+
+### The run before this one said
 
 > Nothing was KEPT because the change is real but unlandable, and that is a gate verdict, not a diagnosis
 > problem.
@@ -46,13 +77,13 @@
 > single-line table cell already carries. Measured live in Google by this run, before and after, on two
 > documents:
 >
->   74_balance_sheet_indented_subitems      41/42 -> 42/42  CLEAN
->   72_bank_statement_no_rules_right_amounts 41/42 -> 41/42  not worse
+> 74_balance_sheet_indented_subitems      41/42 -> 42/42  CLEAN
+> 72_bank_statement_no_rules_right_amounts 41/42 -> 41/42  not worse
 >
 > Predicted net-zero, measured +1 clean and 0 worse. I reverted it because:
 >
->   measure_gate.py  -> engine docx d28ca7516c3f9165, tree f4ce54f257d15f1c  NOT READY
->   regress.py --check -> ENGINE CHANGED (docx): table measured on d28ca7, the tree is f4ce54f2  REFUSED
+> measure_gate.py  -> engine docx d28ca7516c3f9165, tree f4ce54f257d15f1c  NOT READY
+> regress.py --check -> ENGINE CHANGED (docx): table measured on d28ca7, the tree is f4ce54f2  REFUSED
 >
 > Both tables pass the comparison ("docx: no document worse than baseline", "txt: no document worse than
 > baseline"). What refuses is that RANKING.csv has not been re-measured on this engine. That is one full
@@ -61,27 +92,29 @@
 >
 > What I did spend the slot on instead, because it changes what the NEXT run should do:
 >
->   1. The patch is worth +1, not 54. I measured the three other documents whose cells carry the same
->      0.500 shape that made 74 clean - 71_invoice_space_aligned_no_rules, 22_invoice_four_columns_txtpos,
->      price-list-2col-dense-right-aligned - and all three stay at 41/42. The shape is necessary and not
->      sufficient. That kills the "worth 53.9 clean documents" reading of the leverage table for this
->      construct with a measurement instead of an inference.
+> 1. The patch is worth +1, not 54. I measured the three other documents whose cells carry the same
+> 0.500 shape that made 74 clean - 71_invoice_space_aligned_no_rules, 22_invoice_four_columns_txtpos,
+> price-list-2col-dense-right-aligned - and all three stay at 41/42. The shape is necessary and not
+> sufficient. That kills the "worth 53.9 clean documents" reading of the leverage table for this
+> construct with a measurement instead of an inference.
 >
->   2. The relay's proposed gate (cellBoxTw*2 >= rowHeightTw) is unnecessary AND ineffective: counting the
->      emitted XML, 72 carries 66 cells at exactly the shape the gate is meant to exclude, so it does not
->      spare 72 - and 72 does not need sparing, because it does not get worse at the check level. The
->      earlier "72 regresses" was read off med_dy, and med_dy moving inside a still-failing check is not a
->      regression.
+> 2. The relay's proposed gate (cellBoxTw*2 >= rowHeightTw) is unnecessary AND ineffective: counting the
+> emitted XML, 72 carries 66 cells at exactly the shape the gate is meant to exclude, so it does not
+> spare 72 - and 72 does not need sparing, because it does not get worse at the check level. The
+> earlier "72 regresses" was read off med_dy, and med_dy moving inside a still-failing check is not a
+> regression.
 >
->   3. The residual on 71 and 22 is NOT a row displacement. An independent probe (not verify_google.py)
->      shows every run on the page off by the same 5.84 pt (71) and 4.01 pt (22), footer included. It is
->      the page's flow origin, and the two documents need OPPOSITE corrections. That is the lead.
+> 3. The residual on 71 and 22 is NOT a row displacement. An independent probe (not verify_google.py)
+> shows every run on the page off by the same 5.84 pt (71) and 4.01 pt (22), footer included. It is
+> the page's flow origin, and the two documents need OPPOSITE corrections. That is the lead.
+
+Accounts share 14% of their significant words - a different account (the cut is 50%).
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.2 h ago** |
+| Measured | **2.3 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -90,19 +123,21 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-01` | Which of the 41 docs failing 18_displacement share O | 21:26 | - | - |
+| `18_dB-01` | Is the 11:57 landing 33863086 real in Google, and ho | 21:26 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 20:09 → 21:09 · 59 min |
+| Slot window | 21:17 → running · 1h 01m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 67 |
-| Longest silence | **23.6 min** — from 20:10:11, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 6 |
-| Obstacles | 0 cleared · 1 parked, with the evidence to re-open them |
-| Still a wall | same refusal as 17:55 and 18:45: `ENGINE CHANGED (docx): table measured on `d28ca7516c3f9165`, the tree is `a0 |
+| Tool beats | 128 |
+| Longest silence | **9.1 min** — from 21:17:10, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 9 |
+| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
 ### Where the time went
@@ -110,17 +145,16 @@
 | Phase | Time | |
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **5 min** | `##` |
-| build - compiling the engine | **1 min** | `#` |
-| measure or build - a conversion, screen or compile writes no beacon | **31 min** | `###########` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **5 min** | `##` |
-| other - not attributed to a tool | **15 min** | `######` |
+| fix - diagnose and change the engine | **4 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **39 min** | `##############` |
+| report - the report and the chain | **1 min** | `#` |
+| other - not attributed to a tool | **10 min** | `####` |
 
-The unattributed row is 11 distinct beat(s) that matched no phase. They said:
+The unattributed row is 9 distinct beat(s) that matched no phase. They said:
 
-- `corpus slice 2/4 for the gate`
-- `collecting Google scores for HEAD probes 74 and 72`
-- `rebuilding engine with cell-before patch`
+- `relay: agents A/B deploying, measuring corpus state`
+- `relay: corpus pass 1 on current engine a05b20eb (unblocks landing); agents landed`
+- `relay: corpus pass 1 chunk 2`
 ## Best results this round
 
 | Document | Before | After | Change |

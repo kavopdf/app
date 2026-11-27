@@ -1,32 +1,5 @@
 [
  {
-  "agents": [
-   "scresoffice prerender-01",
-   "t12_txt instrument-01"
-  ],
-  "attempts": 5,
-  "class": "t12_word_invention",
-  "counted": [
-   [
-    "content-present-partly-displaced",
-    0
-   ],
-   [
-    "t12_word_invention",
-    5
-   ]
-  ],
-  "docs_improved": 5,
-  "ended": "(never)",
-  "ended_ts": null,
-  "kept": 2,
-  "needs_human": 0,
-  "obstacles_cleared": 0,
-  "started": "15:06",
-  "started_ts": 1795599360.1153748,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started": "17:16",
   "started_ts": 1795607202.1812255,
   "ended": "(never)",
@@ -795,5 +768,16 @@
   "window_for_claim": 1795793259.7012837,
   "class": "18_displacement",
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "21:16",
+  "started_ts": 1795794416.9801614,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
