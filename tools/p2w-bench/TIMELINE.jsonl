@@ -9473,3 +9473,7 @@
 {"t": 1795780729.3475103, "ist": "17:28:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795780729.8832402, "ist": "17:28:49", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1795786079.3321857, "ist": "18:57:59", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795786083.7376554, "ist": "18:58:03", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795786083.9405925, "ist": "18:58:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795786084.0799425, "ist": "18:58:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795786085.0369453, "ist": "18:58:05", "ev": "beat", "d": "classrow.py: refreshing the class file"}
