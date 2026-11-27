@@ -1,12 +1,6 @@
-The gate is not blocked by the rung. It is blocked by 82 documents worse than the 15 Nov baseline, and the rung is 28 of them — the lead the last two runs discarded was judged against the wrong table.
-
-Both prior runs measured `ROW_RUNG_UNDER_TW = 0` against `benchmarks/RANKING.csv`, which is the rung=10 tree's own output. Against `RANKING-BASELINE.csv` — the 15 Nov state the gate actually compares to — it is a net improvement: **57 documents worse than baseline instead of 82**, and more better, at the price of exactly one document newly worse (`marksheet-subject-left-marks-right` 4.55 -> 5.21, where rung=10 gives 2.15). I re-derived the rung=0 stamp `b648594972a7682b` by hashing the tree with only that constant changed. It still does not unblock the gate — 57 is a refusal — but the remaining 57 are five constructs, not one constant, and the largest coherent one is **stamps: ten documents**, worst `03_stamp_vertical_90deg` 16.98 -> 34.38.
-
-The txt half can still be committed today and is **three documents from the charter's 99%**. Two of those three are one construct: the two `Account_Opening_Form` documents carry 127 U+FFFD where their source carries none — ligature glyphs the engine cannot name, not a decode fault.
-
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 02:24 → running IST · 19 min**
+**28 Nov 2026 · slot 03:18 → running IST · 5 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -18,8 +12,8 @@ The txt half can still be committed today and is **three documents from the char
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 1 code commit(s) in this window, first: relay 28nov 02:24: the gate is 84 regressions, n vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| Self-check | **every field agrees with its second source** |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -29,24 +23,22 @@ The txt half can still be committed today and is **three documents from the char
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `63_table_rows` - taken from the pending list (64 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `63_table_rows` by hand instead |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 02:43 | **lead** | None/None | Gate state measured: regress.py --check refuses on 84 docx regressions vs the 15 Nov baseline (fingerprint refusal already cleared at 00:58 - different message, same tool). Judged the rung on the gate |
+| Working on | `-` - taken from the pending list (65 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## Why nothing moved, in this run's own words
+
+*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+
+### The run before this one said
 
 > Nothing was kept because the commit gate refuses every engine change, and this run measured what it
 > refuses on rather than working around it.
 >
 > `regress.py --check` returns:
 >
->     docx: 84 REGRESSION(S)
->     REFUSED. This commit would land a regression or an unmeasured engine.
+> docx: 84 REGRESSION(S)
+> REFUSED. This commit would land a regression or an unmeasured engine.
 >
 > The 00:58 report calls the gate "unblocked". That is true of one of the tool's two refusals. It cleared
 > the fingerprint refusal — the table now names the engine it was measured on — and the regression refusal,
@@ -70,9 +62,8 @@ The txt half can still be committed today and is **three documents from the char
 > The run did not get to a build. The pod was warm but 18 documents short of a converted corpus, and
 > diagnosing the stamp cluster properly is more than the slot allowed after the gate measurement. It stopped
 > at the measurement and recorded it, rather than starting a patch it could not prove.
-
-### The run before this one said
-
+>
+>
 >
 >
 > **The gate was the work, and it is now honest.** For the last several runs `regress.py --check`
@@ -119,14 +110,14 @@ The txt half can still be committed today and is **three documents from the char
 > I did not run that A/B because the re-measure consumed the slot: 213 documents at 5.9 s/document
 > is 21 minutes of measurement after a cold-pod install, and it is the prerequisite for *any*
 > change being landable. Recorded as `18_displacement` attempt 119, outcome `lead`.
-
-Accounts share 17% of their significant words - a different account (the cut is 50%).
+>
+> Accounts share 17% of their significant words - a different account (the cut is 50%).
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **2 min ago** |
+| Measured | **41 min ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -141,11 +132,11 @@ Accounts share 17% of their significant words - a different account (the cut is 
 
 | | |
 |:--|:--|
-| Slot window | 02:24 → running · 19 min |
+| Slot window | 03:18 → running · 5 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 32 |
-| Longest silence | **7.0 min** — from 02:27:39, after `relay: checking the gate itself` |
-| Silences over 2 min | 4 |
+| Tool beats | 13 |
+| Longest silence | **4.8 min** — from 03:18:43, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -153,18 +144,7 @@ Accounts share 17% of their significant words - a different account (the cut is 
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **2 min** | `###` |
-| build - compiling the engine | **4 min** | `#####` |
-| measure or build - a conversion, screen or compile writes no beacon | **7 min** | `########` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **3 min** | `####` |
-
-The unattributed row is 4 distinct beat(s) that matched no phase. They said:
-
-- `relay: checking the gate itself`
-- `relay: warming pod (corpus+jdk+engine)`
-- `relay: writing report`
+| setup - claim, housekeeping, reading the gate | **4 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -181,9 +161,3 @@ READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-A
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-```
-
-Written by report.py from committed files only. Every number above is read from
-ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
-and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.

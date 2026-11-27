@@ -10149,3 +10149,31 @@
 {"t": 1795814077.8392563, "ist": "02:44:37", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795814078.224737, "ist": "02:44:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795814080.214563, "ist": "02:44:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795816123.6055708, "ist": "03:18:43", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795816123.7571912, "ist": "03:18:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795816123.8445132, "ist": "03:18:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795816414.5099468, "ist": "03:23:34", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795816414.6832335, "ist": "03:23:34", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795816414.8565185, "ist": "03:23:34", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795816415.0089796, "ist": "03:23:35", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795816415.1937032, "ist": "03:23:35", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795816415.3643057, "ist": "03:23:35", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795816415.5354912, "ist": "03:23:35", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795816415.701508, "ist": "03:23:35", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795816428.1941218, "ist": "03:23:48", "ev": "beat", "d": "relay: install-gate timed out, reading state"}
+{"t": 1795816428.3600826, "ist": "03:23:48", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795816825.6142979, "ist": "03:30:25", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795816825.798306, "ist": "03:30:25", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795816825.9678788, "ist": "03:30:25", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795816826.156706, "ist": "03:30:26", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795816826.3027813, "ist": "03:30:26", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795816826.4742064, "ist": "03:30:26", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795816826.6561074, "ist": "03:30:26", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795816826.8054326, "ist": "03:30:26", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795816831.0507627, "ist": "03:30:31", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795816831.1407216, "ist": "03:30:31", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795817322.5878017, "ist": "03:38:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795817322.7082283, "ist": "03:38:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795817323.2907217, "ist": "03:38:43", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795817323.3997662, "ist": "03:38:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795817417.5729573, "ist": "03:40:17", "ev": "beat", "d": "relay: findings committed, writing report"}

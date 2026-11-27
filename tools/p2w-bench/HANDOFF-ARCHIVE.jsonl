@@ -537,3 +537,6 @@
 {"_list": "notes", "_entry": {"at": "15:48", "text": "attempt 91 on 18_displacement -> lead"}}
 {"_list": "notes", "_entry": {"at": "17:39", "text": "attempt 3 on 44_header_footer -> lead"}}
 {"_list": "notes", "_entry": {"at": "17:43", "text": "agent deployed: 44_header_footer / A - is flowFromBox the second anchor site and does the foot-band guard transfer to i"}}
+{"_list": "notes", "_entry": {"at": "19:42", "text": "attempt 93 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "19:43", "text": "agent deployed: --help /  - "}}
+{"_list": "agents", "_entry": {"id": "t09_A-01", "class": "t09_page_furniture", "angle": "A", "question": "is the 125 single-char present a TxtWriter line-assembly defect or a t09 band asymmetry - census every one of the .txt single-character lines against the drawn line it came from", "expected": "19:45", "deployed": "20:47", "status": "running", "finding": "", "deployed_at": "2026-11-26T20:47"}}
