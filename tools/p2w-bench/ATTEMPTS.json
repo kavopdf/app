@@ -1903,16 +1903,9 @@
   "status": "OPEN"
  },
  "t01_word_accuracy": {
-  "attempts": 20,
+  "attempts": 21,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-20 20:59",
-    "moved": 0,
-    "outcome": "reverted",
-    "reason": "claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_sma",
-    "total": 10
-   },
    {
     "at": "2026-11-20 21:22",
     "moved": 3,
@@ -2049,10 +2042,21 @@
     "outcome": "reverted",
     "reason": "t01 on the whitespace-stripped character multiset at zero tolerance: measured over all 213 .txt, clears 39 and 77 but fails 6 documents, 205 -> 201 clean. 99 percent char recall would additionally sil",
     "total": null
+   },
+   {
+    "at": "2026-11-27 14:42",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "p2w fixer 27nov: table gap spent as w:before (70%), pitch-bound rows declared 10 twips und"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "t01's whitespace token unit charges the source's own bidi and letter-spacing extraction artefacts as lost words: 77_arabic_rtl_document and 39_small_caps_letter_spacing carry every alphanumeric charac",
+    "total": 3
    }
   ],
   "last": null,
-  "last_engine": "3462086",
+  "last_engine": "8fb4f503",
   "last_moved": 0,
   "last_total": 3,
   "outcomes": [
@@ -2075,11 +2079,12 @@
    "kept",
    "kept",
    "reverted",
-   "reverted"
+   "reverted",
+   "lead"
   ],
   "ratchet_at": "20 Nov 21:49",
   "ratchet_docs": 4,
-  "reason": "t01 on the whitespace-stripped character multiset at zero tolerance: measured over all 213 .txt, clears 39 and 77 but fails 6 documents, 205 -> 201 clean. 99 percent char recall would additionally silence 601's real 2-char checkbox loss. FINDINGS/t01-CHARACTER-UNIT-REFUTED-205-TO-201-27NOV-relay.md",
+  "reason": "t01's whitespace token unit charges the source's own bidi and letter-spacing extraction artefacts as lost words: 77_arabic_rtl_document and 39_small_caps_letter_spacing carry every alphanumeric character the source carries (546/546 and 930/930, 0 missing, 0 extra) yet score 92.1 and 97.4. FINDINGS/T01-WHITESPACE-TOKEN-CHARGES-SOURCE-EXTRACTION-ARTEFACTS-27NOV-fixer.md. The corpus-wide pass->fail/fail->pass count that would justify changing the check did not fit this slot.",
   "reasons": [
    "claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_small_caps_letter_spacing, 406_passport_mrz_page, 411_nested_xobject_transforms, 601_fillable_admission_form, 77_arabic_rtl_document, 79_inr_indian_digit_grouping_table. Check is 'source words all present >= 98%', so the .txt is dropping words the page drew.",
    "CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words welded to those NULs by r'\\S+', so 'Strongly\\x00agree' and '\\x00\\x00\\x00\\x00PHOTOGRAPH' were single tokens no .txt can ever contain, and t01 charged each one as lost text. _words now splits on control characters instead of treating them as word characters. Measured: 79_inr_indian_digit_grouping_table 91.9 -> 100.0 (9/10 -> 10/10 checks), 391_survey_questionnaire_grid 97.5 -> 100.0 (5/7 -> 7/7), 406_passport_mrz_page 98.5 -> 100.0 (5/7 -> 7/7); all three now PASS every applicable txt check. t12 improved on 391 and 406 for the same reason - a NUL token was counted as an invented word. Scanned all 213 documents with glyph_truth: exactly 6 declare a control character inside a source token, and the other three (balance-sheet-and-profit-loss, 392_statistical_console_output, balance-sheet-two-columns-of-figures) still PASS t01. The change only removes source tokens and adds none, so no document can regress. test_txt_checks.py 8/8.",
@@ -2100,7 +2105,8 @@
    "clip-off: 411_nested_xobject_transforms t01 90.0->100.0, 12_stamp_across_page_break t12 also clean; corpus 186->188, 0 regressions",
    "doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical",
    "DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. This run did not land it and takes no credit for it - the 411/12_stamp movement belongs to d2ea491. What this run adds is the independent confirmation (a second build, a second harness, 211 documents, same 2 rows, same direction) and the class table that commit left stale: DEFECT-CLASSES-TXT.md still said t01 5 / t12 9 / 25 failing, now 3 / 8 / 24, regenerated from the committed ranking. And two writer changes the agents killed: 39 gs=sizePt->size 97.4->78.8 and 38 dedupe window 40->200 98.0->93.0; the position-aware dedupe that DID clear 38 (2d44a3a) is the version the agent called defensible.",
-   "t01 on the whitespace-stripped character multiset at zero tolerance: measured over all 213 .txt, clears 39 and 77 but fails 6 documents, 205 -> 201 clean. 99 percent char recall would additionally silence 601's real 2-char checkbox loss. FINDINGS/t01-CHARACTER-UNIT-REFUTED-205-TO-201-27NOV-relay.md"
+   "t01 on the whitespace-stripped character multiset at zero tolerance: measured over all 213 .txt, clears 39 and 77 but fails 6 documents, 205 -> 201 clean. 99 percent char recall would additionally silence 601's real 2-char checkbox loss. FINDINGS/t01-CHARACTER-UNIT-REFUTED-205-TO-201-27NOV-relay.md",
+   "t01's whitespace token unit charges the source's own bidi and letter-spacing extraction artefacts as lost words: 77_arabic_rtl_document and 39_small_caps_letter_spacing carry every alphanumeric character the source carries (546/546 and 930/930, 0 missing, 0 extra) yet score 92.1 and 97.4. FINDINGS/T01-WHITESPACE-TOKEN-CHARGES-SOURCE-EXTRACTION-ARTEFACTS-27NOV-fixer.md. The corpus-wide pass->fail/fail->pass count that would justify changing the check did not fit this slot."
   ],
   "requeues": 0,
   "status": "OPEN"
