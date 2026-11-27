@@ -1,29 +1,6 @@
 {
  "agents": [
   {
-   "angle": "B",
-   "class": "18_displacement",
-   "deployed": "16:18",
-   "deployed_at": "2026-11-26T16:18",
-   "expected": "15:28",
-   "finding": "FINDINGS/18-displacement-SINGLE-PAGE-SPACER-MEASURED-26NOV-explore.md",
-   "id": "18_dB-01",
-   "landed_at": "2026-11-26T16:18",
-   "question": "single-page half: is the exact-line spacer charged proportionally by Google",
-   "status": "landed"
-  },
-  {
-   "id": "44_hA-01",
-   "class": "44_header_footer",
-   "angle": "A",
-   "question": "is flowFromBox the second anchor site and does the foot-band guard transfer to it",
-   "expected": "17:39",
-   "deployed": "17:43",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-26T17:43"
-  },
-  {
    "id": "--he-01",
    "class": "--help",
    "angle": "",
@@ -272,6 +249,28 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-27T16:45"
+  },
+  {
+   "id": "63_tA-01",
+   "class": "63_table_rows",
+   "angle": "A",
+   "question": "which engine commit between d28ca7516c3f9165 and a05b20eb05fe0fc8 broke table row placement",
+   "expected": "root cause by 00:00",
+   "deployed": "23:17",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-27T23:17"
+  },
+  {
+   "id": "63_tB-01",
+   "class": "63_table_rows",
+   "angle": "B",
+   "question": "what exactly differs in the docx for table-with-no-header-row: per-row placement diff, independent of RANKING.csv",
+   "expected": "mechanism by 00:00",
+   "deployed": "23:17",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-27T23:17"
   }
  ],
  "history": [
@@ -376,16 +375,8 @@
    "plan": ""
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. ",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "15:12",
-   "text": "attempt 89 on 18_displacement -> lead"
-  },
-  {
-   "at": "15:46",
-   "text": "attempt 90 on 18_displacement -> lead"
-  },
   {
    "at": "15:48",
    "text": "attempt 91 on 18_displacement -> lead"
@@ -617,12 +608,20 @@
   {
    "at": "23:09",
    "text": "attempt 118 on 18_displacement -> lead"
+  },
+  {
+   "at": "23:17",
+   "text": "agent deployed: 63_table_rows / A - which engine commit between d28ca7516c3f9165 and a05b20eb05fe0fc8 broke table ro"
+  },
+  {
+   "at": "23:17",
+   "text": "agent deployed: 63_table_rows / B - what exactly differs in the docx for table-with-no-header-row: per-row placement"
   }
  ],
  "plan": "",
  "run": {
-  "started": "22:00",
-  "ended": "23:10",
-  "ended_how": "forced"
+  "started": "23:17",
+  "ended": null,
+  "ended_how": null
  }
 }

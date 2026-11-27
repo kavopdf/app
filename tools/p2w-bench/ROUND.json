@@ -17,8 +17,10 @@
       }
     ]
   },
+  "fixer_doing": "relay: running regress --check on warm corpus",
+  "fixer_doing_since": 1795803852.3175478,
   "fixer_engine_at_claim": "33863086",
-  "fixer_last_beat": 1795800731.432506,
+  "fixer_last_beat": 1795803852.3175485,
   "fixer_started": 1795801622.288167,
   "history": [
     {
