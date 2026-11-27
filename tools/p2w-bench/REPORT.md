@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - kept change: 2 code commit(s) in this window, first: fixer 28nov: the report carries the run's own ac vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 1; kept change: 4 code commit(s) in this window, first: relay 03:18: run state and handoff ledger vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 2 deployed vs no FINDINGS filename carries row_A-01, commB-01 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -26,16 +26,21 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (64 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `63_table_rows` - taken from the pending list (64 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `63_table_rows` by hand instead |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 03:24 | **lead** | 0/None | Bisected the 84-regression cluster to one constant: ROW_RUNG_UNDER_TW=10 (8fb4f503). -Dp2w.rung=0 restores 6 of 6 probed table documents (table-with-no-header-row 47.48->0.61, electricity-bill 36.78-> |
+| 03:40 | **lead** | None/None | gate refuses main itself (84 with no engine change); rung=0 recomputed from the committed full-corpus table: 84 -> 57, 28 released, 1 cost, net 27; 27 of the 84 have a baseline of 0.00 and 6 are alrea |
 
 ## Why nothing moved, in this run's own words
+
+*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+
+### The run before this one said
 
 > The gate's regressions are not five constructs. They are one constant, and this run bisected them to it.
 >
@@ -84,7 +89,7 @@
 
 | | |
 |:--|:--|
-| Measured | **46 min ago** |
+| Measured | **59 min ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -93,7 +98,10 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `row_A-01` | which of the 84 docx regressions vs the 15 Nov basel | 03:41 | - | not recorded |
+| `commB-01` | is the gate's 84 a real quality loss or an inflated  | 03:41 | - | not recorded |
 
 ## Timing
 

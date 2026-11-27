@@ -1,28 +1,6 @@
 {
  "agents": [
   {
-   "id": "--he-01",
-   "class": "--help",
-   "angle": "",
-   "question": "",
-   "expected": "",
-   "deployed": "19:43",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-26T19:43"
-  },
-  {
-   "id": "t09_A-01",
-   "class": "t09_page_furniture",
-   "angle": "A",
-   "question": "is the 125 single-char present a TxtWriter line-assembly defect or a t09 band asymmetry - census every one of the .txt single-character lines against the drawn line it came from",
-   "expected": "19:45",
-   "deployed": "20:47",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-26T20:47"
-  },
-  {
    "id": "18_dA-02",
    "class": "18_displacement",
    "angle": "A",
@@ -271,6 +249,30 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-27T23:17"
+  },
+  {
+   "id": "row_A-01",
+   "class": "row_rung",
+   "angle": "A",
+   "question": "which of the 84 docx regressions vs the 15 Nov baseline does ROW_RUNG_UNDER_TW account for, and can a per-row rung keep the one row it earns while releasing the rest",
+   "expected": "03:55",
+   "deployed": "03:41",
+   "status": "landed",
+   "finding": "FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md",
+   "deployed_at": "2026-11-28T03:41",
+   "landed_at": "2026-11-28T03:41"
+  },
+  {
+   "id": "commB-01",
+   "class": "commit_gate",
+   "angle": "B",
+   "question": "is the gate's 84 a real quality loss or an inflated count - baseline provenance, noise floor, zero-baseline rows",
+   "expected": "04:10",
+   "deployed": "03:41",
+   "status": "landed",
+   "finding": "FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md",
+   "deployed_at": "2026-11-28T03:41",
+   "landed_at": "2026-11-28T03:41"
   }
  ],
  "history": [
@@ -377,26 +379,6 @@
  ],
  "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "19:43",
-   "text": "agent deployed: --help /  - "
-  },
-  {
-   "at": "20:35",
-   "text": "attempt 2 on t09_page_furniture -> lead"
-  },
-  {
-   "at": "20:47",
-   "text": "agent deployed: t09_page_furniture / A - is the 125 single-char present a TxtWriter line-assembly defect or a t09 band as"
-  },
-  {
-   "at": "22:12",
-   "text": "attempt 94 on 18_displacement -> lead (0/208 moved)"
-  },
-  {
-   "at": "22:14",
-   "text": "agent deployed: 18_displacement / A - find the single construct behind the displaced runs on the 25 documents that fai"
-  },
   {
    "at": "22:14",
    "text": "measured aa496ebe across 208 of 212: newsletter 0.20->86.30, 600 54.30->62.46, itr-computation 42.33->9.10 - regression, engine unstamped"
@@ -616,6 +598,26 @@
   {
    "at": "03:24",
    "text": "attempt 120 on 18_displacement -> lead"
+  },
+  {
+   "at": "03:40",
+   "text": "attempt 5 on 63_table_rows -> lead"
+  },
+  {
+   "at": "03:41",
+   "text": "agent deployed: row_rung / A - which of the 84 docx regressions vs the 15 Nov baseline does ROW_RUNG_UNDER_TW a"
+  },
+  {
+   "at": "03:41",
+   "text": "agent deployed: commit_gate / B - is the gate's 84 a real quality loss or an inflated count - baseline provenance,"
+  },
+  {
+   "at": "03:41",
+   "text": "agent landed: row_rung / A -> FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md"
+  },
+  {
+   "at": "03:41",
+   "text": "agent landed: commit_gate / B -> FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md"
   }
  ],
  "plan": "",

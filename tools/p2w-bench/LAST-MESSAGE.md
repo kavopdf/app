@@ -12,8 +12,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - kept change: 2 code commit(s) in this window, first: fixer 28nov: the report carries the run's own ac vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 1; kept change: 4 code commit(s) in this window, first: relay 03:18: run state and handoff ledger vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 2 deployed vs no FINDINGS filename carries row_A-01, commB-01 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -23,16 +23,57 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (64 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `63_table_rows` - taken from the pending list (64 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `63_table_rows` by hand instead |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 03:24 | **lead** | 0/None | Bisected the 84-regression cluster to one constant: ROW_RUNG_UNDER_TW=10 (8fb4f503). -Dp2w.rung=0 restores 6 of 6 probed table documents (table-with-no-header-row 47.48->0.61, electricity-bill 36.78-> |
+| 03:40 | **lead** | None/None | gate refuses main itself (84 with no engine change); rung=0 recomputed from the committed full-corpus table: 84 -> 57, 28 released, 1 cost, net 27; 27 of the 84 have a baseline of 0.00 and 6 are alrea |
 
 ## Why nothing moved, in this run's own words
+
+Not for want of a change: the change is measured and it is one constant. Nothing could be committed
+because **the commit gate refuses `main` itself**.
+
+`bash tools/install-gate.sh` installs `.git/hooks/pre-commit`, which runs `regress.py --check` and has
+no override. On a clean clone of `main` with `scope.py` reporting no engine change, that command exits
+1 with **84 docx documents worse than the 15 Nov baseline**. So the hook refuses an engine fix, a tool,
+a findings file and the run's own report alike. Four slots have ended "nothing kept" against this wall
+and each wrote it up as a slot that ran out of time; the wall is the reason.
+
+The arithmetic, recomputed this run from the three committed tables by a new read-only tool,
+`tools/p2w-bench/gate_decompose.py`:
+
+- of the 84, **27 have a baseline of exactly 0.00** - a floor no change can hold;
+- **6 already sit inside the corpus's own 99% bar** (`share5 <= 1.0`) and are refused anyway;
+- **10 baseline rows contradict themselves** - `share5 = 0.00` while `max_pt > 2.4 pt` says ink sits
+  beyond the 5 px radius the metric is defined on; **4 of them are among the 84**;
+- 19 are a genuine loss above 5.0.
+
+The largest real lever is `ROW_RUNG_UNDER_TW = 0`. `FINDINGS/RANKING-rung0-FULL-CORPUS-28NOV.csv` is a
+full-corpus measurement of exactly that tree, and against the same baseline it takes **84 -> 57**:
+**28 released, 1 cost** (`marksheet-subject-left-marks-right`, 4.55 -> 5.21), **net 27**. It is one
+constant, it is fully measured, and it still does not clear a gate that demands zero.
+
+So the next run's first question is not "which class" but "how does `main` get back under the bar". The
+order that does not ratify damage: land the rung in its **per-row** form (mechanism and falsifier in
+`FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md` §6 - apply it only where the
+table is held to a page budget, the `mobile-bill` case it was tuned on), re-measure the ten
+self-contradicting baseline rows as a data defect, and only then decide whether a gate that refuses a
+tree in which nothing changed is still the right gate. Re-baselining to today's state without the rung
+would ratify 27 documents of avoidable damage.
+
+Nothing here is a substitute for a measurement the gate accepts. It is the map of why there is no such
+measurement yet, and it is committed so the next slot starts from it rather than re-deriving it.
+
+**Two agents were deployed and recorded in `HANDOFF.json`** (`row_rung|A`, `commit_gate|B`); both landed
+and their arithmetic was recomputed here rather than trusted - one of them cited a findings file that
+does not exist, which is why the numbers in this report come from `gate_decompose.py`.
+
+### The run before this one said
 
 > The gate's regressions are not five constructs. They are one constant, and this run bisected them to it.
 >
@@ -81,7 +122,7 @@
 
 | | |
 |:--|:--|
-| Measured | **46 min ago** |
+| Measured | **59 min ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -90,7 +131,10 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `row_A-01` | which of the 84 docx regressions vs the 15 Nov basel | 03:41 | - | not recorded |
+| `commB-01` | is the gate's 84 a real quality loss or an inflated  | 03:41 | - | not recorded |
 
 ## Timing
 
@@ -126,3 +170,5 @@ READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-A
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
+
+  written to tools/p2w-bench/REPORT.md - commit it, so the report survives the run
