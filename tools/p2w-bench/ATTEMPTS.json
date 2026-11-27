@@ -1404,6 +1404,34 @@
   "requeues": 0,
   "status": "OPEN"
  },
+ "63_table_rows": {
+  "attempts": 1,
+  "first_seen": null,
+  "history": [
+   {
+    "at": "2026-11-27 23:07",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "GATE STATE, NOT A FIX: full 212-doc re-measurement on engine a05b20eb shows the commit gate refuses on 96 REAL regressions vs the 15 Nov baseline (84 on share@5, recomputed independently from the two ",
+    "total": null
+   }
+  ],
+  "last": null,
+  "last_engine": "33863086",
+  "outcomes": [
+   "lead"
+  ],
+  "reason": "GATE STATE, NOT A FIX: full 212-doc re-measurement on engine a05b20eb shows the commit gate refuses on 96 REAL regressions vs the 15 Nov baseline (84 on share@5, recomputed independently from the two CSVs), not on a stale table as the last nine runs assumed. The regressions are table row placement: table-with-no-header-row 0.61->47.48, boq-tender-bill-of-quantities 7.10->41.95, very-long-single-column-table 6.87->41.14. Measured on the p2w share@5 axis, not on a Google check. Did NOT run regress.py --stamp: stamping would ratify the 84 as the new floor. Evidence: FINDINGS/GATE-BLOCKED-BY-84-REAL-REGRESSIONS-NOT-A-STALE-TABLE-27NOV.md",
+  "reasons": [
+   "GATE STATE, NOT A FIX: full 212-doc re-measurement on engine a05b20eb shows the commit gate refuses on 96 REAL regressions vs the 15 Nov baseline (84 on share@5, recomputed independently from the two CSVs), not on a stale table as the last nine runs assumed. The regressions are table row placement: table-with-no-header-row 0.61->47.48, boq-tender-bill-of-quantities 7.10->41.95, very-long-single-column-table 6.87->41.14. Measured on the p2w share@5 axis, not on a Google check. Did NOT run regress.py --stamp: stamping would ratify the 84 as the new floor. Evidence: FINDINGS/GATE-BLOCKED-BY-84-REAL-REGRESSIONS-NOT-A-STALE-TABLE-27NOV.md"
+  ],
+  "requeues": 0,
+  "status": "OPEN"
+ },
  "content-missing-nothing-in-its-place": {
   "attempts": 7,
   "engine_note": "last_engine corrected 8c14e53 -> 5cd9e33: attempt.py derived the hash while the fix was still uncommitted in the working tree, so it recorded the commit BEFORE the change. 5cd9e33 is the commit that touched app/.../engine/ and is exactly the tree the 213-document ratchet measured (212 compared, 0 regressions, 1 improvement).",
