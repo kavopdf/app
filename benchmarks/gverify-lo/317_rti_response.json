@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/317_rti_response.pdf",
-  "render": "/scratch/tmp/lo-one-ut76nrol/317_rti_response.pdf",
+  "render": "/scratch/tmp/lo-one-08fo1391/317_rti_response.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.4,
-        "worst_dy": 0.5,
+        "med_dy": -0.0,
+        "worst_dy": 0.1,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 26
@@ -251,5 +251,5 @@
   },
   "document": "317_rti_response",
   "source_file": "/scratch/work/p2w/corpus/317_rti_response.pdf",
-  "render_file": "/scratch/tmp/lo-one-ut76nrol/317_rti_response.pdf"
+  "render_file": "/scratch/tmp/lo-one-08fo1391/317_rti_response.pdf"
 }

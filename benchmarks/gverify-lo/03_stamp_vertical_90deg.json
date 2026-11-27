@@ -1,6 +1,6 @@
 {
   "source": "/scratch/work/p2w/corpus/03_stamp_vertical_90deg.pdf",
-  "render": "/scratch/tmp/lo-one-5krhlsyf/03_stamp_vertical_90deg.pdf",
+  "render": "/scratch/tmp/lo-one-us03kg5i/03_stamp_vertical_90deg.pdf",
   "passed": 38,
   "total": 44,
   "failed": [
@@ -11,7 +11,7 @@
     "62_table_columns",
     "63_table_rows"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -59,8 +59,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": 5.6,
-        "worst_dy": 66.8,
+        "med_dy": 7.6,
+        "worst_dy": 23.9,
         "med_dx": 0.1,
         "bad_pages": [
           0
@@ -125,7 +125,7 @@
     },
     "36_underline_rules": {
       "source": 0,
-      "render": 77,
+      "render": 5,
       "ok": true
     },
     "37_super_subscript": {
@@ -270,5 +270,5 @@
   },
   "document": "03_stamp_vertical_90deg",
   "source_file": "/scratch/work/p2w/corpus/03_stamp_vertical_90deg.pdf",
-  "render_file": "/scratch/tmp/lo-one-5krhlsyf/03_stamp_vertical_90deg.pdf"
+  "render_file": "/scratch/tmp/lo-one-us03kg5i/03_stamp_vertical_90deg.pdf"
 }

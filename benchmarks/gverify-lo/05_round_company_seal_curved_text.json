@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/05_round_company_seal_curved_text.pdf",
-  "render": "/scratch/tmp/lo-one-t06qjjd_/05_round_company_seal_curved_text.pdf",
+  "render": "/scratch/tmp/lo-one-v_57ma_6/05_round_company_seal_curved_text.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -2.9,
-        "worst_dy": 25.7,
+        "med_dy": 0.0,
+        "worst_dy": 1.9,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 79
@@ -251,5 +251,5 @@
   },
   "document": "05_round_company_seal_curved_text",
   "source_file": "/scratch/work/p2w/corpus/05_round_company_seal_curved_text.pdf",
-  "render_file": "/scratch/tmp/lo-one-t06qjjd_/05_round_company_seal_curved_text.pdf"
+  "render_file": "/scratch/tmp/lo-one-v_57ma_6/05_round_company_seal_curved_text.pdf"
 }

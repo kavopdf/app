@@ -1,11 +1,14 @@
 {
   "source": "/scratch/work/p2w/corpus/300_prescription_rx.pdf",
-  "render": "/scratch/tmp/lo-one-cddvs15d/300_prescription_rx.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-ly_25tzz/300_prescription_rx.pdf",
+  "passed": 45,
   "total": 47,
-  "failed": [],
-  "engine": "d28ca7516c3f9165",
-  "ok": true,
+  "failed": [
+    "18_displacement",
+    "59_shape_anchor"
+  ],
+  "engine": "a05b20eb05fe0fc8",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,13 +52,15 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": -0.5,
-        "worst_dy": 2.1,
+        "med_dy": -0.2,
+        "worst_dy": 4.7,
         "med_dx": 0.3,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 50
       }
     },
@@ -227,8 +232,8 @@
     },
     "59_shape_anchor": {
       "source": 39,
-      "render": 39,
-      "ok": true
+      "render": 35,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 0,
@@ -276,5 +281,5 @@
   },
   "document": "300_prescription_rx",
   "source_file": "/scratch/work/p2w/corpus/300_prescription_rx.pdf",
-  "render_file": "/scratch/tmp/lo-one-cddvs15d/300_prescription_rx.pdf"
+  "render_file": "/scratch/tmp/lo-one-ly_25tzz/300_prescription_rx.pdf"
 }
