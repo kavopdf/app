@@ -596,3 +596,78 @@ stops early misses all of it.
 
 **Read the last six sections before anything else in this file.** They are the ones a run will otherwise
 rediscover the hard way.
+
+## Absolute positioning turns overflow into deletion, and textboxes are why half the text is not editable
+
+Full detail: `FINDINGS/MULTIPAGE-RASTERISATION-AND-DENSITY-27NOV-agent.md`. **The source document is in the repo
+at `benchmarks/corpus-extra/Prakashan_Print_Fidelity_Handbook.pdf`.**
+
+Converted a 10-page handbook through the engine, run locally on the JVM, and exported through **Google** - not
+LibreOffice, which this work has already learned gives a different and wrong answer.
+
+    10 source pages  ->  11 rendered pages
+    text reaching the render:  46 percent
+    median position error:     123.8 pt  (1.5 inches)
+
+    page  1  46% of its text     page  6  14%       page  9  1.5%
+    page  2   5%                 page  7 107%       page 10  97%
+
+**Page 9 renders blank.** Side by side with the source, the source page holds a header, a section heading, five
+stage boxes, six formulae, a code listing, a checklist table and two note columns. The Google page holds one
+horizontal rule and fragments clipped at the top edge.
+
+### Two halves, one cause
+
+**Plain paragraphs shift down by one page.** Their `w:before` moves and they reappear on the next page - source
+page 9's content is on rendered page 10, source page 10's on rendered page 11. **That is the extra page: content
+moved and nothing replaced it.**
+
+**Tables and textboxes are deleted outright.** `PRE-PRESS CHECKLIST` and `SOURCE LISTING` appear on no page of the
+render. A table cannot shift, because moving it means recomputing row heights and cell positions, and an
+absolutely positioned document has no machinery for that.
+
+**In a flowing document an overflow paginates. In an absolutely positioned one it either shifts or is destroyed,
+and which of the two depends on whether the object can be moved without recomputing its layout.**
+
+### And this is the same decision that makes the text uneditable
+
+    352 wps:txbx holding 12,050 characters  ->  53.2 percent of all text
+    spread: 0 empty, 132 under 20 chars, 214 between 20 and 100, 6 over 100
+
+**More than half the text is inside a textbox, and Google rasterises `wps:txbx`.** The 214 boxes holding 20 to 100
+characters are labels, values and short body lines - not stamps. **The engine is putting ordinary content into
+textboxes instead of paragraphs, and that one choice produces both failures: a textbox is rasterised, and a
+textbox cannot be moved when the page overflows.**
+
+**So do not treat the rasterisation and the overflow as two problems. Put the content in paragraphs and both go.**
+
+## Nothing renders in Google Docs dark mode, and not one colour in any output is automatic
+
+Full detail: `FINDINGS/DARK-MODE-NOTHING-SHOWS-EXPLICIT-COLOURS-27NOV-agent.md`.
+
+**Measured across 131 output files:**
+
+    with zero w:color="auto"     115   (88 percent)
+    with any w:color="auto"        0   <- the engine never writes one
+
+**Google Docs dark mode inverts *automatic* colours. An explicit colour is treated as an author's choice and is
+left alone.** With no automatic colour anywhere, every dark colour stays dark on a background that has just been
+turned dark, and the text is not dimmed - it is gone.
+
+**On the 10-page output: 1,622 runs, 1,045 with an explicit colour, none automatic.** The colours are `#1A1A1A`
+x565 at luminance 26, `#12314F` x125 at 43, `#A3232E` x67 at 74, `#3A4653` x39 at 68, and the borders are
+`#000000` x55 at luminance 0.
+
+**Three behaviours appear on one page, all from `w:color`:** headings survive because they are brighter than the
+background; body text at luminance 26 against a background near 20 is a contrast ratio near 1.1 and is painted but
+invisible; and a glyph column vanishes entirely while its labels stay, which means those symbols are carried in
+textboxes and textboxes are the ones that get rasterised.
+
+**The fix is not "make everything automatic".** A red total, a teal section marker and a grey rule are content, and
+inverting them is a fidelity failure too. Near-black body text carrying no meaning should be automatic; meaningful
+colour should keep its value; rules at `#000000` are the strongest case for automatic. **The boundary between
+"incidental near-black" and "meaningful colour" is a product decision the corpus must settle - no threshold has
+been measured and none should be guessed.**
+
+**Do not test this with LibreOffice.** There is no UI for Google dark mode in a pod, and a LibreOffice render does
+not answer it - this work already produced one wrong finding today by measuring the wrong renderer.
