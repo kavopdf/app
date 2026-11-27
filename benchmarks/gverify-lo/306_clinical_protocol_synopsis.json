@@ -1,11 +1,14 @@
 {
   "source": "/scratch/work/p2w/corpus/306_clinical_protocol_synopsis.pdf",
-  "render": "/scratch/tmp/lo-one-kh9xhge9/306_clinical_protocol_synopsis.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-mtyy4fma/306_clinical_protocol_synopsis.pdf",
+  "passed": 45,
   "total": 47,
-  "failed": [],
-  "engine": "a4d8fca469bba636",
-  "ok": true,
+  "failed": [
+    "18_displacement",
+    "59_shape_anchor"
+  ],
+  "engine": "74a152e7d3fb3d26",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,19 +52,21 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 0.4,
-        "worst_dy": 0.5,
+        "med_dy": -4.6,
+        "worst_dy": 5.0,
         "med_dx": 0.5,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 75
       }
     },
     "23_line_pitch": {
       "source": 17.0,
-      "render": 17.0,
+      "render": 16.5,
       "ok": true
     },
     "25_invisible_text": {
@@ -227,8 +232,8 @@
     },
     "59_shape_anchor": {
       "source": 74,
-      "render": 74,
-      "ok": true
+      "render": 67,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 0,
@@ -276,5 +281,5 @@
   },
   "document": "306_clinical_protocol_synopsis",
   "source_file": "/scratch/work/p2w/corpus/306_clinical_protocol_synopsis.pdf",
-  "render_file": "/scratch/tmp/lo-one-kh9xhge9/306_clinical_protocol_synopsis.pdf"
+  "render_file": "/scratch/tmp/lo-one-mtyy4fma/306_clinical_protocol_synopsis.pdf"
 }

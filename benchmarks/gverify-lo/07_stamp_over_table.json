@@ -1,6 +1,6 @@
 {
   "source": "/scratch/work/p2w/corpus/07_stamp_over_table.pdf",
-  "render": "/scratch/tmp/lo-one-068exixa/07_stamp_over_table.pdf",
+  "render": "/scratch/tmp/lo-one-59hzi15z/07_stamp_over_table.pdf",
   "passed": 37,
   "total": 42,
   "failed": [
@@ -10,7 +10,7 @@
     "43_within_10pt_x",
     "47_margins"
   ],
-  "engine": "a4d8fca469bba636",
+  "engine": "74a152e7d3fb3d26",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -270,5 +270,5 @@
   },
   "document": "07_stamp_over_table",
   "source_file": "/scratch/work/p2w/corpus/07_stamp_over_table.pdf",
-  "render_file": "/scratch/tmp/lo-one-068exixa/07_stamp_over_table.pdf"
+  "render_file": "/scratch/tmp/lo-one-59hzi15z/07_stamp_over_table.pdf"
 }

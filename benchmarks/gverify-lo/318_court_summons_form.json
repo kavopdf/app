@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/318_court_summons_form.pdf",
-  "render": "/scratch/tmp/lo-one-s__9cvtz/318_court_summons_form.pdf",
+  "render": "/scratch/tmp/lo-one-5_4wui0u/318_court_summons_form.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "60_text_column_right_edge"
   ],
-  "engine": "a4d8fca469bba636",
+  "engine": "74a152e7d3fb3d26",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,7 +54,7 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.0,
+        "med_dy": -0.8,
         "worst_dy": 17.9,
         "med_dx": 0.1,
         "bad_pages": [],
@@ -63,7 +63,7 @@
     },
     "23_line_pitch": {
       "source": 18.0,
-      "render": 18.0,
+      "render": 17.5,
       "ok": true
     },
     "25_invisible_text": {
@@ -278,5 +278,5 @@
   },
   "document": "318_court_summons_form",
   "source_file": "/scratch/work/p2w/corpus/318_court_summons_form.pdf",
-  "render_file": "/scratch/tmp/lo-one-s__9cvtz/318_court_summons_form.pdf"
+  "render_file": "/scratch/tmp/lo-one-5_4wui0u/318_court_summons_form.pdf"
 }

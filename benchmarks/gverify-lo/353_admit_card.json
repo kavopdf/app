@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/353_admit_card.pdf",
-  "render": "/scratch/tmp/lo-one-ufzylm6j/353_admit_card.pdf",
+  "render": "/scratch/tmp/lo-one-fmhy_a6p/353_admit_card.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "a4d8fca469bba636",
+  "engine": "74a152e7d3fb3d26",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,7 +52,7 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.1,
+        "med_dy": -0.4,
         "worst_dy": 2.3,
         "med_dx": 0.1,
         "bad_pages": [],
@@ -276,5 +276,5 @@
   },
   "document": "353_admit_card",
   "source_file": "/scratch/work/p2w/corpus/353_admit_card.pdf",
-  "render_file": "/scratch/tmp/lo-one-ufzylm6j/353_admit_card.pdf"
+  "render_file": "/scratch/tmp/lo-one-fmhy_a6p/353_admit_card.pdf"
 }

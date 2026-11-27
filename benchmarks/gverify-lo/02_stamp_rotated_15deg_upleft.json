@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/02_stamp_rotated_15deg_upleft.pdf",
-  "render": "/scratch/tmp/lo-one-i4usu6r8/02_stamp_rotated_15deg_upleft.pdf",
+  "render": "/scratch/tmp/lo-one-q5wteg7i/02_stamp_rotated_15deg_upleft.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
-  "engine": "a4d8fca469bba636",
+  "engine": "74a152e7d3fb3d26",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -253,5 +253,5 @@
   },
   "document": "02_stamp_rotated_15deg_upleft",
   "source_file": "/scratch/work/p2w/corpus/02_stamp_rotated_15deg_upleft.pdf",
-  "render_file": "/scratch/tmp/lo-one-i4usu6r8/02_stamp_rotated_15deg_upleft.pdf"
+  "render_file": "/scratch/tmp/lo-one-q5wteg7i/02_stamp_rotated_15deg_upleft.pdf"
 }

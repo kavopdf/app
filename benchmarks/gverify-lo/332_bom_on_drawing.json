@@ -1,11 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/332_bom_on_drawing.pdf",
-  "render": "/scratch/tmp/lo-one-rajbhh3q/332_bom_on_drawing.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-ta8zb_np/332_bom_on_drawing.pdf",
+  "passed": 46,
   "total": 47,
-  "failed": [],
-  "engine": "a4d8fca469bba636",
-  "ok": true,
+  "failed": [
+    "18_displacement"
+  ],
+  "engine": "74a152e7d3fb3d26",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,19 +51,21 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 0.1,
-        "worst_dy": 0.3,
+        "med_dy": -1.9,
+        "worst_dy": 2.9,
         "med_dx": 0.4,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 52
       }
     },
     "23_line_pitch": {
       "source": 15.0,
-      "render": 15.0,
+      "render": 14.5,
       "ok": true
     },
     "25_invisible_text": {
@@ -276,5 +280,5 @@
   },
   "document": "332_bom_on_drawing",
   "source_file": "/scratch/work/p2w/corpus/332_bom_on_drawing.pdf",
-  "render_file": "/scratch/tmp/lo-one-rajbhh3q/332_bom_on_drawing.pdf"
+  "render_file": "/scratch/tmp/lo-one-ta8zb_np/332_bom_on_drawing.pdf"
 }

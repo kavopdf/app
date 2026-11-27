@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/305_vaccination_certificate.pdf",
-  "render": "/scratch/tmp/lo-one-k6_sl1ax/305_vaccination_certificate.pdf",
+  "render": "/scratch/tmp/lo-one-f7p7jxfp/305_vaccination_certificate.pdf",
   "passed": 45,
   "total": 47,
   "failed": [
     "17_matched_runs",
     "59_shape_anchor"
   ],
-  "engine": "a4d8fca469bba636",
+  "engine": "74a152e7d3fb3d26",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,7 +55,7 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.0,
+        "med_dy": -0.5,
         "worst_dy": 5.6,
         "med_dx": 0.1,
         "bad_pages": [],
@@ -64,7 +64,7 @@
     },
     "23_line_pitch": {
       "source": 16.0,
-      "render": 16.0,
+      "render": 15.5,
       "ok": true
     },
     "25_invisible_text": {
@@ -74,7 +74,7 @@
     },
     "26_text_overlap": {
       "source": 46,
-      "render": 30,
+      "render": 29,
       "ok": true
     },
     "27_text_off_page": {
@@ -279,5 +279,5 @@
   },
   "document": "305_vaccination_certificate",
   "source_file": "/scratch/work/p2w/corpus/305_vaccination_certificate.pdf",
-  "render_file": "/scratch/tmp/lo-one-k6_sl1ax/305_vaccination_certificate.pdf"
+  "render_file": "/scratch/tmp/lo-one-f7p7jxfp/305_vaccination_certificate.pdf"
 }

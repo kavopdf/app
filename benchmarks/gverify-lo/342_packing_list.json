@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/342_packing_list.pdf",
-  "render": "/scratch/tmp/lo-one-x3wzsy7k/342_packing_list.pdf",
+  "render": "/scratch/tmp/lo-one-a0o7wkx9/342_packing_list.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "a4d8fca469bba636",
+  "engine": "74a152e7d3fb3d26",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.1,
-        "worst_dy": 0.5,
+        "med_dy": -0.9,
+        "worst_dy": 2.0,
         "med_dx": 0.4,
         "bad_pages": [],
         "runs_matched": 52
@@ -61,7 +61,7 @@
     },
     "23_line_pitch": {
       "source": 16.0,
-      "render": 16.0,
+      "render": 15.5,
       "ok": true
     },
     "25_invisible_text": {
@@ -276,5 +276,5 @@
   },
   "document": "342_packing_list",
   "source_file": "/scratch/work/p2w/corpus/342_packing_list.pdf",
-  "render_file": "/scratch/tmp/lo-one-x3wzsy7k/342_packing_list.pdf"
+  "render_file": "/scratch/tmp/lo-one-a0o7wkx9/342_packing_list.pdf"
 }

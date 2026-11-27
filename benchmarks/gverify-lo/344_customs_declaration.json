@@ -1,11 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/344_customs_declaration.pdf",
-  "render": "/scratch/tmp/lo-one-pzuqrw7h/344_customs_declaration.pdf",
-  "passed": 47,
+  "render": "/scratch/tmp/lo-one-aztdkx30/344_customs_declaration.pdf",
+  "passed": 46,
   "total": 47,
-  "failed": [],
-  "engine": "a4d8fca469bba636",
-  "ok": true,
+  "failed": [
+    "18_displacement"
+  ],
+  "engine": "74a152e7d3fb3d26",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,19 +51,21 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 0.4,
+        "med_dy": -1.4,
         "worst_dy": 3.5,
         "med_dx": 0.4,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 65
       }
     },
     "23_line_pitch": {
       "source": 18.0,
-      "render": 18.0,
+      "render": 17.5,
       "ok": true
     },
     "25_invisible_text": {
@@ -227,7 +231,7 @@
     },
     "59_shape_anchor": {
       "source": 58,
-      "render": 58,
+      "render": 56,
       "ok": true
     },
     "60_text_column_right_edge": {
@@ -276,5 +280,5 @@
   },
   "document": "344_customs_declaration",
   "source_file": "/scratch/work/p2w/corpus/344_customs_declaration.pdf",
-  "render_file": "/scratch/tmp/lo-one-pzuqrw7h/344_customs_declaration.pdf"
+  "render_file": "/scratch/tmp/lo-one-aztdkx30/344_customs_declaration.pdf"
 }
