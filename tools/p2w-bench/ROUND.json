@@ -17,9 +17,11 @@
       }
     ]
   },
+  "fixer_doing": "gate.py last 6 documents",
+  "fixer_doing_since": 1795800731.4325054,
   "fixer_engine_at_claim": "33863086",
-  "fixer_last_beat": 1795798146.435716,
-  "fixer_started": 0,
+  "fixer_last_beat": 1795800731.432506,
+  "fixer_started": 1795796997.7430224,
   "history": [
     {
       "at": "2026-11-12 09:46",

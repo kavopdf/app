@@ -9,19 +9,21 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 21:17 |
-| ended | 22:24 |
-| how it ended | forced |
+| started | 22:00 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
+| 18_dB-01 | 18_displacement | B | single-page half: is the exact-line spacer charged proportionally by G | 16:18 | 15:28 | landed | FINDINGS/18-displacement-SINGLE-PAGE-SPACER-MEASURED-26NOV-explore.md |
+| 44_hA-01 | 44_header_footer | A | is flowFromBox the second anchor site and does the foot-band guard tra | 17:43 | 17:39 | running |  |
 | --he-01 | --help |  |  | 19:43 |  | running |  |
 | t09_A-01 | t09_page_furniture | A | is the 125 single-char present a TxtWriter line-assembly defect or a t | 20:47 | 19:45 | running |  |
 | 18_dA-02 | 18_displacement | A | find the single construct behind the displaced runs on the 25 document | 22:14 | 16:10 | landed | FINDINGS/18-displacement-DOMINANT-SUBCAUSE-27NOV-agent.md |
@@ -44,14 +46,17 @@ unfinished work, not as a result.
 | corp-01 | corpus-cache-per-document-27NOV |  |  | 13:31 |  | running |  |
 | 18_dsmall-dy cluster of 15-01 | 18_displacement | small-dy cluster of 15 | which code site places a run's baseline, and is the small dy an ascent | 16:45 | the mechanical cause with a falsifiable claim and the exact file:line | running |  |
 | txtform-feed lead-01 | txt | form-feed lead | is _txt_lines dropping page separators, and how many documents does it | 16:45 | a fixture proving the bug and a count of verdicts moved | running |  |
-| 18_dA-01 | 18_displacement | A | Which of the 41 docs failing 18_displacement share ONE row-shortfall c | 21:26 | 22:20 | landed | FINDINGS/18_dB-01-18_dA-01-CORPUS-PASS-206-OF-213-IN-ONE-SLOT-27NOV-relay.md |
-| 18_dB-01 | 18_displacement | B | Is the 11:57 landing 33863086 real in Google, and how many neighbourin | 21:26 | 22:20 | landed | FINDINGS/18_dB-01-18_dA-01-CORPUS-PASS-206-OF-213-IN-ONE-SLOT-27NOV-relay.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
+- `10:56` attempt 106 on 18_displacement -> lead
+- `10:58` agent deployed: 18_displacement / A - which sub-cause of the displacement survives every eliminated one, measured on o
+- `10:58` agent deployed: 60_text_column_right_edge / B - how many CLEAN documents does fixing 60 alone win, and is there a live construct
+- `10:58` agent landed: 18_displacement / A -> FINDINGS/18-displacement-DOMINANT-SUBCAUSE-27NOV-agent.md
+- `10:58` agent landed: 60_text_column_right_edge / B -> FINDINGS/60-COLUMN-RIGHT-EDGE-CENSUS-27NOV-agent.md
 - `11:21` agent deployed: 18dA-03 / 18_displacement - baseline placement inside the hairline exact line box
 - `11:21` agent deployed: 60tB-02 / 60_text_column_right_edge - the right-tab line is split by our own reader
 - `11:54` attempt 107 on 18_displacement -> lead
@@ -72,11 +77,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `20:52` attempt 114 on 18_displacement -> lead (1/2 moved)
 - `20:57` attempt 115 on 18_displacement -> lead (0/1 moved)
 - `21:08` attempt 116 on 18_displacement -> lead (0/4 moved)
-- `21:26` agent deployed: 18_displacement / A - Which of the 41 docs failing 18_displacement share ONE row-shortfall construct, 
-- `21:26` agent deployed: 18_displacement / B - Is the 11:57 landing 33863086 real in Google, and how many neighbouring docs sit
-- `22:16` attempt 117 on 18_displacement -> lead (None/213 moved)
-- `22:24` agent landed: 18_dA-01 /  -> FINDINGS/18_dB-01-18_dA-01-CORPUS-PASS-206-OF-213-IN-ONE-SLOT-27NOV-relay.md
-- `22:24` agent landed: 18_dB-01 /  -> FINDINGS/18_dB-01-18_dA-01-CORPUS-PASS-206-OF-213-IN-ONE-SLOT-27NOV-relay.md
 
 ## Where the rest of the state lives
 
