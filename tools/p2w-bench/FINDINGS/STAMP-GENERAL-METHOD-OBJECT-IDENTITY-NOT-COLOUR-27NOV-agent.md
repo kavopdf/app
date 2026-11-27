@@ -326,3 +326,48 @@ percent" from "opaque text in a box that is 12 percent background", and the seco
     open       02: font-metric drift, about 4 pt
     open       10, 12, 14: the three shapes the flow cannot enter
     open       the count of affected documents
+
+## The clamp works on colour. The geometry still does not, and it is the font.
+
+The opacity clamp - treat anything above 0.85 as opaque - did what it was meant to:
+
+    07  ink -52%  ->  -17%      opacity 0.88 -> 1.00
+
+So colour is now in hand: 06's PAID at its true 0.55, 07's text at its true 1.0.
+
+**Geometry did not move, and the same two numbers keep appearing:**
+
+    07  offset +0.0, +1.9    size +0.0, +3.8     unchanged by the clamp, unchanged by the ink box
+    02  offset +0.7, +4.6    size -1.2, -4.6     unchanged by the ink box
+
+**The cause is the font, not the rect.** Both documents' stamp text is drawn with `Liberation Serif Bold`
+substituted for the PDF's own subset font. The substitute has different ascent and descent, so the
+rendered text is **shorter** than the text bounding box the PDF reports - by about 4 pt at 15 pt type.
+
+The image is stretched to the stamp rect's size, but its own ink does not fill that box, because the text
+inside it is too short. So the ink measures short by exactly that font difference, and the top of the
+stamp sits low because the ascent is smaller.
+
+**Cropping the image to its own ink and stretching that to the rect does not fix it** - that was tried, and
+02 came back at -4.6 again. Cropping cannot invent the missing ascent; it can only redistribute what is
+there.
+
+### What actually fixes it
+
+**Use the PDF's own font, not a substitute.** `page.get_fonts()` lists the embedded fonts with their xrefs;
+`doc.extract_font(xref)` returns the bytes. Embedding the stamp's real font removes the metric difference
+at its source, and then the text sits in its own bounding box and the geometry follows.
+
+**This is the same conclusion as the operator-copying note above, arriving from a different direction:**
+reconstruction loses what the API does not hand over, and the font is one more thing it does not hand
+over by default. Copying the operators loses nothing - not the alpha, not the cap and join, and not the
+font metrics either.
+
+### Where it stands
+
+    fixed      06 end to end: +0.5/+0.2, size -1.0/-0.5, ink -7%, PAID at its true 0.55
+    colour     07 at its true opacity, ink -52% -> -17%
+    open       07 and 02 geometry, about 4 pt, caused by font substitution
+    open       02 needs the embedded font; both need the operator-copy path
+    open       10, 12, 14
+    open       the count
