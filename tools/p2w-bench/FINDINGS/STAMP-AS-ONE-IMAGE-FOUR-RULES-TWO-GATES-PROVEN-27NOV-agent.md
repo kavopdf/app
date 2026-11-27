@@ -183,3 +183,51 @@ a candidate must pass before it is accepted.
 
 What is ruled out, so it is not retried: 300 DPI, 600 DPI, binary alpha, continuous alpha, and
 redact-then-render. All five measured, all five +50 to +58 percent ink.
+
+## CORRECTION - the 58 percent figure was wrong, and the reason is a bug I had just written
+
+The user opened the document I had produced and saw **two seals**: the original one, still in place, and
+a second one that moved when they dragged it. They also saw that the original's outline is slightly cut
+while the new one's is not - which is itself proof they are two different objects.
+
+They were right, and the cause is worth recording because it invalidates the measurement above.
+
+**`312_affidavit_stamp_paper` does not have one textbox for its stamp. It has twenty-eight, one per
+character** - the curved text around the circle is drawn as individually positioned letters:
+
+    #0 'A'  #1 'D'  #2 'V'  #3 'O'  #4 'C'  #5 'A'  #6 'T'  #7 'E'      ADVOCATE
+    #8 'N'  #9 'D' #10 'N' #11 'O' #12 'T' #13 'A' #14 'R' #15 'Y'      AND NOTARY
+    #16 'B' ... #23 'U'                                                 BENGALURU
+    #26 'INDIA'   #27 '2024'
+
+I replaced **the first textbox anchor I found**, which was a 10.0 x 8.6 pt anchor holding the single
+letter `A`. The seal was never touched. So the document ended up with the original seal plus my image
+on top of it, and the ink measurement above was counting both.
+
+**Corrected measurement, same page, same 150 dpi:**
+
+    original PDF       4,828 navy px
+    my buggy build     7,863 navy px    +63%  (the original seal plus my image)
+    corrected build    6,415 navy px    +33%  (my image alone)
+
+So the stroke is **33 percent heavier, not 58**. Still heavier than the vector original - the open
+issue below stands - but the number in it was contaminated by a duplicate.
+
+## Rule 6 - which anchors are the stamp
+
+**Every anchor whose rect lies inside the stamp's rect in the PDF belongs to the stamp. Replace all of
+them, not the first one.**
+
+Measured on `312_affidavit_stamp_paper`: all 28 per-character anchors lie inside the stamp rect
+(282.0,653.9 -> 358.0,729.9). On `01_stamp_rotated_15deg_upright` there is exactly one. The rule covers
+both, and it is the only thing that stops the duplicate.
+
+Verified after the change: textbox anchors in the document went from 28 to 0, and the exported page
+carries one seal at the right place with the ink figure above.
+
+## The lesson, because it has now happened five times
+
+Every attempt to decide "which textbox is the stamp" by guessing - by count, by stamp-like words, by
+whether words appear inside a textbox, by picking the first one - has been wrong. The rule above works
+because it asks the PDF where the stamp is and then takes **everything** inside that rectangle, rather
+than trying to recognise a stamp by what it looks like.
