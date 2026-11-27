@@ -257,9 +257,10 @@
    "question": "Which of the 41 docs failing 18_displacement share ONE row-shortfall construct, and which engine path sets it - does 18-small-dy-cellbefore.patch cover them all?",
    "expected": "22:20",
    "deployed": "21:26",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T21:26"
+   "status": "landed",
+   "finding": "FINDINGS/18_dB-01-18_dA-01-CORPUS-PASS-206-OF-213-IN-ONE-SLOT-27NOV-relay.md",
+   "deployed_at": "2026-11-27T21:26",
+   "landed_at": "2026-11-27T22:24"
   },
   {
    "id": "18_dB-01",
@@ -268,17 +269,13 @@
    "question": "Is the 11:57 landing 33863086 real in Google, and how many neighbouring docs sit 1-4 pt short of their row (the same shortfall) without being fixed by it?",
    "expected": "22:20",
    "deployed": "21:26",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T21:26"
+   "status": "landed",
+   "finding": "FINDINGS/18_dB-01-18_dA-01-CORPUS-PASS-206-OF-213-IN-ONE-SLOT-27NOV-relay.md",
+   "deployed_at": "2026-11-27T21:26",
+   "landed_at": "2026-11-27T22:24"
   }
  ],
  "history": [
-  {
-   "at": "23:26",
-   "how": "forced",
-   "plan": ""
-  },
   {
    "at": "01:05",
    "how": "forced",
@@ -373,18 +370,15 @@
    "at": "21:09",
    "how": "forced",
    "plan": ""
+  },
+  {
+   "at": "22:24",
+   "how": "forced",
+   "plan": ""
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. ",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "15:46",
-   "text": "attempt 90 on 18_displacement -> lead"
-  },
-  {
-   "at": "15:48",
-   "text": "attempt 91 on 18_displacement -> lead"
-  },
   {
    "at": "17:39",
    "text": "attempt 3 on 44_header_footer -> lead"
@@ -616,12 +610,20 @@
   {
    "at": "22:16",
    "text": "attempt 117 on 18_displacement -> lead (None/213 moved)"
+  },
+  {
+   "at": "22:24",
+   "text": "agent landed: 18_dA-01 /  -> FINDINGS/18_dB-01-18_dA-01-CORPUS-PASS-206-OF-213-IN-ONE-SLOT-27NOV-relay.md"
+  },
+  {
+   "at": "22:24",
+   "text": "agent landed: 18_dB-01 /  -> FINDINGS/18_dB-01-18_dA-01-CORPUS-PASS-206-OF-213-IN-ONE-SLOT-27NOV-relay.md"
   }
  ],
  "plan": "",
  "run": {
   "started": "21:17",
-  "ended": null,
-  "ended_how": null
+  "ended": "22:24",
+  "ended_how": "forced"
  }
 }

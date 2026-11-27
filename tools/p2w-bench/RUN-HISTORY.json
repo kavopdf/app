@@ -1,16 +1,5 @@
 [
  {
-  "started": "17:16",
-  "started_ts": 1795607202.1812255,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "agents": [],
   "attempts": 2,
   "class": "t12_word_invention",
@@ -779,5 +768,17 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "started_ts": 1795798010.8519251,
+  "started": "22:16",
+  "window_for_claim": 1795798010.8519251,
+  "ended_ts": null,
+  "ended": "(never)",
+  "attempts": 1,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
