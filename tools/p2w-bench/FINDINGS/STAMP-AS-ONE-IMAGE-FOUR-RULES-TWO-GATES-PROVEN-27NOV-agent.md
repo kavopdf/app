@@ -147,3 +147,39 @@ body text behind a stamp is meant to show through it. Making it opaque would be 
 **If a stamp ever carries a fill, this rule inverts for that stamp:** the filled interior must be
 opaque. No such stamp exists in the corpus, so that branch is unproven and must not be written until
 one appears - the same standing as the black-stamp fallback.
+
+## OPEN - the strokes come out 58 percent too heavy, and it is measured, not an impression
+
+All five rules were applied end to end to one real document, `312_affidavit_stamp_paper`, and exported
+from Google. What worked:
+
+    position        dx +0.4 pt, dy +0.0 pt
+    shape           the circle is a circle, the four corners of the box are transparent
+    nothing else    no body text, no foreign ink
+
+What did not:
+
+    ORIGINAL (vector)  core ink 17,893 px   ink mass 2,735,337
+    image version      core ink 28,233 px   ink mass 4,095,952     +58% ink
+
+The stamp's strokes are visibly heavier than the PDF's. Three attempts did not fix it:
+
+1. **300 DPI, binary alpha** - heavy and soft.
+2. **600 DPI, continuous alpha from colour distance** - heavy. Resolution was not the cause: the fringe
+   grew with the resolution, so the ratio stayed the same.
+3. **600 DPI, redact everything that is not the stamp, then let the PDF render it** - heavy. Partial
+   coverage dropped from 5.1 to 2.6 percent of pixels, and the ink mass did not move.
+
+Attempt 3 rules out the mask: with the mask gone and the PDF's own renderer doing the work, the result
+is the same weight. **So this is the vector-to-raster step itself.** A 1.2 pt stroke rasterised at any
+DPI, downsampled by Google's export, spreads over more pixels than the vector stroke does at the same
+display size, and reads heavier.
+
+**Do not claim a stamp is fixed while this is open.** Position, shape and isolation are proved; stroke
+weight is not. The next thing to try is not another DPI setting - it is either a threshold on the
+coverage that keeps the stroke's core width and discards the outer fringe, or accepting that a raster
+stamp is inherently a little heavier than the vector original and setting a tolerance on ink mass that
+a candidate must pass before it is accepted.
+
+What is ruled out, so it is not retried: 300 DPI, 600 DPI, binary alpha, continuous alpha, and
+redact-then-render. All five measured, all five +50 to +58 percent ink.
