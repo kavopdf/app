@@ -1,51 +1,63 @@
-# Text overlapping itself - the supplied file does not reproduce it, and its spacing is adequate
+# Text overlaps itself: the bug is measured, and the fix I proposed is disproved
 
-The user supplied `Z-07_2.docx` in response to the report. **It is not the document in the screenshot**, and
-its paragraph spacing is adequate, so it would not produce the overlap.
+The user supplied the real file. **The overlap is real**, and it is now measured rather than inferred from a
+screenshot. **The arithmetic fix I proposed earlier does not work** - it removes the overlap and breaks the
+layout. Both facts are below.
 
-## The file does not match the screenshot
+## The overlap, measured through a real Google export
 
-The screenshot's visible figures are `12000`, `6,857` and `6,54,40`. In `Z-07_2.docx`:
+Text line bounding boxes in the totals block, from `CLAMP-07.pdf` (the build of `Z-07.docx`):
 
-    12000  -> not found
-    6,857  -> not found
-    6857   -> not found
+    'Total job work charges'    y0 372.5   y1 385.2
+    'E. & O.E. Job work...'     y0 380.1   y1 391.1     starts 5.1 pt ABOVE where Total ends
+    'CGST @ 6%'                 y0 388.0   y1 399.0     starts 3.1 pt ABOVE where E.&O.E. ends
+    'SGST @ 6%'                 y0 402.6   y1 413.6
+    'Grand Total'               y0 427.5   y1 440.2
 
-Its totals block reads `2,81,120.00`, `16,867.20`, `16,867.20`, `3,14,854.40`. **Same template, different
-figures.** The file in the screenshot is still not in hand.
+**Two overlaps of 5.1 pt and 3.1 pt.** That is the defect the user circled, in numbers.
 
-## And in this file the spacing is sufficient, so it would not overlap
+## The fix I proposed, applied and measured
 
-The `<w:tc>` containing `Grand Total` holds four paragraphs:
+`w:line` raised to `font_size * 1.15 * 20`, `w:before` lowered by the same amount, so the advance
+`before + line` is unchanged. On this document, 78 paragraphs changed:
 
-    'Total job work charges 2,81,120.00'  8.5 pt  before 11.9 pt  line 0.6 pt  advance 12.5 pt
-    'CGST @ 6% 16,867.20'                 8.5 pt  before 12.4 pt  line 0.6 pt  advance 13.0 pt
-    'SGST @ 6% 16,867.20'                 8.5 pt  before 12.4 pt  line 0.6 pt  advance 13.0 pt
-    'Grand Total 3,14,854.40'             9.0 pt  before 24.4 pt  line 0.7 pt  advance 25.0 pt
+    'Total job work charges'   before 11.9 -> 2.8   line 0.6 -> 9.8   advance 12.5 -> 12.5
+    'CGST @ 6%'                before 12.4 -> 3.2   line 0.6 -> 9.8   advance 13.0 -> 13.0
+    'SGST @ 6%'                before 12.4 -> 3.2   line 0.6 -> 9.8   advance 13.0 -> 13.0
+    'Grand Total'              before 24.4 -> 14.1  line 0.7 -> 10.9  advance 25.0 -> 25.0
 
-**8.5 pt of text needs about 6.4 pt of vertical room. Every advance here is 12.5 pt or more.** The vertical
-position comes from `w:before`, which is correct; `w:line` only sets the box height. **So these four lines
-sit apart and do not print over each other.**
+**The arithmetic held exactly. And the render got worse:**
 
-**Four paragraphs in one cell is unusual but not itself the bug** - it is one cell holding a stacked totals
-block, which is a legitimate structure.
+    BEFORE  gaps between line tops:  7.6   7.9  14.6  24.9      1 page
+    AFTER   gaps between line tops:  5.3  18.5  33.1  43.1      2 pages
 
-## What this file does confirm
+**The overlap is gone and the document has grown to two pages.** CGST's gap went from 7.9 pt to 18.5 pt.
 
-**The clipping, with exact numbers.** `w:line="12"` with `w:lineRule="exact"` is a **0.6 pt** box around
-**8.5 pt** text. The glyph extends well outside the box and the part outside is clipped - the descender. That
-is `TEXT-CLIPPED-AT-THE-BOTTOM-EXACT-LINE-HEIGHT-27NOV-agent.md` reproduced here in a second document with
-the same figures.
+## Why it failed, and what that tells us
 
-## So the overlap remains unexplained, and unexplained is the honest state
+**Google does not advance by `before + line`.** If it did, changing the two while holding their sum constant
+would leave every gap untouched. The gaps changed by 10.6, 15.2 and 18.2 pt - so the renderer is using
+`before` and `line` in some other combination, and **the sum is not the quantity that matters.**
 
-Two candidates were proposed and neither survives this file:
+The measured `before` values before the fix were 11.9, 12.4, 12.4, 24.4 and the measured gaps were 7.6, 7.9,
+14.6, 24.9. **No constant offset relates the two.** Something else - the line box, the font's ascent, or a
+minimum the renderer applies - is contributing, and it has not been identified.
 
-- **identical `w:before` putting two paragraphs at one y** - the values here are 11.9, 12.4, 12.4, 24.4, which
-  are distinct and adequate
-- **a table grid narrower than its content** - this table's grid is
-  `639 1012 5137 988 1315 700` twips, six columns, and the cell holding the totals carries no `gridSpan` and
-  no `vMerge`
+**So the model behind the fix is wrong, not just its numbers.** Writing another formula against a renderer
+whose line-advance rule has not been established would be the sixth guess in this work.
 
-**Neither can be blamed without the actual document.** The next step is the file in the screenshot, not
-another hypothesis about it.
+## What has to be measured next, before any fix
+
+**One document, one paragraph, a controlled sweep.** Take a single paragraph with known `before`, `line`,
+`lineRule` and font size; vary one at a time; export through Google; record the y of the next line's top.
+That gives the renderer's actual advance rule as a table of measurements instead of an assumption.
+
+**Until that table exists, every fix to this is a guess.** Two have now been made - `exact` to `atLeast`,
+and the arithmetic - and both are recorded as wrong so neither is tried again.
+
+## What is confirmed and unchanged
+
+**The clipping is real and separate.** `w:line="12"` with `w:lineRule="exact"` is a 0.6 pt box around 8.5 pt
+text; the part of the glyph outside the box is cut, and that is the descender. Confirmed on two documents.
+**The overlap is a second symptom of the same `lineRule="exact"` construct, and it is not fixed by anything
+tried so far.**
