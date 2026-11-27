@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**27 Nov 2026 · slot 22:00 → running IST · 0 min**
+**27 Nov 2026 · slot 22:00 → running IST · 1h 08m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| Self-check | **every field agrees with its second source** |
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 1 code commit(s) in this window, first: FINDINGS: the gate is blocked by 84 real regress vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **61** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **+39.70%** — mean 6.15 → 3.71 |
 | Regressions | **none** |
@@ -26,8 +26,14 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **28** — improved, not fixed |
 | Classes solved | 0 of 40 clear — 40 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (63 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `63_table_rows` - taken from the pending list (61 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `63_table_rows` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 23:07 | **lead** | 0/None | GATE STATE, NOT A FIX: full 212-doc re-measurement on engine a05b20eb shows the commit gate refuses on 96 REAL regressions vs the 15 Nov baseline (84 on share@5, recomputed independently from the two |
 
 ## Why nothing moved, in this run's own words
 
@@ -35,6 +41,8 @@
 
 ### The run before this one said
 
+>
+>
 > Nothing was KEPT because the change is real but unlandable, and that is a gate verdict, not a diagnosis
 > problem.
 >
@@ -77,7 +85,7 @@
 
 | | |
 |:--|:--|
-| Measured | **2.0 h ago** |
+| Measured | **3.1 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -92,12 +100,29 @@
 
 | | |
 |:--|:--|
-| Slot window | 22:00 → running · 0 min |
+| Slot window | 22:00 → running · 1h 08m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 3 |
-| Silences over 2 min | 0 |
+| Tool beats | 152 |
+| Longest silence | **14.6 min** — from 22:00:01, after `pending.py: reading the pending gate` |
+| Silences over 2 min | 8 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| setup - claim, housekeeping, reading the gate | **4 min** | `#` |
+| fix - diagnose and change the engine | **4 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **47 min** | `###############` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| other - not attributed to a tool | **10 min** | `###` |
+
+The unattributed row is 5 distinct beat(s) that matched no phase. They said:
+
+- `corpus slice 2/4 for the gate`
+- `corpus slice 3/4 for the gate`
+- `corpus slice 4/4 for the gate`
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -110,7 +135,7 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

@@ -1,7 +1,7 @@
 {
  "agents": [],
- "attempts": 1,
- "class": "",
+ "attempts": 2,
+ "class": "63_table_rows",
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
