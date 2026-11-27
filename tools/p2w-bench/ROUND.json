@@ -17,10 +17,10 @@
       }
     ]
   },
-  "fixer_doing": "relay: pBdr construct refuted in LibreOffice, writing finding",
-  "fixer_doing_since": 1795752718.74591,
+  "fixer_doing": "relay: txt half - t12 root-caused on all 3 documents",
+  "fixer_doing_since": 1795752987.2516782,
   "fixer_engine_at_claim": "8fb4f503",
-  "fixer_last_beat": 1795752718.745911,
+  "fixer_last_beat": 1795752987.2516792,
   "fixer_started": 1795752748.188662,
   "history": [
     {
