@@ -17,11 +17,11 @@
       }
     ]
   },
-  "fixer_doing": "p2w.py: scoring balance-sheet-and-profit-los (8 in this pass)",
-  "fixer_doing_since": 1795820234.2070405,
+  "fixer_doing": "writing the report",
+  "fixer_doing_since": 1795820482.0177424,
   "fixer_engine_at_claim": "33863086",
-  "fixer_last_beat": 1795820234.207041,
-  "fixer_started": 1795820258.0735073,
+  "fixer_last_beat": 1795820482.0177429,
+  "fixer_started": 1795820368.0065424,
   "history": [
     {
       "at": "2026-11-12 09:46",

@@ -545,3 +545,5 @@
 {"_list": "agents", "_entry": {"id": "t09_A-01", "class": "t09_page_furniture", "angle": "A", "question": "is the 125 single-char present a TxtWriter line-assembly defect or a t09 band asymmetry - census every one of the .txt single-character lines against the drawn line it came from", "expected": "19:45", "deployed": "20:47", "status": "running", "finding": "", "deployed_at": "2026-11-26T20:47"}}
 {"_list": "notes", "_entry": {"at": "22:12", "text": "attempt 94 on 18_displacement -> lead (0/208 moved)"}}
 {"_list": "notes", "_entry": {"at": "22:14", "text": "agent deployed: 18_displacement / A - find the single construct behind the displaced runs on the 25 documents that fai"}}
+{"_list": "notes", "_entry": {"at": "22:14", "text": "measured aa496ebe across 208 of 212: newsletter 0.20->86.30, 600 54.30->62.46, itr-computation 42.33->9.10 - regression, engine unstamped"}}
+{"_list": "notes", "_entry": {"at": "23:19", "text": "agent deployed: commit_gate / A - which clause of aa496ebe moves itr-computation and can it be split from the news"}}

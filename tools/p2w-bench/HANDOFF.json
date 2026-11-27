@@ -273,6 +273,32 @@
    "finding": "FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md",
    "deployed_at": "2026-11-28T03:41",
    "landed_at": "2026-11-28T03:41"
+  },
+  {
+   "id": "18prize-01",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "which documents would become CLEAN if 18_displacement passed, and what single engine rule claims the most of them",
+   "expected": "04:15",
+   "deployed": "04:05",
+   "status": "landed",
+   "finding": "FINDINGS/18prize-01-18-DISPLACEMENT-PRIZE-CENSUS-28NOV-agent.md",
+   "deployed_at": "2026-11-28T04:05",
+   "landed_at": "2026-11-28T04:12",
+   "result": "108 documents fail 18_displacement; 18 are solo (would be clean if it passed); 28 are solo plus exactly one other (12 with 60_text_column_right_edge, 10 with 59_shape_anchor); leverage 46.56 reproduces classpick.py. All 18 solos are single-page bad_pages [0], which rules out the page-break w:before construct for them; 12 carry a rigid offset, 6 a per-run tail."
+  },
+  {
+   "id": "61rank-02",
+   "class": "18_displacement",
+   "angle": "B",
+   "question": "among the 61 genuine losses, which single Google check would clean the most of them",
+   "expected": "04:35",
+   "deployed": "04:31",
+   "status": "landed",
+   "finding": "FINDINGS/61rank-02-SIXTY-ONE-LOSSES-RANKED-BY-CHECK-28NOV-agent.md",
+   "deployed_at": "2026-11-28T04:31",
+   "landed_at": "2026-11-28T04:32",
+   "result": "18_displacement fails 47 of the 61 and is the only failing check on 13 of them; no other check is worth more than 3. 60_text_column_right_edge 3, 26_text_overlap 1. Sub-construct B (the rung) is closed as a revert, so the 13 are A (LINE_BASE 0.8 vs Google 0.31 em) and C (afterTablePt/edgeGap) territory."
   }
  ],
  "history": [
@@ -377,12 +403,8 @@
    "plan": ""
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. ",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "23:19",
-   "text": "agent deployed: commit_gate / A - which clause of aa496ebe moves itr-computation and can it be split from the news"
-  },
   {
    "at": "01:12",
    "text": "agent deployed: triage / A - which of the 113 failing checks buys the most clean documents, with the converte"
@@ -618,6 +640,10 @@
   {
    "at": "04:27",
    "text": "attempt 6 on 63_table_rows -> lead"
+  },
+  {
+   "at": "04:29",
+   "text": "attempt 7 on 63_table_rows -> lead"
   }
  ],
  "plan": "",

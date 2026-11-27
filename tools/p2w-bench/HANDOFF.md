@@ -9,14 +9,14 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 03:07 |
-| ended | 03:27 |
-| how it ended | forced |
+| started | 04:00 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
@@ -52,8 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `14:42` attempt 21 on t01_word_accuracy -> lead (0/3 moved)
-- `15:24` attempt 108 on 18_displacement -> lead
 - `16:43` attempt 109 on 18_displacement -> lead
 - `16:45` agent deployed: 18_displacement / small-dy cluster of 15 - which code site places a run's baseline, and is the small dy an ascent artefact 
 - `16:45` agent deployed: txt / form-feed lead - is _txt_lines dropping page separators, and how many documents does it clear
@@ -77,6 +75,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `03:41` agent deployed: commit_gate / B - is the gate's 84 a real quality loss or an inflated count - baseline provenance,
 - `03:41` agent landed: row_rung / A -> FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md
 - `03:41` agent landed: commit_gate / B -> FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md
+- `04:27` attempt 6 on 63_table_rows -> lead
+- `04:29` attempt 7 on 63_table_rows -> lead
 
 ## Where the rest of the state lives
 
