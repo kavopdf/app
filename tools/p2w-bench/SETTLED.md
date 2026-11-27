@@ -404,3 +404,92 @@ change on that verdict.
 **Settled:** `screen.py` sets `p2w.ENGINE_SRC = REPO` beside `p2w.REPO`. Verified 22 Nov: 0 of 2
 measured before, 2 of 2 after, with no environment variable set. If a screen ever reports
 "0 of N measured" again, check that `p2w.ENGINE_SRC` resolves to the tree before believing it.
+
+## Stamps: separate by object identity, not by colour. Five colour masks are dead.
+
+Full detail: `FINDINGS/STAMP-GENERAL-METHOD-OBJECT-IDENTITY-NOT-COLOUR-27NOV-agent.md`.
+
+A stamp sits **on top of** body text, so both paint the same pixels, and the result is a blend that records
+nothing about how much of each contributed. **No colour test can undo that** - not distance, not saturation,
+not a residual, not an ordering test. Five were built and measured and every one failed differently:
+
+1. colour distance plus a saturation floor - discarded pale lettering entirely
+2. coverage only - **the whole black body text came through at full alpha**
+3. residual to the paper-to-ink line - left a pale ghost
+4. plus a small absolute saturation floor - cleaned two documents, not the third
+5. plus rejecting anything darker than the pure ink - **punched holes in the stamp's own letters**
+
+**Settled:** render the stamp from its **own objects** onto a blank page. The body text is not on that page,
+so nothing can blend, and the stamp comes out complete and alone **by construction** rather than by
+threshold. It is colour-blind, so it holds for black stamps, multi-colour, semi-transparent, any shape, and
+stamps that are already raster or are glyphs with no border.
+
+**Do not build a sixth colour mask.** Measured, dead, recorded so no run spends itself rediscovering it.
+
+## Stamps: the rect is the ink box, not the stroke's centre path
+
+`get_drawings()` returns `rect` as the bounding box of the stroke's **centre path**. The ink extends half the
+stroke width beyond it on every side. Measured:
+
+    06  stamp rect 147.62x114.13   rendered ink 152.64x119.16   error +5.02   stroke 4.89
+    07  stamp rect 159.71x82.89    rendered ink 161.28x84.48    error +1.57   stroke 1.44
+
+**The error equals the stroke width, exactly.** Every size deficit measured on these documents was this:
+-4.6 and -5.0 on 06 against a stroke of 4.89, -3.4 on 02 against 1.67, -2.2 on 07 against 1.44.
+
+**Settled:** `SR = SR expanded by (max_stroke_width / 2)` on every side, then place the image at that rect
+with that rect's size. After the fix the render matches the rect within **0.09, 0.12, 0.02 and 0.15 pt** on
+01, 02, 06 and 07. Self-correcting crop-and-stretch was tried first and **made 06 worse** - do not use it.
+
+## Stamps: colour cannot locate one. Three discriminators measured, three dead.
+
+- **Rarity** - stamp colour counts run 2 to 5, body colour counts run 4 to 32. **Ranges overlap completely.**
+  On `15_stamp_on_scanned_page` and `43_red_stamp_over_black_text` the stamp's colour **is** the most common
+  colour on the page.
+- **Saturation** - 312's body text is `(0.25,0.25,0.55)` at 0.30 against a stamp at `(0.48,0.12,0.12)` at
+  0.36. Six hundredths apart.
+- **Overlap** - 7 of 15 stamps overlap any body text against 5 of 16 non-stamps; **eight of fifteen stamps
+  overlap nothing.**
+
+**Settled:** the locator must be **geometric**. Rotated text spans find the stamp on **14 of 16**; the page
+carrying an image finds `10_stamp_as_image`; a closed tall path finds `12_stamp_across_page_break`. **16 of
+16 located, 15 renderable** (12 is one stamp drawn across a page boundary, at y -16.4 on page 1).
+
+**But the locator has false positives and the count is NOT 52.** Across 213 documents it returns 31 + 12 + 9
+= 52 candidates, and the lists include `table-with-rotated-header`, `60_page_border`,
+`one-page-rotated-180-degrees`, prescription photographs and coloured callout boxes. **The corpus has 16
+documents with a stamp.** Reporting 52 would be reporting rotated content, not stamps.
+
+## Stamps: opacity is measured inside the glyphs, not inside the span box
+
+`get_texttrace()` returns `alpha=None` for every span, so the PDF's text alpha is not available from the API.
+It has to be measured from the render as coverage along the paper-to-ink line.
+
+**Measured inside the span's bounding box it is wrong**, because the box is mostly background: 07 came out
+0.88 when its text is fully opaque. **Measured inside the glyphs** - the median of covered pixels, clamped to
+1.0 above 0.85 - the answer is right.
+
+**Settled:** 06's `PAID` is genuinely **0.55** (a semi-transparent stamp), and every other stamp text is
+**1.0**. Peak coverage p90 and max are 1.00 on all four test documents.
+
+## Stamps: position and size are inside 1 pt on four documents, through a real Google export
+
+    01  +0.0, +0.0   size -0.2, +0.0      exact
+    02  +0.2, +0.2   size -0.7, -0.2
+    06  +0.5, +0.2   size -1.0, -0.5      PAID at its true 0.55, ink -5%
+    07  +0.2, +0.2   size -0.2, -0.5
+
+**And the measurement that produced "+4.6" and "+3.8" earlier was wrong, not the placement.** The .docx
+anchor is the ink box to the hundredth of a point on all three. The error was a colour tolerance of 120
+catching neighbouring ink and growing the bounding box - at tolerance 60 both documents read +0.2, +0.2.
+
+**Settled:** measure the stamp with a **tight** colour tolerance, or the window grows and the number lies.
+Every geometry "failure" in this work was the stamp measured with a window that included what was not the
+stamp.
+
+## Stamps: the engine should copy the operators, not reconstruct
+
+Reconstruction from `get_drawings()` and `get_text()` has now lost three things the API does not hand over:
+**the text's alpha**, **the exact stroke cap and join**, and **the font metrics**. Each cost a run to
+discover. Copying the stamp's operators into a fresh page loses nothing - that is the engine's job and it is
+not to be done by rebuilding the stamp from the XML.
