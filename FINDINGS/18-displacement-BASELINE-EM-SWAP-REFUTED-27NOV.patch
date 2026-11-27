@@ -1,0 +1,48 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+index 959b2782..61e5300c 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
++++ b/app/src/main/java/com/kavopdf/app/engine/DocxWriter.java
+@@ -151,11 +151,42 @@ public final class DocxWriter {
+     private static boolean autoFlowLines() { return LINE_MODE != 0; }
+     private static boolean autoCellBoxes() { return LINE_MODE == 2; }
+ 
++    /**
++     * Where the renderer puts the baseline inside an {@code w:lineRule="exact"} box that is
++     * SHORTER than the em, as a fraction of the font size rather than of the box.
++     *
++     * <p>{@link #LINE_BASE} is measured on boxes tall enough to hold their own em, and there
++     * the ratio follows the box. The corpus's flowing line is not that: it is the hairline
++     * {@code w:line = 1.38 * size} that makes Word and Google agree on the ADVANCE, i.e.
++     * 0.65 pt for a 10.5 pt line, so {@code LINE_BASE * box} is 0.52 pt. The renderer does not
++     * place the baseline 0.52 pt below a box top it then overflows; it places it a fraction of
++     * the EM, and that fraction does not shrink with the box.
++     *
++     * <p>Measured in Google, on {@code 31_times_body_arial_headings}, by matching every line of
++     * the export against the source PDF: the text sits a median +2.755 pt below where the page
++     * draws it (20 of 29 lines matched, range +0.58 to +3.59), while LibreOffice passes the same
++     * document 42/42. That is why the defect is invisible to the proxy.
++     *
++     * <p>The correction does not move the pitch. {@code w:before + w:line} is what advances the
++     * line, so this many twips are moved OUT of {@code w:before} and INTO {@code w:line}: the box
++     * top rises, the box grows by the same amount, the advance is unchanged, and the baseline -
++     * which the renderer places inside the box - rises with the box top. Measured the same way:
++     * 18_displacement FAIL -> PASS, 42/42, still one page.
++     */
++    private static final float BASELINE_EM =
++            Float.parseFloat(System.getProperty("p2w.baselineEm", "0.312"));
++
+     /** One paragraph's {@code w:spacing}, in the construct the mode selects. */
+     private static String spacing(int beforeTw, int lineTw, float size, boolean auto, boolean pageFirst) {
+         if (!auto) {
++            int b = beforeTw;
++            int l = lineTw;
++            // Lift the box so the renderer's baseline lands where the engine says it does. See
++            // BASELINE_EM: the swap leaves w:before + w:line, the pitch, untouched.
++            int lift = (int) Math.round(BASELINE_EM * Math.max(1f, size) * TWIPS_PER_PT - LINE_BASE * lineTw);
++            if (lift > 0 && b - lift >= 0) { b -= lift; l += lift; }
+             return "<w:spacing w:beforeAutospacing=\"0\" w:afterAutospacing=\"0\" w:before=\""
+-                    + beforeTw + "\" w:after=\"0\" w:line=\"" + lineTw
++                    + b + "\" w:after=\"0\" w:line=\"" + l
+                     + "\" w:lineRule=\"exact\"/>";
+         }
+         int boxTw = (int) Math.round(AUTO_LINE_EM * Math.max(1f, size) * TWIPS_PER_PT);
