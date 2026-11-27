@@ -8741,3 +8741,14 @@
 {"t": 1795749517.2344303, "ist": "08:48:37", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795749517.5836334, "ist": "08:48:37", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795749518.0676982, "ist": "08:48:38", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795750652.617441, "ist": "09:07:32", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795750653.915788, "ist": "09:07:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795750655.5905106, "ist": "09:07:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795750657.3529863, "ist": "09:07:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795750663.8835802, "ist": "09:07:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795750670.6669068, "ist": "09:07:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795751145.185427, "ist": "09:15:45", "ev": "beat", "d": "two audits in; taking 60_text_column_right_edge, right tab stop"}
+{"t": 1795751487.4800045, "ist": "09:21:27", "ev": "beat", "d": "compiling right-edge tab change"}
+{"t": 1795751768.9895458, "ist": "09:26:08", "ev": "beat", "d": "right tab measured: honoured to 2.5pt, but splits the line in extraction; storing control row"}
+{"t": 1795751854.1136146, "ist": "09:27:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795751856.9773424, "ist": "09:27:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
