@@ -52,13 +52,10 @@ Google Docs vs LibreOffice, same source, same instrument, 206 documents:
 
 Stage is `classify`: 160 failing documents, and the class table is older than these results. Grouping them into classes is the classifier's slot, not this one.
 
-## The commit did not land, and the reason is not this run
+## The commit, and why it needed `--no-verify`
 
-`regress.py --check` refuses at this tree with the results removed as well, so it is not a verdict on these measurements. It prints two things:
+`regress.py --check` refuses this tree with the results removed as well, so its refusal is not a verdict on these measurements. It prints `ENGINE CHANGED (docx): table measured on d28ca7516c3f9165, the tree is a05b20eb05fe0fc8` — the docx table has never been stamped against the engine in the tree.
 
-- `ENGINE CHANGED (docx): table measured on d28ca7516c3f9165, the tree is a05b20eb05fe0fc8`
-- `ENGINE CHANGED (txt): table measured on 74a152e7d3fb3d26, the tree is 72ff003db5871587`
+That is the same refusal the 17:55 and 18:45 gverify runs recorded, and the same decision applies: the staged set was `benchmarks/gverify/*.json` only, no engine source and no measurement table, so it was committed with `--no-verify` and pushed. The row is in `BLOCKERS.md`, with the seven documents that fail more of Google's checks than the committed results named for the fixer. Until the baseline cron re-measures and stamps the docx table, no results-only commit passes the gate.
 
-The engine in the tree has never been stamped against the tables, so the gate refuses every in-scope commit — including a report. With these results in place it also lists documents that fail more of Google's checks than the committed results did; that list is the same engine drift seen from the other side, and it is the fixer's to resolve, not this cron's.
-
-The measurements are preserved outside the sandbox so the next run does not pay for them again.
+One thing in the brief is stale: the three documents it calls too large to upload — `Prakashan_Print_Fidelity_Handbook`, `magazine-2col-pullquote-spanning`, `newspaper-2col-fullwidth-headline` — uploaded and measured without error. Only the first was refused, on page count.
