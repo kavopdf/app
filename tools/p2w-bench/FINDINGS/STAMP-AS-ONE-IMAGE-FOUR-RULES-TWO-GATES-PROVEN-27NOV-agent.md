@@ -148,7 +148,7 @@ body text behind a stamp is meant to show through it. Making it opaque would be 
 opaque. No such stamp exists in the corpus, so that branch is unproven and must not be written until
 one appears - the same standing as the black-stamp fallback.
 
-## OPEN - the strokes come out 58 percent too heavy, and it is measured, not an impression
+## WITHDRAWN - the stroke-weight issue below was a measurement artefact, see CORRECTION 2, and it is measured, not an impression
 
 All five rules were applied end to end to one real document, `312_affidavit_stamp_paper`, and exported
 from Google. What worked:
@@ -231,3 +231,43 @@ Every attempt to decide "which textbox is the stamp" by guessing - by count, by 
 whether words appear inside a textbox, by picking the first one - has been wrong. The rule above works
 because it asks the PDF where the stamp is and then takes **everything** inside that rectangle, rather
 than trying to recognise a stamp by what it looks like.
+
+## CORRECTION 2 - there was no stroke-weight problem. Both ink figures were counting leftovers.
+
+After the correction above I rebuilt the document and the user opened it again. There were still two
+seals: one with text, and **one that was an empty circle**. The empty circle was the original seal's two
+border shapes, which my removal had missed because it only looked for textbox anchors.
+
+Measured: of the 30 anchors inside the stamp rect on `312_affidavit_stamp_paper`, **28 are textboxes
+(one per letter) and 2 are shapes (the outer and inner circle)**. I had removed the 28 and left the 2.
+
+Removing all 30 and measuring again on the same page at the same 150 dpi:
+
+    original PDF          4,828 navy px
+    first build           6,415   (the two border shapes were still there)
+    corrected build       4,337   - 10 percent BELOW the original, not above it
+
+**So the stroke-weight problem recorded in the open issue above does not exist.** Both the 58 percent
+and the 33 percent were the same mistake twice: I measured a page that carried extra objects and
+attributed the extra ink to stroke weight. The image's ink is within 10 percent of the vector
+original, on the low side.
+
+The open issue is withdrawn. The three attempts recorded there - 300 DPI, 600 DPI, redact-then-render -
+were not wrong to try, but none of them was ever going to move a number that was being inflated by
+objects that should not have been on the page at all.
+
+**Rule 6, corrected, and this is the whole of it:**
+
+> Every anchor whose rect lies inside the stamp's rect in the PDF belongs to the stamp - **textbox,
+> shape or picture, every kind**. Remove all of them, then place one image.
+
+On 312 that is 30 anchors (28 textbox + 2 shape). On `01_stamp_rotated_15deg_upright` it is one. The
+kind does not matter; the position inside the stamp's rect is the whole test.
+
+## The pattern, said plainly
+
+Three numbers in a row - 58, 33, then the truth - were each printed against a thing they did not
+describe. The first two were not measurement errors in the arithmetic; they were measurements of the
+wrong object, and the wrong object was there because the previous fix had left it behind. **A number is
+only as good as the page it was taken from.** Before measuring a change, check that the page holds
+nothing but the change.
