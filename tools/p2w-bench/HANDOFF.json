@@ -601,6 +601,10 @@
   {
    "at": "19:56",
    "text": "attempt 22 on t01_word_accuracy -> kept (3/6 moved)"
+  },
+  {
+   "at": "20:52",
+   "text": "attempt 114 on 18_displacement -> lead (1/2 moved)"
   }
  ],
  "plan": "",

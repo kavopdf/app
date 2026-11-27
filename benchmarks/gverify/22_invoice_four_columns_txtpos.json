@@ -2,7 +2,7 @@
  "name": "22_invoice_four_columns_txtpos",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-27T12:26:20",
+ "at": "2026-11-27T15:23:20",
  "passed": 41,
  "total": 42,
  "failed": [
@@ -17,6 +17,6 @@
   ],
   "runs_matched": 71
  },
- "engine": "a05b20eb05fe0fc8",
- "checks": "377699-1795780738"
+ "engine": "f4ce54f257d15f1c",
+ "checks": "377699-1795790091"
 }

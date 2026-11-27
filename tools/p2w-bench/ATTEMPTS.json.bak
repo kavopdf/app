@@ -300,20 +300,9 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 112,
+  "attempts": 113,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-26 22:11",
-    "changed": {
-     "files": [],
-     "last_engine_commit": "18_displacement: the page-top gap moves from w:before into w:pgMar w:top"
-    },
-    "moved": 0,
-    "outcome": "lead",
-    "reason": "aa496ebe re-measured across 208 of 212: newsletter 0.20->86.30, 600 54.30->62.46, but itr-computation 42.33->9.10 - a 33pt regression, so the engine stays unstamped and the gate stays closed",
-    "total": 208
-   },
    {
     "at": "2026-11-27 02:11",
     "changed": {
@@ -522,6 +511,17 @@
     "outcome": "lead",
     "reason": "cell-before shortfall: patch reaches the XML (w:before 170->136 tw on 74_balance_sheet, 317->254 on bus-timetable) but screen.py on 10 docs shows share5/median_pt/p90_pt identical - share5's 5px thres",
     "total": null
+   },
+   {
+    "at": "2026-11-27 19:39",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "cell-before patch measured in Google on the 3 only-18 documents: 74_balance_sheet 41/42 -> 42/42 (dy 1.5->0.6); bus-timetable 18 fixed but gains 46_text_crossing_rule; 72_bank_statement dy -1.0 -> -3.",
+    "total": null
    }
   ],
   "last": null,
@@ -639,6 +639,7 @@
    "lead",
    "kept",
    "kept",
+   "lead",
    "lead"
   ],
   "park_reason": "no progress in the last 12 attempts (lead, lead, lead, lead, reverted, lead, lead, reverted, reverted, lead, lead, lead)",
@@ -646,7 +647,7 @@
   "pending_moved": 37,
   "ratchet_at": "27 Nov 07:44",
   "ratchet_docs": 213,
-  "reason": "cell-before shortfall: patch reaches the XML (w:before 170->136 tw on 74_balance_sheet, 317->254 on bus-timetable) but screen.py on 10 docs shows share5/median_pt/p90_pt identical - share5's 5px threshold is blind to a 1.7-3.15 pt shift and LibreOffice does not lay the cell line out from w:before. Patch in PATCHES/18-small-dy-cellbefore.patch, not landed. Settling measurement: Google render of 74_balance_sheet at HEAD vs patched.",
+  "reason": "cell-before patch measured in Google on the 3 only-18 documents: 74_balance_sheet 41/42 -> 42/42 (dy 1.5->0.6); bus-timetable 18 fixed but gains 46_text_crossing_rule; 72_bank_statement dy -1.0 -> -3.0 (worse). Net -1, not landed. See FINDINGS/18-cellbefore-GOOGLE-27NOV-relay.md",
   "reasons": [
    "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 pt mark, Google does not implement lineRule=exact and buys a fraction of it. Applied it (w:before=spacerTw, w:line=1) and measured bank-statement-5-pages through Drive: GOOGLE 40/47 -> 36/47, WORSE, and 27_text_off_page went 0 -> 12 as the extra space overflowed the page. LibreOffice unchanged at 47/47. The reason it cannot work: the spacer is NOT where the 57 pt comes from. Counted in the emitted docx, bank-statement-5-pages carries 9 spacers totalling 81.0 pt across 5 pages, max 16.2 pt - at most 16 pt per page against a measured uniform upward shift of 56.9-57.1 pt on pages 1-4. Forcing the full gap in therefore adds space the page never had and pushes rows off it.",
    "ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 pt - the paper's top edge), while LibreOffice places it at 56.80. The engine emits exactly that construct: bank-statement-5-pages carries w:before=1103 twips (55.15 pt) on the first paragraph of each page, and the measured Google dy on its pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Same number. The probe also found the construct Google DOES honour at a page top: a 1x1 table row with w:trHeight hRule=exact, 55.83 pt of 55.15 asked, exact in LibreOffice. Ruled out with numbers: the table-spacer paragraph (at most 16.2 pt per page against a 57 pt shift, and moving its gap into w:before took Google 40/47 -> 36/47, LO unchanged - reverted), w:line exact (LO honours it, so it cannot split the two renderers), auto line boxes (face-dependent in both). Next run: emit the page-first gap as a trHeight-exact table row and set that paragraph's w:before to 0. FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md has the probe table.",
@@ -756,7 +757,8 @@
    "table-with-no-header-row: the charge is a per-row PITCH RAMP (source 18.4pt, render 17.9pt, 0.44pt/row, 0.7->12.0pt over 27 rows), not the constant offset med_dy reports; and worst_dy 101.4 is the check's greedy assignment claiming one source row's cells at three render rows 5.5 rows apart. Declared trHeight is already exact; LINE_BASE's whole lever is <=0.52pt. No engine change can be validated in-slot because the only renderer that sees this cluster (Google) has no cached export on the pod.",
    "18_displacement scored the bbox top (origin minus the rendered face's ascent), so dy was baseline difference + ascent difference. runs() now also publishes roy (origin in reading space) and 18 scores/reports it; ry untouched. Measured on 12 live Google renders with HEAD's instrument and the patched one on the same PDF: 31_times_body_arial_headings 18 FAIL (med +2.6) -> PASS (med +0.9), 41/42 -> 42/42 clean; no new failure on any of the 12, including the six passing-18 documents with the smallest margin (07/312/364/393/09/06). The other four sole-18 documents tested carry a real baseline shift of -3.1 to +6.3 pt, confirmed by a second implementation that reads span origins directly. FINDINGS/18dA-06-ORIGIN-NOT-BBOX-ONE-DOCUMENT-AND-FOUR-REAL-1730-relay.md",
    "engine writes a single-line cell at its row height; 362 and 16 both 41/42 -> 42/42 in Google",
-   "cell-before shortfall: patch reaches the XML (w:before 170->136 tw on 74_balance_sheet, 317->254 on bus-timetable) but screen.py on 10 docs shows share5/median_pt/p90_pt identical - share5's 5px threshold is blind to a 1.7-3.15 pt shift and LibreOffice does not lay the cell line out from w:before. Patch in PATCHES/18-small-dy-cellbefore.patch, not landed. Settling measurement: Google render of 74_balance_sheet at HEAD vs patched."
+   "cell-before shortfall: patch reaches the XML (w:before 170->136 tw on 74_balance_sheet, 317->254 on bus-timetable) but screen.py on 10 docs shows share5/median_pt/p90_pt identical - share5's 5px threshold is blind to a 1.7-3.15 pt shift and LibreOffice does not lay the cell line out from w:before. Patch in PATCHES/18-small-dy-cellbefore.patch, not landed. Settling measurement: Google render of 74_balance_sheet at HEAD vs patched.",
+   "cell-before patch measured in Google on the 3 only-18 documents: 74_balance_sheet 41/42 -> 42/42 (dy 1.5->0.6); bus-timetable 18 fixed but gains 46_text_crossing_rule; 72_bank_statement dy -1.0 -> -3.0 (worse). Net -1, not landed. See FINDINGS/18-cellbefore-GOOGLE-27NOV-relay.md"
   ],
   "requeues": 0,
   "status": "PARKED"
@@ -1913,16 +1915,9 @@
   "status": "OPEN"
  },
  "t01_word_accuracy": {
-  "attempts": 21,
+  "attempts": 22,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-20 21:22",
-    "moved": 3,
-    "outcome": "kept",
-    "reason": "CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words wel",
-    "total": 10
-   },
    {
     "at": "2026-11-20 21:46",
     "moved": 0,
@@ -2063,12 +2058,23 @@
     "outcome": "lead",
     "reason": "t01's whitespace token unit charges the source's own bidi and letter-spacing extraction artefacts as lost words: 77_arabic_rtl_document and 39_small_caps_letter_spacing carry every alphanumeric charac",
     "total": 3
+   },
+   {
+    "at": "2026-11-27 19:56",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": 3,
+    "outcome": "kept",
+    "reason": "reader fault, not writer fault: t01 charged a regrouped word as lost text (zero character deficit) and t02 read the span bbox left edge instead of the first inked glyph. 205->208 of 214 .txt clean, 0 ",
+    "total": 6
    }
   ],
   "last": null,
-  "last_engine": "8fb4f503",
-  "last_moved": 0,
-  "last_total": 3,
+  "last_engine": "33863086",
+  "last_moved": 3,
+  "last_total": 6,
   "outcomes": [
    "reverted",
    "kept",
@@ -2090,11 +2096,12 @@
    "kept",
    "reverted",
    "reverted",
-   "lead"
+   "lead",
+   "kept"
   ],
   "ratchet_at": "20 Nov 21:49",
   "ratchet_docs": 4,
-  "reason": "t01's whitespace token unit charges the source's own bidi and letter-spacing extraction artefacts as lost words: 77_arabic_rtl_document and 39_small_caps_letter_spacing carry every alphanumeric character the source carries (546/546 and 930/930, 0 missing, 0 extra) yet score 92.1 and 97.4. FINDINGS/T01-WHITESPACE-TOKEN-CHARGES-SOURCE-EXTRACTION-ARTEFACTS-27NOV-fixer.md. The corpus-wide pass->fail/fail->pass count that would justify changing the check did not fit this slot.",
+  "reason": "reader fault, not writer fault: t01 charged a regrouped word as lost text (zero character deficit) and t02 read the span bbox left edge instead of the first inked glyph. 205->208 of 214 .txt clean, 0 newly failing; proved by paired A/B, restamp_txt.py blind, and test_txt_checks 8/8",
   "reasons": [
    "claimed. t01_word_accuracy (.txt half, 10 documents). Failing: 041122-Account_Opening_Form, Account_Opening_Form_Fillable_filled, 38_faux_bold_italic_synthesised, 391_survey_questionnaire_grid, 39_small_caps_letter_spacing, 406_passport_mrz_page, 411_nested_xobject_transforms, 601_fillable_admission_form, 77_arabic_rtl_document, 79_inr_indian_digit_grouping_table. Check is 'source words all present >= 98%', so the .txt is dropping words the page drew.",
    "CONTROL-CHAR TOKENISATION in verify_txt.py _words(). A PDF that declares U+0000 for a glyph with no Unicode of its own (a space between two words, a bullet, an empty MRZ cell) had its source words welded to those NULs by r'\\S+', so 'Strongly\\x00agree' and '\\x00\\x00\\x00\\x00PHOTOGRAPH' were single tokens no .txt can ever contain, and t01 charged each one as lost text. _words now splits on control characters instead of treating them as word characters. Measured: 79_inr_indian_digit_grouping_table 91.9 -> 100.0 (9/10 -> 10/10 checks), 391_survey_questionnaire_grid 97.5 -> 100.0 (5/7 -> 7/7), 406_passport_mrz_page 98.5 -> 100.0 (5/7 -> 7/7); all three now PASS every applicable txt check. t12 improved on 391 and 406 for the same reason - a NUL token was counted as an invented word. Scanned all 213 documents with glyph_truth: exactly 6 declare a control character inside a source token, and the other three (balance-sheet-and-profit-loss, 392_statistical_console_output, balance-sheet-two-columns-of-figures) still PASS t01. The change only removes source tokens and adds none, so no document can regress. test_txt_checks.py 8/8.",
@@ -2116,7 +2123,8 @@
    "doubled draw, both sides: 38_faux_bold_italic_synthesised fully clean (t01+t07 dropped); corpus 188->189, 0 regressions, 1 of 213 txt changed, 213 docx content identical",
    "DUPLICATE, not a second fix. The relay claimed the slot at 14:11 and picked the same lead the :50 run landed at 14:21 (d2ea491, TEXT_MEDIABOX_CLIP). Found on the push: the commit was already on main. This run did not land it and takes no credit for it - the 411/12_stamp movement belongs to d2ea491. What this run adds is the independent confirmation (a second build, a second harness, 211 documents, same 2 rows, same direction) and the class table that commit left stale: DEFECT-CLASSES-TXT.md still said t01 5 / t12 9 / 25 failing, now 3 / 8 / 24, regenerated from the committed ranking. And two writer changes the agents killed: 39 gs=sizePt->size 97.4->78.8 and 38 dedupe window 40->200 98.0->93.0; the position-aware dedupe that DID clear 38 (2d44a3a) is the version the agent called defensible.",
    "t01 on the whitespace-stripped character multiset at zero tolerance: measured over all 213 .txt, clears 39 and 77 but fails 6 documents, 205 -> 201 clean. 99 percent char recall would additionally silence 601's real 2-char checkbox loss. FINDINGS/t01-CHARACTER-UNIT-REFUTED-205-TO-201-27NOV-relay.md",
-   "t01's whitespace token unit charges the source's own bidi and letter-spacing extraction artefacts as lost words: 77_arabic_rtl_document and 39_small_caps_letter_spacing carry every alphanumeric character the source carries (546/546 and 930/930, 0 missing, 0 extra) yet score 92.1 and 97.4. FINDINGS/T01-WHITESPACE-TOKEN-CHARGES-SOURCE-EXTRACTION-ARTEFACTS-27NOV-fixer.md. The corpus-wide pass->fail/fail->pass count that would justify changing the check did not fit this slot."
+   "t01's whitespace token unit charges the source's own bidi and letter-spacing extraction artefacts as lost words: 77_arabic_rtl_document and 39_small_caps_letter_spacing carry every alphanumeric character the source carries (546/546 and 930/930, 0 missing, 0 extra) yet score 92.1 and 97.4. FINDINGS/T01-WHITESPACE-TOKEN-CHARGES-SOURCE-EXTRACTION-ARTEFACTS-27NOV-fixer.md. The corpus-wide pass->fail/fail->pass count that would justify changing the check did not fit this slot.",
+   "reader fault, not writer fault: t01 charged a regrouped word as lost text (zero character deficit) and t02 read the span bbox left edge instead of the first inked glyph. 205->208 of 214 .txt clean, 0 newly failing; proved by paired A/B, restamp_txt.py blind, and test_txt_checks 8/8"
   ],
   "requeues": 0,
   "status": "OPEN"

@@ -1,30 +1,5 @@
 [
  {
-  "agents": [
-   "Expl-01"
-  ],
-  "attempts": 1,
-  "docs_improved": 0,
-  "ended": "(never)",
-  "ended_ts": null,
-  "kept": 0,
-  "started": "11:24",
-  "started_ts": 1795586076.2526999,
-  "class": "content-present-partly-displaced",
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
-  "started": "12:13",
-  "started_ts": 1795589015.5087528,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "started": "14:17",
   "started_ts": 1795596463.152636,
   "ended": "(never)",
@@ -796,5 +771,27 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "20:09",
+  "started_ts": 1795790345.6860926,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "20:09",
+  "started_ts": 1795790381.3258214,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
