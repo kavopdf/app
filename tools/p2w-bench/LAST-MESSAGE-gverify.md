@@ -1,34 +1,43 @@
-# P2W Google Verify - Run Report
+**gverify run — 27 Nov 2026**
 
-**27 Nov 2026 · 10:09 IST · stage measure-google**
+Stage: `measure-google`. The corpus is 213 documents; 212 now have a Google result — 211 scored, 1 refused on page count. 1 document is left.
 
-> 205 of 213 measured in Google, 8 refused on page count. Google passes every check on 44; LibreOffice on 135 of the same 205.
+The corpus had to be rebuilt first: this pod started with 42 of the 213 `.docx` converted, so the run finished the remaining conversions before it could measure anything.
 
-This run rebuilt the corpus on a cold pod, took the next slice of documents through Drive and Google's own PDF export, and scored every one of them; the results are committed with the run. The LibreOffice column is now the backlog, since its results carry an older engine.
+## Where the corpus stands
 
-| checks applied | **42, 44, 47 (mixed - a document is clean only against its own set)** |
-| measured against the current set | **71 of 205** |
-## Measured
+| | documents |
+|---|---:|
+| Google result, scored | 211 |
+| Google result, refused (page count) | 1 |
+| pass every check offered | 42 |
+| fail at least one check | 169 |
 
-| | |
-|:--|--:|
-| scored | **205** |
-| refused on page count | **8** |
-| clean in Google | **44** |
-| passes in LibreOffice (proxy, not the renderer the user opens) | **135** |
+## Top five failing checks
 
-## Checks Google fails and LibreOffice does not
+| check | Google fails |
+|---|---:|
+| 18\_displacement | 119 |
+| 60\_text\_column\_right\_edge | 63 |
+| 04\_chars\_missing | 58 |
+| 59\_shape\_anchor | 51 |
+| 45\_char\_accuracy | 37 |
 
-| check | Google | LibreOffice |
-|:--|--:|--:|
-| `18\_displacement` | **115** | 18 |
-| `04\_chars\_missing` | **48** | 2 |
-| `60\_text\_column\_right\_edge` | **60** | 18 |
-| `59\_shape\_anchor` | **46** | 10 |
-| `13\_text\_colours` | **32** | 1 |
-| `45\_char\_accuracy` | **33** | 2 |
-| `17\_matched\_runs` | **30** | 5 |
-| `26\_text\_overlap` | **17** | 2 |
+## Capability table — both renderers
 
-The first row is the class to take: `18\_displacement`, 115 documents in Google against 18 in LibreOffice.
+| renderer | pass every check offered |
+|---|---:|
+| LibreOffice | 134 of 212 |
+| Google Docs | 42 of 212 |
 
+Google on the tree engine: 211 of 212 pairs. LibreOffice on the tree engine: 13 of 212 pairs — the LibreOffice backlog is the open work, and `gverify.py --lo-stale` is the tool that clears it.
+
+## One instrument defect found and fixed (tools, not engine)
+
+The corpus stamp and the two readers hashed different sets of engine files. `corpus-convert.py` stamps the corpus with the `.docx` engine — every `.java` except `TxtWriter.java`, which no `.docx` byte depends on — and `gvbatch.py` writes the Google verdicts from that stamp. `gverify.py` and `verify_google.py` hashed every `.java`, so after the rebuild the store held 211 rows on one hash and the readers computed another, and `plan()` saw 2 of 213. The LibreOffice half carried the all-`.java` hash too, which is why the matrix read 0 pairs on the tree engine.
+
+Both readers now compute the same quantity the store is stamped with. No check was changed, no engine code touched, no result re-stamped by hand.
+
+## Next
+
+Measure the last document, then clear the LibreOffice backlog so every row is a pair on one engine. `stage.py` still says `measure-google`; the capability table is not due yet.
