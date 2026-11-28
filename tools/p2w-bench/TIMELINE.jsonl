@@ -10666,3 +10666,7 @@
 {"t": 1795838197.6874545, "ist": "09:26:37", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
 {"t": 1795838287.6544864, "ist": "09:28:07", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795838298.094489, "ist": "09:28:18", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795838301.5955725, "ist": "09:28:21", "ev": "attempt", "d": "t09_page_furniture -> lead"}
+{"t": 1795838301.7111, "ist": "09:28:21", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795838301.8010888, "ist": "09:28:21", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795838302.3518474, "ist": "09:28:22", "ev": "beat", "d": "classrow.py: refreshing the class file"}

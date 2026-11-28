@@ -9,14 +9,14 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 08:04 |
-| ended | 09:08 |
-| how it ended | forced |
+| started | 09:16 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `01:27` attempt 3 on 63_table_rows -> reverted
 - `02:43` attempt 4 on 63_table_rows -> lead
 - `03:24` attempt 120 on 18_displacement -> lead
 - `03:40` attempt 5 on 63_table_rows -> lead
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `08:56` agent deployed: 18_displacement / A - take a real Google export of 35_four_typefaces_one_page and test whether Google 
 - `09:05` agent deployed: 05_chars_extra / B - test whether the U+FFFD ligature glyphs resolve by advance width
 - `09:06` attempt 125 on 18_displacement -> lead
+- `09:28` attempt 4 on t09_page_furniture -> lead
 
 ## Where the rest of the state lives
 

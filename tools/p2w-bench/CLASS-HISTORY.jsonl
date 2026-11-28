@@ -270,3 +270,4 @@
 {"at": "2026-11-28 08:54", "attempt": 4, "class": "05_chars_extra", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-28 08:56", "attempt": 124, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
 {"at": "2026-11-28 09:06", "attempt": 125, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
+{"at": "2026-11-28 09:28", "attempt": 4, "class": "t09_page_furniture", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
