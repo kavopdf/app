@@ -275,6 +275,28 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-28T10:22"
+  },
+  {
+   "id": "60-font-01",
+   "class": "60_text_column_right_edge",
+   "angle": "does the font NAME change the Google render, and does w:jc stretch a one-line paragraph",
+   "question": "Root-cause 60_text_column_right_edge (21.1 worth, no prior solo investigation) and name the engine change, or prove the check is wrong",
+   "expected": "a named engine change with its expected document effect, or a refutation with a measurement",
+   "deployed": "10:02",
+   "status": "done",
+   "finding": "FINDINGS/60-text-column-right-edge-28NOV.md - 59 docs fail; 15 engine (8.67 worth), 17 instrument (4.17), 7 stale-pass, 20 undecided; no reflow anywhere; instrument over-charges via a hard 10pt left-edge bucket (purchase-order +103.36 charged vs +2.79 actual); replacement bucketing refuted (15 pass / 6 regress); named change = extend the right-tab emitter to full-measure body lines, blocked because it drops 17_matched_runs 34->13",
+   "deployed_at": "2026-11-28T10:02"
+  },
+  {
+   "id": "18d-split-01",
+   "class": "18_displacement",
+   "angle": "split the 19 solo documents by row pitch and row count and find the collectable subset",
+   "question": "Which of the 19 documents that fail only 18_displacement are collectable, and by what engine change",
+   "expected": "a per-document classification and one named engine change with its expected point effect, or a refutation",
+   "deployed": "10:02",
+   "status": "done",
+   "finding": "FINDINGS/18-displacement-SPLIT-28NOV.md - all 19 single-page; 6 dense-table accumulation carriers, 13 not; 11 of the 13 fail only the 5% count clause at the smallest type; engine row geometry faithful to 0.00pt on 13 of 19; collectable subset = 0 with two independent proofs",
+   "deployed_at": "2026-11-28T10:02"
   }
  ],
  "history": [
