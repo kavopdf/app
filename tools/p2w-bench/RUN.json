@@ -1,14 +1,10 @@
 {
- "started_ts": 1795858055.1203706,
- "started": "14:57",
- "window_for_claim": 1795858055.1203706,
- "ended_ts": 1795858203.8827934,
- "ended": "15:00",
- "attempts": 1,
+ "started": "15:07",
+ "started_ts": 1795858675.8215632,
+ "ended": null,
+ "ended_ts": null,
+ "attempts": 0,
  "kept": 0,
- "agents": [
-  "60_tcolumn geometry-01",
-  "415_zero SSIM-01"
- ],
+ "agents": [],
  "docs_improved": 0
 }
