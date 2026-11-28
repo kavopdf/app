@@ -10481,3 +10481,7 @@
 {"t": 1795828871.6806674, "ist": "06:51:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795828871.9281347, "ist": "06:51:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795829561.6243548, "ist": "07:02:41", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795829565.270734, "ist": "07:02:45", "ev": "attempt", "d": "18_displacement -> lead"}
+{"t": 1795829565.3868873, "ist": "07:02:45", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795829565.4794507, "ist": "07:02:45", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795829565.9820387, "ist": "07:02:45", "ev": "beat", "d": "classrow.py: refreshing the class file"}

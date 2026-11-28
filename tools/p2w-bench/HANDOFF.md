@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `20:57` attempt 115 on 18_displacement -> lead (0/1 moved)
 - `21:08` attempt 116 on 18_displacement -> lead (0/4 moved)
 - `23:07` attempt 1 on 63_table_rows -> lead
 - `23:09` attempt 118 on 18_displacement -> lead
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `05:41` attempt 121 on 18_displacement -> error
 - `06:04` agent deployed: 18_displacement / A - root cause of cell displacement; landed c8056b8
 - `06:04` agent deployed: 63_table_rows / B - ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc2
+- `07:02` attempt 122 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 
