@@ -2648,3 +2648,41 @@ this report is checked against a second source. If a number matters, it belongs 
 **If you leave the file unwritten the report says so, in the section, as a gap.** That is not a
 punishment and it is not hidden: a run that cannot say why it moved nothing has told the reader something
 real, and it is better said than omitted.
+
+## THE 46-MINUTE FLOOR - plan the slot around it, or land nothing
+
+**A corpus re-measurement is 46 minutes: 19 to convert the 213 documents, 21 to render them to PDF at about
+5.9 s each on six workers, and 6 to score.** Every landing needs one, because nothing is committed without a
+measurement before and after.
+
+**So a run that does not START the re-measurement before minute 30 cannot land anything, however good its
+finding is.** The slot is 90 minutes; 46 of them are this one step.
+
+**This was measured on the 28 Nov 05:54 run, which proved a mechanism and landed nothing** - it started the
+render at minute 58 and was still 74 documents from done when the slot ended. The run before it lost its slot on
+the same step. **The number is written here because it was in neither this file nor `SETTLED.md`, so two runs in
+a row planned as though landing were free.**
+
+**What that means in practice:**
+
+- **Prove on one document first, and time it.** One conversion and one render is about a minute.
+- **Start the full re-measurement by minute 30 at the latest.** If the clock says later, record the finding and
+  the patch, and say in the report that the slot went to the proof rather than the landing.
+- **A proven patch carried as a finding is worth more than a half-run measurement**, because the next run starts
+  from it. Say so plainly in the report instead of calling the run empty.
+
+## THE CORPUS IS 213. THE COMPARED SET IS 212. SAY WHICH YOU MEAN.
+
+**`report.py` already carries this and `classrow.py` already documents how it went wrong once: adding
+`len(EXEMPTED)` counted a document a second time and produced 214.** `benchmarks/RANKING.csv` has 214 lines -
+213 data rows and a header - so **213 is the corpus.**
+
+**Three numbers appear in the tools for three different things and a report that mixes them is wrong:**
+
+- **213** - the corpus, every PDF there is
+- **212** - the compared set, the documents a given comparison could actually line up
+- **206** - the ones re-measured on the current engine
+
+**Never print one where the other belongs, and never let 214 appear.** If a count comes out 214, a document has
+been counted twice.
+
