@@ -10315,8 +10315,6 @@
 {"t": 1795820541.0141194, "ist": "04:32:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795820542.9309022, "ist": "04:32:22", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795820578.024116, "ist": "04:32:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
-<<<<<<< Updated upstream
-=======
 {"t": 1795822417.3612876, "ist": "05:03:37", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
 {"t": 1795822417.5843737, "ist": "05:03:37", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
 {"t": 1795822417.7364347, "ist": "05:03:37", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
@@ -10351,7 +10349,6 @@
 {"t": 1795824546.1294374, "ist": "05:39:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795824546.219626, "ist": "05:39:06", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795824546.721257, "ist": "05:39:06", "ev": "beat", "d": "classrow.py: refreshing the class file"}
->>>>>>> Stashed changes
 {"t": 1795824575.0834737, "ist": "05:39:35", "ev": "beat", "d": "heartbeat before any claim: attempt 2: 18_displacement per-line drift"}
 {"t": 1795824621.6992433, "ist": "05:40:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795824623.0073602, "ist": "05:40:23", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
@@ -10399,3 +10396,53 @@
 {"t": 1795824787.0350876, "ist": "05:43:07", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795824787.418324, "ist": "05:43:07", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795824789.3253603, "ist": "05:43:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795823344.7182858, "ist": "05:19:04", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795823344.9147065, "ist": "05:19:04", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795823345.074548, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795823345.2598188, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795823345.41932, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795823345.5846863, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795823345.7479236, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795823345.8985913, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795823358.5914924, "ist": "05:19:18", "ev": "beat", "d": "relay: gate install hung, checking state"}
+{"t": 1795823567.8491602, "ist": "05:22:47", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795823569.064251, "ist": "05:22:49", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795823571.569752, "ist": "05:22:51", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795823572.4488008, "ist": "05:22:52", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795823573.1447318, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795823573.4839602, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795823573.653005, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795823573.8089201, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795823582.7782948, "ist": "05:23:02", "ev": "beat", "d": "relay: running pod-prep (gate prereqs)"}
+{"t": 1795823761.8070638, "ist": "05:26:01", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795823761.9730709, "ist": "05:26:01", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795823762.1442938, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795823762.3244922, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795823762.477974, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795823762.6604898, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795823762.8127809, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795823762.9894745, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795823765.2651753, "ist": "05:26:05", "ev": "beat", "d": "relay: reading last run"}
+{"t": 1795823765.4140627, "ist": "05:26:05", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795823771.6206727, "ist": "05:26:11", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823772.1144786, "ist": "05:26:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823772.6465414, "ist": "05:26:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823773.1539102, "ist": "05:26:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823775.7730956, "ist": "05:26:15", "ev": "beat", "d": "relay: picking class, deploying agents"}
+{"t": 1795823776.1186633, "ist": "05:26:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823779.8940754, "ist": "05:26:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795823779.9792848, "ist": "05:26:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823783.037542, "ist": "05:26:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823789.6488218, "ist": "05:26:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795823789.762374, "ist": "05:26:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823790.3655815, "ist": "05:26:30", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795823790.4773595, "ist": "05:26:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795825611.0604274, "ist": "05:56:51", "ev": "beat", "d": "relay: both agents landed, implementing cell-top fix"}
+{"t": 1795825629.2833447, "ist": "05:57:09", "ev": "beat", "d": "relay: verifying gate health"}
+{"t": 1795825991.0609188, "ist": "06:03:11", "ev": "beat", "d": "corpus-slice: 6 of 38 converted"}
+{"t": 1795825991.2900488, "ist": "06:03:11", "ev": "beat", "d": "corpus-slice: 12 of 38 converted"}
+{"t": 1795825991.5077014, "ist": "06:03:11", "ev": "beat", "d": "corpus-slice: 18 of 38 converted"}
+{"t": 1795825991.7387354, "ist": "06:03:11", "ev": "beat", "d": "corpus-slice: 24 of 38 converted"}
+{"t": 1795825991.944905, "ist": "06:03:11", "ev": "beat", "d": "corpus-slice: 30 of 38 converted"}
+{"t": 1795825992.1672623, "ist": "06:03:12", "ev": "beat", "d": "corpus-slice: 36 of 38 converted"}
+{"t": 1795825997.1808548, "ist": "06:03:17", "ev": "beat", "d": "attempt.py: recording an attempt"}
