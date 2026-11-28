@@ -1,58 +1,71 @@
 {
-<<<<<<< Updated upstream
- "started_ts": 1795818649.2767327,
- "started": "04:00",
- "window_for_claim": 1795820368.0065424,
- "ended_ts": null,
- "ended": null,
- "attempts": 2,
- "kept": 0,
  "agents": [
   {
-   "id": "18prize-01",
-   "class": "18_displacement",
    "angle": "A",
-   "question": "which documents would become CLEAN if 18_displacement passed, and what single engine rule claims the most of them",
-   "expected": "04:15",
+   "class": "18_displacement",
    "deployed": "04:05",
-   "status": "landed",
-   "finding": "FINDINGS/18prize-01-18-DISPLACEMENT-PRIZE-CENSUS-28NOV-agent.md",
    "deployed_at": "2026-11-28T04:05",
+   "expected": "04:15",
+   "finding": "FINDINGS/18prize-01-18-DISPLACEMENT-PRIZE-CENSUS-28NOV-agent.md",
+   "id": "18prize-01",
    "landed_at": "2026-11-28T04:12",
-   "result": "108 documents fail 18_displacement; 18 are solo (would be clean if it passed); 28 are solo plus exactly one other (12 with 60_text_column_right_edge, 10 with 59_shape_anchor); leverage 46.56 reproduces classpick.py. All 18 solos are single-page bad_pages [0], which rules out the page-break w:before construct for them; 12 carry a rigid offset, 6 a per-run tail."
+   "question": "which documents would become CLEAN if 18_displacement passed, and what single engine rule claims the most of them",
+   "result": "108 documents fail 18_displacement; 18 are solo (would be clean if it passed); 28 are solo plus exactly one other (12 with 60_text_column_right_edge, 10 with 59_shape_anchor); leverage 46.56 reproduces classpick.py. All 18 solos are single-page bad_pages [0], which rules out the page-break w:before construct for them; 12 carry a rigid offset, 6 a per-run tail.",
+   "status": "landed"
   },
   {
-   "id": "61rank-02",
-   "class": "18_displacement",
    "angle": "B",
-   "question": "among the 61 genuine losses, which single Google check would clean the most of them",
-   "expected": "04:35",
+   "class": "18_displacement",
    "deployed": "04:31",
-   "status": "landed",
-   "finding": "FINDINGS/61rank-02-SIXTY-ONE-LOSSES-RANKED-BY-CHECK-28NOV-agent.md",
    "deployed_at": "2026-11-28T04:31",
+   "expected": "04:35",
+   "finding": "FINDINGS/61rank-02-SIXTY-ONE-LOSSES-RANKED-BY-CHECK-28NOV-agent.md",
+   "id": "61rank-02",
    "landed_at": "2026-11-28T04:32",
-   "result": "18_displacement fails 47 of the 61 and is the only failing check on 13 of them; no other check is worth more than 3. 60_text_column_right_edge 3, 26_text_overlap 1. Sub-construct B (the rung) is closed as a revert, so the 13 are A (LINE_BASE 0.8 vs Google 0.31 em) and C (afterTablePt/edgeGap) territory."
+   "question": "among the 61 genuine losses, which single Google check would clean the most of them",
+   "result": "18_displacement fails 47 of the 61 and is the only failing check on 13 of them; no other check is worth more than 3. 60_text_column_right_edge 3, 26_text_overlap 1. Sub-construct B (the rung) is closed as a revert, so the 13 are A (LINE_BASE 0.8 vs Google 0.31 em) and C (afterTablePt/edgeGap) territory.",
+   "status": "landed"
+  },
+  {
+   "angle": "A",
+   "class": "60_text_column_right_edge",
+   "deployed": "08:05",
+   "deployed_at": "2026-11-28T08:05",
+   "expected": "08:05",
+   "finding": "FINDINGS/60-THE-LINE-OBJECT-IS-A-TABLE-ROW-28NOV-fixer.md",
+   "id": "60_tA-01",
+   "landed_at": "2026-11-28T08:18",
+   "question": "which engine construct sets a body line's right edge - is 60 an engine defect or an instrument one",
+   "result": "Instrument defect. Google's export draws a whole table row as ONE line object; the check read the right cell's edge as the left column's overrun (+66.36 pt where the source's ink is 0.18 pt away). Engine writes no right edge at all. Census of 62: 52 unchanged, 10 over->pass, 1 over->under, 0 pass->fail. KEPT: 2 documents 47/47.",
+   "status": "landed"
+  },
+  {
+   "angle": "B",
+   "class": "18_displacement",
+   "deployed": "08:05",
+   "deployed_at": "2026-11-28T08:05",
+   "expected": "08:05",
+   "finding": "FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md",
+   "id": "18_dB-01",
+   "landed_at": "2026-11-28T08:25",
+   "question": "test the 0.961 spacer model at the current engine and quantify the inverse correction",
+   "result": "REFUTED at a05b20eb05fe0fc8: the fit was taken at b7699196. Measured 0.2288 (22.9% of an exact line height, not 3.9%), r=1.0000; page-break leg binary at -59.03 pt regardless of gap, slope 0.000. Correction moves the probe 0.29 pt and it still fails. Real mechanism: dy = -8.44 - 0.027*y, accumulating exact-line-box drift.",
+   "status": "landed"
   }
  ],
- "docs_improved": 0,
- "class": "63_table_rows"
-=======
- "agents": [],
  "attempts": 2,
- "docs_improved": 2,
- "ended": null,
- "ended_ts": null,
- "kept": 1,
- "started": "04:58",
- "started_ts": 1795822122.715651,
- "window_for_claim": 1795822122.715651,
  "class": "60_text_column_right_edge",
  "counted": [
   [
    "60_text_column_right_edge",
    2
   ]
- ]
->>>>>>> Stashed changes
+ ],
+ "docs_improved": 2,
+ "ended": null,
+ "ended_ts": null,
+ "kept": 1,
+ "started": "04:58",
+ "started_ts": 1795822122.715651,
+ "window_for_claim": 1795822122.715651
 }

@@ -1,28 +1,6 @@
 {
  "agents": [
   {
-   "id": "triaA-01",
-   "class": "triage",
-   "angle": "A",
-   "question": "which of the 113 failing checks buys the most clean documents, with the converter file and line for each",
-   "expected": "18:55",
-   "deployed": "01:12",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T01:12"
-  },
-  {
-   "id": "ssimB-01",
-   "class": "ssim",
-   "angle": "B",
-   "question": "what caps the 99 percent SSIM goal - is the deficit concentrated or uniform",
-   "expected": "19:00",
-   "deployed": "01:12",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T01:12"
-  },
-  {
    "id": "Expl-01",
    "class": "Explore:docx construct ranking by documents-cleared (10-row table, rung rule named first)",
    "angle": "",
@@ -276,6 +254,30 @@
    "deployed_at": "2026-11-28T04:31",
    "landed_at": "2026-11-28T04:32",
    "result": "18_displacement fails 47 of the 61 and is the only failing check on 13 of them; no other check is worth more than 3. 60_text_column_right_edge 3, 26_text_overlap 1. Sub-construct B (the rung) is closed as a revert, so the 13 are A (LINE_BASE 0.8 vs Google 0.31 em) and C (afterTablePt/edgeGap) territory."
+  },
+  {
+   "id": "60_tA-03",
+   "class": "60_text_column_right_edge",
+   "angle": "A",
+   "question": "which engine construct sets a body line's right edge - is 60 an engine defect or an instrument one",
+   "expected": "08:05",
+   "deployed": "05:40",
+   "status": "landed",
+   "finding": "FINDINGS/60-THE-LINE-OBJECT-IS-A-TABLE-ROW-28NOV-fixer.md",
+   "deployed_at": "2026-11-28T05:40",
+   "landed_at": "2026-11-28T05:40"
+  },
+  {
+   "id": "18_dB-01",
+   "class": "18_displacement",
+   "angle": "B",
+   "question": "test the 0.961 spacer model at the current engine and quantify the inverse correction",
+   "expected": "08:05",
+   "deployed": "05:40",
+   "status": "landed",
+   "finding": "FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md",
+   "deployed_at": "2026-11-28T05:40",
+   "landed_at": "2026-11-28T05:40"
   }
  ],
  "history": [
@@ -380,24 +382,8 @@
    "plan": ""
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. ",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "01:12",
-   "text": "agent deployed: ssim / B - what caps the 99 percent SSIM goal - is the deficit concentrated or uniform"
-  },
-  {
-   "at": "01:51",
-   "text": "attempt 95 on 18_displacement -> lead"
-  },
-  {
-   "at": "01:52",
-   "text": "attempt 96 on 18_displacement -> lead"
-  },
-  {
-   "at": "02:24",
-   "text": "attempt 97 on 18_displacement -> lead"
-  },
   {
    "at": "02:26",
    "text": "attempt 98 on 18_displacement -> lead"
@@ -621,6 +607,22 @@
   {
    "at": "05:39",
    "text": "attempt 9 on 60_text_column_right_edge -> kept"
+  },
+  {
+   "at": "05:40",
+   "text": "agent deployed: 60_text_column_right_edge / A - which engine construct sets a body line's right edge - is 60 an engine defect or"
+  },
+  {
+   "at": "05:40",
+   "text": "agent landed: 60_text_column_right_edge / A -> FINDINGS/60-THE-LINE-OBJECT-IS-A-TABLE-ROW-28NOV-fixer.md"
+  },
+  {
+   "at": "05:40",
+   "text": "agent deployed: 18_displacement / B - test the 0.961 spacer model at the current engine and quantify the inverse corre"
+  },
+  {
+   "at": "05:40",
+   "text": "agent landed: 18_displacement / B -> FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md"
   }
  ],
  "plan": "",
