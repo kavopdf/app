@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 09:28 → running IST · 0 min**
+**28 Nov 2026 · slot 09:28 → running IST · 15 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - kept change: 1 code commit(s) in this window, first: findings: the .txt splits a letter-spaced line i vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 09:28 vs TIMELINE.jsonl records the claim at 09:16, so the window was reset and the duration is short |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 3 code commit(s) in this window, first: findings: Google's table row advance is not cont vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 09:28 vs TIMELINE.jsonl records the claim at 09:16, so the window was reset and the duration is short |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -26,16 +26,20 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (63 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `18_displacement` - taken from the pending list (63 still open), not a new class |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 09:28 | **lead** | 0/None | TxtWriter writes a letter-spaced line as one line per glyph while DocxWriter merges it: 305_vaccination_certificate has 47 single-char lines of 85 and fails t08 32/33 because the glyphs land after the |
+| 09:41 | **lead** | 0/None | Ten Google variants on three documents: Google's table row advance exceeds the source pitch by +0.10 (16.40 src), +0.13 (18.40) and +0.50 (13.00) pt per row, accumulating 3.9-9.2 pt by the bottom of a |
 
 ## Why nothing moved, in this run's own words
+
+*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+
+### The run before this one said
 
 > **The decision, and its reason.** `classpick.py` suggested `t09_page_furniture` on a lead whose own
 > FINDINGS file (`t09-PAGE-FURNITURE-RELAY-27NOV-relay.md`) refutes its `.docx` half and asks for the `.txt`
@@ -80,7 +84,7 @@
 
 | | |
 |:--|:--|
-| Measured | **4.0 h ago** |
+| Measured | **4.3 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -89,18 +93,31 @@
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `18_dA-05` | is the cell w:line natural-box rewrite right in GOOG | 09:42 | - | not recorded |
+| `18_dB-03` | census the 19 documents that fail only 18_displaceme | 09:42 | - | not recorded |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 09:28 → running · 0 min |
+| Slot window | 09:28 → running · 15 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 7 |
-| Silences over 2 min | 0 |
+| Tool beats | 30 |
+| Longest silence | **12.8 min** — from 09:28:54, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| setup - claim, housekeeping, reading the gate | **0 min** | `#` |
+| fix - diagnose and change the engine | **12 min** | `##################` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| report - the report and the chain | **1 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -113,7 +130,7 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

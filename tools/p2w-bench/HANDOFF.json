@@ -1,30 +1,6 @@
 {
  "agents": [
   {
-   "id": "60_tA-02",
-   "class": "60_text_column_right_edge",
-   "angle": "A",
-   "question": "which engine construct sets a body line's right edge, and which fixes are already refuted",
-   "expected": "07:40",
-   "deployed": "08:12",
-   "status": "landed",
-   "finding": "FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md",
-   "deployed_at": "2026-11-27T08:12",
-   "landed_at": "2026-11-27T08:12"
-  },
-  {
-   "id": "gateB-02",
-   "class": "gate",
-   "angle": "B",
-   "question": "why does regress.py --check refuse on unmodified HEAD",
-   "expected": "07:41",
-   "deployed": "08:12",
-   "status": "landed",
-   "finding": "FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md",
-   "deployed_at": "2026-11-27T08:12",
-   "landed_at": "2026-11-27T08:12"
-  },
-  {
    "id": "18-d-01",
    "class": "18-displacement w:pBdr probe: measured Google 15.00 vs 15.75, finding committed",
    "angle": "",
@@ -276,6 +252,30 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-28T09:05"
+  },
+  {
+   "id": "18_dA-05",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "is the cell w:line natural-box rewrite right in GOOGLE on 35_four_typefaces_one_page",
+   "expected": "18:00",
+   "deployed": "09:42",
+   "status": "landed",
+   "finding": "FINDINGS/18d-WLINE-GOOGLE-MEASURED-AGENT-28NOV.md",
+   "deployed_at": "2026-11-28T09:42",
+   "landed_at": "2026-11-28T09:42"
+  },
+  {
+   "id": "18_dB-03",
+   "class": "18_displacement",
+   "angle": "B",
+   "question": "census the 19 documents that fail only 18_displacement and test the measured gap law against them",
+   "expected": "18:00",
+   "deployed": "09:42",
+   "status": "landed",
+   "finding": "FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md",
+   "deployed_at": "2026-11-28T09:42",
+   "landed_at": "2026-11-28T09:42"
   }
  ],
  "history": [
@@ -380,28 +380,8 @@
    "plan": ""
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. ",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "09:13",
-   "text": "attempt 104 on 18_displacement -> lead"
-  },
-  {
-   "at": "09:14",
-   "text": "agent deployed: 18-displacement w:pBdr probe: measured Google 15.00 vs 15.75, finding committed /  - "
-  },
-  {
-   "at": "09:42",
-   "text": "attempt 105 on 18_displacement -> lead"
-  },
-  {
-   "at": "09:46",
-   "text": "attempt 13 on t12_word_invention -> lead"
-  },
-  {
-   "at": "10:56",
-   "text": "attempt 106 on 18_displacement -> lead"
-  },
   {
    "at": "10:58",
    "text": "agent deployed: 18_displacement / A - which sub-cause of the displacement survives every eliminated one, measured on o"
@@ -621,6 +601,26 @@
   {
    "at": "09:28",
    "text": "attempt 4 on t09_page_furniture -> lead"
+  },
+  {
+   "at": "09:41",
+   "text": "attempt 126 on 18_displacement -> lead"
+  },
+  {
+   "at": "09:42",
+   "text": "agent deployed: 18_displacement / A - is the cell w:line natural-box rewrite right in GOOGLE on 35_four_typefaces_one_"
+  },
+  {
+   "at": "09:42",
+   "text": "agent deployed: 18_displacement / B - census the 19 documents that fail only 18_displacement and test the measured gap"
+  },
+  {
+   "at": "09:42",
+   "text": "agent landed: 18_dA-05 /  -> FINDINGS/18d-WLINE-GOOGLE-MEASURED-AGENT-28NOV.md"
+  },
+  {
+   "at": "09:42",
+   "text": "agent landed: 18_dB-03 /  -> FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md"
   }
  ],
  "plan": "",
