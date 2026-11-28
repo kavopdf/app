@@ -52,5 +52,20 @@ the 127 occurrences, compare each ligature's `w` against `w(f)+w(i)`, `w(f)+w(f)
 `w(f)+w(l)` from the same font's ASCII glyphs, and check the assignment is unique on every one. If any
 occurrence is ambiguous, the route is a guess and the class is a Google-side finding, not a fix.
 
+## MEASURED 28 Nov 08:5x, same slot - the geometric route is a guess too
+
+A second agent measured it (`05-CHARS-EXTRA-FFFD-GEOMETRY-IS-A-GUESS-28NOV-agent.md`): the four codes'
+advance widths are 0.6370, 0.5390, 0.8470, 0.8580 em, and this font's ligatures run **0.013–0.048 em
+narrower** than the sum of their components — 1.3 to 4.8 times the 0.010 em that separates `fi` from
+`fl`. **0 of 127 occurrences resolve uniquely** at ±0.02 em; 87 are ambiguous and 40 have no candidate.
+The 89 occurrences of `0x124` (70 % of the document) land nearest to `fl` while the glyph is `fi`.
+Signal smaller than noise, so a width heuristic would write the wrong word 70 % of the time.
+
+**So this class is closed as far as the PDF's own data goes: the producer wrote `U+FFFD`, and neither a
+glyph name, a cmap, nor the geometry can recover the character.** What is left is a rendering-and-OCR
+route, which is out of scope for this engine. The two documents stay open and their `.txt` stays wrong;
+that is a finding, not a pending fix.
+
 What would prove this wrong: a `/ToUnicode` in a later revision of the same form that maps these codes to
-real characters, or a font revision carrying a `post` table.
+real characters, a font revision carrying a `post` table, or a width measurement that separates `fi`
+from `fl` in this face — none of which the shipped bytes offer.

@@ -10600,3 +10600,9 @@
 {"t": 1795836437.6734095, "ist": "08:57:17", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795836438.2371674, "ist": "08:57:18", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795836440.8066227, "ist": "08:57:20", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795836911.5386322, "ist": "09:05:11", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795836911.707005, "ist": "09:05:11", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795836918.9443123, "ist": "09:05:18", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795836921.043421, "ist": "09:05:21", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795836921.4115384, "ist": "09:05:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795836923.4701374, "ist": "09:05:23", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

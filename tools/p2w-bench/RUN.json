@@ -1,6 +1,7 @@
 {
  "agents": [
-  "18_dA-02"
+  "18_dA-02",
+  "05_cB-01"
  ],
  "attempts": 4,
  "class": "18_displacement",
