@@ -1789,3 +1789,41 @@ tool list before a paused or zombie cron can be cleared by automation.
 **STEP 4 D did not fire.** `status.py` reads SILENT, on a claim taken inside a run that is still in its
 slot; the slot is held by a live run that has not beaconed recently, not by a dead one, and
 `round.py --release-fixer --force` was not run.
+
+## 2026-11-28 15:03 - watchdog pass
+
+**Nothing is stopped.** measure-google done at 214 of 214 (9.4 h), matrix done at 214 of 214 (7.5 h),
+classify superseded (7.0 h), fix moving at 7 attempt(s) in 3 h (0.1 h), txt moving at 209 clean and 5
+failing (0.9 h). No stage was stopped, so no stage needed a restart.
+
+**The trend row was stale by one column and is now amended.** The committed row for today read txt
+failing 6; the live tables read 5. `progress.py --amend` rewrote today's row to 116 / 5 / 206 / 48 and
+named what it used to say, which is the single correction the tool allows in a day. No past row was
+edited. Against 27 Nov the row reads: docx open 116 -> 116, txt failing 6 -> 5, google 206 -> 206,
+google clean 46 -> 48.
+
+**The .docx column is flat and that is the standing signal, not a new stall.** docx open has read 116 on
+both of the last two rows, against 59 for the six rows before them, while google clean rose 46 to 48 on
+the day. The renderer the settled decision names is producing passes the LibreOffice proxy column does
+not show. What would overturn this reading: docx open moving off 116 on a row where the fixer lands one
+measured construct, or google clean flattening while docx open stays put. Nothing was parked with
+`classpick.py --exhaust`: the class table is fresh (7.0 h) and the fixer is inside its budget.
+
+**STEP 4 C did not fire.** `round.py --reopen` refused - "the phase is fix, not done - there is nothing
+to reopen". **STEP 4 D did not fire.** `status.py` reads IDLE, the slot free, the last fixer run minutes
+old; no dead run held the slot, so `round.py --release-fixer --force` was not run.
+
+**No `cron` tool in this pass.** this watchdog has no cron tool, so a paused or zombie cron cannot be
+moved by automation. STEP 3 and STEP 4 A and B did not run: no cron was listed, inspected, paused,
+resumed, deleted or recreated, and no cron id is reported because none was read. The calls it would have
+made, exactly:
+
+    cron(action="list")
+    cron(action="runs", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85")   # gverify, from the HEALTH-BRIEF table
+
+and then, only for a stale `next_fire_at` or a zombie run:
+
+    cron(action="pause", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85"); cron(action="resume", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85")
+
+A `cron` operation has to be in this cron's tool list before a paused or zombie cron can be cleared by
+automation. This is a missing tool, not a decision a person has to make.

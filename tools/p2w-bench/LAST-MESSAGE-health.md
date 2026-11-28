@@ -1,48 +1,37 @@
-## The pipeline is moving
+# P2W Watchdog - Run Report
 
-Nothing is stopped. `health.py --stalled` exits 0 with all five stages clear, so this pass had no
-stage to restart and no cron to touch.
+**28 Nov 2026 · 15:03 IST**
+
+> Nothing is stopped.
+
+## Stages
+
 
 | stage | state | progress | age |
-|:--|:--|:--|--:|
-| measure-google | done | 214 of 214 | 6.5 h |
-| matrix | done | 214 of 214, all on the engine in the tree | 4.6 h |
-| classify | superseded | - | 4.0 h |
-| fix | moving | 8 attempt(s) in 3 h | 0.6 h |
-| txt | moving | 209 clean, 5 failing | 0.6 h |
-
-Matrix is the change since the last pass: it read stopped, with only a fraction of its results on the
-engine in the tree, and now reads done at 214 on the engine. The escalation that pass set against 27 Nov
-did not have to fire.
+|:--|:--|--:|--:|
+| measure-google | done | 214 of 214 | 9.4 h |
+| matrix | done | 214 of 214 | 7.5 h |
+| classify | superseded |  | 7.0 h |
+| fix | moving | 7 attempt(s) in 3 h | 0.1 h |
+| txt | moving | 209 clean, 5 failing | 0.9 h |
 
 ## Trend
 
-Today's row was already appended by an earlier pass, so nothing new was written to
-benchmarks/PROGRESS.md and there was nothing to commit for it.
+| | 2026-11-27 | 2026-11-28 | |
+|:--|--:|--:|:--|
+| .docx open | 116 | **116** | no change |
+| .txt failing | 6 | **5** | -1 |
+| Google measured | 206 | **206** | no change |
+| Google clean | 46 | **48** | +2 |
 
-| | 27 Nov | 28 Nov |
-|:--|--:|--:|
-| docx open | 116 | 116 |
-| txt failing | 6 | 6 |
-| google measured | 206 | 206 |
-| google clean | 46 | 48 |
+## What this pass did
 
-Two of the four columns did not move, and the fixer's count beside that flat line is 8 attempt(s) in
-3 h. That is the signal STEP 2 asks for and it is written into BLOCKERS.md. The movement that
-contradicts a stall is google clean, up 2 on the day, with txt now reading 209 clean and 5 failing.
+* Read health.py, health.py --stalled, stage.py, progress.py and round.py --phase.
+* Nothing needed moving.
 
-## Round
+* Amended today's PROGRESS.md row from the live tables: txt failing was 6 there, the tables read 5. That is the single correction the tool allows in a day, and no past row was touched.
+* The reopen check did not fire. round.py --reopen refused because the phase is fix, not done.
+* The release check did not fire. status.py reads IDLE with the slot free and the last fixer run minutes old, so no dead run was holding it.
+* No cron was listed, inspected, paused, resumed, deleted or recreated. This run has no cron tool; the exact calls are named in BLOCKERS.md.
 
-The phase is fix, with open classes still to close. STEP 4 C did not fire, because `round.py --reopen`
-refuses unless the phase is done and the phase is fix.
-
-## What this pass could not do
-
-This watchdog's tool list carries no `cron` operation. STEP 3 and STEP 4 A and B did not run: no cron
-was inspected, paused, resumed, deleted or recreated, and the id of no cron is reported here because
-none was read. A paused or zombie cron cannot be moved by automation from this agent until a `cron`
-operation is in its tool list. The exact calls are recorded in BLOCKERS.md.
-
-STEP 4 D did not fire either: `status.py` reads SILENT on a claim that is minutes old inside a run that
-is still in its slot, so the slot is held by a live run, not a dead one, and `--release-fixer --force`
-was not run.
+The fixer is inside its budget and the txt stage is inside its threshold, so the pipeline is moving on its own. The flat .docx column is the standing signal, not a new stall: docx open has read 116 on both of the last two rows while google clean rose 46 to 48, which says the renderer the settled decision names is producing passes the LibreOffice column does not show. Nothing was parked with classpick.py --exhaust, because the class table is fresh and the fixer has not exhausted its approach.
