@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-28 13:53
+# Fixer report - 2026-11-28 14:35
 
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 13:53 → running IST · 5 min**
+**28 Nov 2026 · slot 14:35 → running IST · 13 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - .txt age: measured 8.5 h ago vs nothing re-measures it on a schedule |
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - kept change: 1 code commit(s) in this window, first: t12_word_invention: both annotation doors must b vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 14:35 vs TIMELINE.jsonl records the claim at 13:53, so the window was reset and the duration is short |
+| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -26,8 +26,14 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (64 still open), not a new class |
+| Working on | `-` - taken from the pending list (63 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `-` by hand instead |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 14:35 | **lead** | 0/None | both annotation guards together take 600_reviewed_invoice_with_annotations t12 from 83 invented chars to 0 (FAIL->PASS); each guard alone leaves 49/30 and was previously recorded as NO CLEAR; change i |
 
 ## Why nothing moved, in this run's own words
 
@@ -35,6 +41,8 @@
 
 ### The run before this one said
 
+>
+>
 > The slot did not land a document because the lead it inherited was measured on an incomplete
 > instrument, and the complete one refuses it.
 >
@@ -94,7 +102,7 @@
 
 | | |
 |:--|:--|
-| Measured | **8.5 h ago** - nothing re-measures this on a schedule; run `txt_gate.py --score 60` |
+| Measured | **1.0 h ago** |
 | Scored | **214** of 214 |
 | Clean - every applicable check passes | **209** (97.7%) |
 | Failing at least one check | **5** |
@@ -109,10 +117,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 13:53 → running · 5 min |
+| Slot window | 14:35 → running · 13 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 3 |
-| Silences over 2 min | 0 |
+| Tool beats | 16 |
+| Longest silence | **8.7 min** — from 14:35:53, after `classrow.py: refreshing the class file` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -120,7 +129,8 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `######################` |
+| build - compiling the engine | **4 min** | `########` |
+| measure or build - a conversion, screen or compile writes no beacon | **8 min** | `##############` |
 ## Best results this round
 
 | Document | Before | After | Change |
