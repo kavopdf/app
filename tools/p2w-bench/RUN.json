@@ -2,8 +2,8 @@
  "agents": [
   "--cl-01"
  ],
- "attempts": 1,
- "class": "",
+ "attempts": 2,
+ "class": "t09_page_furniture",
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,

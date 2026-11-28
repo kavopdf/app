@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 09:54 → running IST · 6 min**
+**28 Nov 2026 · slot 09:54 → running IST · 26 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - subagents: 1 deployed vs no FINDINGS filename carries --cl-01 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; subagents: 1 deployed vs no FINDINGS filename carries --cl-01 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -26,14 +26,15 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (63 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `t09_page_furniture` - taken from the pending list (63 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `t09_page_furniture` by hand instead |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 09:53 | **lead** | 0/None | The glyph merge was built and measured on 305 and it is refuted: source draws 85 lines of which 47 are single characters (_src_line_count, PyMuPDF granularity) and the .txt at HEAD carries exactly 85 |
+| 10:21 | **lead** | 0/None | The placement fix is measured and it works: hoisting the seal paragraph by its own top (TxtWriter.pageOrder -> hoistLastPara, plus the lastY>0 guard) takes 305_vaccination_certificate to PASS - t04 85 |
 
 ## Why nothing moved, in this run's own words
 
@@ -76,52 +77,11 @@
 > merge I measured is done downstream and would have to be moved. That is one conversion and one
 > `verify_txt.py` run to settle, and it is the first thing the next slot should do.
 
-### The run before this one said
-
-> **The decision, and its reason.** `classpick.py --leverage` prices `18_displacement` at **47.1 clean
-> documents** and 19 documents that fail nothing else, and the 05:54 run had already root-caused it and
-> named its next step: *"give the cell the font's natural line box and move the identical difference into
-> `before`"*. That is a falsifiable prediction, so I did not build it — I tested it in Google first. It is
-> wrong, and the measurement that refutes it found the real mechanism.
->
-> **What I did, in order.** Two agents in the first ten minutes (both ran inside the turn, both negative,
-> both committed). Then ten Google variants across three documents: upload, convert, export, and read the
-> row pitch out of the export with PyMuPDF. That is the whole run, and it is four measured attempts, not
-> one.
->
-> **The finding, and it is not the one anyone expected.** Google's table row advance **exceeds** the source
-> pitch by a per-document amount, and it accumulates: **+0.10 pt/row** on a 16.40 pt pitch, **+0.13** on
-> 18.40, **+0.50** on 13.00 with 6 pt text. Over 24-40 rows that is **+3.9 to +9.2 pt** by the bottom of the
-> table, and `18_displacement` allows 2.8 pt. The engine's row geometry is **already exact** — it writes
-> `w:trHeight 328` and `before 317 + line 11`, which is the source's 16.40 pt to the twip.
->
-> **And no declaration the engine writes can change it.** `w:trHeight` is inert (two values, identical
-> export); reducing `w:before` is inert (three values, identical export); the cell's paragraph mark is
-> inert; `w:line="0"` reads as single spacing and makes it worse. Only an *increase* of `before` above a
-> per-document value is honoured, and it is honoured upward.
->
-> **So there was nothing to land, and that is the decision.** The only change the previous run proposed
-> (v2 here: same sum, a 12 pt box instead of 0.55) leaves the pitch at 16.500 and moves the table's first
-> row **+11.51 pt**. Building it would have cost the corpus pass and produced a Google regression. A
-> change I could not measure as an improvement is not a change.
->
-> **What I now know that I did not.** `18_displacement` on dense-table documents is a **renderer
-> behaviour, not an engine defect** — the fourth construct in this repository where the answer is "Google
-> cannot do it". Twelve of the nineteen documents that fail nothing else are 20-plus-row tables, so the
-> class's 47.1 price is mostly not collectable. The next run should split those nineteen by their own row
-> pitch and row count before spending a slot on any of them, and the split is in the finding.
->
-> **What would prove me wrong.** Any Google render of a 20+ row table whose pitch equals its source pitch
-> to 0.05 pt; or any variant that moves the delivered pitch while *reducing* `before`. Four attempts at the
-> second failed.
-
-Accounts share 19% of their significant words - a different account (the cut is 50%).
-
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **4.6 h ago** |
+| Measured | **4.9 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -138,11 +98,11 @@ Accounts share 19% of their significant words - a different account (the cut is 
 
 | | |
 |:--|:--|
-| Slot window | 09:54 → running · 6 min |
+| Slot window | 09:54 → running · 26 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 7 |
-| Longest silence | **5.2 min** — from 09:55:02, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 1 |
+| Tool beats | 12 |
+| Longest silence | **20.1 min** — from 10:01:26, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 2 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -150,8 +110,9 @@ Accounts share 19% of their significant words - a different account (the cut is 
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `##################` |
-| report - the report and the chain | **1 min** | `####` |
+| fix - diagnose and change the engine | **20 min** | `#################` |
+| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `####` |
+| report - the report and the chain | **1 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

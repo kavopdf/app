@@ -384,10 +384,6 @@
  "notes": [
   {
    "at": "10:58",
-   "text": "agent landed: 18_displacement / A -> FINDINGS/18-displacement-DOMINANT-SUBCAUSE-27NOV-agent.md"
-  },
-  {
-   "at": "10:58",
    "text": "agent landed: 60_text_column_right_edge / B -> FINDINGS/60-COLUMN-RIGHT-EDGE-CENSUS-27NOV-agent.md"
   },
   {
@@ -621,6 +617,10 @@
   {
    "at": "10:00",
    "text": "agent deployed: --class /  - "
+  },
+  {
+   "at": "10:21",
+   "text": "attempt 6 on t09_page_furniture -> lead"
   }
  ],
  "plan": "",

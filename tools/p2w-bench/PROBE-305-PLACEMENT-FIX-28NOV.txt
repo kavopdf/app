@@ -1,0 +1,114 @@
+      NATIONAL IMMUNISATION REGISTRY
+      Government of India  |  Certificate of COVID-19 vaccination
+
+
+
+
+      NAME
+      ANANYA RAO
+
+      DATE OF BIRTH
+                                          GENDER
+                                                                   BENEFICIARY REFERENCE ID
+      12-07-1990
+                                          FEMALE
+                                                                   8842 1177 0291
+      Dose
+                  Vaccine
+                                   Date given
+                                                  Batch
+                                                                 Centre
+                                                                                     Administered by
+       1
+                  COVISHIELD
+                                   12-06-2021
+                                                  4120Z012
+                                                                 PHC Whitefield
+                                                                                     A. Kulkarni
+       2
+                  COVISHIELD
+                                   10-08-2021
+                                                  4120Z037
+                                                                 PHC Whitefield
+                                                                                     A. Kulkarni
+      Precaution
+                  COVISHIELD
+                                   18-03-2022
+                                                  4121A114
+                                                                 BMC Hall 4
+                                                                                     S. Bose
+
+
+
+
+
+
+
+
+
+
+
+      This certificate is digitally signed and can be verified at verify.cowin.example using the reference ID above.
+                   N
+                  A
+                  T
+                  I
+                  O
+                  N
+                   A
+                   L
+                    I
+                    M
+                     M
+                      U
+                       N
+                        I
+                         S
+                          A
+                           T
+                            I
+                            O
+                             N
+                              R
+                               E
+                               G
+                                I
+                                S
+                                T
+                                R
+                                Y
+                   G
+                  O
+                  V
+                  E
+                   R
+                    N
+                    M
+                      E
+                       N
+                           O
+                             F
+                               I
+                               N
+                                D
+                                I
+                               A
+                         T
+      Issued: 18-03-2022 14:22 IST  |  Certificate ID: 8842-1177-0291-4412
+                       INDIA
+                       2024
+
+
+
+                                                                                             Verify online
+
+
+
+
+
+
+
+
+
+
+      This is a computer generated certificate and does not require a physical signature.

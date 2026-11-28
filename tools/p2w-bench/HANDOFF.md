@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:27` attempt 6 on 63_table_rows -> lead
 - `04:29` attempt 7 on 63_table_rows -> lead
 - `05:39` attempt 9 on 60_text_column_right_edge -> kept
 - `05:40` agent deployed: 60_text_column_right_edge / A - which engine construct sets a body line's right edge - is 60 an engine defect or
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `09:42` agent landed: 18_dB-03 /  -> FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md
 - `09:44` attempt 127 on 18_displacement -> lead
 - `10:00` agent deployed: --class /  - 
+- `10:21` attempt 6 on t09_page_furniture -> lead
 
 ## Where the rest of the state lives
 

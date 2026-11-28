@@ -122,3 +122,90 @@ stays 85/85 and `t08` should reach 33/33. **Not measured — the build stopped a
 
 **Do not land the merge.** It moves `305` from one failing check to another and it makes the `.txt`
 unfaithful to a page that drew 85 lines.
+
+---
+
+# The placement fix works: 305 goes PASS. Here is the exact change, measured, not landed
+
+A second build in the same slot, ordering only and merging nothing. **I re-ran `verify_txt.py` on its
+output myself**: `7/12 applicable, 7 passed, 5 abstained  PASS` — `t04_structure` 85/85 (unchanged),
+`t08_line_order` 33/33 (was 33/32), 85 non-blank lines, 47 single-character, 30 blank, 3384 bytes.
+
+## Why it is right
+
+The page's seal paragraph (`top = 270.89`, 48 lines, `lineY` **empty** — its glyphs sit on baselines that
+are not horizontal) is block 10 of 11, i.e. **after** the footer at y = 781.9. `pageOrder()` emits blocks
+in model order, so the seal's text lands after the footer. Hoisting it by the one number it has — `top` —
+puts it between `This certificate is digitally signed…` (y = 264) and `Verify online` (y = 304), where the
+page drew it. The inversion `t08` charged is in column 6: the page draws `Issued: 18-03-2022 14:22 IST |
+Certificate ID: …` before `This is a computer generated certificate…`, and `Issued` is line 45 *inside*
+the seal paragraph, so it travelled with the seal.
+
+## The change, verbatim (TxtWriter.java, +82/−1, two hunks)
+
+Hunk 1 renames the existing `pageOrder` body to `pageOrderByColumn` and wraps it:
+
+```java
+private static List<Object> pageOrder(PdfToWord.Page page) {
+    return hoistLastPara(pageOrderByColumn(page));
+}
+
+/** A paragraph the model appended last, put back where its own top says the page drew it.
+ *  MOVE UP ONLY; NEVER ACROSS A TABLE (the run of Paras immediately before it ends at a Table);
+ *  NOTHING IS MERGED (line count must stay 85 for t04). */
+private static List<Object> hoistLastPara(List<Object> blocks) {
+    if (blocks == null || blocks.size() < 3) return blocks;
+    int last = -1;
+    for (int i = blocks.size() - 1; i >= 0; i--) {
+        if (blocks.get(i) instanceof PdfToWord.Para || blocks.get(i) instanceof PdfToWord.Table) { last = i; break; }
+    }
+    if (last < 0 || !(blocks.get(last) instanceof PdfToWord.Para)) return blocks;
+    PdfToWord.Para para = (PdfToWord.Para) blocks.get(last);
+    float top = para.top;
+    if (Float.isNaN(top) || top <= 0f) return blocks;
+    int run = last;
+    while (run > 0 && blocks.get(run - 1) instanceof PdfToWord.Para) run--;
+    if (run >= last) return blocks;
+    int at = -1;
+    for (int i = run; i < last; i++) {
+        float t = ((PdfToWord.Para) blocks.get(i)).top;
+        if (Float.isNaN(t)) continue;
+        if (t > top) { at = i; break; }
+    }
+    if (at < 0) return blocks;
+    List<Object> out = new ArrayList<>(blocks);
+    out.remove(last);
+    out.add(at, para);
+    return out;
+}
+```
+
+Hunk 2, in `appendPara`, is one changed line and it is load-bearing:
+
+```java
+-            lastY = ly;
++            // A LINE WITH NO BASELINE DOES NOT SET THE FLOW'S Y. ly is 0 when the paragraph
++            // carries no lineY at all (the seal case), and letting that 0 become lastY tells
++            // the next paragraph the flow is at the top of the page: measured, hoisting the
++            // seal without this guard inserted ten blank lines before "Verify online" and took
++            // the file from 30 blanks to 37, where the page drew a three-line gap.
++            if (ly > 0f) lastY = ly;
+```
+
+## Blast radius, measured by the same build
+
+* A probe over all 214 corpus PDFs: the hoist fires on **27 pages in 27 documents** (rotated stamps,
+  seals, ornate borders, and 305).
+* Full-corpus `.txt` byte-diff, base build against patched build: **27 of 214 differ, 187 byte-identical**
+  — exactly the pages the probe named.
+* `verify_txt.py` on all 27: `t04` and `t08` and the pass count are **identical on the other 26**;
+  **305 is the only document that moves** (6 → 7 passed). No check regressed anywhere.
+* The `.docx` is untouched: all 9 zip parts of `305_vaccination_certificate.docx` are byte-identical
+  before and after.
+
+## Why it is not in the tree
+
+It was measured at 90+ minutes into the slot. Landing it needs the engine rebuilt on the pod, a full
+213-document `.txt` re-conversion and a re-stamped `RANKING-TXT.csv`, and the commit gate refuses without
+that stamp. **The next run should apply the two hunks above verbatim, re-convert, re-stamp, and expect
+`305` to be the only mover.**
