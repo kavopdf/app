@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 08:24 → running IST · 43 min**
+**28 Nov 2026 · slot 08:24 → 09:08 IST · 44 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,7 +15,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 5 vs ATTEMPTS.json history 4; kept change: 2 code commit(s) in this window, first: findings: the U+FFFD geometry route is a guess t vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 2 deployed vs no FINDINGS filename carries 18_dA-02, 05_cB-01 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
+| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 5 vs ATTEMPTS.json history 4; kept change: 3 code commit(s) in this window, first: findings: 19.00 pt is inside Google's row-height vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 2 deployed vs no FINDINGS filename carries 18_dA-02, 05_cB-01 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
 | Document-moves this run | **0** — 5 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
@@ -79,8 +79,9 @@
 > > **What I leave behind, and what would overturn it.** Three findings with the raw measurements, four
 > > reproducible probe builds, and a new probe tool (`GlyphProbe2.java`) that answers "what does this font
 > > still know about this glyph" in one command. The next run should not spend a slot on `w:line`/`w:before`
-> > arithmetic in table cells, nor on a glyph-name fallback for `U+FFFD`. What would overturn the first: a
-> > `before` in the 368–373 twip band whose Google export lays 19.00 on all seven rows. What would overturn
+> > arithmetic in table cells, nor on a glyph-name fallback for `U+FFFD`. The band was then swept
+> > (368/370/371/373 twips): the pitch jumps 18.75 → 19.24 across a 0.49 pt discontinuity and 19.00 falls
+> > inside the gap, so no value of `before` reaches the target. What would overturn
 > > the second: a revision of the form whose `/ToUnicode` maps those codes to real characters.
 
 ## The txt
@@ -105,9 +106,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 08:24 → running · 43 min |
+| Slot window | 08:24 → 09:08 · 44 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 39 |
+| Tool beats | 44 |
 | Longest silence | **16.4 min** — from 08:27:14, after `claimed; deploying agents, then pod-prep` |
 | Silences over 2 min | 5 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -122,7 +123,7 @@
 | fix - diagnose and change the engine | **3 min** | `##` |
 | measure or build - a conversion, screen or compile writes no beacon | **24 min** | `#############` |
 | record - attempt, handoff, class rows | **2 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
+| report - the report and the chain | **2 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |
