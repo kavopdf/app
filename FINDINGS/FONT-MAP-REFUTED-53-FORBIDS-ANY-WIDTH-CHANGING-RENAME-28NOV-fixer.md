@@ -157,3 +157,40 @@ Several of the 13 have a worst dy BELOW the 4.5 pt cap (303 and 70 at 3.1, two-t
 6.5 pt is 4.55 pt) or on the per-page budget, not on the median. The 6 drift documents are the row-pitch
 question `FINDINGS/TABLE-ROW-PITCH-IS-FLOORED-BY-GOOGLE-8-VARIANTS-28NOV-fixer.md` already opened; the
 13 constant-offset ones are a different, smaller, and never-separated shape.
+
+---
+
+## What the 27 actually do: they OVER-run, by 77 to 161 pt, in one column each
+
+`60` reports pass/fail and no numbers, so a fixer could not tell a shortfall from an over-run. This run
+added `tools/p2w-bench/edgeprobe.py`, which prints the numbers `60` compares - per column, the source's
+right edge, Google's, the difference, and the window `60` allows - using `60`'s own estimator and
+tolerance. **Cross-checked against an independent number:** on `313_power_of_attorney` it prints
+`src_edge=538.63 gd_edge=477.66 d=-60.97 allow=-48.00`, which is the previous run's own recorded
+`edge 477.66 vs src 538.63, tolerance 48` to the digit. So the probe is the check, not a lookalike.
+
+Five of the 27 measured through Google at engine HEAD:
+
+| document | verdict from the probe | the one column that fails |
+|:--|:--|:--|
+| delivery-challan | 9 of 10 columns PASS | left 422.76: src 473.53, gd **550.74**, **+77.21** (allow +27.61) |
+| purchase-order | 7 of 8 columns PASS | left 428.30: src 449.71, gd **553.07**, **+103.36** (allow +23.51) |
+| gst-invoice-3line-items | 10 of 11 columns PASS | left 62.92: src 174.79, gd **335.97**, **+161.18** (allow +25.99) |
+| marksheet-subject-left-marks-right | every column PASSES | - |
+| very-long-single-column-table | every column PASSES | - |
+
+**That inverts the story both previous runs told.** `60` on these documents is not "the line stops short
+because the face is narrow". It is **one column running 77-161 pt past the source's edge** while every
+other column on the page lands within a couple of points. A column whose text is 1.6x to 2.4x the width
+the page drew is a lost table cell width, a lost wrap, or text that should have been split and was not -
+a geometry fault in `PdfToWord`, not a font fault and not a small tolerance miss.
+
+The two that pass every column and still fail `60` fail the check's SAFETY NET, not its columns:
+`far >= 2` lines past `s_max + 3 * RIGHT_OVERRUN` - ink outside every column, which `edgeprobe.py` does
+not yet print. That is the next instrument gap and it is one function.
+
+**So the next run's target is not "stretch the line".** It is: on each of the 27, find the column the
+probe names, and ask why that column's render is 77-161 pt wider than the page's. `gst-invoice-3line-items`
+at +161.18 pt on a 112 pt source column is the cheapest single document to open, because a 2.4x
+widening is not a tolerance question - it is a table column that arrived at the wrong width, and it
+should be visible in the `.docx`'s `w:tcW` without any renderer at all.
