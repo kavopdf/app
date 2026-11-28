@@ -1337,7 +1337,7 @@
   "status": "OPEN"
  },
  "60_text_column_right_edge": {
-  "attempts": 15,
+  "attempts": 16,
   "first_seen": null,
   "history": [
    {
@@ -1484,6 +1484,17 @@
     "outcome": "lead",
     "reason": "Split the class, which neither of the last two runs did: of the 59 documents failing 60, 32 take their column edge from a line drawn in DejaVu (font-limited, see attempt 14) and 27 take it from Libera",
     "total": null
+   },
+   {
+    "at": "2026-11-28 13:41",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "txt: hoist a paragraph the model parked at the end back to its own top"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Built edgeprobe.py (prints what 60 compares; cross-checked to the digit against the previous run's own 313 numbers). Measured 5 of the 27 non-font-limited documents at HEAD: delivery-challan +77.21 pt",
+    "total": null
    }
   ],
   "last": null,
@@ -1505,9 +1516,10 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "Split the class, which neither of the last two runs did: of the 59 documents failing 60, 32 take their column edge from a line drawn in DejaVu (font-limited, see attempt 14) and 27 take it from Liberation Sans/Serif or Noto Naskh Arabic. Liberation is Arial's metric drop-in and the engine already maps it, so on those 27 the short edge is NOT a substitution artefact - it is the column right edge, an indent, justification or a table cell width, all engine-controlled. 27 documents = 8.9 clean documents of leverage that was invisible while the two halves were counted as one class. Named in FINDINGS/FONT-MAP-REFUTED-...-28NOV-fixer.md.",
+  "reason": "Built edgeprobe.py (prints what 60 compares; cross-checked to the digit against the previous run's own 313 numbers). Measured 5 of the 27 non-font-limited documents at HEAD: delivery-challan +77.21 pt OVER (allow +27.61), purchase-order +103.36 OVER, gst-invoice-3line-items +161.18 OVER, while every other column on each page passes; marksheet-subject-left-marks-right and very-long-single-column-table pass every column and fail only 60's far-line safety net. So 60 on these is an OVER-run of 77-161 pt in ONE column - a lost table cell width or a lost wrap in PdfToWord - not narrow text and not a tolerance miss. That inverts the premise of the last two runs. gst-invoice-3line-items is the cheapest next document: +161.18 pt on a 112 pt source column is a 2.4x widening, visible in w:tcW with no renderer.",
   "reasons": [
    "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one.",
    "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect.",
@@ -1523,7 +1535,8 @@
    "Google round trip refutes the justify-pin: 313 41/42 HEAD vs 40/42 pinned, 60 still FAIL (under-run 60.97pt -> 57.92pt, tolerance 48), plus a new 18_displacement. Cause is face substitution: source DejaVuSerif 10pt, Google has none, draws 14.6% narrower. See FINDINGS/60-JUSTIFY-PIN-REFUTED-IN-GOOGLE-28NOV-fixer.md",
    "Google round trip (6 probes): face substitution is the cause. 313 HEAD 41/42 (60 FAIL, edge 477.66 vs src 538.63) -> Verdana face 42/42 PASS (edge 536.15); 302 HEAD 41/42 -> Verdana 42/42 PASS. Georgia control moved 0.35pt. sz23 fixes 60 but breaks 34a_span_size_match. Engine mapping + 54min corpus docx pass owed. FINDINGS/60-JUSTIFY-PIN-REFUTED-IN-GOOGLE-28NOV-fixer.md",
    "DejaVu face map, measured through Google on 12 documents. The Verdana rename makes 60 PASS on 5 of 5 target documents (313, 302, 316, 370, 321) and makes 53_embedded_faces FAIL on all 12 - including 5 documents that were clean before (304, 315, 362, 33_sans, 340, the last two also losing 46/59 and 18). 53's own rule 2 forbids any width-changing rename and DejaVu Serif has no metric-identical serif on Google, so 60 and 53 cannot both pass on a DejaVu document. Zero clean gained, five clean lost: reverted, no engine change. Evidence: FINDINGS/FONT-MAP-REFUTED-53-FORBIDS-ANY-WIDTH-CHANGING-RENAME-28NOV-fixer.md. Also closed blocker #5: the Drive measurement path works (VERIFY-GOOGLE.md, the path that works).",
-   "Split the class, which neither of the last two runs did: of the 59 documents failing 60, 32 take their column edge from a line drawn in DejaVu (font-limited, see attempt 14) and 27 take it from Liberation Sans/Serif or Noto Naskh Arabic. Liberation is Arial's metric drop-in and the engine already maps it, so on those 27 the short edge is NOT a substitution artefact - it is the column right edge, an indent, justification or a table cell width, all engine-controlled. 27 documents = 8.9 clean documents of leverage that was invisible while the two halves were counted as one class. Named in FINDINGS/FONT-MAP-REFUTED-...-28NOV-fixer.md."
+   "Split the class, which neither of the last two runs did: of the 59 documents failing 60, 32 take their column edge from a line drawn in DejaVu (font-limited, see attempt 14) and 27 take it from Liberation Sans/Serif or Noto Naskh Arabic. Liberation is Arial's metric drop-in and the engine already maps it, so on those 27 the short edge is NOT a substitution artefact - it is the column right edge, an indent, justification or a table cell width, all engine-controlled. 27 documents = 8.9 clean documents of leverage that was invisible while the two halves were counted as one class. Named in FINDINGS/FONT-MAP-REFUTED-...-28NOV-fixer.md.",
+   "Built edgeprobe.py (prints what 60 compares; cross-checked to the digit against the previous run's own 313 numbers). Measured 5 of the 27 non-font-limited documents at HEAD: delivery-challan +77.21 pt OVER (allow +27.61), purchase-order +103.36 OVER, gst-invoice-3line-items +161.18 OVER, while every other column on each page passes; marksheet-subject-left-marks-right and very-long-single-column-table pass every column and fail only 60's far-line safety net. So 60 on these is an OVER-run of 77-161 pt in ONE column - a lost table cell width or a lost wrap in PdfToWord - not narrow text and not a tolerance miss. That inverts the premise of the last two runs. gst-invoice-3line-items is the cheapest next document: +161.18 pt on a 112 pt source column is a 2.4x widening, visible in w:tcW with no renderer."
   ],
   "requeues": 0,
   "status": "OPEN"
