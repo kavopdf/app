@@ -2579,7 +2579,7 @@
   "status": "OPEN"
  },
  "t12_word_invention": {
-  "attempts": 13,
+  "attempts": 14,
   "first_seen": null,
   "history": [
    {
@@ -2712,10 +2712,21 @@
     "outcome": "lead",
     "reason": "t12 root-caused on all three documents: (A) 127 U+FFFD in the two Account_Opening_Form twins, one-to-one with 127 source symbol glyphs (H-circumflex 89, H-doubleacute 23, g-cedilla 13, h-bar 2) the wr",
     "total": null
+   },
+   {
+    "at": "2026-11-28 14:35",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "txt: hoist a paragraph the model parked at the end back to its own top"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "both annotation guards together take 600_reviewed_invoice_with_annotations t12 from 83 invented chars to 0 (FAIL->PASS); each guard alone leaves 49/30 and was previously recorded as NO CLEAR; change i",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "8fb4f503",
+  "last_engine": "99fefe2a",
   "last_moved": 0,
   "last_total": 212,
   "outcomes": [
@@ -2731,9 +2742,10 @@
    "lead",
    "reverted",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "t12 root-caused on all three documents: (A) 127 U+FFFD in the two Account_Opening_Form twins, one-to-one with 127 source symbol glyphs (H-circumflex 89, H-doubleacute 23, g-cedilla 13, h-bar 2) the writer cannot decode - the verifier has the Annex D table, the engine does not; (B) 600_reviewed_invoice hoists annotation /Contents (91 extra chars, 0 missing), a conflict between t12 and 50_annotation_text plus a drawnByAppearance defect on the stamp.",
+  "reason": "both annotation guards together take 600_reviewed_invoice_with_annotations t12 from 83 invented chars to 0 (FAIL->PASS); each guard alone leaves 49/30 and was previously recorded as NO CLEAR; change is in PdfToWord.java so landing costs the full docx re-score, which the slot did not have. Patch + measurement in FINDINGS/ANNOTATION-TWO-DOORS-MUST-BE-CLOSED-TOGETHER-28NOV-fixer.md",
   "reasons": [
    "claimed (second attempt, same slot). t12_word_invention, 12 documents, the biggest .txt class after t13 closed. Plan: read the check, census the invented tokens per document, group by mechanism (furniture duplication, hyphenation join, symbol decode, dropped glyph fallback) and attack the largest group. No engine change until the census names one.",
    "NO ENGINE CHANGE LANDED - a measured census, which is the result. t12_word_invention is NOT one construct: the twelve documents carry at least five different faults. 21 of the words on 600_reviewed_invoice_with_annotations are the six review ANNOTATIONS, which page.get_text() does not read and the engine does (measured: 'confirmed' absent from get_text(), present in the annotation stream). 12_stamp_across_page_break is duplication across the break - KUNIGAL is drawn once on page 1 and arrives twice - which is t09's question. 311_fir_police_form is cell welding: 60067 and Mobile are two drawn lines in one cell and arrive as '60067Mobile'. 77_arabic_rtl_document is RTL order, 05_round_company_seal_curved_text is single letters from a curve, 39_small_caps_letter_spacing is letter-spaced caps. And THREE OF THE TWELVE ARE THE INSTRUMENT'S OWN ARTIFACT: the PDF text layer carries U+0000 as a zero-width cell separator, _words splits on \\S+ so NUL is not whitespace and glues to the token beside it ('\\x00\\x00\\x00PHOTOGRAPH', 'DisagreeStrongly\\x00disagree', '0.8412,\\x00Adjusted'), and _strip_punct does not strip NUL - so the clean token the writer emitted is counted as invented. Replacing U+0000 with a space on the source side clears 391_survey_questionnaire_grid, 392_statistical_console_output and 406_passport_mrz_page and BREAKS NO DOCUMENT (0 of the 205 passing). Not edited into verify_txt.py: the verifier is the instrument. FINDINGS/t12-is-five-faults-and-three-are-the-instrument-1925.md.",
@@ -2747,7 +2759,8 @@
    "annotation-meta patch: 600 txt FAIL(t12 83) -> PASS, docx word/document.xml byte-identical on 600/041122/601; gate refuses because the docx table needs a 212-doc re-score that p2w.py cannot finish in a slot (24 then 18 measured, remaining rose 188->194)",
    "txt-meta-annotation patch applied, corpus built (213/213, 1.4 min) and fully re-measured (212/212 in 6 calls); gate refused on 1 docx regression 600_reviewed_invoice_with_annotations 54.30 -> 62.46. The patch's byte-identity premise does not reproduce: two conversions of 600 differ in sha256 (8cdb2dd8 patched vs ca292def HEAD). Reverted. The corpus pass itself completes in a slot.",
    "annotationRuns() lacks the FreeText guard annotationContentsOf() has; 600 t12 83->49 invented chars, 1 of 213 .txt changed, txt clean 205 before and after, gate PASSes on worse/Google-safe then REFUSES as an unmeasured engine. Clears no document, reverted; patch in FINDINGS/annotation-runs-freetext-guard-27NOV.patch",
-   "t12 root-caused on all three documents: (A) 127 U+FFFD in the two Account_Opening_Form twins, one-to-one with 127 source symbol glyphs (H-circumflex 89, H-doubleacute 23, g-cedilla 13, h-bar 2) the writer cannot decode - the verifier has the Annex D table, the engine does not; (B) 600_reviewed_invoice hoists annotation /Contents (91 extra chars, 0 missing), a conflict between t12 and 50_annotation_text plus a drawnByAppearance defect on the stamp."
+   "t12 root-caused on all three documents: (A) 127 U+FFFD in the two Account_Opening_Form twins, one-to-one with 127 source symbol glyphs (H-circumflex 89, H-doubleacute 23, g-cedilla 13, h-bar 2) the writer cannot decode - the verifier has the Annex D table, the engine does not; (B) 600_reviewed_invoice hoists annotation /Contents (91 extra chars, 0 missing), a conflict between t12 and 50_annotation_text plus a drawnByAppearance defect on the stamp.",
+   "both annotation guards together take 600_reviewed_invoice_with_annotations t12 from 83 invented chars to 0 (FAIL->PASS); each guard alone leaves 49/30 and was previously recorded as NO CLEAR; change is in PdfToWord.java so landing costs the full docx re-score, which the slot did not have. Patch + measurement in FINDINGS/ANNOTATION-TWO-DOORS-MUST-BE-CLOSED-TOGETHER-28NOV-fixer.md"
   ],
   "requeues": 0,
   "status": "OPEN"

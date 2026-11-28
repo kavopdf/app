@@ -11005,3 +11005,7 @@
 {"t": 1795857637.7258534, "ist": "14:50:37", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795857640.7038026, "ist": "14:50:40", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795858050.2561996, "ist": "14:57:30", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795858055.1199086, "ist": "14:57:35", "ev": "attempt", "d": "60_text_column_right_edge -> kept"}
+{"t": 1795858055.228469, "ist": "14:57:35", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795858055.3409808, "ist": "14:57:35", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795858055.9850216, "ist": "14:57:35", "ev": "beat", "d": "classrow.py: refreshing the class file"}

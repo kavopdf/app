@@ -1,4 +1,3 @@
-| 25 Nov 05:47 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 25 Nov 06:14 | fixer | slot claimed - fixer running |
 | 25 Nov 07:32 | fixer | attempt 04_chars_missing -> lead (0/212 moved) |
 | 25 Nov 06:41 | fixer | attempt 00_page_count -> lead (0/? moved) |
@@ -198,3 +197,4 @@
 | 28 Nov 13:43 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 28 Nov 13:53 | fixer | slot claimed - fixer running |
 | 28 Nov 14:35 | fixer | attempt t12_word_invention -> lead (0/? moved) |
+| 28 Nov 14:57 | fixer | attempt 60_text_column_right_edge -> kept (3/? moved) |
