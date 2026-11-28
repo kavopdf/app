@@ -1,16 +1,5 @@
 [
  {
-  "started": "04:24",
-  "started_ts": 1795647270.3993807,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "agents": [
    {
     "class": "18_displacement",
@@ -771,5 +760,21 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "18_dA-05",
+   "18_dB-03"
+  ],
+  "attempts": 4,
+  "class": "18_displacement",
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "started": "09:28",
+  "started_ts": 1795838301.5959125,
+  "window_for_claim": 1795838301.5959125,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

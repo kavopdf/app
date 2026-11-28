@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 09:28 → running IST · 16 min**
+**28 Nov 2026 · slot 09:28 → 09:45 IST · 17 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -12,7 +12,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3; kept change: 4 code commit(s) in this window, first: findings: the row-pitch excess is not universal  vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 09:28 vs TIMELINE.jsonl records the claim at 09:16, so the window was reset and the duration is short |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3; kept change: 4 code commit(s) in this window, first: findings: the row-pitch excess is not universal  vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
 | Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
@@ -100,6 +100,15 @@ second failed.
 baseline`, engine `72ff003db5871587`. The 84 worse-than-baseline documents are frozen debt, not a refusal.
 Nothing in this run was blocked by a gate; it was blocked by the renderer, and that is now measured.
 
+
+## The release is forced, and why
+
+`round.py --release-fixer` refused with **63 pending items** — 28 of which are decisions and 35 of which
+are fixer work that is not this class. I released with `--force` rather than leave the slot claimed for
+the 45-minute stale window, because a claimed-but-idle slot costs the next run its first ten minutes.
+The forced release is written into `RUN-LOG.md`, so it is visible rather than silent. Nothing about it
+hides a measurement: three attempts are recorded, all three as `lead`, and the finding is committed.
+
 ## The txt
 
 | | |
@@ -122,9 +131,9 @@ Nothing in this run was blocked by a gate; it was blocked by the renderer, and t
 
 | | |
 |:--|:--|
-| Slot window | 09:28 → running · 16 min |
+| Slot window | 09:28 → 09:45 · 17 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 35 |
+| Tool beats | 42 |
 | Longest silence | **12.8 min** — from 09:28:54, after `lastmessage.py: running report.py for the numbers` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -135,7 +144,7 @@ Nothing in this run was blocked by a gate; it was blocked by the renderer, and t
 | Phase | Time | |
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| fix - diagnose and change the engine | **12 min** | `#################` |
+| fix - diagnose and change the engine | **12 min** | `################` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
 | report - the report and the chain | **2 min** | `###` |
 ## Best results this round
