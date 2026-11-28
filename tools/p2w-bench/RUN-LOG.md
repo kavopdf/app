@@ -198,3 +198,4 @@
 | 28 Nov 15:08 | fixer | slot claimed - fixer running |
 | 28 Nov 15:47 | fixer | attempt 18_displacement -> lead |
 | 28 Nov 16:27 | fixer | attempt 18_displacement -> lead |
+| 28 Nov 16:29 | fixer | slot FORCED released - see INCIDENTS.md for why |
