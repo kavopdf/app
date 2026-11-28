@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `03:41` agent landed: row_rung / A -> FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md
 - `03:41` agent landed: commit_gate / B -> FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md
 - `04:27` attempt 6 on 63_table_rows -> lead
 - `04:29` attempt 7 on 63_table_rows -> lead
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `09:42` agent deployed: 18_displacement / B - census the 19 documents that fail only 18_displacement and test the measured gap
 - `09:42` agent landed: 18_dA-05 /  -> FINDINGS/18d-WLINE-GOOGLE-MEASURED-AGENT-28NOV.md
 - `09:42` agent landed: 18_dB-03 /  -> FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md
+- `09:44` attempt 127 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 

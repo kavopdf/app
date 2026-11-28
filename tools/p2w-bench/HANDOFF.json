@@ -384,10 +384,6 @@
  "notes": [
   {
    "at": "10:58",
-   "text": "agent deployed: 18_displacement / A - which sub-cause of the displacement survives every eliminated one, measured on o"
-  },
-  {
-   "at": "10:58",
    "text": "agent deployed: 60_text_column_right_edge / B - how many CLEAN documents does fixing 60 alone win, and is there a live construct"
   },
   {
@@ -621,6 +617,10 @@
   {
    "at": "09:42",
    "text": "agent landed: 18_dB-03 /  -> FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md"
+  },
+  {
+   "at": "09:44",
+   "text": "attempt 127 on 18_displacement -> lead"
   }
  ],
  "plan": "",

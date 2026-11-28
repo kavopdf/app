@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 09:28 → running IST · 15 min**
+**28 Nov 2026 · slot 09:28 → running IST · 16 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 3 code commit(s) in this window, first: findings: Google's table row advance is not cont vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 09:28 vs TIMELINE.jsonl records the claim at 09:16, so the window was reset and the duration is short |
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3; kept change: 4 code commit(s) in this window, first: findings: the row-pitch excess is not universal  vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 09:28 vs TIMELINE.jsonl records the claim at 09:16, so the window was reset and the duration is short |
+| Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -34,6 +34,7 @@
 |--:|:--|--:|:--|
 | 09:28 | **lead** | 0/None | TxtWriter writes a letter-spaced line as one line per glyph while DocxWriter merges it: 305_vaccination_certificate has 47 single-char lines of 85 and fails t08 32/33 because the glyphs land after the |
 | 09:41 | **lead** | 0/None | Ten Google variants on three documents: Google's table row advance exceeds the source pitch by +0.10 (16.40 src), +0.13 (18.40) and +0.50 (13.00) pt per row, accumulating 3.9-9.2 pt by the bottom of a |
+| 09:44 | **lead** | 0/None | Fourth document: table-inside-two-column-page reproduces the source's 11.8 pt text pitch exactly in Google (11 of 16 gaps 11.8, source identical) because its rows are taller than its text pitch (trHei |
 
 ## Why nothing moved, in this run's own words
 
@@ -41,44 +42,42 @@
 
 ### The run before this one said
 
-> **The decision, and its reason.** `classpick.py` suggested `t09_page_furniture` on a lead whose own
-> FINDINGS file (`t09-PAGE-FURNITURE-RELAY-27NOV-relay.md`) refutes its `.docx` half and asks for the `.txt`
-> half. I took it, because the `.txt` gate passes at HEAD and a `.txt`-scoped change is the only kind this
-> pipeline can commit today: the docx half is frozen behind 84 documents of debt and a 54-minute re-measure.
+> **The decision, and its reason.** `classpick.py --leverage` prices `18_displacement` at **47.1 clean
+> documents** and 19 documents that fail nothing else, and the 05:54 run had already root-caused it and
+> named its next step: *"give the cell the font's natural line box and move the identical difference into
+> `before`"*. That is a falsifiable prediction, so I did not build it — I tested it in Google first. It is
+> wrong, and the measurement that refutes it found the real mechanism.
 >
-> **What the previous slot left me, and what it cost me.** The 09:08 run's whole slot was two refutations
-> (the table-cell pitch band and the U+FFFD glyph-name fallback) and no change, so the ledger's newest lead
-> pointed at a class whose `.docx` half was already closed. Reading that before claiming saved the slot
-> from re-deriving it; the first 15 minutes went to `FINDINGS/`, `DISP-TABLE.csv` and the gate, not to a
-> build.
+> **What I did, in order.** Two agents in the first ten minutes (both ran inside the turn, both negative,
+> both committed). Then ten Google variants across three documents: upload, convert, export, and read the
+> row pitch out of the export with PyMuPDF. That is the whole run, and it is four measured attempts, not
+> one.
 >
-> **The gate is not what blocks this pipeline, and I measured that rather than assuming it.** `regress.py
-> --check` at HEAD prints `PASS` — `docx: no document got worse`, the 84 worse-than-baseline documents are
-> "frozen, not forgiven", `txt: no document worse than baseline`. The 28 Nov 02:24 finding's "84 regressions
-> refuse every engine change" is now a frozen debt, not a refusal. What blocks an engine change is the
-> re-measure behind it: the docx table needs a 54-minute corpus pass, the txt table a full 213-document
-> re-conversion. That is the real cost, and it is why nothing landed in 40 minutes of slot.
+> **The finding, and it is not the one anyone expected.** Google's table row advance **exceeds** the source
+> pitch by a per-document amount, and it accumulates: **+0.10 pt/row** on a 16.40 pt pitch, **+0.13** on
+> 18.40, **+0.50** on 13.00 with 6 pt text. Over 24-40 rows that is **+3.9 to +9.2 pt** by the bottom of the
+> table, and `18_displacement` allows 2.8 pt. The engine's row geometry is **already exact** — it writes
+> `w:trHeight 328` and `before 317 + line 11`, which is the source's 16.40 pt to the twip.
 >
-> **What I found, and how.** `305_vaccination_certificate` fails `t08_line_order` 32 of 33 and is one page.
-> Its `.txt` has 85 lines, **47 of them single characters**: the page draws `NATIONAL IMMUNISATION REGISTRY`
-> as one line at `y = 20.1`, and the `.txt` writes it as sixteen lines, one glyph each, at increasing
-> columns. The same document's `.docx` carries the string `NATIONAL IMMUNISATION REGISTRY` merged. So
-> `DocxWriter` merges the glyphs of a letter-spaced line and `TxtWriter` does not — one model, two writers,
-> opposite answers. The two `Account_Opening_Form` documents carry the same defect at scale: 274 single-char
-> lines of 1193, and that is where `t09`'s "29 owed / 125 present" comes from, which the 26 Nov census
-> recorded as instrument asymmetry and could not attribute.
+> **And no declaration the engine writes can change it.** `w:trHeight` is inert (two values, identical
+> export); reducing `w:before` is inert (three values, identical export); the cell's paragraph mark is
+> inert; `w:line="0"` reads as single spacing and makes it worse. Only an *increase* of `before` above a
+> per-document value is honoured, and it is honoured upward.
 >
-> **Why I did not land it.** The fix is writer-local (`TxtWriter.appendPara`), but a `TxtWriter` change
-> moves the engine fingerprint, and the commit gate then demands a re-stamped `RANKING-TXT.csv` over all 213
-> documents. I had the diagnosis and 25 minutes; a half-measured engine change is worse than none, and the
-> charter says an unmeasured change is not a pass. So the measurement, the exact next step and the expected
-> one-document result are in `FINDINGS/TXT-SPLITS-A-LETTER-SPACED-LINE-INTO-ONE-LINE-PER-GLYPH-28NOV-relay.md`
-> and the attempt is recorded as a `lead`, not as a fix.
+> **So there was nothing to land, and that is the decision.** The only change the previous run proposed
+> (v2 here: same sum, a 12 pt box instead of 0.55) leaves the pitch at 16.500 and moves the table's first
+> row **+11.51 pt**. Building it would have cost the corpus pass and produced a Google regression. A
+> change I could not measure as an improvement is not a change.
 >
-> **What would overturn it.** If a merged `TxtWriter` does not take `305` to `t08 33 of 33`, the merge is
-> the wrong merge and the split is in `PdfToWord`'s line model instead — which would also mean the `.docx`
-> merge I measured is done downstream and would have to be moved. That is one conversion and one
-> `verify_txt.py` run to settle, and it is the first thing the next slot should do.
+> **What I now know that I did not.** `18_displacement` on dense-table documents is a **renderer
+> behaviour, not an engine defect** — the fourth construct in this repository where the answer is "Google
+> cannot do it". Twelve of the nineteen documents that fail nothing else are 20-plus-row tables, so the
+> class's 47.1 price is mostly not collectable. The next run should split those nineteen by their own row
+> pitch and row count before spending a slot on any of them, and the split is in the finding.
+>
+> **What would prove me wrong.** Any Google render of a 20+ row table whose pitch equals its source pitch
+> to 0.05 pt; or any variant that moves the delivered pitch while *reducing* `before`. Four attempts at the
+> second failed.
 
 ## The txt
 
@@ -102,9 +101,9 @@
 
 | | |
 |:--|:--|
-| Slot window | 09:28 → running · 15 min |
+| Slot window | 09:28 → running · 16 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 30 |
+| Tool beats | 35 |
 | Longest silence | **12.8 min** — from 09:28:54, after `lastmessage.py: running report.py for the numbers` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -115,9 +114,9 @@
 | Phase | Time | |
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| fix - diagnose and change the engine | **12 min** | `##################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `##` |
+| fix - diagnose and change the engine | **12 min** | `#################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **2 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |

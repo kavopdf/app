@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 09:28 → running IST · 15 min**
+**28 Nov 2026 · slot 09:28 → running IST · 16 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -12,8 +12,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 3 code commit(s) in this window, first: findings: Google's table row advance is not cont vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 09:28 vs TIMELINE.jsonl records the claim at 09:16, so the window was reset and the duration is short |
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3; kept change: 4 code commit(s) in this window, first: findings: the row-pitch excess is not universal  vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 09:28 vs TIMELINE.jsonl records the claim at 09:16, so the window was reset and the duration is short |
+| Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -31,6 +31,7 @@
 |--:|:--|--:|:--|
 | 09:28 | **lead** | 0/None | TxtWriter writes a letter-spaced line as one line per glyph while DocxWriter merges it: 305_vaccination_certificate has 47 single-char lines of 85 and fails t08 32/33 because the glyphs land after the |
 | 09:41 | **lead** | 0/None | Ten Google variants on three documents: Google's table row advance exceeds the source pitch by +0.10 (16.40 src), +0.13 (18.40) and +0.50 (13.00) pt per row, accumulating 3.9-9.2 pt by the bottom of a |
+| 09:44 | **lead** | 0/None | Fourth document: table-inside-two-column-page reproduces the source's 11.8 pt text pitch exactly in Google (11 of 16 gaps 11.8, source identical) because its rows are taller than its text pitch (trHei |
 
 ## Why nothing moved, in this run's own words
 
@@ -121,9 +122,9 @@ Nothing in this run was blocked by a gate; it was blocked by the renderer, and t
 
 | | |
 |:--|:--|
-| Slot window | 09:28 → running · 15 min |
+| Slot window | 09:28 → running · 16 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 30 |
+| Tool beats | 35 |
 | Longest silence | **12.8 min** — from 09:28:54, after `lastmessage.py: running report.py for the numbers` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -134,9 +135,9 @@ Nothing in this run was blocked by a gate; it was blocked by the renderer, and t
 | Phase | Time | |
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| fix - diagnose and change the engine | **12 min** | `##################` |
-| record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **1 min** | `##` |
+| fix - diagnose and change the engine | **12 min** | `#################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **2 min** | `###` |
 ## Best results this round
 
 | Document | Before | After | Change |

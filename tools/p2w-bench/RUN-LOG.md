@@ -1,4 +1,3 @@
-| 24 Nov 20:50 | fixer | attempt 04_chars_missing -> lead (0/26 moved) |
 | 24 Nov 20:51 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 24 Nov 21:49 | baseline | slot claimed - baseline running |
 | 24 Nov 22:20 | fixer | slot claimed - fixer running |
@@ -198,3 +197,4 @@
 | 28 Nov 09:16 | fixer | slot claimed - fixer running |
 | 28 Nov 09:28 | fixer | attempt t09_page_furniture -> lead (0/? moved) |
 | 28 Nov 09:41 | fixer | attempt 18_displacement -> lead (0/? moved) |
+| 28 Nov 09:44 | fixer | attempt 18_displacement -> lead (0/? moved) |
