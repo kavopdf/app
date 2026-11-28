@@ -2,7 +2,7 @@
  "name": "320_balance_sheet_statutory",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-28T10:57:07",
+ "at": "2026-11-28T11:14:28",
  "passed": 46,
  "total": 47,
  "failed": [
@@ -18,5 +18,5 @@
   "runs_matched": 73
  },
  "engine": "a05b20eb05fe0fc8",
- "checks": "384800-1795858671"
+ "checks": "385931-1795862885"
 }
