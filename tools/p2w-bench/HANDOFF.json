@@ -1,29 +1,6 @@
 {
  "agents": [
   {
-   "id": "60_tB-01",
-   "class": "60_text_column_right_edge",
-   "angle": "B",
-   "question": "how many CLEAN documents does fixing 60 alone win, and is there a live construct",
-   "expected": "10:15",
-   "deployed": "10:58",
-   "status": "landed",
-   "finding": "FINDINGS/60-COLUMN-RIGHT-EDGE-CENSUS-27NOV-agent.md",
-   "deployed_at": "2026-11-27T10:58",
-   "landed_at": "2026-11-27T10:58"
-  },
-  {
-   "id": "18dA18_displacement-01",
-   "class": "18dA-03",
-   "angle": "18_displacement",
-   "question": "baseline placement inside the hairline exact line box",
-   "expected": "Turn the measured 0.312 em renderer baseline vs 0.050 em engine charge into a minimal, measured engine change that makes 18_displacement pass on 31_times_body_arial_headings and its siblings without regressing any document. Expected by 12:35",
-   "deployed": "11:21",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T11:21"
-  },
-  {
    "id": "60tB60_text_column_right_edge-01",
    "class": "60tB-02",
    "angle": "60_text_column_right_edge",
@@ -301,11 +278,6 @@
  ],
  "history": [
   {
-   "at": "08:26",
-   "how": "forced",
-   "plan": ""
-  },
-  {
    "at": "09:15",
    "how": "forced",
    "plan": ""
@@ -397,6 +369,11 @@
   },
   {
    "at": "10:22",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "10:40",
    "how": "forced",
    "plan": ""
   }
@@ -647,7 +624,7 @@
  "plan": "",
  "run": {
   "started": "09:54",
-  "ended": "10:22",
+  "ended": "10:40",
   "ended_how": "forced"
  }
 }

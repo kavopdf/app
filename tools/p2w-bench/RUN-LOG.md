@@ -198,3 +198,4 @@
 | 28 Nov 10:22 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 28 Nov 10:33 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
 | 28 Nov 10:33 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
+| 28 Nov 10:40 | fixer | slot FORCED released - see INCIDENTS.md for why |

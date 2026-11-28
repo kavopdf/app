@@ -10,7 +10,7 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 09:54 |
-| ended | 10:22 |
+| ended | 10:40 |
 | how it ended | forced |
 | plan | - |
 
@@ -22,8 +22,6 @@ unfinished work, not as a result.
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 60_tB-01 | 60_text_column_right_edge | B | how many CLEAN documents does fixing 60 alone win, and is there a live | 10:58 | 10:15 | landed | FINDINGS/60-COLUMN-RIGHT-EDGE-CENSUS-27NOV-agent.md |
-| 18dA18_displacement-01 | 18dA-03 | 18_displacement | baseline placement inside the hairline exact line box | 11:21 | Turn the measured 0.312 em renderer baseline vs 0.050 em engine charge into a minimal, measured engine change that makes 18_displacement pass on 31_times_body_arial_headings and its siblings without regressing any document. Expected by 12:35 | running |  |
 | 60tB60_text_column_right_edge-01 | 60tB-02 | 60_text_column_right_edge | the right-tab line is split by our own reader | 11:21 | Find why Google's export splits a right-tabbed line into two lines and ours into one (17_matched_runs 34->13), and produce a reader or writer change that keeps the tab's 538.50 pt edge without collapsing 17. Expected by 12:35 | running |  |
 | 18_dA-04 | 18_displacement | A | Does the +2.70 pt charge on 31_times come from the baseline's placemen | 12:08 | 12:35 | running |  |
 | 18_dB-02 | 18_displacement | B | Is 18_displacement's dy an ascent artifact - bbox top vs baseline orig | 12:08 | 12:35 | landed | FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md |
@@ -46,6 +44,8 @@ unfinished work, not as a result.
 | 18_dB-03 | 18_displacement | B | census the 19 documents that fail only 18_displacement and test the me | 09:42 | 18:00 | landed | FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md |
 | --cl-01 | --class |  |  | 10:00 |  | running |  |
 | --cl-02 | --class |  |  | 10:22 |  | running |  |
+| 60-font-01 | 60_text_column_right_edge | does the font NAME change the Google render, and does w:jc stretch a one-line paragraph | Root-cause 60_text_column_right_edge (21.1 worth, no prior solo invest | 10:02 | a named engine change with its expected document effect, or a refutation with a measurement | done | FINDINGS/60-text-column-right-edge-28NOV.md - 59 docs fail; 15 engine (8.67 worth), 17 instrument (4.17), 7 stale-pass, 20 undecided; no reflow anywhere; instrument over-charges via a hard 10pt left-edge bucket (purchase-order +103.36 charged vs +2.79 actual); replacement bucketing refuted (15 pass / 6 regress); named change = extend the right-tab emitter to full-measure body lines, blocked because it drops 17_matched_runs 34->13 |
+| 18d-split-01 | 18_displacement | split the 19 solo documents by row pitch and row count and find the collectable subset | Which of the 19 documents that fail only 18_displacement are collectab | 10:02 | a per-document classification and one named engine change with its expected point effect, or a refutation | done | FINDINGS/18-displacement-SPLIT-28NOV.md - all 19 single-page; 6 dense-table accumulation carriers, 13 not; 11 of the 13 fail only the 5% count clause at the smallest type; engine row geometry faithful to 0.00pt on 13 of 19; collectable subset = 0 with two independent proofs |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
