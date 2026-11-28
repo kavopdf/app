@@ -11094,3 +11094,26 @@
 {"t": 1795861498.0883398, "ist": "15:54:58", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795861498.958619, "ist": "15:54:58", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795861504.9172778, "ist": "15:55:04", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795862066.705154, "ist": "16:04:26", "ev": "beat", "d": "attempt: FOOT_ROOM_MIN_TW 100->75, reconverting"}
+{"t": 1795862317.3460765, "ist": "16:08:37", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795862317.5421562, "ist": "16:08:37", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795862317.719649, "ist": "16:08:37", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795862317.8987234, "ist": "16:08:37", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795862318.0665529, "ist": "16:08:38", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795862318.2470584, "ist": "16:08:38", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795862318.4276936, "ist": "16:08:38", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795862318.6068923, "ist": "16:08:38", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795862321.120738, "ist": "16:08:41", "ev": "beat", "d": "reconverting corpus for foot-room engine"}
+{"t": 1795862558.8174574, "ist": "16:12:38", "ev": "beat", "d": "google-measuring 320 with foot-room engine"}
+{"t": 1795862889.5251765, "ist": "16:18:09", "ev": "beat", "d": "reverting foot-room change, reconverting for the gate"}
+{"t": 1795863155.5716705, "ist": "16:22:35", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795863155.7923808, "ist": "16:22:35", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795863155.9429238, "ist": "16:22:35", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795863156.1481574, "ist": "16:22:36", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795863156.3570533, "ist": "16:22:36", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795863156.5589056, "ist": "16:22:36", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795863156.7669423, "ist": "16:22:36", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795863157.0059934, "ist": "16:22:37", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795863404.9339466, "ist": "16:26:44", "ev": "beat", "d": "re-measuring 320 at HEAD to restore the stored row"}
+{"t": 1795863432.6660068, "ist": "16:27:12", "ev": "beat", "d": "writing the finding and the report"}
+{"t": 1795863441.3626206, "ist": "16:27:21", "ev": "beat", "d": "attempt.py: recording an attempt"}
