@@ -9,14 +9,14 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 11:59 |
-| ended | 13:43 |
-| how it ended | forced |
+| started | 13:53 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `07:02` attempt 122 on 18_displacement -> lead
 - `08:54` attempt 123 on 18_displacement -> lead
 - `08:54` attempt 4 on 05_chars_extra -> lead
 - `08:56` attempt 124 on 18_displacement -> lead
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:41` attempt 16 on 60_text_column_right_edge -> lead
 - `13:42` agent deployed: 60_text_column_right_edge / font-map - produce a (family,size) table of which Google face each source face must be decl
 - `13:42` agent deployed: 60_text_column_right_edge / edge-probe - extend edgeprobe.py to print the far>=2 safety net that makes marksheet-subject-
+- `14:35` attempt 14 on t12_word_invention -> lead
 
 ## Where the rest of the state lives
 

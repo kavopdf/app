@@ -10976,3 +10976,7 @@
 {"t": 1795856550.783568, "ist": "14:32:30", "ev": "beat", "d": "measuring both annotation doors together on 600"}
 {"t": 1795856735.984226, "ist": "14:35:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795856746.4106011, "ist": "14:35:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795856751.8691518, "ist": "14:35:51", "ev": "attempt", "d": "t12_word_invention -> lead"}
+{"t": 1795856752.0730479, "ist": "14:35:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795856752.26021, "ist": "14:35:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795856753.5106814, "ist": "14:35:53", "ev": "beat", "d": "classrow.py: refreshing the class file"}

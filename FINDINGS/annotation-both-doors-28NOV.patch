@@ -1,0 +1,20 @@
+diff --git a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+index ad56dac1..3997a2c5 100644
+--- a/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
++++ b/app/src/main/java/com/kavopdf/app/engine/PdfToWord.java
+@@ -957,6 +957,7 @@ public final class PdfToWord {
+                 if (flat.contains(ar.text.replaceAll("\\s+", " ").toLowerCase(Locale.ROOT))) {
+                     continue;
+                 }
++                if (drawnByAppearance(apDrawn, ar.text)) continue;
+                 Para p = new Para();
+                 p.runs.add(ar);
+                 p.top = 0;
+@@ -2462,6 +2463,7 @@ public final class PdfToWord {
+                         .PDAnnotationWidget) continue;      // its /V was already read
+                 String c = ann.getContents();
+                 if (c == null || c.trim().isEmpty()) continue;
++                if (!"FreeText".equals(ann.getSubtype())) continue;
+                 float[] style = appearanceStyle(ann);
+                 float size = Float.isNaN(style[1]) || style[1] <= 0f ? 11f : style[1];
+                 out.add(new Run(c.trim(), false, false, size, null, (int) style[0]));
