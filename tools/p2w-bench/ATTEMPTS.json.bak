@@ -313,31 +313,9 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 127,
+  "attempts": 129,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-27 15:24",
-    "changed": {
-     "files": [],
-     "last_engine_commit": "p2w fixer 27nov: table gap spent as w:before (70%), pitch-bound rows declared 10 twips und"
-    },
-    "moved": 0,
-    "outcome": "lead",
-    "reason": "no engine change landed. Instrument fix landed instead: report.py:engine_now() hashed every .java while the docx store stamp excludes TxtWriter.java, so the Google-truth read returned 0 of 0 on a stor",
-    "total": null
-   },
-   {
-    "at": "2026-11-27 16:43",
-    "changed": {
-     "files": [],
-     "last_engine_commit": "p2w fixer 27nov: table gap spent as w:before (70%), pitch-bound rows declared 10 twips und"
-    },
-    "moved": 0,
-    "outcome": "lead",
-    "reason": "table-with-no-header-row: the charge is a per-row PITCH RAMP (source 18.4pt, render 17.9pt, 0.44pt/row, 0.7->12.0pt over 27 rows), not the constant offset med_dy reports; and worst_dy 101.4 is the che",
-    "total": null
-   },
    {
     "at": "2026-11-27 16:50",
     "changed": {
@@ -535,10 +513,32 @@
     "outcome": "lead",
     "reason": "Fourth document: table-inside-two-column-page reproduces the source's 11.8 pt text pitch exactly in Google (11 of 16 gaps 11.8, source identical) because its rows are taller than its text pitch (trHei",
     "total": null
+   },
+   {
+    "at": "2026-11-28 15:47",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "txt: hoist a paragraph the model parked at the end back to its own top"
+    },
+    "moved": null,
+    "outcome": "lead",
+    "reason": "Google loop proven end-to-end (42/47 reproduced on bank-statement-5-pages, same 5 failures, engine a05b20eb); ROW_RUNG_UNDER_TW 10->25 refuted as inert on 320_balance_sheet_statutory - all 21 rows emi",
+    "total": null
+   },
+   {
+    "at": "2026-11-28 15:51",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "claim: fixer"
+    },
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "59_shape_anchor charged the box corner instead of the text's place inside the box; centre-based origin, measured through Google on 9 documents rendered today: 48_form_coloured_border_coloured_values 4",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "33863086",
+  "last_engine": "b19a83e",
   "last_moved": 0,
   "last_total": 4,
   "outcomes": [
@@ -667,14 +667,16 @@
    "lead",
    "lead",
    "lead",
-   "lead"
+   "lead",
+   "lead",
+   "kept"
   ],
   "park_reason": "no progress in the last 12 attempts (lead, lead, lead, lead, reverted, lead, lead, reverted, reverted, lead, lead, lead)",
   "parked_at": "24 Nov 03:30",
   "pending_moved": 37,
   "ratchet_at": "27 Nov 07:44",
   "ratchet_docs": 213,
-  "reason": "Fourth document: table-inside-two-column-page reproduces the source's 11.8 pt text pitch exactly in Google (11 of 16 gaps 11.8, source identical) because its rows are taller than its text pitch (trHeight 18.5/17.5 vs 11.8). So the +0.10/+0.13/+0.50 pt per-row excess is a property of the single-line-sets-the-row regime, not of tables in general. Its 18_displacement is a different shape: the table lands 69.18 pt short at the bottom with the pitch intact.",
+  "reason": "59_shape_anchor charged the box corner instead of the text's place inside the box; centre-based origin, measured through Google on 9 documents rendered today: 48_form_coloured_border_coloured_values 41/42 -> 42/42 CLEAN, 0 new failures, 3 still convicted. Independent PyMuPDF check: worst run moved 2.62pt.",
   "reasons": [
    "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 pt mark, Google does not implement lineRule=exact and buys a fraction of it. Applied it (w:before=spacerTw, w:line=1) and measured bank-statement-5-pages through Drive: GOOGLE 40/47 -> 36/47, WORSE, and 27_text_off_page went 0 -> 12 as the extra space overflowed the page. LibreOffice unchanged at 47/47. The reason it cannot work: the spacer is NOT where the 57 pt comes from. Counted in the emitted docx, bank-statement-5-pages carries 9 spacers totalling 81.0 pt across 5 pages, max 16.2 pt - at most 16 pt per page against a measured uniform upward shift of 56.9-57.1 pt on pages 1-4. Forcing the full gap in therefore adds space the page never had and pushes rows off it.",
    "ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 pt - the paper's top edge), while LibreOffice places it at 56.80. The engine emits exactly that construct: bank-statement-5-pages carries w:before=1103 twips (55.15 pt) on the first paragraph of each page, and the measured Google dy on its pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Same number. The probe also found the construct Google DOES honour at a page top: a 1x1 table row with w:trHeight hRule=exact, 55.83 pt of 55.15 asked, exact in LibreOffice. Ruled out with numbers: the table-spacer paragraph (at most 16.2 pt per page against a 57 pt shift, and moving its gap into w:before took Google 40/47 -> 36/47, LO unchanged - reverted), w:line exact (LO honours it, so it cannot split the two renderers), auto line boxes (face-dependent in both). Next run: emit the page-first gap as a trHeight-exact table row and set that paragraph's w:before to 0. FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md has the probe table.",
@@ -799,7 +801,9 @@
    "The falsifier named in the first attempt was run: five Google builds of 35_four_typefaces_one_page (trHeight atLeast/exact 380/377, cell w:line natural, cell w:before 373). Google's row height is a QUANTISED step function of before+line: +5 twips of before moved the row 0.64 pt, and 380 vs 377 exact landed on the same 19.14 row. No computed value lands on the source's 19.00, so the class cannot be fixed by writing better numbers into the cell - it needs a construct Google lays exactly, or a per-document sweep the one-rule test forbids. Finding 18-DISPLACEMENT-TRHEIGHT-ATLEAST-IS-CONTENT-28NOV-fixer.md now carries all five probes.",
    "Swept the falsifier: cell w:before 368/370/371/373 twips in Google. Pitch laid = 18.75, 19.24, 19.29, 19.39 against a source 19.00. There is a 0.49 pt discontinuity between 368 and 370 twips and 19.00 falls inside it - the reachable set jumps over the target, so the row pitch this document needs cannot be expressed in trHeight + cell spacing at all. Above the step the map is exactly 1 twip = 1 twip of pitch, with the 0.60 pt line box contributing 0.74. Class needs a different row construct, not a better number. Five findings probes total, all in 18-DISPLACEMENT-TRHEIGHT-ATLEAST-IS-CONTENT-28NOV-fixer.md.",
    "Ten Google variants on three documents: Google's table row advance exceeds the source pitch by +0.10 (16.40 src), +0.13 (18.40) and +0.50 (13.00) pt per row, accumulating 3.9-9.2 pt by the bottom of a 24-40 row table, past 18_displacement's 2.8 pt tolerance. w:trHeight is inert (v3/v4 identical to shipped), reducing w:before is inert (v5, bm10 identical), the paragraph mark is inert (v7), w:line=0 reads as single spacing (v8). The previous run's named next step (natural line box in w:line) is refuted by v2: same pitch, table start +11.5 pt. Engine geometry is already exact (trHeight 328 = before 317 + line 11 = the source's 16.40 pt pitch), so there is no engine change to land. Finding committed.",
-   "Fourth document: table-inside-two-column-page reproduces the source's 11.8 pt text pitch exactly in Google (11 of 16 gaps 11.8, source identical) because its rows are taller than its text pitch (trHeight 18.5/17.5 vs 11.8). So the +0.10/+0.13/+0.50 pt per-row excess is a property of the single-line-sets-the-row regime, not of tables in general. Its 18_displacement is a different shape: the table lands 69.18 pt short at the bottom with the pitch intact."
+   "Fourth document: table-inside-two-column-page reproduces the source's 11.8 pt text pitch exactly in Google (11 of 16 gaps 11.8, source identical) because its rows are taller than its text pitch (trHeight 18.5/17.5 vs 11.8). So the +0.10/+0.13/+0.50 pt per-row excess is a property of the single-line-sets-the-row regime, not of tables in general. Its 18_displacement is a different shape: the table lands 69.18 pt short at the bottom with the pitch intact.",
+   "Google loop proven end-to-end (42/47 reproduced on bank-statement-5-pages, same 5 failures, engine a05b20eb); ROW_RUNG_UNDER_TW 10->25 refuted as inert on 320_balance_sheet_statutory - all 21 rows emit 280 twips at both settings because the subtraction is guarded by pitchBinds && footRoom, so construct (3) there is reachable from footRoom, not the constant. Engine reverted, gate passes. See FINDINGS/GOOGLE-LOOP-PROVEN-TODAY-AND-RUNG-CONSTANT-INERT-28NOV-fixer.md",
+   "59_shape_anchor charged the box corner instead of the text's place inside the box; centre-based origin, measured through Google on 9 documents rendered today: 48_form_coloured_border_coloured_values 41/42 -> 42/42 CLEAN, 0 new failures, 3 still convicted. Independent PyMuPDF check: worst run moved 2.62pt."
   ],
   "requeues": 0,
   "status": "PARKED"

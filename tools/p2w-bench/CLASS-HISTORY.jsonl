@@ -284,3 +284,5 @@
 {"at": "2026-11-28 14:35", "attempt": 14, "class": "t12_word_invention", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-28 14:57", "attempt": 17, "class": "60_text_column_right_edge", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-28 15:47", "attempt": 128, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
+{"at": "2026-11-28 15:51", "attempt": 129, "class": "18_displacement", "outcome": "kept", "requeues": 0, "round": 1, "status": "PARKED"}
+{"at": "2026-11-28 15:51", "attempt": 130, "class": "18_displacement", "outcome": "lead", "requeues": 0, "round": 1, "status": "PARKED"}
