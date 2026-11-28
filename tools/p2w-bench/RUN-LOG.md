@@ -198,3 +198,4 @@
 | 28 Nov 09:45 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 28 Nov 09:54 | fixer | slot claimed - fixer running |
 | 28 Nov 10:21 | fixer | attempt t09_page_furniture -> lead (0/? moved) |
+| 28 Nov 10:22 | fixer | slot FORCED released - see INCIDENTS.md for why |

@@ -1,18 +1,6 @@
 {
  "agents": [
   {
-   "id": "18_dA-03",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "which sub-cause of the displacement survives every eliminated one, measured on one named document",
-   "expected": "10:15",
-   "deployed": "10:58",
-   "status": "landed",
-   "finding": "FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md",
-   "deployed_at": "2026-11-27T10:58",
-   "landed_at": "2026-11-27T12:08"
-  },
-  {
    "id": "60_tB-01",
    "class": "60_text_column_right_edge",
    "angle": "B",
@@ -276,14 +264,20 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-28T10:00"
+  },
+  {
+   "id": "--cl-02",
+   "class": "--class",
+   "angle": "",
+   "question": "",
+   "expected": "",
+   "deployed": "10:22",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-28T10:22"
   }
  ],
  "history": [
-  {
-   "at": "06:26",
-   "how": "forced",
-   "plan": ""
-  },
   {
    "at": "08:26",
    "how": "forced",
@@ -378,14 +372,15 @@
    "at": "09:45",
    "how": "forced",
    "plan": ""
+  },
+  {
+   "at": "10:22",
+   "how": "forced",
+   "plan": ""
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. ",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "10:58",
-   "text": "agent landed: 60_text_column_right_edge / B -> FINDINGS/60-COLUMN-RIGHT-EDGE-CENSUS-27NOV-agent.md"
-  },
   {
    "at": "11:21",
    "text": "agent deployed: 18dA-03 / 18_displacement - baseline placement inside the hairline exact line box"
@@ -621,12 +616,16 @@
   {
    "at": "10:21",
    "text": "attempt 6 on t09_page_furniture -> lead"
+  },
+  {
+   "at": "10:22",
+   "text": "agent deployed: --class /  - "
   }
  ],
  "plan": "",
  "run": {
   "started": "09:54",
-  "ended": null,
-  "ended_how": null
+  "ended": "10:22",
+  "ended_how": "forced"
  }
 }

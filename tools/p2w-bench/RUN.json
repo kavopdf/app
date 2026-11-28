@@ -1,12 +1,13 @@
 {
  "agents": [
-  "--cl-01"
+  "--cl-01",
+  "--cl-02"
  ],
  "attempts": 2,
  "class": "t09_page_furniture",
  "docs_improved": 0,
- "ended": null,
- "ended_ts": null,
+ "ended": "10:22",
+ "ended_ts": 1795841526.0964077,
  "kept": 0,
  "needs_human": 0,
  "obstacles_cleared": 0,

@@ -10,19 +10,18 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 09:54 |
-| ended | still running |
-| how it ended | - |
+| ended | 10:22 |
+| how it ended | forced |
 | plan | - |
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 18_dA-03 | 18_displacement | A | which sub-cause of the displacement survives every eliminated one, mea | 10:58 | 10:15 | landed | FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md |
 | 60_tB-01 | 60_text_column_right_edge | B | how many CLEAN documents does fixing 60 alone win, and is there a live | 10:58 | 10:15 | landed | FINDINGS/60-COLUMN-RIGHT-EDGE-CENSUS-27NOV-agent.md |
 | 18dA18_displacement-01 | 18dA-03 | 18_displacement | baseline placement inside the hairline exact line box | 11:21 | Turn the measured 0.312 em renderer baseline vs 0.050 em engine charge into a minimal, measured engine change that makes 18_displacement pass on 31_times_body_arial_headings and its siblings without regressing any document. Expected by 12:35 | running |  |
 | 60tB60_text_column_right_edge-01 | 60tB-02 | 60_text_column_right_edge | the right-tab line is split by our own reader | 11:21 | Find why Google's export splits a right-tabbed line into two lines and ours into one (17_matched_runs 34->13), and produce a reader or writer change that keeps the tab's 538.50 pt edge without collapsing 17. Expected by 12:35 | running |  |
@@ -46,13 +45,13 @@ unfinished work, not as a result.
 | 18_dA-05 | 18_displacement | A | is the cell w:line natural-box rewrite right in GOOGLE on 35_four_type | 09:42 | 18:00 | landed | FINDINGS/18d-WLINE-GOOGLE-MEASURED-AGENT-28NOV.md |
 | 18_dB-03 | 18_displacement | B | census the 19 documents that fail only 18_displacement and test the me | 09:42 | 18:00 | landed | FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md |
 | --cl-01 | --class |  |  | 10:00 |  | running |  |
+| --cl-02 | --class |  |  | 10:22 |  | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `04:29` attempt 7 on 63_table_rows -> lead
 - `05:39` attempt 9 on 60_text_column_right_edge -> kept
 - `05:40` agent deployed: 60_text_column_right_edge / A - which engine construct sets a body line's right edge - is 60 an engine defect or
 - `05:40` agent landed: 60_text_column_right_edge / A -> FINDINGS/60-THE-LINE-OBJECT-IS-A-TABLE-ROW-28NOV-fixer.md
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `09:44` attempt 127 on 18_displacement -> lead
 - `10:00` agent deployed: --class /  - 
 - `10:21` attempt 6 on t09_page_furniture -> lead
+- `10:22` agent deployed: --class /  - 
 
 ## Where the rest of the state lives
 

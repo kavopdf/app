@@ -1,16 +1,5 @@
 [
  {
-  "started": "07:11",
-  "started_ts": 1795657295.3888447,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "started": "08:27",
   "started_ts": 1795661874.4352477,
   "ended": "(never)",
@@ -760,5 +749,22 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "--cl-01",
+   "--cl-02"
+  ],
+  "attempts": 2,
+  "class": "t09_page_furniture",
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "needs_human": 0,
+  "obstacles_cleared": 0,
+  "started": "09:54",
+  "started_ts": 1795839889.1903405,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
