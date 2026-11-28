@@ -1,9 +1,15 @@
 {
-  "baseline_started": 1795826557.3697824,
+  "baseline_started": 0,
   "fixer_last_beat": 1795826041.077433,
   "fixer_started": 0,
-  "history": [],
-  "phase": "measure",
+  "history": [
+    {
+      "at": "2026-11-28 06:52",
+      "phase": "measure",
+      "round": 1
+    }
+  ],
+  "phase": "classify",
   "round": 1,
   "rounds_total": 3,
   "started": 1795824735.8565679
