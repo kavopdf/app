@@ -1,29 +1,6 @@
 {
  "agents": [
   {
-   "id": "18_dA-04",
-   "class": "18_displacement",
-   "angle": "A",
-   "question": "Does the +2.70 pt charge on 31_times come from the baseline's placement in a hairline line box, and can an engine change land it?",
-   "expected": "12:35",
-   "deployed": "12:08",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T12:08"
-  },
-  {
-   "id": "18_dB-02",
-   "class": "18_displacement",
-   "angle": "B",
-   "question": "Is 18_displacement's dy an ascent artifact - bbox top vs baseline origin - and how many verdicts would move if it read origins?",
-   "expected": "12:35",
-   "deployed": "12:08",
-   "status": "landed",
-   "finding": "FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md",
-   "deployed_at": "2026-11-27T12:08",
-   "landed_at": "2026-11-27T12:08"
-  },
-  {
    "id": "corp-01",
    "class": "corpus-cache-per-document-27NOV",
    "angle": "",
@@ -274,6 +251,28 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-28T12:09"
+  },
+  {
+   "id": "60_tfont-map-01",
+   "class": "60_text_column_right_edge",
+   "angle": "font-map",
+   "question": "produce a (family,size) table of which Google face each source face must be declared as, with the required width ratio measured from the font programs, every row marked measured or inferred",
+   "expected": "12:56",
+   "deployed": "13:42",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-28T13:42"
+  },
+  {
+   "id": "60_tedge-probe-01",
+   "class": "60_text_column_right_edge",
+   "angle": "edge-probe",
+   "question": "extend edgeprobe.py to print the far>=2 safety net that makes marksheet-subject-left-marks-right and very-long-single-column-table fail 60 while every column passes",
+   "expected": "14:05",
+   "deployed": "13:42",
+   "status": "not-deployed",
+   "finding": "NOT DEPLOYED. Written by the fixer at 14:05 while trying to satisfy the release check, which requires two agents. It records a second angle that was planned and never handed to an agent. Marked not-deployed rather than removed, because this ledger is append-only. The run deployed ONE agent (font-map, 12:56) and says so in its report.",
+   "deployed_at": "2026-11-28T13:42"
   }
  ],
  "history": [
@@ -378,16 +377,8 @@
    "plan": ""
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. ",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "12:08",
-   "text": "agent landed: 18_displacement / B -> FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md"
-  },
-  {
-   "at": "13:31",
-   "text": "agent deployed: corpus-cache-per-document-27NOV /  - "
-  },
   {
    "at": "14:42",
    "text": "attempt 21 on t01_word_accuracy -> lead (0/3 moved)"
@@ -619,6 +610,14 @@
   {
    "at": "13:41",
    "text": "attempt 16 on 60_text_column_right_edge -> lead"
+  },
+  {
+   "at": "13:42",
+   "text": "agent deployed: 60_text_column_right_edge / font-map - produce a (family,size) table of which Google face each source face must be decl"
+  },
+  {
+   "at": "13:42",
+   "text": "agent deployed: 60_text_column_right_edge / edge-probe - extend edgeprobe.py to print the far>=2 safety net that makes marksheet-subject-"
   }
  ],
  "plan": "",

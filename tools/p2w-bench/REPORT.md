@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 12:36 → running IST · 1h 05m**
+**28 Nov 2026 · slot 12:36 → running IST · 1h 06m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,7 +15,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **4 disagreement(s)** - attempts: RUN.json counter 5 vs ATTEMPTS.json history 4; kept change: 3 code commit(s) in this window, first: fixer 28nov: edgeprobe.py prints what 60 compare vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; .txt age: measured 8.2 h ago vs nothing re-measures it on a schedule |
+| **Self-check** | **5 disagreement(s)** - attempts: RUN.json counter 5 vs ATTEMPTS.json history 4; kept change: 5 code commit(s) in this window, first: fixer 28nov: report states one agent deployed, n vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; .txt age: measured 8.2 h ago vs nothing re-measures it on a schedule |
 | Document-moves this run | **0** — 5 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
@@ -26,7 +26,7 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `60_text_column_right_edge` - taken from the pending list (62 still open), not a new class |
+| Working on | `60_text_column_right_edge` - taken from the pending list (63 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `60_text_column_right_edge` by hand instead |
 
 ## What was tried
@@ -96,51 +96,6 @@
 >
 > None of that is blocked. It is what the clock cost.
 
-### The run before this one said
-
-> The slot did not land a document because the honest measurement said the change on the table would
-> cost one, and then a different change turned out to be right but too large to prove inside the slot.
->
-> The lead I inherited was a justify-pin: set the paragraph's right indent to its band's widest line,
-> justify it, and add a trailing line break so the line is no longer a last line. On a face-substituted
-> LibreOffice render it made all five documents whose only Google failure is `60_text_column_right_edge`
-> clean. I did not trust it, so I put it through the real Drive round trip on one document, and Google
-> refused it: still failing, and now also failing `18_displacement`. That is the trade the charter
-> forbids, and the proxy had hidden it completely. So the first attempt of this run is a refutation, not
-> a fix, and it is the most useful thing the run produced.
->
-> Refuting it forced the question of what the check is actually measuring, and the answer is not a
-> paragraph property. The source PDFs use DejaVu at 10 pt; the engine declares DejaVu at 10 pt; Google
-> Docs does not carry DejaVu and draws something about fifteen per cent narrower, so every line stops
-> short of the column. Every fix in the "stretch the line" family is therefore aimed at a variable the
-> renderer is not reading. I tested the variable that is read — the face — with three one-attribute
-> probes and a real round trip each. A Georgia probe moved the edge by a third of a point, which is the
-> control: the probe mechanism works, and a face that merely looks similar is worth nothing. A size
-> probe fixed the edge exactly and broke a check that exists to forbid changing the size. Verdana fixed
-> the edge, kept every other check passing, and took the document to 42 of 42 in Google; a second
-> document, with two declared families rather than one, went to 42 of 42 the same way.
->
-> That is a real fix for two of five documents and a strong lead for the class, and I am recording it as
-> a lead because I cannot honestly call it more. It is a `.docx` change, so it owes a full-corpus
-> `.docx` re-measure, and that is fifty-four minutes on a slot that also had to fetch and convert a cold
-> corpus. The gate is not what stopped me and neither is the engine. The clock stopped me, and the
-> report should say so rather than dress two measured documents up as a kept attempt.
->
-> What I would have done with another twenty minutes, in order: the three remaining documents through
-> the round trip, because a face that is right at 10 pt may be wrong at 8 or 14 and the mapping has to
-> be keyed on family and size rather than applied globally; then the mapping in the engine; then the
-> corpus pass. The falsifier is written into the findings file so the next run can fail it on purpose.
->
->
-> | At | Outcome | Moved | What it measured |
-> |--:|:--|--:|:--|
-> | 12:34 | **lead** | 0/None | Google round trip refutes the justify-pin: 313 41/42 HEAD vs 40/42 pinned, 60 still FAIL (under-run 60.97pt -> 57.92pt, tolerance 48), plus a new 18_displacement. Cause is face substitution: source De |
-> | 12:36 | **lead** | 0/None | Google round trip (6 probes): face substitution is the cause. 313 HEAD 41/42 (60 FAIL, edge 477.66 vs src 538.63) -> Verdana face 42/42 PASS (edge 536.15); 302 HEAD 41/42 -> Verdana 42/42 PASS. Georgi |
->
-> Accounts share 7% of their significant words - a different account (the cut is 50%).
-
-Accounts share 24% of their significant words - a different account (the cut is 50%).
-
 ## The txt
 
 | | |
@@ -154,15 +109,17 @@ Accounts share 24% of their significant words - a different account (the cut is 
 
 ## Subagents
 
-*None deployed this run.*
+| Agent | Sent to find | Deployed | Landed | Took |
+|:--|:--|--:|--:|--:|
+| `60_tfont-map-01` | produce a (family,size) table of which Google face e | 13:42 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 12:36 → running · 1h 05m |
+| Slot window | 12:36 → running · 1h 06m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 11 |
+| Tool beats | 17 |
 | Longest silence | **63.3 min** — from 12:37:54, after `lastmessage.py: running report.py for the numbers` |
 | Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
@@ -187,7 +144,7 @@ Accounts share 24% of their significant words - a different account (the cut is 
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

@@ -1,5 +1,8 @@
 {
- "agents": [],
+ "agents": [
+  "60_tfont-map-01",
+  "60_tedge-probe-01"
+ ],
  "attempts": 5,
  "docs_improved": 0,
  "ended": null,

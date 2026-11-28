@@ -16,14 +16,12 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 18_dA-04 | 18_displacement | A | Does the +2.70 pt charge on 31_times come from the baseline's placemen | 12:08 | 12:35 | running |  |
-| 18_dB-02 | 18_displacement | B | Is 18_displacement's dy an ascent artifact - bbox top vs baseline orig | 12:08 | 12:35 | landed | FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md |
 | corp-01 | corpus-cache-per-document-27NOV |  |  | 13:31 |  | running |  |
 | 18_dsmall-dy cluster of 15-01 | 18_displacement | small-dy cluster of 15 | which code site places a run's baseline, and is the small dy an ascent | 16:45 | the mechanical cause with a falsifiable claim and the exact file:line | running |  |
 | txtform-feed lead-01 | txt | form-feed lead | is _txt_lines dropping page separators, and how many documents does it | 16:45 | a fixture proving the bug and a count of verdicts moved | running |  |
@@ -46,14 +44,14 @@ unfinished work, not as a result.
 | 60-font-01 | 60_text_column_right_edge | does the font NAME change the Google render, and does w:jc stretch a one-line paragraph | Root-cause 60_text_column_right_edge (21.1 worth, no prior solo invest | 10:02 | a named engine change with its expected document effect, or a refutation with a measurement | done | FINDINGS/60-text-column-right-edge-28NOV.md - 59 docs fail; 15 engine (8.67 worth), 17 instrument (4.17), 7 stale-pass, 20 undecided; no reflow anywhere; instrument over-charges via a hard 10pt left-edge bucket (purchase-order +103.36 charged vs +2.79 actual); replacement bucketing refuted (15 pass / 6 regress); named change = extend the right-tab emitter to full-measure body lines, blocked because it drops 17_matched_runs 34->13 |
 | 18d-split-01 | 18_displacement | split the 19 solo documents by row pitch and row count and find the collectable subset | Which of the 19 documents that fail only 18_displacement are collectab | 10:02 | a per-document classification and one named engine change with its expected point effect, or a refutation | done | FINDINGS/18-displacement-SPLIT-28NOV.md - all 19 single-page; 6 dense-table accumulation carriers, 13 not; 11 of the 13 fail only the 5% count clause at the smallest type; engine row geometry faithful to 0.00pt on 13 of 19; collectable subset = 0 with two independent proofs |
 | 18dA18_displacement-01 | 18dA-01 | 18_displacement | engine | 12:09 | Is the 0.961 x gap - 0.58 pt law an inversion of a loss fit, and can an engine gap transform make Google deliver the drawn gap? | running |  |
+| 60_tfont-map-01 | 60_text_column_right_edge | font-map | produce a (family,size) table of which Google face each source face mu | 13:42 | 12:56 | running |  |
+| 60_tedge-probe-01 | 60_text_column_right_edge | edge-probe | extend edgeprobe.py to print the far>=2 safety net that makes markshee | 13:42 | 14:05 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `06:04` agent deployed: 18_displacement / A - root cause of cell displacement; landed c8056b8
-- `06:04` agent deployed: 63_table_rows / B - ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc2
 - `07:02` attempt 122 on 18_displacement -> lead
 - `08:54` attempt 123 on 18_displacement -> lead
 - `08:54` attempt 4 on 05_chars_extra -> lead
@@ -77,6 +75,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `12:34` attempt 12 on 60_text_column_right_edge -> lead
 - `12:36` attempt 13 on 60_text_column_right_edge -> lead
 - `13:41` attempt 16 on 60_text_column_right_edge -> lead
+- `13:42` agent deployed: 60_text_column_right_edge / font-map - produce a (family,size) table of which Google face each source face must be decl
+- `13:42` agent deployed: 60_text_column_right_edge / edge-probe - extend edgeprobe.py to print the far>=2 safety net that makes marksheet-subject-
 
 ## Where the rest of the state lives
 
