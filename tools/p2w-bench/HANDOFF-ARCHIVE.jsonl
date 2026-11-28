@@ -571,3 +571,5 @@
 {"_list": "notes", "_entry": {"at": "09:46", "text": "attempt 13 on t12_word_invention -> lead"}}
 {"_list": "notes", "_entry": {"at": "10:56", "text": "attempt 106 on 18_displacement -> lead"}}
 {"_list": "notes", "_entry": {"at": "10:58", "text": "agent deployed: 18_displacement / A - which sub-cause of the displacement survives every eliminated one, measured on o"}}
+{"_list": "notes", "_entry": {"at": "10:58", "text": "agent deployed: 60_text_column_right_edge / B - how many CLEAN documents does fixing 60 alone win, and is there a live construct"}}
+{"_list": "agents", "_entry": {"id": "18-d-01", "class": "18-displacement w:pBdr probe: measured Google 15.00 vs 15.75, finding committed", "angle": "", "question": "", "expected": "", "deployed": "09:14", "status": "running", "finding": "", "deployed_at": "2026-11-27T09:14"}}

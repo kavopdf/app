@@ -1,17 +1,6 @@
 {
  "agents": [
   {
-   "id": "18-d-01",
-   "class": "18-displacement w:pBdr probe: measured Google 15.00 vs 15.75, finding committed",
-   "angle": "",
-   "question": "",
-   "expected": "",
-   "deployed": "09:14",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T09:14"
-  },
-  {
    "id": "18_dA-03",
    "class": "18_displacement",
    "angle": "A",
@@ -276,6 +265,17 @@
    "finding": "FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md",
    "deployed_at": "2026-11-28T09:42",
    "landed_at": "2026-11-28T09:42"
+  },
+  {
+   "id": "--cl-01",
+   "class": "--class",
+   "angle": "",
+   "question": "",
+   "expected": "",
+   "deployed": "10:00",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-28T10:00"
   }
  ],
  "history": [
@@ -382,10 +382,6 @@
  ],
  "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "10:58",
-   "text": "agent deployed: 60_text_column_right_edge / B - how many CLEAN documents does fixing 60 alone win, and is there a live construct"
-  },
   {
    "at": "10:58",
    "text": "agent landed: 18_displacement / A -> FINDINGS/18-displacement-DOMINANT-SUBCAUSE-27NOV-agent.md"
@@ -621,12 +617,16 @@
   {
    "at": "09:44",
    "text": "attempt 127 on 18_displacement -> lead"
+  },
+  {
+   "at": "10:00",
+   "text": "agent deployed: --class /  - "
   }
  ],
  "plan": "",
  "run": {
-  "started": "09:16",
-  "ended": "09:45",
-  "ended_how": "forced"
+  "started": "09:54",
+  "ended": null,
+  "ended_how": null
  }
 }

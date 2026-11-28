@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 09:16 |
-| ended | 09:45 |
-| how it ended | forced |
+| started | 09:54 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## What the next run should do first
@@ -22,7 +22,6 @@ unfinished work, not as a result.
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 18-d-01 | 18-displacement w:pBdr probe: measured Google 15.00 vs 15.75, finding committed |  |  | 09:14 |  | running |  |
 | 18_dA-03 | 18_displacement | A | which sub-cause of the displacement survives every eliminated one, mea | 10:58 | 10:15 | landed | FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md |
 | 60_tB-01 | 60_text_column_right_edge | B | how many CLEAN documents does fixing 60 alone win, and is there a live | 10:58 | 10:15 | landed | FINDINGS/60-COLUMN-RIGHT-EDGE-CENSUS-27NOV-agent.md |
 | 18dA18_displacement-01 | 18dA-03 | 18_displacement | baseline placement inside the hairline exact line box | 11:21 | Turn the measured 0.312 em renderer baseline vs 0.050 em engine charge into a minimal, measured engine change that makes 18_displacement pass on 31_times_body_arial_headings and its siblings without regressing any document. Expected by 12:35 | running |  |
@@ -46,13 +45,13 @@ unfinished work, not as a result.
 | 05_cB-01 | 05_chars_extra | B | test whether the U+FFFD ligature glyphs resolve by advance width | 09:05 | 08:58 | running |  |
 | 18_dA-05 | 18_displacement | A | is the cell w:line natural-box rewrite right in GOOGLE on 35_four_type | 09:42 | 18:00 | landed | FINDINGS/18d-WLINE-GOOGLE-MEASURED-AGENT-28NOV.md |
 | 18_dB-03 | 18_displacement | B | census the 19 documents that fail only 18_displacement and test the me | 09:42 | 18:00 | landed | FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md |
+| --cl-01 | --class |  |  | 10:00 |  | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `03:41` agent landed: commit_gate / B -> FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md
 - `04:27` attempt 6 on 63_table_rows -> lead
 - `04:29` attempt 7 on 63_table_rows -> lead
 - `05:39` attempt 9 on 60_text_column_right_edge -> kept
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `09:42` agent landed: 18_dA-05 /  -> FINDINGS/18d-WLINE-GOOGLE-MEASURED-AGENT-28NOV.md
 - `09:42` agent landed: 18_dB-03 /  -> FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md
 - `09:44` attempt 127 on 18_displacement -> lead
+- `10:00` agent deployed: --class /  - 
 
 ## Where the rest of the state lives
 

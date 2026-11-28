@@ -1,32 +1,5 @@
 [
  {
-  "agents": [
-   {
-    "class": "18_displacement",
-    "id": "18_diag-01"
-   },
-   {
-    "class": "t12_word_invention",
-    "id": "txt9-01"
-   }
-  ],
-  "attempts": 1,
-  "class": "t02_position",
-  "counted": [
-   [
-    "t02_position",
-    1
-   ]
-  ],
-  "docs_improved": 1,
-  "ended": "(never)",
-  "ended_ts": null,
-  "kept": 1,
-  "started": "05:57",
-  "started_ts": 1795652834.9540026,
-  "ended_how": "killed - slot cleared by a force release"
- },
- {
   "started": "07:11",
   "started_ts": 1795657295.3888447,
   "ended": "(never)",
@@ -776,5 +749,16 @@
   "started_ts": 1795838301.5959125,
   "window_for_claim": 1795838301.5959125,
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "09:54",
+  "started_ts": 1795839885.4230359,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
