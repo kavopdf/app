@@ -15,6 +15,35 @@ read anything else.
 Exit 1 means a previous run still holds the slot. Output exactly `previous classifier run still
 active` and STOP. Exit 0 means the slot is yours.
 
+## TOOL NAMES IN THE PROMPT LOSE THEIR UNDERSCORES. THE NAMES BELOW ARE THE REAL ONES.
+
+**The cron prompt for this run has been seen to name tools that do not exist, and the cause is the same one that
+eats check names in a report: underscores disappear.** The prompt says `GITHUBCOMMITMULTIPLE_FILES` and
+`GOOGLEDRIVEUPLOADFILE`. **Neither exists.**
+
+    PROMPT SAYS (wrong)                     REAL NAME
+    GITHUBCOMMITMULTIPLE_FILES          ->  GITHUB_COMMIT_MULTIPLE_FILES
+    GOOGLEDRIVEUPLOADFILE               ->  GOOGLEDRIVE_UPLOAD_FILE
+    GOOGLEDRIVECREATEFILE               ->  GOOGLEDRIVE_CREATE_FILE
+    GOOGLEDRIVEEXPORTGOOGLEWORKSPACE_FILE -> GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE
+    from sarvamtools import ...         ->  from sarvam_tools import ...
+
+**This file already carries the correct `GITHUB_COMMIT_MULTIPLE_FILES` at the commit instruction, and
+`BASELINE-BRIEF.md` and `APK-BRIEF.md` carry it too. The prompt is the only place it is wrong.**
+
+**`git` is the path, not the GitHub tool.** The commit instruction in this file says "Commit these files with
+git (fallback: GITHUB_COMMIT_MULTIPLE_FILES)". **`GITHUB_COMMIT_MULTIPLE_FILES` is a whole-file commit and
+`BLOCKERS.md` records it silently reverting another slot's 218-line engine fix when the tree was stale. Use
+`git`, and only reach for the tool when `git` genuinely cannot.**
+
+**For the Drive fallback: `GOOGLEDRIVE_UPLOAD_FILE` is not importable in the shape the prompt implies.** The
+platform `upload` tool stages the file and returns an `s3key`; `GOOGLEDRIVE_UPLOAD_FILE` takes
+`file_to_upload={name, mimetype, s3key}` and `folder_to_upload_to=<folder id>`. **It has a 5 MB ceiling.**
+
+**When a name has moved, `tool_search` finds the current one in one call.** Do that rather than guessing, and
+correct the paragraph that was wrong in the same run - the prompt itself says a prompt naming a tool that does
+not exist costs the run that discovers it, every time.
+
 ## 1. The classification is already in the data. Do not invent one.
 
 The instrument writes `signature` and `problem` for every document. They are derived mechanically -
