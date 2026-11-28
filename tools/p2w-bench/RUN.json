@@ -1,13 +1,20 @@
 {
  "agents": [],
- "attempts": 1,
- "class": "",
- "docs_improved": 0,
+ "attempts": 2,
+ "class": "t08_line_order",
+ "docs_improved": 1,
  "ended": null,
  "ended_ts": null,
- "kept": 0,
+ "kept": 1,
  "needs_human": 0,
  "obstacles_cleared": 0,
  "started": "11:00",
- "started_ts": 1795843831.3859441
+ "started_ts": 1795843831.3859441,
+ "ratchets": 1,
+ "counted": [
+  [
+   "t08_line_order",
+   1
+  ]
+ ]
 }

@@ -1,11 +1,11 @@
-# Fixer report - 2026-11-28 10:28
+# Fixer report - 2026-11-28 11:00
 
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 10:28 → running IST · 11 min**
+**28 Nov 2026 · slot 11:00 → running IST · 29 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> **305_vaccination_certificate** improved — 1.00 → 0.00. Corpus ratchet clean across 214 documents.
 
 ## Progress
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 3 code commit(s) in this window, first: FINDINGS: 60-P falsified in Google - w:jc=distri vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
-| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; .txt age: measured 6.0 h ago vs nothing re-measures it on a schedule |
+| Document-moves this run | **1** — 2 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -26,15 +26,14 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `60_text_column_right_edge` - taken from the pending list (64 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `60_text_column_right_edge` by hand instead |
+| Working on | `t08_line_order` - taken from the pending list (64 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `t08_line_order` by hand instead |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 10:33 | **lead** | 0/None | Google-measured on 313_power_of_attorney (fails only 60). The font-name lever was measured in Google for the first time: HEAD renders ArialMT at max right edge 480.14 against a source 538.63; Georgia |
-| 10:33 | **lead** | 0/None | 60-P falsified in Google in one round trip, which the 1900-fixer finding's section 6 item 2 asked for: w:jc=distribute plus a per-line right indent (w:ind right=1133, pinning the measure to the source |
+| 11:29 | **kept** | 1/None | TxtWriter.pageOrder hoists the paragraph the model parks at the end back to its own top; 305_vaccination_certificate 6/7 -> 7/7 clean, whole corpus 208 -> 209 of 214 clean, 0 worsened (store diff, not |
 
 ## Why nothing moved, in this run's own words
 
@@ -42,6 +41,8 @@
 
 ### The run before this one said
 
+>
+>
 > **The decision, and its reason.** `classpick.py` suggested `t09_page_furniture` on a lead whose own FINDINGS file refutes its `.docx` half and asks for the `.txt` half. I took it because the `.txt` gate passes at HEAD and a `.txt`-scoped change is the only kind this pipeline can commit today: the docx half is frozen behind 84 documents of debt and a 54-minute re-measure.
 >
 > **The gate is not what blocks this pipeline, and I measured that rather than assuming it.** `regress.py --check` at HEAD prints `PASS` — `docx: no document got worse`, the 84 worse-than-baseline documents are "frozen, not forgiven", `txt: no document worse than baseline`. What blocks an engine change is the re-measure behind it, not the gate.
@@ -58,10 +59,10 @@
 
 | | |
 |:--|:--|
-| Measured | **5.2 h ago** |
-| Scored | **214** of 213 |
-| Clean - every applicable check passes | **208** (97.2%) |
-| Failing at least one check | **6** |
+| Measured | **6.0 h ago** - nothing re-measures this on a schedule; run `txt_gate.py --score 60` |
+| Scored | **214** of 214 |
+| Clean - every applicable check passes | **209** (97.7%) |
+| Failing at least one check | **5** |
 | Moved since the last commit | **none** - nothing changed |
 | Most common failure | `t12_word_invention` - 4 documents |
 
@@ -73,11 +74,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 10:28 → running · 11 min |
+| Slot window | 11:00 → running · 29 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 10 |
-| Longest silence | **5.2 min** — from 10:34:16, after `lastmessage.py: running report.py for the numbers` |
-| Silences over 2 min | 1 |
+| Tool beats | 50 |
+| Longest silence | **5.3 min** — from 11:04:05, after `pod-prep: corpus fetch + jdk + engine compile` |
+| Silences over 2 min | 6 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -85,7 +86,17 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **5 min** | `######################` |
+| setup - claim, housekeeping, reading the gate | **3 min** | `###` |
+| build - compiling the engine | **13 min** | `##########` |
+| measure or build - a conversion, screen or compile writes no beacon | **10 min** | `########` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| other - not attributed to a tool | **1 min** | `#` |
+
+The unattributed row is 3 distinct beat(s) that matched no phase. They said:
+
+- `proving the hoist on 305 alone before the corpus pass`
+- `regress --check with the txt table re-stamped`
+- `t08_line_order -> kept`
 ## Best results this round
 
 | Document | Before | After | Change |

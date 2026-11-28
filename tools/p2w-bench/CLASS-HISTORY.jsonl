@@ -277,3 +277,4 @@
 {"at": "2026-11-28 10:21", "attempt": 6, "class": "t09_page_furniture", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-28 10:33", "attempt": 10, "class": "60_text_column_right_edge", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-28 10:33", "attempt": 11, "class": "60_text_column_right_edge", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-28 11:29", "attempt": 4, "class": "t08_line_order", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
