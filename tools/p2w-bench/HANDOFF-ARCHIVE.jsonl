@@ -571,3 +571,10 @@
 {"_list": "agents", "_entry": {"id": "gateB-01", "class": "gate", "angle": "B", "question": "why does regress.py --check refuse on unmodified HEAD", "expected": "07:41", "deployed": "08:04", "status": "landed", "finding": "FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md", "deployed_at": "2026-11-27T08:04", "landed_at": "2026-11-27T08:04"}}
 {"_list": "notes", "_entry": {"at": "08:12", "text": "agent landed: 60_text_column_right_edge / A -> FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md"}}
 {"_list": "notes", "_entry": {"at": "08:12", "text": "agent landed: gate / B -> FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md"}}
+{"_list": "notes", "_entry": {"at": "09:13", "text": "attempt 104 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "09:14", "text": "agent deployed: 18-displacement w:pBdr probe: measured Google 15.00 vs 15.75, finding committed /  - "}}
+{"_list": "agents", "_entry": {"id": "60_tA-02", "class": "60_text_column_right_edge", "angle": "A", "question": "which engine construct sets a body line's right edge, and which fixes are already refuted", "expected": "07:40", "deployed": "08:12", "status": "landed", "finding": "FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md", "deployed_at": "2026-11-27T08:12", "landed_at": "2026-11-27T08:12"}}
+{"_list": "notes", "_entry": {"at": "09:42", "text": "attempt 105 on 18_displacement -> lead"}}
+{"_list": "agents", "_entry": {"id": "gateB-02", "class": "gate", "angle": "B", "question": "why does regress.py --check refuse on unmodified HEAD", "expected": "07:41", "deployed": "08:12", "status": "landed", "finding": "FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md", "deployed_at": "2026-11-27T08:12", "landed_at": "2026-11-27T08:12"}}
+{"_list": "notes", "_entry": {"at": "09:46", "text": "attempt 13 on t12_word_invention -> lead"}}
+{"_list": "notes", "_entry": {"at": "10:56", "text": "attempt 106 on 18_displacement -> lead"}}

@@ -16,14 +16,12 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 60_tA-02 | 60_text_column_right_edge | A | which engine construct sets a body line's right edge, and which fixes  | 08:12 | 07:40 | landed | FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md |
-| gateB-02 | gate | B | why does regress.py --check refuse on unmodified HEAD | 08:12 | 07:41 | landed | FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md |
 | 18-d-01 | 18-displacement w:pBdr probe: measured Google 15.00 vs 15.75, finding committed |  |  | 09:14 |  | running |  |
 | 18_dA-03 | 18_displacement | A | which sub-cause of the displacement survives every eliminated one, mea | 10:58 | 10:15 | landed | FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md |
 | 60_tB-01 | 60_text_column_right_edge | B | how many CLEAN documents does fixing 60 alone win, and is there a live | 10:58 | 10:15 | landed | FINDINGS/60-COLUMN-RIGHT-EDGE-CENSUS-27NOV-agent.md |
@@ -46,17 +44,14 @@ unfinished work, not as a result.
 | 63_tB-02 | 63_table_rows | B | ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc2 | 06:04 | landed 06:26 | running |  |
 | 18_dA-02 | 18_displacement | A | take a real Google export of 35_four_typefaces_one_page and test wheth | 08:56 | 08:31 | running |  |
 | 05_cB-01 | 05_chars_extra | B | test whether the U+FFFD ligature glyphs resolve by advance width | 09:05 | 08:58 | running |  |
+| 18_dA-05 | 18_displacement | A | is the cell w:line natural-box rewrite right in GOOGLE on 35_four_type | 09:42 | 18:00 | landed | FINDINGS/18d-WLINE-GOOGLE-MEASURED-AGENT-28NOV.md |
+| 18_dB-03 | 18_displacement | B | census the 19 documents that fail only 18_displacement and test the me | 09:42 | 18:00 | landed | FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `02:43` attempt 4 on 63_table_rows -> lead
-- `03:24` attempt 120 on 18_displacement -> lead
-- `03:40` attempt 5 on 63_table_rows -> lead
-- `03:41` agent deployed: row_rung / A - which of the 84 docx regressions vs the 15 Nov baseline does ROW_RUNG_UNDER_TW a
-- `03:41` agent deployed: commit_gate / B - is the gate's 84 a real quality loss or an inflated count - baseline provenance,
 - `03:41` agent landed: row_rung / A -> FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md
 - `03:41` agent landed: commit_gate / B -> FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md
 - `04:27` attempt 6 on 63_table_rows -> lead
@@ -77,6 +72,11 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `09:05` agent deployed: 05_chars_extra / B - test whether the U+FFFD ligature glyphs resolve by advance width
 - `09:06` attempt 125 on 18_displacement -> lead
 - `09:28` attempt 4 on t09_page_furniture -> lead
+- `09:41` attempt 126 on 18_displacement -> lead
+- `09:42` agent deployed: 18_displacement / A - is the cell w:line natural-box rewrite right in GOOGLE on 35_four_typefaces_one_
+- `09:42` agent deployed: 18_displacement / B - census the 19 documents that fail only 18_displacement and test the measured gap
+- `09:42` agent landed: 18_dA-05 /  -> FINDINGS/18d-WLINE-GOOGLE-MEASURED-AGENT-28NOV.md
+- `09:42` agent landed: 18_dB-03 /  -> FINDINGS/18D-CENSUS-19-AND-THE-GAP-LAW-AGENT-28NOV.md
 
 ## Where the rest of the state lives
 
