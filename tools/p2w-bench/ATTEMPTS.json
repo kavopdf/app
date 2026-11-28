@@ -2384,7 +2384,7 @@
   "status": "OPEN"
  },
  "t09_page_furniture": {
-  "attempts": 5,
+  "attempts": 6,
   "first_seen": null,
   "history": [
    {
@@ -2437,6 +2437,17 @@
     "outcome": "lead",
     "reason": "The glyph merge was built and measured on 305 and it is refuted: source draws 85 lines of which 47 are single characters (_src_line_count, PyMuPDF granularity) and the .txt at HEAD carries exactly 85 ",
     "total": null
+   },
+   {
+    "at": "2026-11-28 10:21",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "The placement fix is measured and it works: hoisting the seal paragraph by its own top (TxtWriter.pageOrder -> hoistLastPara, plus the lastY>0 guard) takes 305_vaccination_certificate to PASS - t04 85",
+    "total": null
    }
   ],
   "last": null,
@@ -2446,15 +2457,17 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "The glyph merge was built and measured on 305 and it is refuted: source draws 85 lines of which 47 are single characters (_src_line_count, PyMuPDF granularity) and the .txt at HEAD carries exactly 85 with 47 single, so the .txt is faithful. Merging takes t08 from 33/32 FAIL to 34/34 pass but breaks t04_structure 85/42 (drift 0.49 under MAX_LINE_DRIFT 1.5) and loses the seal's inter-word spaces, so 305 still FAILs. The real defect is placement not line count: the seal paragraph is appended last in page.blocks while its own top is y=271, so the run lands after a footer at y=777. Next: order that paragraph by top without merging, expect t04 85/85 and t08 33/33. Do not land the merge.",
+  "reason": "The placement fix is measured and it works: hoisting the seal paragraph by its own top (TxtWriter.pageOrder -> hoistLastPara, plus the lastY>0 guard) takes 305_vaccination_certificate to PASS - t04 85/85 unchanged, t08 33/32 -> 33/33, 85 lines and 47 single-char lines preserved, 30 blanks, 3384 bytes; I ran verify_txt.py on the output myself. Corpus probe: the hoist fires on 27 pages of 27 documents, 187 of 214 .txt byte-identical, the other 26 unchanged on t04/t08/pass-count, 305 the only mover. Two hunks are written verbatim into FINDINGS/TXT-SPLITS-A-LETTER-SPACED-LINE-INTO-ONE-LINE-PER-GLYPH-28NOV-relay.md. Not landed: 90+ min into the slot, and a TxtWriter change needs the full 213-doc re-conversion and re-stamp before the gate will take it.",
   "reasons": [
    "verify_txt.py only, no engine change: a furniture key with no letter in it is not furniture (_furniture_key folds digits to '#', so 324's numeric table cells invented 18 owed and 1437 present - 66/1485 -> 48/48), and owed is now counted per drawn occurrence, not per page (gst-invoice-multipage-item-table draws 'Page N of 4' twice per page: 39/43 -> 43/43). Full 213 re-scored with the real verify_txt.compare() on a fresh conversion: head 197 clean, each fault alone 198, zero ok->fail flips on any check of any document. The two landed together; the combination was bounded but not re-scored - 324 can only hold or stay failing. RANKING-TXT.csv is now stale and needs restamp_txt.py.",
    "the band arm the FINDINGS patch uses reads 0 of 29 (the .txt has no form feeds: segs=1), and dropping one-char keys alone leaves Date 6 vs 3; a correct fix needs an aligner plus a full 213-doc .txt re-measure, which did not fit",
    "txt reader: verify_txt.py _txt_lines dropped the form-feed separator line (l.strip() is empty for U+000C), so every multi-page .txt was read as one segment. Patched to keep it and re-scored the whole corpus with txt_rank.py --all: 213 documents, 12 failing check-instances before, 12 after, 0 worse 0 better. The reader is now truthful but no check consumes segmentation, so this unblocks nothing on its own - it corrects the t09 lead's premise ('blocked on an aligner plus a full txt re-measure'): the band arm needs a segment-consuming check that does not exist yet. See FINDINGS/TXT-READER-DROPS-THE-PAGE-SEPARATOR-27NOV-fixer.md",
    "TxtWriter writes a letter-spaced line as one line per glyph while DocxWriter merges it: 305_vaccination_certificate has 47 single-char lines of 85 and fails t08 32/33 because the glyphs land after the body though the page draws them at the top; the two Account forms carry 274 of 1193. Same model, opposite answers, so the merge is writer-local and belongs in TxtWriter.appendPara. Named next step: merge before the line is written, measure 305 alone (expected t08 33/33 PASS), then the full 213-doc txt re-stamp. Not landed: a TxtWriter change needs the full re-conversion and re-stamp and that did not fit the slot.",
-   "The glyph merge was built and measured on 305 and it is refuted: source draws 85 lines of which 47 are single characters (_src_line_count, PyMuPDF granularity) and the .txt at HEAD carries exactly 85 with 47 single, so the .txt is faithful. Merging takes t08 from 33/32 FAIL to 34/34 pass but breaks t04_structure 85/42 (drift 0.49 under MAX_LINE_DRIFT 1.5) and loses the seal's inter-word spaces, so 305 still FAILs. The real defect is placement not line count: the seal paragraph is appended last in page.blocks while its own top is y=271, so the run lands after a footer at y=777. Next: order that paragraph by top without merging, expect t04 85/85 and t08 33/33. Do not land the merge."
+   "The glyph merge was built and measured on 305 and it is refuted: source draws 85 lines of which 47 are single characters (_src_line_count, PyMuPDF granularity) and the .txt at HEAD carries exactly 85 with 47 single, so the .txt is faithful. Merging takes t08 from 33/32 FAIL to 34/34 pass but breaks t04_structure 85/42 (drift 0.49 under MAX_LINE_DRIFT 1.5) and loses the seal's inter-word spaces, so 305 still FAILs. The real defect is placement not line count: the seal paragraph is appended last in page.blocks while its own top is y=271, so the run lands after a footer at y=777. Next: order that paragraph by top without merging, expect t04 85/85 and t08 33/33. Do not land the merge.",
+   "The placement fix is measured and it works: hoisting the seal paragraph by its own top (TxtWriter.pageOrder -> hoistLastPara, plus the lastY>0 guard) takes 305_vaccination_certificate to PASS - t04 85/85 unchanged, t08 33/32 -> 33/33, 85 lines and 47 single-char lines preserved, 30 blanks, 3384 bytes; I ran verify_txt.py on the output myself. Corpus probe: the hoist fires on 27 pages of 27 documents, 187 of 214 .txt byte-identical, the other 26 unchanged on t04/t08/pass-count, 305 the only mover. Two hunks are written verbatim into FINDINGS/TXT-SPLITS-A-LETTER-SPACED-LINE-INTO-ONE-LINE-PER-GLYPH-28NOV-relay.md. Not landed: 90+ min into the slot, and a TxtWriter change needs the full 213-doc re-conversion and re-stamp before the gate will take it."
   ],
   "requeues": 0,
   "status": "OPEN"
