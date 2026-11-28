@@ -11142,3 +11142,4 @@
 {"t": 1795864489.7416048, "ist": "16:44:49", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795864489.832286, "ist": "16:44:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795864490.5294638, "ist": "16:44:50", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795864655.5071218, "ist": "16:47:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
