@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 05:54 → running IST · 10 min**
+**28 Nov 2026 · slot 05:54 → running IST · 1h 09m**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - kept change: 2 code commit(s) in this window, first: findings: 18_displacement is a 0.6pt line box, a vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 2 deployed vs no FINDINGS filename carries 63_tB-02 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
-| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 5 code commit(s) in this window, first: watchdog: drop a commit hash the rebase invalida vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 2 deployed vs no FINDINGS filename carries 63_tB-02 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -26,10 +26,58 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (62 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `18_displacement` - taken from the pending list (62 still open), not a new class |
+
+## What was tried
+
+| At | Outcome | Moved | What it measured |
+|--:|:--|--:|:--|
+| 07:02 | **lead** | 0/None | row top (:6662) and cell baseline are not inverses; fix proven on 35_four_typefaces_one_page (dy +3.70 -> 0.00) as a patch, not landed: no slot left for a 214-document re-measure |
 
 ## Why nothing moved, in this run's own words
+
+> **The decision, and its reason.** The pending list said 62 items open and `classpick.py` refused a new
+> class until they are taken, so I took `18_displacement` - the class the previous run had just root-caused
+> - and asked its own question first: *if this works, which documents become CLEAN?* The answer is 19
+> documents that fail nothing else, plus partial rows in 21 more.
+>
+> **The mechanism.** `DocxWriter.java:6662` invents a row's top edge as `rowEdge[r] - LINE_BASE*pitch`,
+> and the cell's baseline is then written at `rowTopPagePt + before + LINE_BASE*box`. Those two are
+> inverses only if `before + LINE_BASE*box == LINE_BASE*pitch`, and nothing in the cell emission enforces
+> it. The shortfall is one-signed and the same on every row of the same geometry.
+>
+> **Proved wrong before changed, and it survived.** I did not measure my own edit. I took the *shipped*
+> `.docx` for `35_four_typefaces_one_page`, rewrote only the table-cell spacing declarations
+> (`before -> 0`, `line -> the row's own w:trHeight`, `lineRule=exact`), rendered both files with `soffice`
+> and read the baselines with PyMuPDF against the source PDF. Source 148.80, shipped docx 152.50
+> (dy +3.70), rewritten 148.80 (dy 0.00), with all four body lines above the table unmoved at
+> 58.00/72.00/104.00/122.00. The +3.70 is `0.2 x 18.5`, the row pitch - exactly the part of the pitch the
+> two pieces of arithmetic disagree about. Built into the engine and converted through `ConvertOne`, the
+> document renders at dy 0.00 on all six table rows.
+>
+> **Where I disagree with the previous run, on the record.** The run before this one refuted this same
+> hypothesis by showing the shipped pair is *internally* self-consistent (`before` 368 tw, `w:line` 12 tw,
+> baseline back at 18.88 pt) and blamed a sub-glyph exact line box. Both observations are true and they are
+> not the same question. Internal consistency says the engine renders the position it chose; it does not say
+> the position it chose is the page's. The page drew 148.80. The row pitch is the inverse the engine already
+> computes. This is measured on the emitted bytes and on the source, not on a model of either.
+>
+> **Why it is not landed, and that is the whole cost of this slot.** Landing needs a 214-document
+> re-measurement and I spent the slot discovering what that costs: `corpus-slice.py` took 19 minutes for the
+> 214 conversions, and rendering 214 `.docx` to PDF runs at about 5.9 s/document even at six workers with a
+> separate LibreOffice profile each - roughly 21 minutes more, before any scoring. I started the render too
+> late, at minute 58, and it was still 74 documents from done when the slot ran out. I reverted the engine
+> edit rather than commit a change the gate would have refused, and carried it as a patch plus a finding.
+> **The tree is clean; the corpus on disk is the patched build (stamp `3209475a50dcd58a`), not HEAD - the
+> next run's gate rebuilds it, and should not trust that stamp.**
+>
+> **The lesson worth more than the patch.** Two runs in a row have now ended with a proven mechanism and no
+> landed change, and both ran out of slot on the same step: the corpus re-measurement. It is 19 minutes of
+> conversion plus 21 of render plus 6 of scoring, so it is a 46-minute job. Any run that does not start it
+> before minute 30 cannot land anything, whatever it proves. That is the number to plan against, and it is
+> not written anywhere in the tools.
+
+### The run before this one said
 
 > No engine change was made, and that is the decision, not an overrun.
 >
@@ -71,9 +119,8 @@
 > 35_four_typefaces_one_page anywhere in the repo, so the Google side of every number above is the recorded
 > verdict (med_dy 0.1, 47/47), not a measurement I took. The next run should take one before it trusts the
 > w:line hypothesis.
-
-### The run before this one said
-
+>
+>
 > **Something did move: two documents, measured through Google.** This section is here because the tool
 > asks for the reasoning, not because the run was empty.
 >
@@ -113,14 +160,16 @@
 > **What stopped this run was not the clock.** The pipeline rotated to `measure` while I was writing up and
 > `--claim-fixer` now refuses. The kept change was committed, measured and pushed before that happened
 > (`620dc85e`, `30121a9a`).
+>
+> Accounts share 16% of their significant words - a different account (the cut is 50%).
 
-Accounts share 16% of their significant words - a different account (the cut is 50%).
+Accounts share 20% of their significant words - a different account (the cut is 50%).
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **37 min ago** |
+| Measured | **1.6 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -138,11 +187,11 @@ Accounts share 16% of their significant words - a different account (the cut is 
 
 | | |
 |:--|:--|
-| Slot window | 05:54 → running · 10 min |
+| Slot window | 05:54 → running · 1h 09m |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 14 |
-| Longest silence | **6.0 min** — from 05:57:09, after `relay: verifying gate health` |
-| Silences over 2 min | 1 |
+| Tool beats | 20 |
+| Longest silence | **37.4 min** — from 06:13:43, after `lastmessage.py: running a tool for its numbers` |
+| Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -150,12 +199,13 @@ Accounts share 16% of their significant words - a different account (the cut is 
 
 | Phase | Time | |
 |:--|--:|:--|
-| measure or build - a conversion, screen or compile writes no beacon | **6 min** | `################` |
-| record - attempt, handoff, class rows | **0 min** | `##` |
-| report - the report and the chain | **0 min** | `##` |
-| other - not attributed to a tool | **0 min** | `##` |
+| fix - diagnose and change the engine | **11 min** | `####` |
+| measure or build - a conversion, screen or compile writes no beacon | **50 min** | `#################` |
+| record - attempt, handoff, class rows | **1 min** | `#` |
+| report - the report and the chain | **2 min** | `#` |
+| other - not attributed to a tool | **0 min** | `#` |
 
-The unattributed row is 3 distinct beat(s) that matched no phase. They said:
+The unattributed row is 4 distinct beat(s) that matched no phase. They said:
 
 - `relay: both agents landed, implementing cell-top fix`
 - `relay: verifying gate health`
