@@ -22,8 +22,6 @@ unfinished work, not as a result.
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| triaA-01 | triage | A | which of the 113 failing checks buys the most clean documents, with th | 01:12 | 18:55 | running |  |
-| ssimB-01 | ssim | B | what caps the 99 percent SSIM goal - is the deficit concentrated or un | 01:12 | 19:00 | running |  |
 | Expl-01 | Explore:docx construct ranking by documents-cleared (10-row table, rung rule named first) |  |  | 05:51 |  | running |  |
 | Expl-02 | Explore:txt failure root cause (8 docs, 12 check-instances; recommended the t01 character unit) |  |  | 05:51 |  | running |  |
 | 60_tA-01 | 60_text_column_right_edge | A | which engine construct sets a body line's right edge, and which fixes  | 08:04 | 07:40 | landed | FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md |
@@ -46,17 +44,14 @@ unfinished work, not as a result.
 | commB-01 | commit_gate | B | is the gate's 84 a real quality loss or an inflated count - baseline p | 03:41 | 04:10 | landed | FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md |
 | 18prize-01 | 18_displacement | A | which documents would become CLEAN if 18_displacement passed, and what | 04:05 | 04:15 | landed | FINDINGS/18prize-01-18-DISPLACEMENT-PRIZE-CENSUS-28NOV-agent.md |
 | 61rank-02 | 18_displacement | B | among the 61 genuine losses, which single Google check would clean the | 04:31 | 04:35 | landed | FINDINGS/61rank-02-SIXTY-ONE-LOSSES-RANKED-BY-CHECK-28NOV-agent.md |
+| 60_tA-03 | 60_text_column_right_edge | A | which engine construct sets a body line's right edge - is 60 an engine | 05:40 | 08:05 | landed | FINDINGS/60-THE-LINE-OBJECT-IS-A-TABLE-ROW-28NOV-fixer.md |
+| 18_dB-01 | 18_displacement | B | test the 0.961 spacer model at the current engine and quantify the inv | 05:40 | 08:05 | landed | FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `16:45` agent deployed: 18_displacement / small-dy cluster of 15 - which code site places a run's baseline, and is the small dy an ascent artefact 
-- `16:45` agent deployed: txt / form-feed lead - is _txt_lines dropping page separators, and how many documents does it clear
-- `16:50` attempt 110 on 18_displacement -> kept
-- `17:27` attempt 111 on 18_displacement -> kept
-- `18:58` attempt 112 on 18_displacement -> lead
 - `19:56` attempt 22 on t01_word_accuracy -> kept (3/6 moved)
 - `20:52` attempt 114 on 18_displacement -> lead (1/2 moved)
 - `20:57` attempt 115 on 18_displacement -> lead (0/1 moved)
@@ -77,6 +72,11 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `04:27` attempt 6 on 63_table_rows -> lead
 - `04:29` attempt 7 on 63_table_rows -> lead
 - `05:39` attempt 9 on 60_text_column_right_edge -> kept
+- `05:40` agent deployed: 60_text_column_right_edge / A - which engine construct sets a body line's right edge - is 60 an engine defect or
+- `05:40` agent landed: 60_text_column_right_edge / A -> FINDINGS/60-THE-LINE-OBJECT-IS-A-TABLE-ROW-28NOV-fixer.md
+- `05:40` agent deployed: 18_displacement / B - test the 0.961 spacer model at the current engine and quantify the inverse corre
+- `05:40` agent landed: 18_displacement / B -> FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md
+- `05:41` attempt 121 on 18_displacement -> error
 
 ## Where the rest of the state lives
 

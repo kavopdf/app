@@ -64,11 +64,20 @@ gone; the drift is not.
 | of the 18 that fail `18_displacement` alone, documents carrying that lever | **1 of 18** |
 | documents failing `18_displacement` that are single-page (no page-break leg) | **90 of 108** |
 
-**The leverage ledger and the store disagree and this run did not reconcile them.**
-`classpick.py --leverage` prices `18_displacement` at **46.6 CLEAN documents**; the `gverify` store has
-**108 documents failing it, 18 of them alone**. Both cannot be right about the same population, and a
-future run should reconcile them before trusting either — a 46.6 that is really 18 changes which class is
-worth a slot.
+**The leverage figure is fractional, not a document count — CORRECTED.** An earlier draft of this finding
+called `classpick.py --leverage`'s **46.6** irreconcilable with the store's **108 failing / 18 alone**. It
+is not: `18prize-01` (this same day, 04:12) reproduced 46.56 from `sum(1/len(failed))` over the 108, and
+that is the same fractional construction as `60`'s 23.63. **46.6 is not 46.6 documents** — the true
+document count behind it is 18 solo plus 28 that are solo-plus-one. Read `--leverage` as a ranking, never
+as a yield, and read the same warning on `60`'s 23.63.
+
+**`18prize-01` also narrows the mechanism, and it agrees with the drift above.** All 18 solo documents are
+**single-page**, `bad_pages [0]` — which rules out the page-break `w:before` construct for every one of
+them, exactly as the flat −59.03 pt on pages 1–4 implies. 12 of the 18 carry a **rigid offset** and 6 a
+**per-run tail**; the per-run tail is the accumulating drift measured here. And `61rank-02` names the
+offset's site: **`LINE_BASE` 0.8 em against Google's 0.31 em**, sub-construct A, with C
+(`afterTablePt`/`edgeGap`) behind it. **That is where the next slot goes first** — a baseline constant is
+a number that can be measured, where a line-box drift is a slope that has to be fitted.
 
 ## Where to go next, in order
 

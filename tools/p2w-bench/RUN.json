@@ -6,12 +6,13 @@
    "deployed": "04:05",
    "deployed_at": "2026-11-28T04:05",
    "expected": "04:15",
-   "finding": "FINDINGS/18prize-01-18-DISPLACEMENT-PRIZE-CENSUS-28NOV-agent.md",
+   "finding": "FINDINGS/18PRIZE-AND-61RANK-RESULTS-RESCUED-THEIR-FILES-NEVER-EXISTED-28NOV-fixer.md",
    "id": "18prize-01",
    "landed_at": "2026-11-28T04:12",
    "question": "which documents would become CLEAN if 18_displacement passed, and what single engine rule claims the most of them",
    "result": "108 documents fail 18_displacement; 18 are solo (would be clean if it passed); 28 are solo plus exactly one other (12 with 60_text_column_right_edge, 10 with 59_shape_anchor); leverage 46.56 reproduces classpick.py. All 18 solos are single-page bad_pages [0], which rules out the page-break w:before construct for them; 12 carry a rigid offset, 6 a per-run tail.",
-   "status": "landed"
+   "status": "landed",
+   "finding_note": "the path this agent was recorded with never existed; its result text is preserved here"
   },
   {
    "angle": "B",
@@ -19,12 +20,13 @@
    "deployed": "04:31",
    "deployed_at": "2026-11-28T04:31",
    "expected": "04:35",
-   "finding": "FINDINGS/61rank-02-SIXTY-ONE-LOSSES-RANKED-BY-CHECK-28NOV-agent.md",
+   "finding": "FINDINGS/18PRIZE-AND-61RANK-RESULTS-RESCUED-THEIR-FILES-NEVER-EXISTED-28NOV-fixer.md",
    "id": "61rank-02",
    "landed_at": "2026-11-28T04:32",
    "question": "among the 61 genuine losses, which single Google check would clean the most of them",
    "result": "18_displacement fails 47 of the 61 and is the only failing check on 13 of them; no other check is worth more than 3. 60_text_column_right_edge 3, 26_text_overlap 1. Sub-construct B (the rung) is closed as a revert, so the 13 are A (LINE_BASE 0.8 vs Google 0.31 em) and C (afterTablePt/edgeGap) territory.",
-   "status": "landed"
+   "status": "landed",
+   "finding_note": "the path this agent was recorded with never existed; its result text is preserved here"
   },
   {
    "angle": "A",
@@ -53,8 +55,8 @@
    "status": "landed"
   }
  ],
- "attempts": 2,
- "class": "60_text_column_right_edge",
+ "attempts": 3,
+ "class": "18_displacement",
  "counted": [
   [
    "60_text_column_right_edge",

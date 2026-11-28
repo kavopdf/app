@@ -264,3 +264,4 @@
 {"at": "2026-11-28 04:27", "attempt": 6, "class": "63_table_rows", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-28 04:29", "attempt": 7, "class": "63_table_rows", "outcome": "lead", "requeues": 0, "round": 1, "status": "OPEN"}
 {"at": "2026-11-28 05:39", "attempt": 9, "class": "60_text_column_right_edge", "outcome": "kept", "requeues": 0, "round": 1, "status": "OPEN"}
+{"at": "2026-11-28 05:41", "attempt": 121, "class": "18_displacement", "outcome": "error", "requeues": 0, "round": null, "status": "PARKED"}
