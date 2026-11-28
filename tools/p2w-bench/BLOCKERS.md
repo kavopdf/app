@@ -61,6 +61,50 @@ file is read by every run after it.
 - Never work around a tool by editing its output by hand. That is the bug wearing a hat.
 - Never record an obstacle you did not actually attempt to clear.
 
+## 28 Nov 09:06 IST - watchdog: nothing stopped, matrix finished, and the trend row is flat a second day
+
+**The picture, from the tools.** corpus 214. measure-google done at 214 of 214, 3.5 h. matrix done at
+214 of 214, 1.6 h, 214 of 214 results on the engine in the tree. classify superseded, 1.0 h. fix moving,
+5 attempt(s) in 3 h, last activity 0.0 h ago. txt moving, 208 clean and 6 failing, 2.3 h.
+`health.py --stalled` exits 0 - nothing is stopped. That is the change since the 06:20 pass, which read
+matrix stopped at 213 of 214 with 37 of 213 on the engine: the stage completed on its own, and the
+"gverify half is not firing" question the last pass left open is closed by that number, not by a
+decision here.
+
+**The trend row, and the fixer's attempt count beside it.** Today's row is docx open 116, txt failing 6,
+google 206, google clean 48. docx open and txt failing are unchanged from the 27 Nov row - 116 and 6 to
+116 and 6 - with the fixer at 5 attempt(s) in 3 h. Google moved 206 to 206, clean 46 to 48, so the only
+movement in the row is two documents crossing into clean on the Google side. That is one day of a flat
+.docx and .txt column, not the three the brief names as the signal, and the .docx column left 59 only
+yesterday because the table was re-measured. Nothing was appended this pass - today's row already
+existed - so there is no trend commit to make and none was invented.
+
+**STEP 4 C and D did not fire.** `round.py --phase` is `fix`, not `done`, so `--reopen` has nothing to
+reopen and was not run. `status.py` reads SILENT with a claim 12 min old, last beacon 12 min ago, one
+fixer run started 08:24 and 44 min in, 4 attempt(s) this run at 5.4 attempts/hour. Under an hour and
+still producing attempts, so this is a working run inside a long step, not a slot held by a dead run:
+`--release-fixer --force` was NOT run.
+
+**No `cron` tool in this pass.** This watchdog's declared tool list carries no `cron` operation - checked
+by name in the tool search and absent from the list - so STEP 3 and STEP 4 A and B did not run, no cron
+was inspected, recreated, paused or resumed. This is a missing tool, not a decision a person has to make.
+The calls it would have made, exactly:
+
+    cron(action="list")
+    cron(action="runs", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")   # fixer, from the HEALTH-BRIEF table
+    cron(action="runs", cron_id="01M7Y6DSBB2KBYAREFVMHYAB4D")   # fixer relay
+
+and then, only for a stale `next_fire_at` or a zombie run:
+
+    cron(action="pause", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6"); cron(action="resume", cron_id="01M7Y5WNJ9E0N78KRHX2TRJGQ6")
+
+**Decision, on the evidence.** Nothing is parked and nothing is re-opened. The matrix escalation the
+06:20 pass set is discharged by matrix reading 214 of 214 on the engine. The open question is the flat
+.docx column, and the standing explanation - the commit gate, not the converter - is untested until a
+fixer slot installs no gate and lands one measured construct. What would overturn that: docx open still
+116 at a pass 24 h from now with the fixer having landed a kept attempt in that window, at which point
+the gate is exonerated and the construct in `18_displacement` is the wall.
+
 ## Rows
 
 | time | what I was doing | the obstacle | what I tried | can I fix it | what is needed |

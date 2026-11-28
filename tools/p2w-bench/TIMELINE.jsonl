@@ -8837,6 +8837,7 @@
 {"t": 1795751135.1160343, "ist": "09:15:35", "ev": "killed", "d": "dead claim cleared by force release"}
 {"t": 1795751145.185427, "ist": "09:15:45", "ev": "beat", "d": "two audits in; taking 60_text_column_right_edge, right tab stop"}
 {"t": 1795751487.4800045, "ist": "09:21:27", "ev": "beat", "d": "compiling right-edge tab change"}
+{"t": 1795751662.975145, "ist": "09:24:22", "ev": "beat", "d": "heartbeat before any claim: relay: pod-prep"}
 {"t": 1795751768.9895458, "ist": "09:26:08", "ev": "beat", "d": "right tab measured: honoured to 2.5pt, but splits the line in extraction; storing control row"}
 {"t": 1795751854.1136146, "ist": "09:27:34", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795751856.9773424, "ist": "09:27:36", "ev": "beat", "d": "attempt.py: recording an attempt"}
@@ -8845,12 +8846,25 @@
 {"t": 1795751861.2842014, "ist": "09:27:41", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795751862.5341187, "ist": "09:27:42", "ev": "beat", "d": "classrow.py: refreshing the class file"}
 {"t": 1795751881.2461886, "ist": "09:28:01", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795751885.1143734, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795751885.346885, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795751885.5837262, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795751885.7876203, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
 {"t": 1795751885.982181, "ist": "09:28:05", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795751885.999233, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795751886.2310708, "ist": "09:28:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795751886.4720533, "ist": "09:28:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795751886.7005837, "ist": "09:28:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
 {"t": 1795751886.7730255, "ist": "09:28:06", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795751891.3577733, "ist": "09:28:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795751897.2703445, "ist": "09:28:17", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795751897.4694858, "ist": "09:28:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795751897.642543, "ist": "09:28:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795751903.639196, "ist": "09:28:23", "ev": "beat", "d": "claimed, reading handoff"}
 {"t": 1795751907.2855403, "ist": "09:28:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795751911.7702472, "ist": "09:28:31", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795751912.449614, "ist": "09:28:32", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795751912.8895178, "ist": "09:28:32", "ev": "beat", "d": "gaps.py: reading the timeline"}
 {"t": 1795751915.3168414, "ist": "09:28:35", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795751922.5320907, "ist": "09:28:42", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795751922.7305079, "ist": "09:28:42", "ev": "beat", "d": "pending.py: reading the pending gate"}
@@ -8865,6 +8879,7 @@
 {"t": 1795751949.8601263, "ist": "09:29:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795751952.5226266, "ist": "09:29:12", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795751953.1978579, "ist": "09:29:13", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795751953.8484006, "ist": "09:29:13", "ev": "beat", "d": "relay: finishing baseline corpus conversion (pre-change engine)"}
 {"t": 1795751957.0633721, "ist": "09:29:17", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795751961.9277563, "ist": "09:29:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795751964.4717598, "ist": "09:29:24", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
@@ -8875,57 +8890,6 @@
 {"t": 1795752026.4615843, "ist": "09:30:26", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795752026.566528, "ist": "09:30:26", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795752027.0911489, "ist": "09:30:27", "ev": "killed", "d": "dead claim cleared by force release"}
-{"t": 1795752678.446921, "ist": "09:41:18", "ev": "beat", "d": "heartbeat before any claim: gverify: converting corpus slices before Google batch"}
-{"t": 1795752889.9919834, "ist": "09:44:49", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 55 converted"}
-{"t": 1795752904.7297554, "ist": "09:45:04", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 55 converted"}
-{"t": 1795752904.962997, "ist": "09:45:04", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 55 converted"}
-{"t": 1795752905.144592, "ist": "09:45:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 55 converted"}
-{"t": 1795752905.346162, "ist": "09:45:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 55 converted"}
-{"t": 1795752905.5409515, "ist": "09:45:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 55 converted"}
-{"t": 1795752905.7266853, "ist": "09:45:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 55 converted"}
-{"t": 1795752905.9207027, "ist": "09:45:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 55 converted"}
-{"t": 1795752906.14675, "ist": "09:45:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 54 of 55 converted"}
-{"t": 1795753202.2529962, "ist": "09:50:02", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 55 converted"}
-{"t": 1795753202.5147326, "ist": "09:50:02", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 55 converted"}
-{"t": 1795753202.76255, "ist": "09:50:02", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 55 converted"}
-{"t": 1795753202.957227, "ist": "09:50:02", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 55 converted"}
-{"t": 1795753203.164394, "ist": "09:50:03", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 55 converted"}
-{"t": 1795753203.4110386, "ist": "09:50:03", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 55 converted"}
-{"t": 1795753203.6291332, "ist": "09:50:03", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 55 converted"}
-{"t": 1795753203.8403397, "ist": "09:50:03", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 55 converted"}
-{"t": 1795753204.0413573, "ist": "09:50:04", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 54 of 55 converted"}
-{"t": 1795753689.9490817, "ist": "09:58:09", "ev": "beat", "d": "heartbeat before any claim: gverify: collecting 60 Google renders"}
-{"t": 1795754399.9660654, "ist": "10:09:59", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754403.0556953, "ist": "10:10:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754403.6194167, "ist": "10:10:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754404.369425, "ist": "10:10:04", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754405.159086, "ist": "10:10:05", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754407.8268256, "ist": "10:10:07", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754408.3863423, "ist": "10:10:08", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754409.0679724, "ist": "10:10:09", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754415.693563, "ist": "10:10:15", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754417.9163198, "ist": "10:10:17", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754418.5826788, "ist": "10:10:18", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754419.2902067, "ist": "10:10:19", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754419.9218564, "ist": "10:10:19", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754421.924057, "ist": "10:10:21", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754422.617882, "ist": "10:10:22", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795754423.4449499, "ist": "10:10:23", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
-{"t": 1795751662.975145, "ist": "09:24:22", "ev": "beat", "d": "heartbeat before any claim: relay: pod-prep"}
-{"t": 1795751885.1143734, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
-{"t": 1795751885.346885, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
-{"t": 1795751885.5837262, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
-{"t": 1795751885.7876203, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
-{"t": 1795751885.999233, "ist": "09:28:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
-{"t": 1795751886.2310708, "ist": "09:28:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
-{"t": 1795751886.4720533, "ist": "09:28:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
-{"t": 1795751886.7005837, "ist": "09:28:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
-{"t": 1795751897.2703445, "ist": "09:28:17", "ev": "claim", "d": "fixer claimed the slot"}
-{"t": 1795751897.4694858, "ist": "09:28:17", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795751897.642543, "ist": "09:28:17", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795751903.639196, "ist": "09:28:23", "ev": "beat", "d": "claimed, reading handoff"}
-{"t": 1795751912.8895178, "ist": "09:28:32", "ev": "beat", "d": "gaps.py: reading the timeline"}
-{"t": 1795751953.8484006, "ist": "09:29:13", "ev": "beat", "d": "relay: finishing baseline corpus conversion (pre-change engine)"}
 {"t": 1795752185.8597274, "ist": "09:33:05", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
 {"t": 1795752186.0122638, "ist": "09:33:06", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
 {"t": 1795752186.1818035, "ist": "09:33:06", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
@@ -8942,6 +8906,7 @@
 {"t": 1795752457.3821359, "ist": "09:37:37", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
 {"t": 1795752457.5695474, "ist": "09:37:37", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
 {"t": 1795752457.719706, "ist": "09:37:37", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795752678.446921, "ist": "09:41:18", "ev": "beat", "d": "heartbeat before any claim: gverify: converting corpus slices before Google batch"}
 {"t": 1795752718.7452924, "ist": "09:41:58", "ev": "beat", "d": "relay: pBdr construct refuted in LibreOffice, writing finding"}
 {"t": 1795752732.4604714, "ist": "09:42:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
 {"t": 1795752745.72, "ist": "09:42:25", "ev": "beat", "d": "attempt.py: recording an attempt"}
@@ -8977,13 +8942,22 @@
 {"t": 1795752848.8773308, "ist": "09:44:08", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795752849.2909143, "ist": "09:44:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795752851.4214916, "ist": "09:44:11", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795752889.9919834, "ist": "09:44:49", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 55 converted"}
 {"t": 1795752891.8072424, "ist": "09:44:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795752895.6858895, "ist": "09:44:55", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795752900.0292604, "ist": "09:45:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795752900.1448731, "ist": "09:45:00", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795752904.5038564, "ist": "09:45:04", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795752904.595092, "ist": "09:45:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795752904.7297554, "ist": "09:45:04", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 55 converted"}
+{"t": 1795752904.962997, "ist": "09:45:04", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 55 converted"}
+{"t": 1795752905.144592, "ist": "09:45:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 55 converted"}
 {"t": 1795752905.2771385, "ist": "09:45:05", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795752905.346162, "ist": "09:45:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 55 converted"}
+{"t": 1795752905.5409515, "ist": "09:45:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 55 converted"}
+{"t": 1795752905.7266853, "ist": "09:45:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 55 converted"}
+{"t": 1795752905.9207027, "ist": "09:45:05", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 55 converted"}
+{"t": 1795752906.14675, "ist": "09:45:06", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 54 of 55 converted"}
 {"t": 1795752925.4038455, "ist": "09:45:25", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795752927.3933954, "ist": "09:45:27", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795752927.8053927, "ist": "09:45:27", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
@@ -9012,6 +8986,16 @@
 {"t": 1795753046.6856258, "ist": "09:47:26", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795753046.7898438, "ist": "09:47:26", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795753047.305722, "ist": "09:47:27", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795753202.2529962, "ist": "09:50:02", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 55 converted"}
+{"t": 1795753202.5147326, "ist": "09:50:02", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 55 converted"}
+{"t": 1795753202.76255, "ist": "09:50:02", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 55 converted"}
+{"t": 1795753202.957227, "ist": "09:50:02", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 55 converted"}
+{"t": 1795753203.164394, "ist": "09:50:03", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 55 converted"}
+{"t": 1795753203.4110386, "ist": "09:50:03", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 55 converted"}
+{"t": 1795753203.6291332, "ist": "09:50:03", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 55 converted"}
+{"t": 1795753203.8403397, "ist": "09:50:03", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 55 converted"}
+{"t": 1795753204.0413573, "ist": "09:50:04", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 54 of 55 converted"}
+{"t": 1795753689.9490817, "ist": "09:58:09", "ev": "beat", "d": "heartbeat before any claim: gverify: collecting 60 Google renders"}
 {"t": 1795754137.5906942, "ist": "10:05:37", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795754137.7723558, "ist": "10:05:37", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795754137.8817523, "ist": "10:05:37", "ev": "beat", "d": "pending.py: reading the pending gate"}
@@ -9019,6 +9003,22 @@
 {"t": 1795754150.8209085, "ist": "10:05:50", "ev": "beat", "d": "pod-prep"}
 {"t": 1795754159.923762, "ist": "10:05:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795754164.241423, "ist": "10:06:04", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795754399.9660654, "ist": "10:09:59", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754403.0556953, "ist": "10:10:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754403.6194167, "ist": "10:10:03", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754404.369425, "ist": "10:10:04", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754405.159086, "ist": "10:10:05", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754407.8268256, "ist": "10:10:07", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754408.3863423, "ist": "10:10:08", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754409.0679724, "ist": "10:10:09", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754415.693563, "ist": "10:10:15", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754417.9163198, "ist": "10:10:17", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754418.5826788, "ist": "10:10:18", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754419.2902067, "ist": "10:10:19", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754419.9218564, "ist": "10:10:19", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754421.924057, "ist": "10:10:21", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754422.617882, "ist": "10:10:22", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795754423.4449499, "ist": "10:10:23", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795755588.3305047, "ist": "10:29:48", "ev": "beat", "d": "converting corpus slice"}
 {"t": 1795755817.96375, "ist": "10:33:37", "ev": "beat", "d": "corpus-slice: 6 of 57 converted"}
 {"t": 1795755818.7815847, "ist": "10:33:38", "ev": "beat", "d": "corpus-slice: 12 of 57 converted"}
@@ -9642,8 +9642,8 @@
 {"t": 1795793364.5607584, "ist": "20:59:24", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795793366.5029266, "ist": "20:59:26", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795793366.8548539, "ist": "20:59:26", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795793368.926099, "ist": "20:59:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795793368.4999282, "ist": "20:59:28", "ev": "release", "d": "baseline released"}
+{"t": 1795793368.926099, "ist": "20:59:28", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795793831.5171208, "ist": "21:07:11", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
 {"t": 1795793831.8054185, "ist": "21:07:11", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
 {"t": 1795793832.046803, "ist": "21:07:12", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
@@ -10333,6 +10333,47 @@
 {"t": 1795822644.783745, "ist": "05:07:24", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
 {"t": 1795822660.6619854, "ist": "05:07:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795822663.77815, "ist": "05:07:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823344.7182858, "ist": "05:19:04", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795823344.9147065, "ist": "05:19:04", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795823345.074548, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795823345.2598188, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795823345.41932, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795823345.5846863, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795823345.7479236, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795823345.8985913, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795823358.5914924, "ist": "05:19:18", "ev": "beat", "d": "relay: gate install hung, checking state"}
+{"t": 1795823567.8491602, "ist": "05:22:47", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795823569.064251, "ist": "05:22:49", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795823571.569752, "ist": "05:22:51", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795823572.4488008, "ist": "05:22:52", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795823573.1447318, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795823573.4839602, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795823573.653005, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795823573.8089201, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795823582.7782948, "ist": "05:23:02", "ev": "beat", "d": "relay: running pod-prep (gate prereqs)"}
+{"t": 1795823761.8070638, "ist": "05:26:01", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795823761.9730709, "ist": "05:26:01", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795823762.1442938, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795823762.3244922, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795823762.477974, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795823762.6604898, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795823762.8127809, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795823762.9894745, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795823765.2651753, "ist": "05:26:05", "ev": "beat", "d": "relay: reading last run"}
+{"t": 1795823765.4140627, "ist": "05:26:05", "ev": "beat", "d": "gaps.py: reading the timeline"}
+{"t": 1795823771.6206727, "ist": "05:26:11", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823772.1144786, "ist": "05:26:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823772.6465414, "ist": "05:26:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823773.1539102, "ist": "05:26:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823775.7730956, "ist": "05:26:15", "ev": "beat", "d": "relay: picking class, deploying agents"}
+{"t": 1795823776.1186633, "ist": "05:26:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823779.8940754, "ist": "05:26:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795823779.9792848, "ist": "05:26:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823783.037542, "ist": "05:26:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823789.6488218, "ist": "05:26:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795823789.762374, "ist": "05:26:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823790.3655815, "ist": "05:26:30", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795823790.4773595, "ist": "05:26:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795823868.5327692, "ist": "05:27:48", "ev": "beat", "d": "applying instrument fix to 60_text_column_right_edge"}
 {"t": 1795823955.2950246, "ist": "05:29:15", "ev": "beat", "d": "converting 3 probes for the 60 instrument fix"}
 {"t": 1795824219.031928, "ist": "05:33:39", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
@@ -10396,47 +10437,6 @@
 {"t": 1795824787.0350876, "ist": "05:43:07", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795824787.418324, "ist": "05:43:07", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795824789.3253603, "ist": "05:43:09", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
-{"t": 1795823344.7182858, "ist": "05:19:04", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
-{"t": 1795823344.9147065, "ist": "05:19:04", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
-{"t": 1795823345.074548, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
-{"t": 1795823345.2598188, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
-{"t": 1795823345.41932, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
-{"t": 1795823345.5846863, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
-{"t": 1795823345.7479236, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
-{"t": 1795823345.8985913, "ist": "05:19:05", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
-{"t": 1795823358.5914924, "ist": "05:19:18", "ev": "beat", "d": "relay: gate install hung, checking state"}
-{"t": 1795823567.8491602, "ist": "05:22:47", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
-{"t": 1795823569.064251, "ist": "05:22:49", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
-{"t": 1795823571.569752, "ist": "05:22:51", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
-{"t": 1795823572.4488008, "ist": "05:22:52", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
-{"t": 1795823573.1447318, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
-{"t": 1795823573.4839602, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
-{"t": 1795823573.653005, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
-{"t": 1795823573.8089201, "ist": "05:22:53", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
-{"t": 1795823582.7782948, "ist": "05:23:02", "ev": "beat", "d": "relay: running pod-prep (gate prereqs)"}
-{"t": 1795823761.8070638, "ist": "05:26:01", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
-{"t": 1795823761.9730709, "ist": "05:26:01", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
-{"t": 1795823762.1442938, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
-{"t": 1795823762.3244922, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
-{"t": 1795823762.477974, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
-{"t": 1795823762.6604898, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
-{"t": 1795823762.8127809, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
-{"t": 1795823762.9894745, "ist": "05:26:02", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
-{"t": 1795823765.2651753, "ist": "05:26:05", "ev": "beat", "d": "relay: reading last run"}
-{"t": 1795823765.4140627, "ist": "05:26:05", "ev": "beat", "d": "gaps.py: reading the timeline"}
-{"t": 1795823771.6206727, "ist": "05:26:11", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795823772.1144786, "ist": "05:26:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795823772.6465414, "ist": "05:26:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795823773.1539102, "ist": "05:26:13", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795823775.7730956, "ist": "05:26:15", "ev": "beat", "d": "relay: picking class, deploying agents"}
-{"t": 1795823776.1186633, "ist": "05:26:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795823779.8940754, "ist": "05:26:19", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795823779.9792848, "ist": "05:26:19", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795823783.037542, "ist": "05:26:23", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795823789.6488218, "ist": "05:26:29", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795823789.762374, "ist": "05:26:29", "ev": "beat", "d": "pending.py: reading the pending gate"}
-{"t": 1795823790.3655815, "ist": "05:26:30", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
-{"t": 1795823790.4773595, "ist": "05:26:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795825611.0604274, "ist": "05:56:51", "ev": "beat", "d": "relay: both agents landed, implementing cell-top fix"}
 {"t": 1795825629.2833447, "ist": "05:57:09", "ev": "beat", "d": "relay: verifying gate health"}
 {"t": 1795825991.0609188, "ist": "06:03:11", "ev": "beat", "d": "corpus-slice: 6 of 38 converted"}
@@ -10629,3 +10629,11 @@
 {"t": 1795837130.398365, "ist": "09:08:50", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795837130.869755, "ist": "09:08:50", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795837133.4252782, "ist": "09:08:53", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795837157.1823452, "ist": "09:09:17", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795837188.0203075, "ist": "09:09:48", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795837188.5766978, "ist": "09:09:48", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795837230.6875162, "ist": "09:10:30", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795837234.334836, "ist": "09:10:34", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795837265.3040526, "ist": "09:11:05", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795837265.7497585, "ist": "09:11:05", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795837298.1561935, "ist": "09:11:38", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
