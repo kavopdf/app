@@ -1,14 +1,14 @@
 {
- "started_ts": 1795825476.7089415,
- "started": "05:54",
- "window_for_claim": 1795825476.7089415,
- "ended_ts": null,
- "ended": null,
- "attempts": 0,
- "kept": 0,
  "agents": [
   "18_dA-01",
   "63_tB-02"
  ],
- "docs_improved": 0
+ "attempts": 1,
+ "docs_improved": 0,
+ "ended": null,
+ "ended_ts": null,
+ "kept": 0,
+ "started": "05:54",
+ "started_ts": 1795825476.7089415,
+ "window_for_claim": 1795825476.7089415
 }
