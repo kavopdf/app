@@ -1,13 +1,15 @@
 {
  "counts": {
   "baseline_not_scored": [],
-  "clean": 205,
-  "failing": 8,
-  "in_baseline": 213,
+  "clean": 208,
+  "failing": 6,
+  "in_baseline": 214,
   "in_marks": 213,
-  "scored": 213,
+  "scored": 214,
   "scored_not_in_baseline": [],
-  "scored_not_in_marks": []
+  "scored_not_in_marks": [
+   "Prakashan_Print_Fidelity_Handbook"
+  ]
  },
  "instrument": {
   "checks": 12,

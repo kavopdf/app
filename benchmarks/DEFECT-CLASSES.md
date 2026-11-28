@@ -12,7 +12,7 @@ dominates it.
 | signature | problem | open | fixed |
 |---|---|---|---|
 | content-loss | content-missing-partly-replaced | 13 | 1 |
-| content-loss | content-missing-nothing-in-its-place | 3 | 1 |
+| content-loss | content-missing-nothing-in-its-place | 4 | 1 |
 | mixed | content-partly-lost-and-displaced | 5 | 4 |
 | mixed | content-partly-lost | 4 | 0 |
 | displacement | content-present-wholly-displaced | 26 | 2 |
@@ -250,6 +250,7 @@ only a work queue.
 | 210 | `63_three_column_brochure` | none | 0.00 | 2.40 | 1 | FIXED | no defect |
 | 211 | `72_bank_statement_no_rules_right_amounts` | none | 1.57 | 4.32 | 1 | FIXED | no defect |
 | 212 | `73_marksheet_subject_marks_grade` | none | 7.95 | 4.32 | 1 | FIXED | no defect |
+| 213 | `Prakashan_Print_Fidelity_Handbook` | content-missing-nothing-in-its-place | 98.19 | 731.52 | 9 | OPEN | - |
 
 ## Parked
 

@@ -198,4 +198,5 @@
 | 28 Nov 06:12 | baseline | slot claimed - baseline running |
 | 28 Nov 07:02 | fixer | attempt 18_displacement -> lead (0/? moved) |
 | 28 Nov 07:31 | baseline | slot claimed - baseline running |
+| 28 Nov 07:54 | classifier | slot claimed - classifier running |
 | 28 Nov 08:04 | fixer | slot claimed - fixer running |

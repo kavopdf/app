@@ -693,12 +693,10 @@
  },
  "39_small_caps_letter_spacing": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t01_word_accuracy",
-  "failed": 1,
-  "failed_ids": [
-   "t01_word_accuracy"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "400_comic_page_speech_bubbles": {
   "applicable": 7,
@@ -1077,12 +1075,10 @@
  },
  "74_balance_sheet_indented_subitems": {
   "applicable": 10,
-  "baseline_failed": 1,
-  "cause": "t02_position",
-  "failed": 1,
-  "failed_ids": [
-   "t02_position"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "75_merged_header_cell_three_columns": {
   "applicable": 10,
@@ -1100,12 +1096,10 @@
  },
  "77_arabic_rtl_document": {
   "applicable": 9,
-  "baseline_failed": 1,
-  "cause": "t01_word_accuracy",
-  "failed": 1,
-  "failed_ids": [
-   "t01_word_accuracy"
-  ]
+  "baseline_failed": 0,
+  "cause": "clean",
+  "failed": 0,
+  "failed_ids": []
  },
  "78_mixed_english_devanagari_line": {
   "applicable": 9,
@@ -1136,6 +1130,18 @@
   "failed_ids": [
    "t06_encoding",
    "t09_page_furniture",
+   "t12_word_invention"
+  ]
+ },
+ "Prakashan_Print_Fidelity_Handbook": {
+  "applicable": 11,
+  "baseline_failed": 4,
+  "cause": "4 checks",
+  "failed": 4,
+  "failed_ids": [
+   "t01_word_accuracy",
+   "t03_symbols",
+   "t07_symbol_counts",
    "t12_word_invention"
   ]
  },

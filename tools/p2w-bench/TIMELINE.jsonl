@@ -10506,6 +10506,13 @@
 {"t": 1795829639.8366132, "ist": "07:03:59", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795829643.1926985, "ist": "07:04:03", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795831300.608519, "ist": "07:31:40", "ev": "claim", "d": "baseline claimed the slot"}
+{"t": 1795832691.921481, "ist": "07:54:51", "ev": "claim", "d": "classifier claimed the slot"}
+{"t": 1795832703.5448105, "ist": "07:55:03", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795832730.1897411, "ist": "07:55:30", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795832741.4963562, "ist": "07:55:41", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795832741.8308225, "ist": "07:55:41", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795832742.02365, "ist": "07:55:42", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795832742.3833513, "ist": "07:55:42", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795833014.3938627, "ist": "08:00:14", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795833014.8075895, "ist": "08:00:14", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795833015.0235178, "ist": "08:00:15", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
@@ -10514,6 +10521,14 @@
 {"t": 1795833026.6590555, "ist": "08:00:26", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795833026.844785, "ist": "08:00:26", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795833027.1888862, "ist": "08:00:27", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795833078.2629933, "ist": "08:01:18", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 53 converted"}
+{"t": 1795833078.4725246, "ist": "08:01:18", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 53 converted"}
+{"t": 1795833078.6406014, "ist": "08:01:18", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 53 converted"}
+{"t": 1795833078.8237078, "ist": "08:01:18", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 53 converted"}
+{"t": 1795833079.0070498, "ist": "08:01:19", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 53 converted"}
+{"t": 1795833079.2166169, "ist": "08:01:19", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 36 of 53 converted"}
+{"t": 1795833079.4027958, "ist": "08:01:19", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 42 of 53 converted"}
+{"t": 1795833079.5997593, "ist": "08:01:19", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 48 of 53 converted"}
 {"t": 1795833286.8464565, "ist": "08:04:46", "ev": "claim", "d": "fixer claimed the slot"}
 {"t": 1795833287.0453956, "ist": "08:04:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795833287.1468918, "ist": "08:04:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
