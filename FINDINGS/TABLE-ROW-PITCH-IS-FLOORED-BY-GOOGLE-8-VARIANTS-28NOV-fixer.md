@@ -1,35 +1,37 @@
-# The table row pitch is FLOORED by Google, and `w:trHeight` is inert. Eight variants, one document, Google only.
+# Google's table row advance is not controllable by any spacing declaration. Ten variants, three documents, Google only.
 
 **28 Nov 2026, fixer run 08:24 IST. Measured in Google Docs (upload -> convert -> export PDF ->
-PyMuPDF), not LibreOffice. Document: `price-list-2col-dense-right-aligned`, 41 table rows, one page.**
+PyMuPDF), not LibreOffice.** Probe `.docx` files are on branch `probe-28nov` under
+`benchmarks/probe-28nov/`; each is reproducible in ~30 s with `GOOGLEDRIVE_UPLOAD_FROM_URL` on the raw
+URL and mime `application/vnd.google-apps.document`.
 
 ## What was believed
 
-Two things, both from the 28 Nov 05:54 run and its agent:
+The 28 Nov 05:54 run root-caused `18_displacement` to the table cell: the engine writes a row's top edge
+from a pitch and the cell's baseline from `before + LINE_BASE*box`, the two disagree, and the shortfall
+is one-signed. Its named next step was: *"give the cell the font's natural line box and move the
+identical difference into `before`, so the baseline is preserved by construction."*
 
-1. The engine writes each cell's baseline from `before + LINE_BASE*box` while the row's top edge comes
-   from a pitch, and the shortfall is one-signed, so text lands a constant amount low per row.
-2. The named next step was: *"the candidate is `w:line`, not `w:before` — give the cell the font's
-   natural line box and move the identical difference into `before` so the baseline is preserved by
-   construction"*, with the prediction that this moves Google by 0 pt **if and only if** Google is
-   already preserving the baseline.
+That prediction is falsifiable on one document, and this run falsified it — and, measuring it, found the
+mechanism underneath.
 
-## What was measured
+## The engine's row geometry is already exact
 
-The shipped `.docx` for this document writes `w:trHeight w:val="328" w:hRule="atLeast"` (16.40 pt) and,
-in each cell, `w:before="317" w:line="11" w:lineRule="exact"` — i.e. `before + line = 328 tw` exactly.
-The source PDF's own row pitch is **16.40 pt** (39 diffs of 16.4, plus a 12 pt header row). The engine's
-row geometry is therefore **correct**: it asks for the pitch the page drew.
+For `price-list-2col-dense-right-aligned` the shipped `.docx` writes `w:trHeight 328 atLeast` (16.40 pt)
+and, in every cell, `w:before="317" w:line="11" w:lineRule="exact"` — `before + line = 328 tw` exactly.
+The source PDF's own row pitch is **16.40 pt**. The engine asks for precisely what the page drew. The
+defect is downstream of the engine.
 
-Google does not deliver it. Eight variants, each differing from the shipped file only in
-`word/document.xml`, converted to Google Docs and exported:
+## Ten variants, in Google
 
-| variant | change | Google row pitch | table span (src 651.60) | first row | last row |
+### price-list-2col-dense-right-aligned — 41 rows, 8 pt text, source pitch 16.40, source span 651.60
+
+| variant | change | pitch | span | first row | last row |
 |---|---|---|---|---|---|
 | src | — | 16.290 | 651.60 | 93.69 | 745.29 |
 | **v0 shipped** | — | **16.497** | **659.88** | 94.19 | 754.07 |
 | v1 | trHeight +5 tw, before +5 tw | 16.601 | 664.05 | 94.44 | 758.49 |
-| v2 | before 88, line 240 (same sum, natural box) | 16.500 | 643.51 | 105.70 | 749.21 |
+| v2 | before 88, line 240 — the named next step | 16.500 | 643.51 | 105.70 | 749.21 |
 | v3 | trHeight +5 tw only | 16.497 | 659.88 | 94.19 | 754.07 |
 | v4 | trHeight −4 tw, before −4 tw | 16.497 | 659.88 | 93.99 | 753.87 |
 | v5 | before −4 tw only | 16.497 | 659.88 | 93.99 | 753.87 |
@@ -37,63 +39,85 @@ Google does not deliver it. Eight variants, each differing from the shipped file
 | v7 | cell paragraph mark at 6 pt | 16.497 | 659.88 | 94.19 | 754.07 |
 | v8 | `w:line="0"` | 22.468 | 674.05 | 99.48 | 773.53 |
 
-Three facts fall out of the table, and each one is a refutation:
+### The same test on two other documents
 
-1. **`w:trHeight` is inert.** v3 (+0.25 pt/row) and v4 (−0.20 pt/row) produce a table **identical to
-   v0 to 0.00 pt** in span and in last-row position. Changing the declared row height changes nothing.
-   The engine's entire row geometry — `328 tw atLeast` — is ignored by Google on these rows.
-2. **The row advance is `max(16.50, before + 0.257)`, and the floor is what costs the document.**
-   v0/v5 (before 15.85 and 15.65) both land at 16.497: the pitch is pinned. v6 (before 16.85) lands at
-   17.107 = 16.85 + 0.257, exactly. So below `before ≈ 16.24` the pitch cannot be reduced at all, and
-   above it every twip of `before` is delivered. The source pitch is 16.40, under the 16.50 floor, so
-   Google adds **+0.097 pt/row … +0.207 pt/row** and the error accumulates: **+8.28 pt by the last row
-   of a 40-row table.**
-3. **The named next step is refuted, and it is refuted by the variant that implements it.** v2 *is* the
-   natural-line-box rewrite (same sum, 12 pt box instead of 0.55 pt): its pitch is unchanged (16.500)
-   and it moves the table's first row **+11.51 pt** (105.70 vs 94.19). It would not fix `18_displacement`
-   and it would move every cell of every table in the corpus. Do not build it.
+| document | rows | font | source pitch | Google pitch | excess/row | accumulated |
+|---|---:|---:|---:|---:|---:|---:|
+| `price-list-2col-dense-right-aligned` | 40 | 8 pt | 16.40 | 16.50 | **+0.10** | **+8.28** |
+| `table-with-no-header-row` | 30 | 8 pt | 18.40 | 18.53 (15 at 18.4, 10 at 18.9) | **+0.13** | **+3.92** |
+| `341_shipping_manifest` | 24 | 6 pt | 13.00 | 13.50 | **+0.50** | **+9.24** |
 
-The check's tolerance is `clamp(0.35*size, 1.5, 4.5)` = 2.8 pt for 8 pt text, and the page limit is
-`max(2, ceil(0.05*41))` = 3 runs out. A drift of +0.207 pt/row crosses 2.8 pt at row 13, so 28 of 41
-rows are out. That is the failure, and it is a renderer floor, not an engine error.
+`341_shipping_manifest` was also run with `before −10 tw` (−0.50 pt/row): **the export is identical to
+the shipped file**, span 570.52 both, first row 14.28 both.
+
+## What the numbers say
+
+1. **`w:trHeight` is inert in Google.** v3 (+0.25 pt/row) and v4 (−0.20 pt/row) render a table identical
+   to v0 in span and in last-row position, to 0.00 pt. The engine's entire row-height spend is a number
+   Google does not read.
+2. **Reducing `w:before` is inert below a per-document value.** v5 (−0.20 pt/row on price-list) and
+   `bm10` (−0.50 pt/row on the manifest) both render identically to shipped: only the whole table's
+   first row moves, never the pitch. **Increasing** `before` by 1.00 pt (v6) moves the pitch by 0.61 pt.
+   The response is one-sided.
+3. **The paragraph mark's font size is inert** (v7 identical to v0), and `w:line="0"` is read as
+   "single spacing" (v8: pitch 22.47), not as zero.
+4. **The excess is not a constant floor.** It is +0.10 at 16.40, +0.13 at 18.40, +0.50 at 13.00 with 6 pt
+   text. So it is not a fixed 16.5 pt clamp either — an earlier draft of this finding claimed one from
+   price-list alone, and the manifest refuted it. What is constant across all three is the *sign* and the
+   *linear accumulation*.
+5. **The named next step is refuted by the variant that implements it.** v2 *is* the natural-line-box
+   rewrite: same `before + line` sum, a 12 pt exact box instead of 0.55 pt. Its pitch is unchanged
+   (16.500) and it moves the table's first row **+11.51 pt**. It would not fix `18_displacement` and it
+   would move every cell of every table in the corpus. **Do not build it.**
+
+## Why this fails the check, arithmetically
+
+`18_displacement` allows `clamp(0.35*size, 1.5, 4.5)` pt per run — 2.8 pt for 8 pt text — on at most
+`max(2, ceil(0.05*n))` runs per page, and no run more than twice its tolerance out. A one-signed excess
+of 0.10 pt/row crosses 2.8 pt at row 28; 0.50 pt/row crosses it at row 6. All three documents measured
+here accumulate 3.9-9.2 pt by the bottom of the table, and all three fail `18_displacement` and
+**nothing else** (41/42 in `benchmarks/gverify/`). The accumulation is the whole defect.
 
 ## What is now true
 
-* For a table whose row pitch is **at or below ~16.50 pt**, Google clamps every row up to 16.50 and the
-  error accumulates per row. No declaration the engine can write removes the clamp: not `w:trHeight`
-  (v3, v4), not the paragraph mark (v7), not a smaller `before` (v5). This is the *third* place in this
-  repository where the answer is "Google cannot do it", and it must be written as a finding, not fixed.
-* For a table whose row pitch is **above** the floor, the pitch is delivered and can be tuned 1:1
-  through `w:before` (v6). That is the only lever, and it only works upward.
-* The engine's `w:trHeight` spend is **inert in Google**. Whatever it is for, it is not for the renderer
-  the user opens. Anything in `DocxWriter` that reasons about row height as a way to place text is
-  reasoning about a number Google does not read.
+* On a table with 20+ rows, **the engine cannot make Google reproduce the source's row pitch.** Not with
+  `w:trHeight`, not with `w:before`, not with the paragraph mark, not with `w:line`. Ten variants across
+  three documents move the pitch in exactly one case, and that case is an increase.
+* The excess is **per-document** (+0.10 to +0.50 pt/row) and correlates with nothing the engine declares:
+  two documents with identical `trHeight 328 / before 316-317 / line 11-12` differ by 0.4 pt/row.
+* Therefore `18_displacement` on dense-table documents is a **renderer behaviour, not an engine defect**.
+  It is the fourth construct in this repository where the answer is "Google cannot do it", and it must be
+  written as a finding and parked, not fixed.
+
+## What the class table should now say
+
+`classpick.py --leverage` prices `18_displacement` at **47.1 clean documents**, with 19 documents that
+fail nothing else. Measured on the source PDFs themselves, those 19 split by their own dominant row pitch:
+
+| pitch | documents |
+|---|---|
+| 11.2-14.0 | `balance-sheet-two-columns-of-figures` (9), `table-inside-two-column-page` (19), `303_discharge_summary` (4), `341_shipping_manifest` (24), `70_magazine_drop_cap_photo_caption` (4), `320_balance_sheet_statutory` (15) |
+| 16.4 | `price-list-2col-dense-right-aligned` (39), `bus-timetable-station-left-times-right` (32) |
+| 17.0-19.0 | `306_clinical_protocol_synopsis`, `72_bank_statement_no_rules_right_amounts`, `74_balance_sheet_indented_subitems`, `10_stamp_as_image`, `30_mixed_font_sizes_one_baseline_txtpos`, `71_invoice_space_aligned_no_rules`, `35_four_typefaces_one_page`, `eway-bill`, `table-with-no-header-row`, `two-tables-stacked-with-no-gap`, `403_crossword_puzzle` |
+
+**Twelve of the nineteen are 20-row-plus tables and the excess is measured on three of them; the other
+seven have fewer rows and may still be reachable.** The next run should not treat the 19 as one class:
+measure each one's row count and pitch first, and expect the dense half to be charged by the renderer.
 
 ## What would prove this wrong
 
-* A document whose source row pitch is under 16.5 pt that Google reproduces to under 1 pt over 20+ rows.
-  (If such a document exists, the floor is not a constant and this finding is a coincidence of
-  `price-list`.)
-* A variant that changes the delivered pitch while leaving `before` at or under 16.24 pt. The eight here
-  do not: v3, v4, v5, v7 are all 16.497.
-* A re-measurement of v0 showing a pitch of 16.40. The probe files are on branch `probe-28nov` under
-  `benchmarks/probe-28nov/` and the exports are reproducible in ten minutes with
-  `GOOGLEDRIVE_UPLOAD_FROM_URL` on the raw URL, mime `application/vnd.google-apps.document`.
+* A Google render of any 20+ row table whose measured pitch equals its source pitch to within 0.05 pt.
+  Nothing measured here does: 16.40->16.50, 18.40->18.53, 13.00->13.50.
+* A variant that changes the delivered pitch while reducing `before`. Four attempts (v5, bm10) failed.
+* The claim that `w:trHeight` is inert is refuted by any export where two different `trHeight` values
+  produce two different pitches on the same table. v3 and v4 are the direct test and both fail to move it.
 
 ## What was not measured
 
-* The second document, `bus-timetable-station-left-times-right`. Its left-column band mixes wrapped
-  lines with rows (35 distinct y for 33 rows), so its pitch number is not a row pitch and is not
-  reported. It needs a row-aware reader, not a y-band.
-* Whether the floor is a constant 16.50 pt or `1.5 x 11 pt` (the default font's line) — the two are
-  numerically identical here and nothing in this corpus separates them.
-* Whether `w:trHeight` is inert on tables that also carry borders or `w:tblCellMar`; this table has
-  neither (`tblBorders` all `nil`, `tblCellMar` all 0).
-
-## The consequence for the class table
-
-`classpick.py --leverage` prices `18_displacement` at **47.1 clean documents** and 19 documents that
-fail nothing else. This finding says that price is only collectable on the subset whose row pitch is
-above the floor. The 19 must be split by their own source row pitch before another slot is spent on
-this class, and the split is mechanical: measure the source's own row pitch, and any document under
-16.5 pt with 20+ rows is charged by the floor, not by the engine.
+* Why the excess is +0.50 on the 6 pt document and +0.10-0.13 on the 8 pt ones. A font-proportional law
+  fits the sign of all three but not the magnitude; nothing here separates "font size" from "row count"
+  from "declared line box" (0.45 pt vs 0.55 pt).
+* `bus-timetable-station-left-times-right`. Its left-column y-band mixes wrapped lines with rows, so the
+  band pitch is not a row pitch. It needs a row-aware reader.
+* Tables carrying borders or `w:tblCellMar`: all three documents here declare `tblBorders` all `nil` and
+  `tblCellMar` all zero.
