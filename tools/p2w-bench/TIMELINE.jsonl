@@ -10539,3 +10539,9 @@
 {"t": 1795833399.4252815, "ist": "08:06:39", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795833399.650008, "ist": "08:06:39", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795833400.0965316, "ist": "08:06:40", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795833568.7916787, "ist": "08:09:28", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 6 of 31 converted"}
+{"t": 1795833576.2828717, "ist": "08:09:36", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 12 of 31 converted"}
+{"t": 1795833577.189951, "ist": "08:09:37", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 18 of 31 converted"}
+{"t": 1795833578.2479906, "ist": "08:09:38", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 24 of 31 converted"}
+{"t": 1795833587.9519649, "ist": "08:09:47", "ev": "beat", "d": "heartbeat before any claim: corpus-slice: 30 of 31 converted"}
+{"t": 1795833616.4034836, "ist": "08:10:16", "ev": "release", "d": "classifier released"}
