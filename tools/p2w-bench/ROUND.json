@@ -1,10 +1,10 @@
 {
   "baseline_started": 0,
   "classifier_started": 0,
-  "fixer_doing": "corpus-slice: 48 of 53 converted",
-  "fixer_doing_since": 1795857314.041295,
+  "fixer_doing": "corpus-slice: 24 of 26 converted",
+  "fixer_doing_since": 1795857467.7453523,
   "fixer_engine_at_claim": "99fefe2a",
-  "fixer_last_beat": 1795857314.0412962,
+  "fixer_last_beat": 1795857467.7453532,
   "fixer_started": 1795856751.8704543,
   "history": [
     {
