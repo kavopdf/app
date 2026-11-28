@@ -1,28 +1,41 @@
 # P2W Baseline - Run Report
 
-**28 Nov 2026 · 01:50 IST**
+**28 Nov 2026 · 06:50 IST**
 
-> 155 of 214 documents are at or under 1% share@5px in LibreOffice. The corpus is 40.3% closer to the 15 Nov baseline than it started.
-This run was not a measure phase, so it published no new table: it rebuilt the corpus from the release zips, converted every PDF with the engine at HEAD, and re-scored the `.txt` half with the current verifier - 208 clean and 6 failing, unchanged, so there was nothing to commit on that side. It also measured the `.docx` half across the whole corpus, which is the one thing `BLOCKERS.md` has been asking the baseline cron for since 20:43, and the answer is not the one the pipeline wanted: the documents that moved are the ones built out of tables, they moved worse rather than better, and the clean count at or under 1% share@5px falls from 155 to 97. The full row-by-row table this run measured travels with this report as RANKING.csv. I checked the worst of them with my own eyes instead of trusting the number - `table-with-no-header-row`, 0.61 to 47.48 share@5px - and the render shows why: every single-line row is now shorter, so the error accumulates down a long table until its bottom sits tens of pixels from where the source drew it. That is the fixer's last engine commit, 'a single-line cell is written at its row's height', behaving as designed in Google and costing the table-heavy corpus in LibreOffice. So the table was not stamped, nothing was published, and the commit gate still refuses this tree; it is right to, and the fixer owns that change.
+> 98 of 214 documents are at or under 1% share@5px in LibreOffice. The corpus is -24.3% closer to the 15 Nov baseline than it started.
 
+This run started from an empty pod: it downloaded the corpus, converted every document with the current engine, measured the whole set, and refreshed the .txt table against the same build. The census and the ranking were published from that measurement, and the ratchet compared it against the committed baseline before anything was committed.
 
 ## Corpus
 
 | | |
 |:--|--:|
 | Documents | **214** |
-| .docx at or under 1% share@5px (LibreOffice) | **155** |
-| .docx still open | **59** |
+| .docx at or under 1% share@5px (LibreOffice) | **98** |
+| .docx still open | **116** |
 | .txt clean | **208** |
 | .txt failing | **6** |
 | Google measured | **206** of 214 |
-| Google clean | **46** |
+| Google clean | **48** |
 
 ## Against the 15 Nov baseline
 
 | | baseline | now | |
 |:--|--:|--:|:--|
-| mean share@5 | 6.15 | **3.67** | -40.26% |
-| documents improved at all (any fall) | | **65** | |
-| regressions | | **0** | none |
+| mean share@5 | 6.15 | **7.64** | +24.29% |
+| documents improved at all (any fall) | | **47** | |
+| regressions | | **84** | LOOK |
+
+Regressions are a defect, not a result:
+
+* `360_restaurant_menu` 34.43 -> 50.18
+* `table-with-no-header-row` 0.61 -> 47.48
+* `boq-tender-bill-of-quantities` 7.10 -> 41.95
+* `very-long-single-column-table` 6.87 -> 41.14
+* `electricity-bill` 16.24 -> 36.78
+* `balance-sheet-and-profit-loss` 6.20 -> 36.69
+* `salary-slip-factory-wages` 18.09 -> 35.15
+* `03_stamp_vertical_90deg` 16.98 -> 34.38
+* `table-across-page-break-repeated-header` 9.41 -> 33.52
+* `mobile-bill` 18.48 -> 30.09
 

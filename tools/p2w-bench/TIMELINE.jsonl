@@ -10468,6 +10468,15 @@
 {"t": 1795826104.956657, "ist": "06:05:04", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795826106.8119378, "ist": "06:05:06", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795826543.7544167, "ist": "06:12:23", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795826560.523678, "ist": "06:12:40", "ev": "claim", "d": "baseline claimed the slot"}
 {"t": 1795826582.2287197, "ist": "06:13:02", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795826582.3970084, "ist": "06:13:02", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795826623.4849997, "ist": "06:13:43", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795828864.5577393, "ist": "06:51:04", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795828864.7732198, "ist": "06:51:04", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795828864.9576626, "ist": "06:51:04", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795828865.1734707, "ist": "06:51:05", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795828871.2779627, "ist": "06:51:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795828871.5322523, "ist": "06:51:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795828871.6806674, "ist": "06:51:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795828871.9281347, "ist": "06:51:11", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}

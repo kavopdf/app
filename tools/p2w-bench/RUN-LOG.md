@@ -198,3 +198,4 @@
 | 28 Nov 04:29 | fixer | attempt 63_table_rows -> lead |
 | 28 Nov 05:39 | fixer | attempt 60_text_column_right_edge -> kept (2/? moved) |
 | 28 Nov 05:41 | fixer | attempt 18_displacement -> error (0/? moved) |
+| 28 Nov 06:12 | baseline | slot claimed - baseline running |
