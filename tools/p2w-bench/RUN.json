@@ -2,8 +2,8 @@
  "started_ts": 1795847363.7612379,
  "started": "11:59",
  "window_for_claim": 1795847363.7612379,
- "ended_ts": null,
- "ended": null,
+ "ended_ts": 1795848352.8953831,
+ "ended": "12:15",
  "attempts": 0,
  "kept": 0,
  "agents": [
