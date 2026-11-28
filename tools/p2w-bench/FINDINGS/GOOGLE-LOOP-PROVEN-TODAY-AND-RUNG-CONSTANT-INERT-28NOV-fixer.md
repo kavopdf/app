@@ -139,3 +139,24 @@ table still describes the engine in the tree (46/47, `med_dy 7.2`, `worst_dy 16.
 document, ~3 minutes with the loop in section 1 — and expect `18_displacement` to pass if `worst_dy` goes
 under the check's tolerance. (3) Only then pay the corpus-wide re-measure and `--stamp`. 19 documents fail
 `18_displacement` alone; this is the construct most likely to turn them CLEAN.
+
+### The arithmetic the next run needs before it touches the constant again
+
+The residual after `FOOT_ROOM_MIN_TW = 75` is not noise, it is the ladder, and the ladder is why a second
+constant tweak is the wrong next move. On `laid = 0.75 * (round(d/0.75) + 1)` the reachable heights near these
+two tables are:
+
+| row pitch the page drew | declaration that lands on it | laid | error per row |
+|---|--:|--:|--:|
+| T1, 14.00 pt | 280 tw (14.00) | 15.00 | **+1.00** |
+| T1, 14.00 pt | 270 tw (13.50) | 14.25 | +0.25 |
+| T2, 13.00 pt | 260 tw (13.00) | 13.50 | **+0.50** |
+| T2, 13.00 pt | 250 tw (12.50) | 13.50 | **+0.50** (inert — this is the residual) |
+| T2, 13.00 pt | 240 tw (12.00) | 12.75 | -0.25 |
+
+14.00 pt and 13.00 pt are **not on the ladder at all** (0.75 x 18.67 and 0.75 x 17.33), so no single
+under-declaration constant lands both tables on their own pitch: T1 wants 270, T2 wants 240, and one constant
+cannot be both. **The change is not a constant, it is choosing `d` per row to minimise `|laid(d) - pitch|`** —
+three lines in the row loop, with `laid(d) = 0.75 * (round(d / 0.75) + 1)`. That is what should be built and
+measured on `320` next, and it is why this run stopped at `FOOT_ROOM_MIN_TW = 75` rather than spending a third
+attempt on another constant.
