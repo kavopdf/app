@@ -1747,3 +1747,43 @@ close the question.
 |:--|:--|:--|
 | 2026-11-28 | The watchdog cron's own tool list carries no `cron` operation, so no paused or zombie cron can be inspected, paused, resumed or recreated by any watchdog run. Recorded again this pass with the exact calls. | whoever owns this agent's cron configuration - add a `cron` operation to the watchdog cron's tool list |
 | 2026-11-28 | A research agent opened public branch `probe/18-displacement-28nov` on `kavopdf/app` (six synthetic probe `.docx` under `probes/`) to reach Drive. It is residue, not evidence. Not deleted, because the brief forbids deleting a branch. | whoever owns the repo - delete it by hand when it is not needed |
+
+## 2026-11-28 12:06 - watchdog pass
+
+**Nothing is stopped.** `health.py --stalled` exits 0: measure-google done at 214 of 214 (6.5 h), matrix
+done at 214 of 214 with all of them on the engine in the tree (4.6 h), classify superseded (4.0 h), fix
+moving at 8 attempt(s) in 3 h (0.6 h), txt moving at 209 clean and 5 failing (0.6 h). No stage needed a
+restart, so STEP 4 C did not fire and, on the phase being fix, `round.py --reopen` would have refused.
+
+**Matrix recovered without this pass acting.** The 03:5x entry read matrix stopped at 37 of 213 results
+on the engine; the tool now reads done at 214 on the engine. The escalation that entry set - "matrix
+still reading 37 on engine at a pass 24 h from now" - is answered by the measurement, not by a decision
+here, and it is not carried forward.
+
+**The trend row is flat on two columns, and that is the signal.** Today's row was already appended by an
+earlier pass, so this pass appended nothing and had nothing to commit for PROGRESS.md. Against 27 Nov:
+docx open 116 -> 116, txt failing 6 -> 6, google 206 -> 206, google clean 46 -> 48. The fixer's attempt
+count beside that flat line is 8 in 3 h, and 1 kept. This is the second row at 116 after six rows at 59,
+so the .docx column has not moved in eight days except when the table was re-measured. What contradicts
+a stall is google clean, up 2 on the day: the renderer the settled decision names is producing passes
+while the LibreOffice proxy column is not. The next thing to test remains the one the 03:5x entry named -
+a fixer slot that lands one measured construct and moves docx open off 116. Nothing was parked with
+`classpick.py --exhaust`, because the class table is fresh and the fixer is inside its budget.
+
+**No `cron` tool in this pass.** STEP 3 and STEP 4 A and B did not run. No cron was listed, inspected,
+paused, resumed, deleted or recreated, and no cron id is reported from this pass because none was read.
+The calls it would have made, exactly:
+
+    cron(action="list")
+    cron(action="runs", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85")   # gverify, from the HEALTH-BRIEF table
+
+and then, only for a stale `next_fire_at` or a zombie run:
+
+    cron(action="pause", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85"); cron(action="resume", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85")
+
+This is a missing tool, not a decision a person has to make: a `cron` operation has to be in this cron's
+tool list before a paused or zombie cron can be cleared by automation.
+
+**STEP 4 D did not fire.** `status.py` reads SILENT, on a claim taken inside a run that is still in its
+slot; the slot is held by a live run that has not beaconed recently, not by a dead one, and
+`round.py --release-fixer --force` was not run.
