@@ -11130,3 +11130,11 @@
 {"t": 1795863556.459925, "ist": "16:29:16", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795863556.5918028, "ist": "16:29:16", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795863557.2298245, "ist": "16:29:17", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795864191.642528, "ist": "16:39:51", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795864191.8234048, "ist": "16:39:51", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795864191.9166625, "ist": "16:39:51", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795864238.6797893, "ist": "16:40:38", "ev": "beat", "d": "relay: building per-row ladder engine (footRoom 75 + per-row under-declaration)"}
+{"t": 1795864313.2369673, "ist": "16:41:53", "ev": "beat", "d": "relay: fetching corpus (6 min)"}
+{"t": 1795864379.908746, "ist": "16:42:59", "ev": "beat", "d": "relay: Google export of 320 collected, scoring"}
+{"t": 1795864484.1296039, "ist": "16:44:44", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795864486.1279106, "ist": "16:44:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
