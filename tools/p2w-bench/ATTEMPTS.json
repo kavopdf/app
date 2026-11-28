@@ -1337,7 +1337,7 @@
   "status": "OPEN"
  },
  "60_text_column_right_edge": {
-  "attempts": 9,
+  "attempts": 10,
   "first_seen": null,
   "history": [
    {
@@ -1418,6 +1418,17 @@
     "outcome": "kept",
     "reason": "instrument fix: page_lines() split a Google table row at its cell gutters; 2 documents CLEAN (salary-slip-factory-wages, table-with-merged-cells), 10 more pass 60, 0 pass->fail in a 62-document census",
     "total": null
+   },
+   {
+    "at": "2026-11-28 10:33",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Google-measured on 313_power_of_attorney (fails only 60). The font-name lever was measured in Google for the first time: HEAD renders ArialMT at max right edge 480.14 against a source 538.63; Georgia ",
+    "total": null
    }
   ],
   "last": null,
@@ -1433,9 +1444,10 @@
    "reverted",
    "lead",
    "lead",
-   "kept"
+   "kept",
+   "lead"
   ],
-  "reason": "instrument fix: page_lines() split a Google table row at its cell gutters; 2 documents CLEAN (salary-slip-factory-wages, table-with-merged-cells), 10 more pass 60, 0 pass->fail in a 62-document census",
+  "reason": "Google-measured on 313_power_of_attorney (fails only 60). The font-name lever was measured in Google for the first time: HEAD renders ArialMT at max right edge 480.14 against a source 538.63; Georgia 480.49; Noto Serif 505.01; Times New Roman 449.00; Liberation Serif is not in Google's library and falls back to Arial byte-for-byte. Best face closes 33.6 of 58.5 pt, so the name is honoured but is not the fix. w:jc=both on all 29 body paragraphs is INERT (all 30 right edges identical to 0.1 pt) because 29 paragraphs over 30 lines means nearly every line is its own paragraph's last line, which justification does not stretch.",
   "reasons": [
    "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one.",
    "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect.",
@@ -1445,7 +1457,8 @@
    "right-edge pin (w:jc=distribute + w:ind w:right) on 302: Google 41/42 -> 39/42, 60 unchanged (0,1,False), 17 33->21, 26 wrap 2->28; LO identical 42/42 both arms. Reverted; FINDINGS/RIGHT-PIN-WRAPS-IN-GOOGLE-INERT-IN-LO-0126-relay.md",
    "the gate now PASSes on this pod (unmodified engine a4d8fca469bba636, exit 0) after corpus-fetch + pod-prep + 2 corpus-slice calls - the four prior refusals were missing pod prerequisites, not the tree. Landed FINDINGS: 60_edge cause settled (DocxWriter:4444 never writes a line's right extent); three fixes refuted in the record; the surviving proposal is a right tab stop at the source edge (flowRow:3805-3809), ceiling 5 CLEAN, prediction 302_radiology_report 41/42 -> 42/42 edge 543.74 +-1.0. Not built this slot: 27 min of the slot went to two inline agents and 10 to the cold corpus. No document moved.",
    "right tab stop in flowFromBox: Google delivers the trailing word at 309.00 asked / 309.00 and 538.50 asked / 538.61, so the edge IS placeable to 0.11 pt; but page_lines() takes one bbox per PyMuPDF line and a tab splits one visual line into two, so the current reader charges an underrun the render does not have (column edge read 239.54 vs the 309.00 drawn) and 17_matched_runs loses its pairs. With page_lines merging same-baseline fragments, 321 goes 60 FAIL -> 60 PASS on both tab variants and the control is unchanged; the remaining failure is 17_matched_runs, which needs one source run to be satisfiable by consecutive render pieces. Engine change reverted: on the reader as it stands it is 41/42 -> 40/42, a Google regression. FINDINGS/60-RIGHT-TAB-HONOURED-INSTRUMENT-BLIND-27NOV-fixer.md",
-   "instrument fix: page_lines() split a Google table row at its cell gutters; 2 documents CLEAN (salary-slip-factory-wages, table-with-merged-cells), 10 more pass 60, 0 pass->fail in a 62-document census"
+   "instrument fix: page_lines() split a Google table row at its cell gutters; 2 documents CLEAN (salary-slip-factory-wages, table-with-merged-cells), 10 more pass 60, 0 pass->fail in a 62-document census",
+   "Google-measured on 313_power_of_attorney (fails only 60). The font-name lever was measured in Google for the first time: HEAD renders ArialMT at max right edge 480.14 against a source 538.63; Georgia 480.49; Noto Serif 505.01; Times New Roman 449.00; Liberation Serif is not in Google's library and falls back to Arial byte-for-byte. Best face closes 33.6 of 58.5 pt, so the name is honoured but is not the fix. w:jc=both on all 29 body paragraphs is INERT (all 30 right edges identical to 0.1 pt) because 29 paragraphs over 30 lines means nearly every line is its own paragraph's last line, which justification does not stretch."
   ],
   "requeues": 0,
   "status": "OPEN"
