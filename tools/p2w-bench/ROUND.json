@@ -1,11 +1,9 @@
 {
   "baseline_started": 1795848001.7969687,
   "classifier_started": 0,
-  "fixer_doing": "relay: writing the report",
-  "fixer_doing_since": 1795847942.7934024,
   "fixer_engine_at_claim": "33863086",
   "fixer_last_beat": 1795847942.793403,
-  "fixer_started": 1795847363.7612379,
+  "fixer_started": 0,
   "history": [
     {
       "at": "2026-11-28 06:52",
