@@ -2651,8 +2651,25 @@ real, and it is better said than omitted.
 
 ## THE 46-MINUTE FLOOR - plan the slot around it, or land nothing
 
-**A corpus re-measurement is 46 minutes: 19 to convert the 213 documents, 21 to render them to PDF at about
-5.9 s each on six workers, and 6 to score.** Every landing needs one, because nothing is committed without a
+**A docx corpus re-measurement is 54 minutes, measured, and a txt re-conversion is on top of that.**
+
+**The figure was 46 in an earlier version of this section, and 46 was wrong.** It came from the 05:54 run's own
+estimate - 19 to convert, 21 to render at 5.9 s each, 6 to score - and the 09:16 run then measured the real cost
+and recorded it: **"the docx half is frozen behind 84 documents of debt and a 54-minute re-measure"**
+(`LAST-MESSAGE.md`, `REPORT.md`). **An estimate is not a measurement, and this section printed one as though it
+were.**
+
+**Two more measured facts that decide whether a landing fits in the slot:**
+
+- **`corpus-slice.py` takes 240 s per slice**, and **a cold pod needs two gate calls**: the first fills one slice
+  and ends at the 290 s ceiling, the second finishes and writes the stamp. **So a cold start is two gate calls
+  before the measurement proper begins.**
+- **A txt change needs a full 213-document re-conversion and a re-stamped `RANKING-TXT.csv`**, and the gate
+  refuses a txt commit without that stamp. **That is a second full pass, not a footnote.**
+
+**So the honest planning figure is 54 minutes for docx alone, before any txt work.** The 90-minute slot minus 54
+leaves 36, and a run must also claim, read, deploy its two agents, prove on one document, write the report and
+release. **Start the re-measurement by minute 25, not 30.** Every landing needs one, because nothing is committed without a
 measurement before and after.
 
 **So a run that does not START the re-measurement before minute 30 cannot land anything, however good its
