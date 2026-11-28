@@ -16,14 +16,12 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 18_dA-02 | 18_displacement | A | find the single construct behind the displaced runs on the 25 document | 22:14 | 16:10 | landed | FINDINGS/18-displacement-DOMINANT-SUBCAUSE-27NOV-agent.md |
-| commA-01 | commit_gate | A | which clause of aa496ebe moves itr-computation and can it be split fro | 23:19 | 17:33 | running |  |
 | triaA-01 | triage | A | which of the 113 failing checks buys the most clean documents, with th | 01:12 | 18:55 | running |  |
 | ssimB-01 | ssim | B | what caps the 99 percent SSIM goal - is the deficit concentrated or un | 01:12 | 19:00 | running |  |
 | Expl-01 | Explore:docx construct ranking by documents-cleared (10-row table, rung rule named first) |  |  | 05:51 |  | running |  |
@@ -46,13 +44,14 @@ unfinished work, not as a result.
 | 63_tB-01 | 63_table_rows | B | what exactly differs in the docx for table-with-no-header-row: per-row | 23:17 | mechanism by 00:00 | running |  |
 | row_A-01 | row_rung | A | which of the 84 docx regressions vs the 15 Nov baseline does ROW_RUNG_ | 03:41 | 03:55 | landed | FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md |
 | commB-01 | commit_gate | B | is the gate's 84 a real quality loss or an inflated count - baseline p | 03:41 | 04:10 | landed | FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md |
+| 18prize-01 | 18_displacement | A | which documents would become CLEAN if 18_displacement passed, and what | 04:05 | 04:15 | landed | FINDINGS/18prize-01-18-DISPLACEMENT-PRIZE-CENSUS-28NOV-agent.md |
+| 61rank-02 | 18_displacement | B | among the 61 genuine losses, which single Google check would clean the | 04:31 | 04:35 | landed | FINDINGS/61rank-02-SIXTY-ONE-LOSSES-RANKED-BY-CHECK-28NOV-agent.md |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `16:43` attempt 109 on 18_displacement -> lead
 - `16:45` agent deployed: 18_displacement / small-dy cluster of 15 - which code site places a run's baseline, and is the small dy an ascent artefact 
 - `16:45` agent deployed: txt / form-feed lead - is _txt_lines dropping page separators, and how many documents does it clear
 - `16:50` attempt 110 on 18_displacement -> kept
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `03:41` agent landed: commit_gate / B -> FINDINGS/GATE-REFUSES-MAIN-ITSELF-AND-THE-RUNG-IS-27-NET-28NOV-relay.md
 - `04:27` attempt 6 on 63_table_rows -> lead
 - `04:29` attempt 7 on 63_table_rows -> lead
+- `05:39` attempt 9 on 60_text_column_right_edge -> kept
 
 ## Where the rest of the state lives
 

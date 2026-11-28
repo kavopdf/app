@@ -1640,3 +1640,9 @@ with the numbers above in front of it, decide whether a gate that refuses a tree
 changed is still the right gate. Re-baselining to today's state without (1) would ratify 27 documents
 of avoidable damage and must not be done. This entry stays open until `regress.py --check` exits 0 on
 `main`.
+
+## Rows
+
+| date | what | who owns it |
+|:--|:--|:--|
+| 2026-11-28 | A research agent opened public branch `probe/18-displacement-28nov` on `kavopdf/app` (six synthetic probe `.docx` under `probes/`) to reach Drive. It is residue, not evidence. Not deleted, because the brief forbids deleting a branch. | whoever owns the repo - delete it by hand when it is not needed |

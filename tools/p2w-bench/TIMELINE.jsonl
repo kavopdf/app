@@ -10315,3 +10315,41 @@
 {"t": 1795820541.0141194, "ist": "04:32:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795820542.9309022, "ist": "04:32:22", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795820578.024116, "ist": "04:32:58", "ev": "beat", "d": "pending.py: reading the pending gate"}
+<<<<<<< Updated upstream
+=======
+{"t": 1795822417.3612876, "ist": "05:03:37", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795822417.5843737, "ist": "05:03:37", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795822417.7364347, "ist": "05:03:37", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795822417.90646, "ist": "05:03:37", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795822418.0809677, "ist": "05:03:38", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795822418.25734, "ist": "05:03:38", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795822418.411722, "ist": "05:03:38", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795822418.591033, "ist": "05:03:38", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795822638.7776828, "ist": "05:07:18", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795822640.0584176, "ist": "05:07:20", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795822643.967475, "ist": "05:07:23", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795822644.1127448, "ist": "05:07:24", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795822644.2948875, "ist": "05:07:24", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795822644.465067, "ist": "05:07:24", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795822644.6194994, "ist": "05:07:24", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795822644.783745, "ist": "05:07:24", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795822660.6619854, "ist": "05:07:40", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795822663.77815, "ist": "05:07:43", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795823868.5327692, "ist": "05:27:48", "ev": "beat", "d": "applying instrument fix to 60_text_column_right_edge"}
+{"t": 1795823955.2950246, "ist": "05:29:15", "ev": "beat", "d": "converting 3 probes for the 60 instrument fix"}
+{"t": 1795824219.031928, "ist": "05:33:39", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795824219.1982732, "ist": "05:33:39", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795824219.3721755, "ist": "05:33:39", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795824219.5097651, "ist": "05:33:39", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795824219.69474, "ist": "05:33:39", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795824219.8674228, "ist": "05:33:39", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795824220.020747, "ist": "05:33:40", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795824220.187979, "ist": "05:33:40", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795824513.8128662, "ist": "05:38:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795824543.5197282, "ist": "05:39:03", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795824546.0066729, "ist": "05:39:06", "ev": "attempt", "d": "60_text_column_right_edge -> kept"}
+{"t": 1795824546.1294374, "ist": "05:39:06", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795824546.219626, "ist": "05:39:06", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795824546.721257, "ist": "05:39:06", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+>>>>>>> Stashed changes
+{"t": 1795824575.0834737, "ist": "05:39:35", "ev": "beat", "d": "heartbeat before any claim: attempt 2: 18_displacement per-line drift"}

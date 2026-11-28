@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
  "started_ts": 1795818649.2767327,
  "started": "04:00",
  "window_for_claim": 1795820368.0065424,
@@ -36,4 +37,22 @@
  ],
  "docs_improved": 0,
  "class": "63_table_rows"
+=======
+ "agents": [],
+ "attempts": 2,
+ "docs_improved": 2,
+ "ended": null,
+ "ended_ts": null,
+ "kept": 1,
+ "started": "04:58",
+ "started_ts": 1795822122.715651,
+ "window_for_claim": 1795822122.715651,
+ "class": "60_text_column_right_edge",
+ "counted": [
+  [
+   "60_text_column_right_edge",
+   2
+  ]
+ ]
+>>>>>>> Stashed changes
 }
