@@ -248,7 +248,7 @@
   "status": "OPEN"
  },
  "05_chars_extra": {
-  "attempts": 3,
+  "attempts": 4,
   "first_seen": null,
   "history": [
    {
@@ -279,22 +279,35 @@
     "outcome": "lead",
     "reason": "isJunk() treats U+FFFD as readable so decodeThroughFont never runs; adding it to the junk set made .txt surplus 127->141 on both forms; reverted. Real cause is a Type0 Identity-H font with no ToUnicod",
     "total": null
+   },
+   {
+    "at": "2026-11-28 08:54",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "The 25 Nov recovery path for the 127 U+FFFD ligatures ('fall back to the glyph name - PDFBox exposes it') is refuted by measurement with the engine's own reader: for 041122-Account_Opening_Form the fo",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "85b8735f",
+  "last_engine": "33863086",
   "last_moved": 11,
   "last_total": 192,
   "outcomes": [
    "kept",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "isJunk() treats U+FFFD as readable so decodeThroughFont never runs; adding it to the junk set made .txt surplus 127->141 on both forms; reverted. Real cause is a Type0 Identity-H font with no ToUnicode.",
+  "reason": "The 25 Nov recovery path for the 127 U+FFFD ligatures ('fall back to the glyph name - PDFBox exposes it') is refuted by measurement with the engine's own reader: for 041122-Account_Opening_Form the four codes 0x123/0x124/0x126/0x127 have no post table, no cmap table, no encoding name, and the PDF's own /ToUnicode CMap maps each to <FFFD>. Only the geometric route remains (ligature advance width vs its components) - a guess, falsifiable in one document by uniqueness of the assignment. No engine change; finding 05-CHARS-EXTRA-FFFD-NO-GLYPH-NAME-28NOV-fixer.md.",
   "reasons": [
    "05_chars_extra counted one U+200B per w:tab - Google's export marks every tab advance with a zero-width space. Full-corpus separation 141/141 vs 51/51, causal on 17 (23 tabs -> 23 extras, 0 tabs -> 0). norm_text now strips U+200B symmetrically. 11 of 11 measured documents cleared 05, none worse.",
    "carry-on guard keyed on whether the line gets a paragraph copy: changed 1 of 213 docx, moved no score (txt 0 rows changed, docx share5 97.62->97.62); reverted. Welded-Y diagnosis disproved.",
-   "isJunk() treats U+FFFD as readable so decodeThroughFont never runs; adding it to the junk set made .txt surplus 127->141 on both forms; reverted. Real cause is a Type0 Identity-H font with no ToUnicode."
+   "isJunk() treats U+FFFD as readable so decodeThroughFont never runs; adding it to the junk set made .txt surplus 127->141 on both forms; reverted. Real cause is a Type0 Identity-H font with no ToUnicode.",
+   "The 25 Nov recovery path for the 127 U+FFFD ligatures ('fall back to the glyph name - PDFBox exposes it') is refuted by measurement with the engine's own reader: for 041122-Account_Opening_Form the four codes 0x123/0x124/0x126/0x127 have no post table, no cmap table, no encoding name, and the PDF's own /ToUnicode CMap maps each to <FFFD>. Only the geometric route remains (ligature advance width vs its components) - a guess, falsifiable in one document by uniqueness of the assignment. No engine change; finding 05-CHARS-EXTRA-FFFD-NO-GLYPH-NAME-28NOV-fixer.md."
   ],
   "requeues": 0,
   "status": "OPEN"
