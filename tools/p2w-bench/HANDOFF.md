@@ -16,14 +16,12 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| corp-01 | corpus-cache-per-document-27NOV |  |  | 13:31 |  | running |  |
-| 18_dsmall-dy cluster of 15-01 | 18_displacement | small-dy cluster of 15 | which code site places a run's baseline, and is the small dy an ascent | 16:45 | the mechanical cause with a falsifiable claim and the exact file:line | running |  |
 | txtform-feed lead-01 | txt | form-feed lead | is _txt_lines dropping page separators, and how many documents does it | 16:45 | a fixture proving the bug and a count of verdicts moved | running |  |
 | 63_tA-01 | 63_table_rows | A | which engine commit between d28ca7516c3f9165 and a05b20eb05fe0fc8 brok | 23:17 | root cause by 00:00 | running |  |
 | 63_tB-01 | 63_table_rows | B | what exactly differs in the docx for table-with-no-header-row: per-row | 23:17 | mechanism by 00:00 | running |  |
@@ -46,14 +44,14 @@ unfinished work, not as a result.
 | 18dA18_displacement-01 | 18dA-01 | 18_displacement | engine | 12:09 | Is the 0.961 x gap - 0.58 pt law an inversion of a loss fit, and can an engine gap transform make Google deliver the drawn gap? | running |  |
 | 60_tfont-map-01 | 60_text_column_right_edge | font-map | produce a (family,size) table of which Google face each source face mu | 13:42 | 12:56 | running |  |
 | 60_tedge-probe-01 | 60_text_column_right_edge | edge-probe | extend edgeprobe.py to print the far>=2 safety net that makes markshee | 13:42 | 14:05 | not-deployed | NOT DEPLOYED. Written by the fixer at 14:05 while trying to satisfy the release check, which requires two agents. It records a second angle that was planned and never handed to an agent. Marked not-deployed rather than removed, because this ledger is append-only. The run deployed ONE agent (font-map, 12:56) and says so in its report. |
+| 60_tcolumn geometry-01 | 60_text_column_right_edge | column geometry | Is the produced .docx table 2.4x wider than the source, or is check 60 | 14:59 | per-column w:tcW vs source rule positions, and the code path that sets them | running |  |
+| 415_zero SSIM-01 | 415_inline_images | zero SSIM | Are 415_inline_images and 411_nested_xobject_transforms a regression,  | 14:59 | converts yes/no, page and image count, which code yields 0.00, any commit that could cause it | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `08:54` attempt 4 on 05_chars_extra -> lead
-- `08:56` attempt 124 on 18_displacement -> lead
 - `08:56` agent deployed: 18_displacement / A - take a real Google export of 35_four_typefaces_one_page and test whether Google 
 - `09:05` agent deployed: 05_chars_extra / B - test whether the U+FFFD ligature glyphs resolve by advance width
 - `09:06` attempt 125 on 18_displacement -> lead
@@ -77,6 +75,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `13:42` agent deployed: 60_text_column_right_edge / edge-probe - extend edgeprobe.py to print the far>=2 safety net that makes marksheet-subject-
 - `14:35` attempt 14 on t12_word_invention -> lead
 - `14:57` attempt 17 on 60_text_column_right_edge -> kept
+- `14:59` agent deployed: 60_text_column_right_edge / column geometry - Is the produced .docx table 2.4x wider than the source, or is check 60 misreadin
+- `14:59` agent deployed: 415_inline_images / zero SSIM - Are 415_inline_images and 411_nested_xobject_transforms a regression, or a misre
 
 ## Where the rest of the state lives
 

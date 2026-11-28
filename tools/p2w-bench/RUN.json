@@ -6,6 +6,9 @@
  "ended": null,
  "attempts": 1,
  "kept": 0,
- "agents": [],
+ "agents": [
+  "60_tcolumn geometry-01",
+  "415_zero SSIM-01"
+ ],
  "docs_improved": 0
 }

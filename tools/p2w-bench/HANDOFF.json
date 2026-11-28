@@ -1,28 +1,6 @@
 {
  "agents": [
   {
-   "id": "corp-01",
-   "class": "corpus-cache-per-document-27NOV",
-   "angle": "",
-   "question": "",
-   "expected": "",
-   "deployed": "13:31",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T13:31"
-  },
-  {
-   "id": "18_dsmall-dy cluster of 15-01",
-   "class": "18_displacement",
-   "angle": "small-dy cluster of 15",
-   "question": "which code site places a run's baseline, and is the small dy an ascent artefact or a displacement",
-   "expected": "the mechanical cause with a falsifiable claim and the exact file:line",
-   "deployed": "16:45",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T16:45"
-  },
-  {
    "id": "txtform-feed lead-01",
    "class": "txt",
    "angle": "form-feed lead",
@@ -273,6 +251,28 @@
    "status": "not-deployed",
    "finding": "NOT DEPLOYED. Written by the fixer at 14:05 while trying to satisfy the release check, which requires two agents. It records a second angle that was planned and never handed to an agent. Marked not-deployed rather than removed, because this ledger is append-only. The run deployed ONE agent (font-map, 12:56) and says so in its report.",
    "deployed_at": "2026-11-28T13:42"
+  },
+  {
+   "id": "60_tcolumn geometry-01",
+   "class": "60_text_column_right_edge",
+   "angle": "column geometry",
+   "question": "Is the produced .docx table 2.4x wider than the source, or is check 60 misreading it?",
+   "expected": "per-column w:tcW vs source rule positions, and the code path that sets them",
+   "deployed": "14:59",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-28T14:59"
+  },
+  {
+   "id": "415_zero SSIM-01",
+   "class": "415_inline_images",
+   "angle": "zero SSIM",
+   "question": "Are 415_inline_images and 411_nested_xobject_transforms a regression, or a misread metric?",
+   "expected": "converts yes/no, page and image count, which code yields 0.00, any commit that could cause it",
+   "deployed": "14:59",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-28T14:59"
   }
  ],
  "history": [
@@ -377,16 +377,8 @@
    "plan": ""
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. ",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "16:43",
-   "text": "attempt 109 on 18_displacement -> lead"
-  },
-  {
-   "at": "16:45",
-   "text": "agent deployed: 18_displacement / small-dy cluster of 15 - which code site places a run's baseline, and is the small dy an ascent artefact "
-  },
   {
    "at": "16:45",
    "text": "agent deployed: txt / form-feed lead - is _txt_lines dropping page separators, and how many documents does it clear"
@@ -618,6 +610,14 @@
   {
    "at": "14:57",
    "text": "attempt 17 on 60_text_column_right_edge -> kept"
+  },
+  {
+   "at": "14:59",
+   "text": "agent deployed: 60_text_column_right_edge / column geometry - Is the produced .docx table 2.4x wider than the source, or is check 60 misreadin"
+  },
+  {
+   "at": "14:59",
+   "text": "agent deployed: 415_inline_images / zero SSIM - Are 415_inline_images and 411_nested_xobject_transforms a regression, or a misre"
   }
  ],
  "plan": "",
