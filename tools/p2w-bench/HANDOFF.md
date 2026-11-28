@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 13:53 |
-| ended | 15:00 |
-| how it ended | forced |
+| started | 15:08 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## What the next run should do first
@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `08:56` agent deployed: 18_displacement / A - take a real Google export of 35_four_typefaces_one_page and test whether Google 
 - `09:05` agent deployed: 05_chars_extra / B - test whether the U+FFFD ligature glyphs resolve by advance width
 - `09:06` attempt 125 on 18_displacement -> lead
 - `09:28` attempt 4 on t09_page_furniture -> lead
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:57` attempt 17 on 60_text_column_right_edge -> kept
 - `14:59` agent deployed: 60_text_column_right_edge / column geometry - Is the produced .docx table 2.4x wider than the source, or is check 60 misreadin
 - `14:59` agent deployed: 415_inline_images / zero SSIM - Are 415_inline_images and 411_nested_xobject_transforms a regression, or a misre
+- `15:47` attempt 128 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 

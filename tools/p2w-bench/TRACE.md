@@ -6,8 +6,6 @@
 | 21 Nov 07:16 | fixer | attempt | 47_margins -> partial (0/26 moved) |
 | 21 Nov 07:58 | fixer | claim | fixer claimed the slot |
 | 21 Nov 07:58 | fixer | stale-claim | fixer slot was stale (41 min) - the previous run ended without releasing it |
-| 24 Nov 03:01 | fixer | build-engine | started |
-| 24 Nov 03:01 | fixer | build-engine | engine built in 34s |
 | 24 Nov 03:02 | fixer | ratchet | UNMEASURED 211 of 211 not compared; DRIFT 211 rows/0 marks |
 | 24 Nov 03:04 | fixer | build-engine | started |
 | 24 Nov 03:05 | fixer | build-engine | engine built in 34s |
@@ -406,3 +404,5 @@
 | 28 Nov 13:53 | fixer | claim | fixer claimed the slot |
 | 28 Nov 14:35 | fixer | attempt | t12_word_invention -> lead (0/? moved) |
 | 28 Nov 14:57 | fixer | attempt | 60_text_column_right_edge -> kept (3/? moved) |
+| 28 Nov 15:08 | fixer | claim | fixer claimed the slot |
+| 28 Nov 15:47 | fixer | attempt | 18_displacement -> lead |

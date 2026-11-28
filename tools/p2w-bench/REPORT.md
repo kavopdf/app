@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-28 14:57
+# Fixer report - 2026-11-28 15:08
 
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 14:57 → running IST · 1 min**
+**28 Nov 2026 · slot 15:08 → running IST · 40 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - run window: RUN.json says this run began at 14:57 vs TIMELINE.jsonl records the claim at 13:53, so the window was reset and the duration is short |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1 |
+| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -26,117 +26,56 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (63 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `18_displacement` - taken from the pending list (64 still open), not a new class |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 14:57 | **kept** | 3/None | Instrument fix, measured through Google on 5 documents: check 60 bucketed source and render by left edge independently, so a 1 pt move across the 10 pt bucket boundary changed the bucket on one side o |
+| 15:47 | **lead** | None/None | Google loop proven end-to-end (42/47 reproduced on bank-statement-5-pages, same 5 failures, engine a05b20eb); ROW_RUNG_UNDER_TW 10->25 refuted as inert on 320_balance_sheet_statutory - all 21 rows emi |
 
 ## Why nothing moved, in this run's own words
 
-*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
-
-### The run before this one said
-
-> Nothing moved because the fix I found is real and the re-score it costs did not fit in the slot.
+> **Two things were measured and neither moved a document, and that is the honest shape of this slot.**
 >
-> I worked `t12_word_invention` because it is the one class where a whole document is one construct
-> away and the instrument is cheap to read: 5 of 214 documents fail the .txt table and 3 of those fail
-> `t12`. Two prior runs had each closed ONE of the two doors that feed it - 25 Nov the
-> `drawnByAppearance` guard (600: 83 invented chars -> 30), 27 Nov the `FreeText` filter inside
-> `annotationRuns()` (83 -> 49) - and each was reverted on its own with `MEASURED NO CLEAR`.
+> The first is a blocker, and unblocking it was worth more than a document. `BLOCKERS.md` says, at 12:15
+> today, that a locally built `.docx` cannot reach Google because the upload call needs an `s3key`, and
+> concludes that only a public probe branch works. That is wrong: the platform `upload` tool mints an
+> `s3key` for any file that is **already in a saved location**, and the reason four runs concluded otherwise
+> is that a file under `/scratch/work` is refused *before* any Drive call, and the refusal arrives as the
+> Drive tool's 403 "file key does not belong to this project or session" — which reads like a permission
+> problem and is a path rule. `bank-statement-5-pages` was put through the three calls end to end today and
+> `gverify.py --collect` scored it **42/47**, failing exactly the same five checks as the row already stored
+> for it (`18_displacement, 25_invisible_text, 27_text_off_page, 44_header_footer, 59_shape_anchor`, engine
+> `a05b20eb05fe0fc8`, `med_dy -54.1`). The path reproduces the stored number, so it measures the same thing.
+> That is the reason any future slot can build an engine change and measure it in Google inside the slot.
 >
-> Nobody had closed both at once. With both, `600_reviewed_invoice_with_annotations` goes 83 invented
-> characters to 0, FAIL to PASS, `.txt` 75 to 72 lines, and the other three `t12` failures are
-> unchanged. The two doors are a conjunction, not alternatives - which is why 14 attempts on this class
-> have produced no kept change: every one of them tested one door.
+> The second was an attempt on `18_displacement`, the biggest class (108 documents) and the one that decides
+> whether 19 documents become CLEAN, since 19 of them fail that check **alone**. `320_balance_sheet_statutory`
+> fails only `18_displacement` at `worst_dy 16.2` over 21 `w:trHeight` rows, and 21 x 0.75 pt = 15.75 pt — the
+> quantum law's number to within a rounding. The hypothesis was that the engine's existing
+> `ROW_RUNG_UNDER_TW = 10` twips (0.5 pt) under-declaration is short of the 0.75 pt rung and the residual
+> accumulates; 25 twips should remove it.
 >
-> It is a lead and not a kept attempt because the change is in `PdfToWord.java`, inside the docx
-> fingerprint, so landing it costs the full 213-document docx re-score: ~13 min conversion plus ~26 min
-> measurement, measured on this pod by the agent I deployed, and the slot had ~25 minutes left when the
-> number was in hand. A concurrent relay run on the same class and the same document
-> (`FINDINGS/28dAtxt-01`) recorded the `.txt`-only route as wrong, and it is right: claiming this on the
-> txt table alone would land an unmeasured docx change.
+> **The hypothesis is refuted, and the refutation is the result.** The engine was rebuilt with the constant at
+> 25 and the corpus reconverted, and the emitted heights are identical: all 21 rows write `280` twips at both
+> settings. The subtraction is guarded by `if (pitchBinds && footRoom && ...)` and one of those predicates is
+> false for every row of a dense balance sheet — so the declaration is the raw pitch, uncompensated, and the
+> rung is charged on top of it. The constant cannot reach this document at all. **The lever is `footRoom`,
+> which asks whether the row's own text leaves 5 pt of room below it — a question a dense table always answers
+> "no", which is why the compensation that exists to stop this drift is switched off exactly where the drift
+> accumulates.**
 >
-> The two documents I could not move are the next lead. `Account_Opening_Form_Fillable_filled` (14
-> surplus) and `Prakashan_Print_Fidelity_Handbook` (88 surplus) are unchanged by both doors, so their
-> surplus is a THIRD duplication nobody has found. `Prakashan`'s surplus is upper-case-concentrated
-> (`2` x7, `e` x7, `I` x6, `S` x5, `E` x4, `T` x4, `A`/`N`/`C` x3), the shape of a heading or running
-> head emitted twice.
->
-> The gate did not refuse me: `regress.py --check` exits 0 on this tree and passed both commits. The
-> clock did.
->
->
->
->
->
->
-> The slot did not land a document because the lead it inherited was measured on an incomplete
-> instrument, and the complete one refuses it.
->
-> I took the lead the last run handed over: the source PDFs are drawn in DejaVu, the engine declares
-> DejaVu, Google Docs has no DejaVu, so it substitutes something ~13% narrower and every line stops
-> short of the column. Declare Verdana instead and the edge lands. The last run proved that on two
-> documents and recorded `42 of 42`.
->
-> It is right about the edge and it is wrong about the document. I put the mapping in the engine
-> (`dejaVuFace`, which normalises all six spellings of the family the corpus uses - a `BASE14` entry
-> catches `DejaVuSans-Bold` and misses `DejaVu-Sans` entirely, and left 32 runs of
-> `33_sans_nondefault_body` in `DejaVu Sans Book`), and measured twelve documents through the real
-> Drive round trip, five targets and seven controls.
->
-> `60` passes on all five targets. `53_embedded_faces` fails on all twelve. So 313 goes 41/42 -> 41/42
-> with a different check failing, and five documents that were clean stop being clean - two of them
-> losing `46_text_crossing_rule` and `59_shape_anchor` as well, because Verdana is inside `60`'s
-> one-word slack but still wide enough to push a line across a rule.
->
-> That is not a near miss, it is the check's own rule. `SAME_FACE` forgives a rename only when the two
-> faces are metric-identical, and says so in as many words: "a serif as a sans, a sans as a serif,
-> anything as DejaVu. Those stay losses." `dejavuserif -> verdana` breaks it twice. Google Docs has no
-> serif as wide as DejaVu Serif - Georgia, the widest it offers, is 11% short and still fails `60` - so
-> on a DejaVu Serif document `60` and `53` cannot both pass. Not "did not this time": cannot, by the
-> instrument's own definition. The class is not fixable by a font rename and should stop being chased.
->
-> So the most useful thing this run produced is a refutation, and the second most useful is that it
-> could measure at all. Three runs lost their `.docx` work to "the upload needs an s3key". It does not:
-> `upload` -> `s3key` -> `CREATE_FILE` works from a local file, and `UPLOAD_FROM_URL` works for a batch
-> inside one `run_program`. Twelve documents took one program call and four minutes. Both routes are
-> written into VERIFY-GOOGLE.md so no run pays that tax again.
->
-> With the loop working I could then ask the question neither previous run asked: which of the 59
-> documents failing `60` are actually font-limited? Thirty-two. The other twenty-seven take their
-> column edge from a line drawn in Liberation Sans or Liberation Serif - families the engine already
-> maps to metric-identical faces - so their edge is not a substitution artefact at all. Twenty-seven
-> documents had been invisible inside a class counted as one problem.
->
-> And what they do is the opposite of the story. I built `edgeprobe.py` to print the numbers `60`
-> compares, and cross-checked it to the digit against the previous run's own recorded
-> `477.66 vs 538.63, tolerance 48`. On five of the twenty-seven, every column on the page lands within
-> a couple of points of the source except one, and that one runs 77 to 161 pt PAST it. `gst-invoice-3line-items`
-> is 161.18 pt over on a 112 pt source column - a 2.4x widening. That is a lost table cell width or a
-> lost wrap in `PdfToWord`, not a narrow face and not a tolerance miss, and it is visible in `w:tcW`
-> without any renderer at all.
->
-> What I would have done with another thirty minutes, in order: open `gst-invoice-3line-items`'s
-> `w:tcW` against its source column and see why a 112 pt column arrived at 273 pt - a 2.4x widening has
-> one likely cause and it is cheap to name; then the same on `purchase-order` (+103.36) and
-> `delivery-challan` (+77.21), to see whether it is one cause or three; then the `far >= 2` safety net
-> in `edgeprobe.py`, which is the reason `marksheet-subject-left-marks-right` and
-> `very-long-single-column-table` pass every column and still fail the check, and is one function.
->
-> None of that is blocked. It is what the clock cost.
->
-> Accounts share 13% of their significant words - a different account (the cut is 50%).
+> The change was reverted, the engine left byte-identical to HEAD, and `regress.py --check` passes. What the
+> next run should do first is the experiment this one could not finish: drop the `footRoom` guard (or lower
+> its threshold) and measure `320` in Google with the loop above — one document, one number, 19 documents at
+> stake. The measurement apparatus now exists for it; when this slot began, it did not.
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.2 h ago** |
+| Measured | **2.0 h ago** |
 | Scored | **214** of 214 |
 | Clean - every applicable check passes | **209** (97.7%) |
 | Failing at least one check | **5** |
@@ -151,10 +90,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 14:57 → running · 1 min |
+| Slot window | 15:08 → running · 40 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 6 |
-| Silences over 2 min | 0 |
+| Tool beats | 23 |
+| Longest silence | **9.9 min** — from 15:32:15, after `reconverting corpus back to HEAD engine for the gate` |
+| Silences over 2 min | 7 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -162,7 +102,17 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| report - the report and the chain | **0 min** | `######################` |
+| setup - claim, housekeeping, reading the gate | **4 min** | `##` |
+| fix - diagnose and change the engine | **5 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **24 min** | `##############` |
+| record - attempt, handoff, class rows | **0 min** | `#` |
+| other - not attributed to a tool | **4 min** | `###` |
+
+The unattributed row is 3 distinct beat(s) that matched no phase. They said:
+
+- `proving google loop on bank-statement-5-pages`
+- `attempt: row rung under 10->25 twips on 320`
+- `18_displacement -> lead`
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -175,7 +125,7 @@
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

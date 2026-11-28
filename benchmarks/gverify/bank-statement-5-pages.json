@@ -2,7 +2,7 @@
  "name": "bank-statement-5-pages",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-27T14:45:38",
+ "at": "2026-11-28T09:51:52",
  "passed": 42,
  "total": 47,
  "failed": [
@@ -26,5 +26,5 @@
   "runs_matched": 585
  },
  "engine": "a05b20eb05fe0fc8",
- "checks": "377699-1795789156"
+ "checks": "384800-1795858671"
 }
