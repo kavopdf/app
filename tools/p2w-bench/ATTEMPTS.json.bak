@@ -1337,7 +1337,7 @@
   "status": "OPEN"
  },
  "60_text_column_right_edge": {
-  "attempts": 11,
+  "attempts": 12,
   "first_seen": null,
   "history": [
    {
@@ -1440,10 +1440,21 @@
     "outcome": "lead",
     "reason": "60-P falsified in Google in one round trip, which the 1900-fixer finding's section 6 item 2 asked for: w:jc=distribute plus a per-line right indent (w:ind right=1133, pinning the measure to the source",
     "total": null
+   },
+   {
+    "at": "2026-11-28 12:34",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "txt: hoist a paragraph the model parked at the end back to its own top"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Google round trip refutes the justify-pin: 313 41/42 HEAD vs 40/42 pinned, 60 still FAIL (under-run 60.97pt -> 57.92pt, tolerance 48), plus a new 18_displacement. Cause is face substitution: source De",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "33863086",
+  "last_engine": "99fefe2a",
   "last_moved": 0,
   "last_total": 5,
   "outcomes": [
@@ -1457,9 +1468,10 @@
    "lead",
    "kept",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "60-P falsified in Google in one round trip, which the 1900-fixer finding's section 6 item 2 asked for: w:jc=distribute plus a per-line right indent (w:ind right=1133, pinning the measure to the source's 481.9 pt) on all 29 body paragraphs of 313 exports the SAME render as HEAD - all 30 right edges identical to 0.1 pt, max 480.14. The LibreOffice measurement (-42.09 -> +0.38 pt, 42/42 on five documents) does not transfer. Do not land 60-P.",
+  "reason": "Google round trip refutes the justify-pin: 313 41/42 HEAD vs 40/42 pinned, 60 still FAIL (under-run 60.97pt -> 57.92pt, tolerance 48), plus a new 18_displacement. Cause is face substitution: source DejaVuSerif 10pt, Google has none, draws 14.6% narrower. See FINDINGS/60-JUSTIFY-PIN-REFUTED-IN-GOOGLE-28NOV-fixer.md",
   "reasons": [
    "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one.",
    "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect.",
@@ -1471,7 +1483,8 @@
    "right tab stop in flowFromBox: Google delivers the trailing word at 309.00 asked / 309.00 and 538.50 asked / 538.61, so the edge IS placeable to 0.11 pt; but page_lines() takes one bbox per PyMuPDF line and a tab splits one visual line into two, so the current reader charges an underrun the render does not have (column edge read 239.54 vs the 309.00 drawn) and 17_matched_runs loses its pairs. With page_lines merging same-baseline fragments, 321 goes 60 FAIL -> 60 PASS on both tab variants and the control is unchanged; the remaining failure is 17_matched_runs, which needs one source run to be satisfiable by consecutive render pieces. Engine change reverted: on the reader as it stands it is 41/42 -> 40/42, a Google regression. FINDINGS/60-RIGHT-TAB-HONOURED-INSTRUMENT-BLIND-27NOV-fixer.md",
    "instrument fix: page_lines() split a Google table row at its cell gutters; 2 documents CLEAN (salary-slip-factory-wages, table-with-merged-cells), 10 more pass 60, 0 pass->fail in a 62-document census",
    "Google-measured on 313_power_of_attorney (fails only 60). The font-name lever was measured in Google for the first time: HEAD renders ArialMT at max right edge 480.14 against a source 538.63; Georgia 480.49; Noto Serif 505.01; Times New Roman 449.00; Liberation Serif is not in Google's library and falls back to Arial byte-for-byte. Best face closes 33.6 of 58.5 pt, so the name is honoured but is not the fix. w:jc=both on all 29 body paragraphs is INERT (all 30 right edges identical to 0.1 pt) because 29 paragraphs over 30 lines means nearly every line is its own paragraph's last line, which justification does not stretch.",
-   "60-P falsified in Google in one round trip, which the 1900-fixer finding's section 6 item 2 asked for: w:jc=distribute plus a per-line right indent (w:ind right=1133, pinning the measure to the source's 481.9 pt) on all 29 body paragraphs of 313 exports the SAME render as HEAD - all 30 right edges identical to 0.1 pt, max 480.14. The LibreOffice measurement (-42.09 -> +0.38 pt, 42/42 on five documents) does not transfer. Do not land 60-P."
+   "60-P falsified in Google in one round trip, which the 1900-fixer finding's section 6 item 2 asked for: w:jc=distribute plus a per-line right indent (w:ind right=1133, pinning the measure to the source's 481.9 pt) on all 29 body paragraphs of 313 exports the SAME render as HEAD - all 30 right edges identical to 0.1 pt, max 480.14. The LibreOffice measurement (-42.09 -> +0.38 pt, 42/42 on five documents) does not transfer. Do not land 60-P.",
+   "Google round trip refutes the justify-pin: 313 41/42 HEAD vs 40/42 pinned, 60 still FAIL (under-run 60.97pt -> 57.92pt, tolerance 48), plus a new 18_displacement. Cause is face substitution: source DejaVuSerif 10pt, Google has none, draws 14.6% narrower. See FINDINGS/60-JUSTIFY-PIN-REFUTED-IN-GOOGLE-28NOV-fixer.md"
   ],
   "requeues": 0,
   "status": "OPEN"
@@ -2364,7 +2377,7 @@
   "status": "OPEN"
  },
  "t08_line_order": {
-  "attempts": 3,
+  "attempts": 4,
   "first_seen": null,
   "history": [
    {
@@ -2387,24 +2400,39 @@
     "outcome": "kept",
     "reason": "t08 ground truth was PyMuPDF paint order, not reading order: sort each page's upright lines by (round(y,1),x) in the t08 block only. All 213 .txt rescored with the same engine: clean 190->197, t08 fai",
     "total": 10
+   },
+   {
+    "at": "2026-11-28 11:29",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "txt: hoist a paragraph the model parked at the end back to its own top"
+    },
+    "moved": 1,
+    "outcome": "kept",
+    "reason": "TxtWriter.pageOrder hoists the paragraph the model parks at the end back to its own top; 305_vaccination_certificate 6/7 -> 7/7 clean, whole corpus 208 -> 209 of 214 clean, 0 worsened (store diff, not",
+    "total": null
    }
   ],
   "last": null,
-  "last_engine": "462353f",
+  "last_engine": "99fefe2a",
   "last_moved": 9,
   "last_total": 10,
   "outcomes": [
    "reverted",
    "reverted",
    "error",
+   "kept",
    "kept"
   ],
-  "reason": "t08 ground truth was PyMuPDF paint order, not reading order: sort each page's upright lines by (round(y,1),x) in the t08 block only. All 213 .txt rescored with the same engine: clean 190->197, t08 failures 10->2, 9 improved, 0 clean->dirty. Falsified both ways (swapped same-column .txt still fails; 39_small_caps now caught on a real inversion).",
+  "ratchet_at": "28 Nov 11:29",
+  "ratchet_docs": 1,
+  "reason": "TxtWriter.pageOrder hoists the paragraph the model parks at the end back to its own top; 305_vaccination_certificate 6/7 -> 7/7 clean, whole corpus 208 -> 209 of 214 clean, 0 worsened (store diff, not the gate's self-comparing baseline)",
   "reasons": [
    "claimed (third attempt, same slot). t08_line_order, 10 documents, the largest .txt class left. Census only: group the ten by the mechanism that reorders their lines (column interleave, page furniture, table row order, RTL, footnote) and name which of them a TxtWriter change could reach, so the next run does not treat the class as one construct the way t12 had to be disproved.",
    "NO ENGINE CHANGE - a census, which is the result. t08_line_order is not 'ten documents with broken order': SIX of its eight measurable documents are off by exactly ONE line, and in all six the displaced line is secondary text the page set among its body lines - a stamp note (09_stamp_font_not_embedded), a certificate disclaimer (305_vaccination_certificate), a drawing note (330_cad_drawing_sheet), a speech bubble ('I will fix it', 400_comic_page_speech_bubbles), the drop cap 'T' (70_magazine_drop_cap_photo_caption) and a sub-caption (itr-computation-with-slab-table). The line is present and in the right column in every case; it is emitted at a different point in the sequence, which is what a writer that lays out its primary block first and its secondary blocks afterwards does. Two documents are off by more - 46_chart_coloured_labels_body_text 6, 65_two_col_full_width_figure_caption 4 - and may be a different fault. Two of the ten (041122-Account_Opening_Form and Account_Opening_Form_Fillable_filled) have no PDF in any corpus-v1 release zip. Not attempted because a block-order change reorders lines in EVERY document with secondary text and cannot be proven on six: it needs the whole corpus re-converted and re-scored, about twenty minutes of conversion across five calls, which is what was left of this slot. Also: t08 has zero tolerance, so a fix that puts 88 of 89 paired lines in order reads as no movement. FINDINGS/t08-is-one-displaced-secondary-line-1950.md.",
    "namespace test",
-   "t08 ground truth was PyMuPDF paint order, not reading order: sort each page's upright lines by (round(y,1),x) in the t08 block only. All 213 .txt rescored with the same engine: clean 190->197, t08 failures 10->2, 9 improved, 0 clean->dirty. Falsified both ways (swapped same-column .txt still fails; 39_small_caps now caught on a real inversion)."
+   "t08 ground truth was PyMuPDF paint order, not reading order: sort each page's upright lines by (round(y,1),x) in the t08 block only. All 213 .txt rescored with the same engine: clean 190->197, t08 failures 10->2, 9 improved, 0 clean->dirty. Falsified both ways (swapped same-column .txt still fails; 39_small_caps now caught on a real inversion).",
+   "TxtWriter.pageOrder hoists the paragraph the model parks at the end back to its own top; 305_vaccination_certificate 6/7 -> 7/7 clean, whole corpus 208 -> 209 of 214 clean, 0 worsened (store diff, not the gate's self-comparing baseline)"
   ],
   "requeues": 0,
   "status": "OPEN"

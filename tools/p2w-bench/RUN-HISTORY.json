@@ -776,17 +776,14 @@
   "ended_how": "killed - slot cleared by a force release"
  },
  {
-  "started_ts": 1795847363.7612379,
   "started": "11:59",
-  "window_for_claim": 1795847363.7612379,
-  "ended_ts": null,
+  "started_ts": 1795847363.763795,
   "ended": "(never)",
+  "ended_ts": null,
   "attempts": 0,
   "kept": 0,
-  "agents": [
-   "18dA18_displacement-01"
-  ],
+  "agents": [],
   "docs_improved": 0,
-  "ended_how": "killed - slot cleared by a force release"
+  "ended_how": "killed - never released the slot"
  }
 ]

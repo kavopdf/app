@@ -1,7 +1,3 @@
-| 25 Nov 02:59 | fixer | attempt 04_chars_missing -> lead (0/64 moved) |
-| 25 Nov 03:12 | fixer | attempt 04_chars_missing -> lead (1/64 moved) |
-| 25 Nov 03:21 | fixer | attempt 04_chars_missing -> lead (1/64 moved) |
-| 25 Nov 04:23 | fixer | attempt 04_chars_missing -> lead (1/? moved) |
 | 25 Nov 04:29 | fixer | slot FORCED released - see INCIDENTS.md for why |
 | 25 Nov 05:09 | fixer | slot claimed - fixer running |
 | 25 Nov 05:34 | fixer | attempt 25_invisible_text -> lead (0/? moved) |
@@ -199,4 +195,6 @@
 | 28 Nov 11:00 | fixer | slot claimed - fixer running |
 | 28 Nov 11:29 | fixer | attempt t08_line_order -> kept (1/? moved) |
 | 28 Nov 11:30 | fixer | slot FORCED released - see INCIDENTS.md for why |
-| 28 Nov 12:15 | fixer | slot FORCED released - see INCIDENTS.md for why |
+| 28 Nov 11:59 | fixer | slot claimed - fixer running |
+| 28 Nov 12:34 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
+| 28 Nov 12:36 | fixer | attempt 60_text_column_right_edge -> lead (0/? moved) |
