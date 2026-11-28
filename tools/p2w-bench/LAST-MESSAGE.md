@@ -1,8 +1,11 @@
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 14:35 → running IST · 14 min**
+**28 Nov 2026 · slot 14:57 → running IST**
 
-> No change was kept this run. The numbers below say what was tried.
+> The instrument was charging documents for a bucket boundary, not for a defect. It now files each
+> render line under its own source line, and three of the five documents I measured through Google
+> moved: `gst-invoice-3line-items` 45/47 → 46/47, `purchase-order` 45/47 → 46/47,
+> `delivery-challan` 42/47 → 43/47. Check `60_text_column_right_edge` passes on all three now.
 
 ## Progress
 
@@ -12,7 +15,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - kept change: 1 code commit(s) in this window, first: t12_word_invention: both annotation doors must b vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 14:35 vs TIMELINE.jsonl records the claim at 13:53, so the window was reset and the duration is short |
+| **Self-check** | **1 disagreement(s)** - run window: RUN.json says this run began at 14:57 vs TIMELINE.jsonl records the claim at 13:53, so the window was reset and the duration is short |
 | Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
@@ -23,114 +26,85 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (63 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `-` by hand instead |
+| Working on | `60_text_column_right_edge` - taken from the pending list (63 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `60_text_column_right_edge` by hand instead |
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 14:35 | **lead** | 0/None | both annotation guards together take 600_reviewed_invoice_with_annotations t12 from 83 invented chars to 0 (FAIL->PASS); each guard alone leaves 49/30 and was previously recorded as NO CLEAR; change i |
+| 14:31 | **lead** | 0 | A subagent measured the table geometry of the three documents the last run flagged. `w:tblGrid`/`w:tcW` against the source's rule positions: worst single column 1.0 pt, table totals within 0.24 pt. The .docx is not 2.4x wide anywhere; check 60 never opens the .docx. |
+| 14:41 | **lead** | 0 | A second subagent tested the two "0.00" documents. They are not regressions: 0.00 is `share@5px` from `p2w.py:773`, where lower is better, and SSIM on the same pair is 99.88 and 98.98. Both convert, 1 page, no exception. |
+| 15:02 | **lead** | 0 | Google round trip on 5 documents (upload → s3key → CREATE_FILE → export → compare). Reproduced the charge to the digit: `gst-invoice-3line-items` +161.18 pt, `purchase-order` +103.36, `delivery-challan` +77.21, all OVER, all in the instrument. |
+| 15:18 | **kept** | 3 | The instrument fix, measured through Google on the same 5 documents before and after. 3 documents moved, 2 unchanged, 0 worse. Falsified twice. |
 
-## Why nothing moved, in this run's own words
+## Why the charge was not the document
 
-> Nothing moved because the fix I found is real and the re-score it costs did not fit in the slot.
->
-> I worked `t12_word_invention` because it is the one class where a whole document is one construct
-> away and the instrument is cheap to read: 5 of 214 documents fail the .txt table and 3 of those fail
-> `t12`. Two prior runs had each closed ONE of the two doors that feed it - 25 Nov the
-> `drawnByAppearance` guard (600: 83 invented chars -> 30), 27 Nov the `FreeText` filter inside
-> `annotationRuns()` (83 -> 49) - and each was reverted on its own with `MEASURED NO CLEAR`.
->
-> Nobody had closed both at once. With both, `600_reviewed_invoice_with_annotations` goes 83 invented
-> characters to 0, FAIL to PASS, `.txt` 75 to 72 lines, and the other three `t12` failures are
-> unchanged. The two doors are a conjunction, not alternatives - which is why 14 attempts on this class
-> have produced no kept change: every one of them tested one door.
->
-> It is a lead and not a kept attempt because the change is in `PdfToWord.java`, inside the docx
-> fingerprint, so landing it costs the full 213-document docx re-score: ~13 min conversion plus ~26 min
-> measurement, measured on this pod by the agent I deployed, and the slot had ~25 minutes left when the
-> number was in hand. A concurrent relay run on the same class and the same document
-> (`FINDINGS/28dAtxt-01`) recorded the `.txt`-only route as wrong, and it is right: claiming this on the
-> txt table alone would land an unmeasured docx change.
->
-> The two documents I could not move are the next lead. `Account_Opening_Form_Fillable_filled` (14
-> surplus) and `Prakashan_Print_Fidelity_Handbook` (88 surplus) are unchanged by both doors, so their
-> surplus is a THIRD duplication nobody has found. `Prakashan`'s surplus is upper-case-concentrated
-> (`2` x7, `e` x7, `I` x6, `S` x5, `E` x4, `T` x4, `A`/`N`/`C` x3), the shape of a heading or running
-> head emitted twice.
->
-> The gate did not refuse me: `regress.py --check` exits 0 on this tree and passed both commits. The
-> clock did.
+Check 60 built "columns" on each page separately: `columns()` groups body lines by left edge with
+`b[0] - seed <= 10`. The source and the render are bucketed **independently**, so a line that moves one
+point across that boundary changes column on one side only, and the check then compares one column's
+widest line against a different column's.
 
-### The run before this one said
+Measured on `gst-invoice-3line-items`, engine `a05b20eb05fe0fc8`, Google export of 28 Nov: the company
+masthead sits at x0 = 73.69 in the source and 73.50 in the render; the item table's Description column
+starts at 62.92 and 63.75. In the source 73.69 − 62.92 = 10.77 > 10, so the masthead is its own column.
+In the render 73.50 − 63.75 = 9.75 ≤ 10, so it joins Description. Description's widest line then read
+174.79 against 335.97 and the check charged **+161.18 pt**, where the widest line had moved **+2.47 pt**
+and the page inset +0.75 pt. Every other column on that page was inside 9.3 pt.
 
->
->
->
->
-> The slot did not land a document because the lead it inherited was measured on an incomplete
-> instrument, and the complete one refuses it.
->
-> I took the lead the last run handed over: the source PDFs are drawn in DejaVu, the engine declares
-> DejaVu, Google Docs has no DejaVu, so it substitutes something ~13% narrower and every line stops
-> short of the column. Declare Verdana instead and the edge lands. The last run proved that on two
-> documents and recorded `42 of 42`.
->
-> It is right about the edge and it is wrong about the document. I put the mapping in the engine
-> (`dejaVuFace`, which normalises all six spellings of the family the corpus uses - a `BASE14` entry
-> catches `DejaVuSans-Bold` and misses `DejaVu-Sans` entirely, and left 32 runs of
-> `33_sans_nondefault_body` in `DejaVu Sans Book`), and measured twelve documents through the real
-> Drive round trip, five targets and seven controls.
->
-> `60` passes on all five targets. `53_embedded_faces` fails on all twelve. So 313 goes 41/42 -> 41/42
-> with a different check failing, and five documents that were clean stop being clean - two of them
-> losing `46_text_crossing_rule` and `59_shape_anchor` as well, because Verdana is inside `60`'s
-> one-word slack but still wide enough to push a line across a rule.
->
-> That is not a near miss, it is the check's own rule. `SAME_FACE` forgives a rename only when the two
-> faces are metric-identical, and says so in as many words: "a serif as a sans, a sans as a serif,
-> anything as DejaVu. Those stay losses." `dejavuserif -> verdana` breaks it twice. Google Docs has no
-> serif as wide as DejaVu Serif - Georgia, the widest it offers, is 11% short and still fails `60` - so
-> on a DejaVu Serif document `60` and `53` cannot both pass. Not "did not this time": cannot, by the
-> instrument's own definition. The class is not fixable by a font rename and should stop being chased.
->
-> So the most useful thing this run produced is a refutation, and the second most useful is that it
-> could measure at all. Three runs lost their `.docx` work to "the upload needs an s3key". It does not:
-> `upload` -> `s3key` -> `CREATE_FILE` works from a local file, and `UPLOAD_FROM_URL` works for a batch
-> inside one `run_program`. Twelve documents took one program call and four minutes. Both routes are
-> written into VERIFY-GOOGLE.md so no run pays that tax again.
->
-> With the loop working I could then ask the question neither previous run asked: which of the 59
-> documents failing `60` are actually font-limited? Thirty-two. The other twenty-seven take their
-> column edge from a line drawn in Liberation Sans or Liberation Serif - families the engine already
-> maps to metric-identical faces - so their edge is not a substitution artefact at all. Twenty-seven
-> documents had been invisible inside a class counted as one problem.
->
-> And what they do is the opposite of the story. I built `edgeprobe.py` to print the numbers `60`
-> compares, and cross-checked it to the digit against the previous run's own recorded
-> `477.66 vs 538.63, tolerance 48`. On five of the twenty-seven, every column on the page lands within
-> a couple of points of the source except one, and that one runs 77 to 161 pt PAST it. `gst-invoice-3line-items`
-> is 161.18 pt over on a 112 pt source column - a 2.4x widening. That is a lost table cell width or a
-> lost wrap in `PdfToWord`, not a narrow face and not a tolerance miss, and it is visible in `w:tcW`
-> without any renderer at all.
->
-> What I would have done with another thirty minutes, in order: open `gst-invoice-3line-items`'s
-> `w:tcW` against its source column and see why a 112 pt column arrived at 273 pt - a 2.4x widening has
-> one likely cause and it is cheap to name; then the same on `purchase-order` (+103.36) and
-> `delivery-challan` (+77.21), to see whether it is one cause or three; then the `far >= 2` safety net
-> in `edgeprobe.py`, which is the reason `marksheet-subject-left-marks-right` and
-> `very-long-single-column-table` pass every column and still fail the check, and is one function.
->
-> None of that is blocked. It is what the clock cost.
+The same boundary did the same to the other two: their charges were one cluster absorbing a line that
+belongs to another.
 
-Accounts share 13% of their significant words - a different account (the cut is 50%).
+## What changed
+
+`tools/p2w-bench/verify_google.py`, check 60 only. `page_lines()` now delegates to `page_lines_t()`,
+which returns each run with its text. A render line is filed under the column of the **source line it
+is the same line as**, matched on text with the engine's zero-width characters removed and within one
+bucket of its left edge. A line whose text matches nothing falls back to the source line it starts
+over; a line whose own source line is in no column cannot evidence any column's edge and is left out.
+The estimator (widest line), the slack (one measured word) and the page-level `far` net are untouched.
+
+Two things the first version got wrong, both caught by measuring rather than by reading:
+
+- Filing an unmatched line by the **render's** nearest column re-created the original bug: the masthead
+  still landed in Description. It now files by the source.
+- The word `Total` is a row label at 62.92 and a column head at 536.83 in the same document. A bare text
+  match handed the row's 551.28 pt figure to the label's column and charged +376.49 pt. A pair more than
+  one bucket apart is not a pair.
+
+## Measured before and after, through Google
+
+| Document | Before | After | Check 60 |
+|:--|--:|--:|:--|
+| `gst-invoice-3line-items` | 45/47 | 46/47 | fails → **passes** |
+| `purchase-order` | 45/47 | 46/47 | fails → **passes** |
+| `delivery-challan` | 42/47 | 43/47 | fails → **passes** |
+| `28_value_overflows_cell_txtpos` | 39/42 | 39/42 | passed → passes (unchanged) |
+| `25_signature_block_underscores_txtpos` | 38/42 | 38/42 | fails → **still fails** |
+
+The last two rows are the reason to believe the first three. `28_value_overflows_cell_txtpos` already
+passed 60 and still does - the fix does not fire on a document that had nothing wrong.
+`25_signature_block_underscores_txtpos` still fails 60 after the fix: a real overrun is still caught.
+
+**Falsified, not assumed:** the source PDF compared against itself passes 60 (41/42, the one failure
+`10_font_sizes`, unrelated). A 44-character run injected at the Description column's left edge into a
+copy of the Google export still **fails** 60 - an unpaired line is still charged.
+
+The other checks did not move on any of the five: the only check whose code changed is 60.
+
+## Limits, stated
+
+- Five documents were measured through Google, not 213. The other 56 documents failing 60 were not
+  re-measured this run, so the corpus-wide effect of the fix is unmeasured and the Progress table above
+  is unchanged from the last run.
+- The `0.00` entries in the regression list are not regressions (subagent finding above); the
+  `Regressions 82` row is report.py's own count and was not re-derived here.
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.0 h ago** |
+| Measured | **1.2 h ago** |
 | Scored | **214** of 214 |
 | Clean - every applicable check passes | **209** (97.7%) |
 | Failing at least one check | **5** |
@@ -139,46 +113,47 @@ Accounts share 13% of their significant words - a different account (the cut is 
 
 ## Subagents
 
-*None deployed this run.*
+Two, both deployed in the first ten minutes and both returning measured numbers, not greps.
+
+1. **Column geometry.** Converted the three flagged documents with the engine and printed, per column,
+   the source's rule x-positions against the produced `w:gridCol`/`w:tcW` in points: worst column 1.0 pt,
+   totals within 0.24 pt. It also named the code path (`DocxWriter.table()` at
+   `DocxWriter.java:6019-6031`, fed by `PdfToWord.java:7962`) and showed the 2.4x exists only in
+   `verify_google.py:2736`, the bucketing, which never reads the .docx. That is what told me to look at
+   the instrument rather than the converter.
+2. **The two zero scores.** Showed `415_inline_images` and `411_nested_xobject_transforms` both convert
+   (1 page, no exception, ink 34,954 vs 35,045 px and 5,574 vs 6,119 px), that 0.00 is the *best* value
+   of `share@5px` and not SSIM (99.88 and 98.98 on the same pair), and that no commit in the last 40
+   touches image or XObject code. It stopped the run chasing a phantom regression.
+
+Neither agent could reach Drive: a subagent's sandbox has no `upload` path, so the s3key route is
+closed to them and they would need `UPLOAD_FROM_URL`.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 14:35 → running · 14 min |
+| Slot window | 14:57 → running · 1 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 16 |
-| Longest silence | **8.7 min** — from 14:35:53, after `classrow.py: refreshing the class file` |
-| Silences over 2 min | 2 |
+| Tool beats | 6 |
+| Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
-
 
 ### Where the time went
 
 | Phase | Time | |
 |:--|--:|:--|
-| build - compiling the engine | **4 min** | `#######` |
-| measure or build - a conversion, screen or compile writes no beacon | **8 min** | `#############` |
-| report - the report and the chain | **1 min** | `##` |
+| report - the report and the chain | **0 min** | `######################` |
 ## Best results this round
-
-| Document | Before | After | Change |
-|:--|--:|--:|--:|
-| `415_inline_images` | 89.04 | 0.00 | -89.04 |
-| `411_nested_xobject_transforms` | 31.05 | 0.00 | -31.05 |
-| `itr-computation-with-slab-table` | 68.82 | 38.49 | -30.33 |
-| `report-2col-table-spanning-both-columns` | 22.58 | 1.18 | -21.40 |
-| `78_mixed_english_devanagari_line` | 13.51 | 1.73 | -11.78 |
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below.
+The instrument is fixed and pushed but the corpus has not been re-scored with it. **The next run should
+re-measure the 56 documents failing `60_text_column_right_edge` through Google with this tree** - that
+is the number that decides how much of the class was the instrument. If it is the same boundary
+mechanism as these three, most of the 56 should clear 60 and only the genuinely over-wide ones should
+stay. `edgeprobe.py` prints the per-column numbers this check now compares; run it on the first failing
+document to see which of the two shapes it is before changing anything in the engine.
 
----
-*Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
-
-## The gate, checked before blaming it
-
-`regress.py --check` exits **0** on this tree and passed both commits this run made. It is not what
-refused the patch; the clock was. The patch and its before/after are in
-`FINDINGS/t12_word_invention-BOTH-DOORS-28NOV-fixer.md` and `FINDINGS/annotation-both-doors-28NOV.patch`.
+`18_displacement` is still on `gst-invoice-3line-items` and `delivery-challan` and is the next check
+standing between those two and clean.
