@@ -1,19 +1,10 @@
 {
- "agents": [],
- "attempts": 4,
- "class": "18_displacement",
- "counted": [
-  [
-   "18_displacement",
-   1
-  ]
- ],
- "docs_improved": 1,
+ "started": "16:18",
+ "started_ts": 1795862893.3087168,
  "ended": null,
  "ended_ts": null,
- "kept": 1,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "15:08",
- "started_ts": 1795858692.21402
+ "attempts": 0,
+ "kept": 0,
+ "agents": [],
+ "docs_improved": 0
 }
