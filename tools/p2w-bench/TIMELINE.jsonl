@@ -10980,3 +10980,11 @@
 {"t": 1795856752.0730479, "ist": "14:35:52", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795856752.26021, "ist": "14:35:52", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795856753.5106814, "ist": "14:35:53", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795857274.2796721, "ist": "14:44:34", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795857276.9514835, "ist": "14:44:36", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795857284.3571403, "ist": "14:44:44", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795857286.5495632, "ist": "14:44:46", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795857312.5946867, "ist": "14:45:12", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795857313.340843, "ist": "14:45:13", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795857313.840779, "ist": "14:45:13", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795857314.039071, "ist": "14:45:14", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
