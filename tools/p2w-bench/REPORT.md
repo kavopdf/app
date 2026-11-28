@@ -3,7 +3,7 @@
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 14:35 → running IST · 13 min**
+**28 Nov 2026 · slot 14:35 → running IST · 14 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -37,10 +37,39 @@
 
 ## Why nothing moved, in this run's own words
 
-*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+> Nothing moved because the fix I found is real and the re-score it costs did not fit in the slot.
+>
+> I worked `t12_word_invention` because it is the one class where a whole document is one construct
+> away and the instrument is cheap to read: 5 of 214 documents fail the .txt table and 3 of those fail
+> `t12`. Two prior runs had each closed ONE of the two doors that feed it - 25 Nov the
+> `drawnByAppearance` guard (600: 83 invented chars -> 30), 27 Nov the `FreeText` filter inside
+> `annotationRuns()` (83 -> 49) - and each was reverted on its own with `MEASURED NO CLEAR`.
+>
+> Nobody had closed both at once. With both, `600_reviewed_invoice_with_annotations` goes 83 invented
+> characters to 0, FAIL to PASS, `.txt` 75 to 72 lines, and the other three `t12` failures are
+> unchanged. The two doors are a conjunction, not alternatives - which is why 14 attempts on this class
+> have produced no kept change: every one of them tested one door.
+>
+> It is a lead and not a kept attempt because the change is in `PdfToWord.java`, inside the docx
+> fingerprint, so landing it costs the full 213-document docx re-score: ~13 min conversion plus ~26 min
+> measurement, measured on this pod by the agent I deployed, and the slot had ~25 minutes left when the
+> number was in hand. A concurrent relay run on the same class and the same document
+> (`FINDINGS/28dAtxt-01`) recorded the `.txt`-only route as wrong, and it is right: claiming this on the
+> txt table alone would land an unmeasured docx change.
+>
+> The two documents I could not move are the next lead. `Account_Opening_Form_Fillable_filled` (14
+> surplus) and `Prakashan_Print_Fidelity_Handbook` (88 surplus) are unchanged by both doors, so their
+> surplus is a THIRD duplication nobody has found. `Prakashan`'s surplus is upper-case-concentrated
+> (`2` x7, `e` x7, `I` x6, `S` x5, `E` x4, `T` x4, `A`/`N`/`C` x3), the shape of a heading or running
+> head emitted twice.
+>
+> The gate did not refuse me: `regress.py --check` exits 0 on this tree and passed both commits. The
+> clock did.
 
 ### The run before this one said
 
+>
+>
 >
 >
 > The slot did not land a document because the lead it inherited was measured on an incomplete
@@ -98,6 +127,8 @@
 >
 > None of that is blocked. It is what the clock cost.
 
+Accounts share 13% of their significant words - a different account (the cut is 50%).
+
 ## The txt
 
 | | |
@@ -117,7 +148,7 @@
 
 | | |
 |:--|:--|
-| Slot window | 14:35 → running · 13 min |
+| Slot window | 14:35 → running · 14 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
 | Tool beats | 16 |
 | Longest silence | **8.7 min** — from 14:35:53, after `classrow.py: refreshing the class file` |
@@ -129,8 +160,9 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| build - compiling the engine | **4 min** | `########` |
-| measure or build - a conversion, screen or compile writes no beacon | **8 min** | `##############` |
+| build - compiling the engine | **4 min** | `#######` |
+| measure or build - a conversion, screen or compile writes no beacon | **8 min** | `#############` |
+| report - the report and the chain | **1 min** | `##` |
 ## Best results this round
 
 | Document | Before | After | Change |
