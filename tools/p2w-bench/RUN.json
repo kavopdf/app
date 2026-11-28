@@ -1,13 +1,11 @@
 {
- "agents": [],
- "attempts": 2,
- "class": "t09_page_furniture",
- "docs_improved": 0,
- "ended": null,
+ "started_ts": 1795838301.5959125,
+ "started": "09:28",
+ "window_for_claim": 1795838301.5959125,
  "ended_ts": null,
+ "ended": null,
+ "attempts": 1,
  "kept": 0,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "09:16",
- "started_ts": 1795837611.5093844
+ "agents": [],
+ "docs_improved": 0
 }
