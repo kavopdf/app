@@ -16,13 +16,12 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 60tB60_text_column_right_edge-01 | 60tB-02 | 60_text_column_right_edge | the right-tab line is split by our own reader | 11:21 | Find why Google's export splits a right-tabbed line into two lines and ours into one (17_matched_runs 34->13), and produce a reader or writer change that keeps the tab's 538.50 pt edge without collapsing 17. Expected by 12:35 | running |  |
 | 18_dA-04 | 18_displacement | A | Does the +2.70 pt charge on 31_times come from the baseline's placemen | 12:08 | 12:35 | running |  |
 | 18_dB-02 | 18_displacement | B | Is 18_displacement's dy an ascent artifact - bbox top vs baseline orig | 12:08 | 12:35 | landed | FINDINGS/18dA-03-ASCENT-NOT-DISPLACEMENT-MEASURED-27NOV-relay.md |
 | corp-01 | corpus-cache-per-document-27NOV |  |  | 13:31 |  | running |  |
@@ -46,13 +45,13 @@ unfinished work, not as a result.
 | --cl-02 | --class |  |  | 10:22 |  | running |  |
 | 60-font-01 | 60_text_column_right_edge | does the font NAME change the Google render, and does w:jc stretch a one-line paragraph | Root-cause 60_text_column_right_edge (21.1 worth, no prior solo invest | 10:02 | a named engine change with its expected document effect, or a refutation with a measurement | done | FINDINGS/60-text-column-right-edge-28NOV.md - 59 docs fail; 15 engine (8.67 worth), 17 instrument (4.17), 7 stale-pass, 20 undecided; no reflow anywhere; instrument over-charges via a hard 10pt left-edge bucket (purchase-order +103.36 charged vs +2.79 actual); replacement bucketing refuted (15 pass / 6 regress); named change = extend the right-tab emitter to full-measure body lines, blocked because it drops 17_matched_runs 34->13 |
 | 18d-split-01 | 18_displacement | split the 19 solo documents by row pitch and row count and find the collectable subset | Which of the 19 documents that fail only 18_displacement are collectab | 10:02 | a per-document classification and one named engine change with its expected point effect, or a refutation | done | FINDINGS/18-displacement-SPLIT-28NOV.md - all 19 single-page; 6 dense-table accumulation carriers, 13 not; 11 of the 13 fail only the 5% count clause at the smallest type; engine row geometry faithful to 0.00pt on 13 of 19; collectable subset = 0 with two independent proofs |
+| 18dA18_displacement-01 | 18dA-01 | 18_displacement | engine | 12:09 | Is the 0.961 x gap - 0.58 pt law an inversion of a loss fit, and can an engine gap transform make Google deliver the drawn gap? | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `05:40` agent deployed: 18_displacement / B - test the 0.961 spacer model at the current engine and quantify the inverse corre
 - `05:40` agent landed: 18_displacement / B -> FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md
 - `05:41` attempt 121 on 18_displacement -> error
 - `06:04` agent deployed: 18_displacement / A - root cause of cell displacement; landed c8056b8
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `10:33` attempt 10 on 60_text_column_right_edge -> lead
 - `10:33` attempt 11 on 60_text_column_right_edge -> lead
 - `11:29` attempt 4 on t08_line_order -> kept
+- `12:09` agent deployed: 18dA-01 / 18_displacement - engine
 
 ## Where the rest of the state lives
 
