@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-28 05:54
+# Fixer report - 2026-11-28 08:24
 
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 05:54 → running IST · 1h 09m**
+**28 Nov 2026 · slot 08:24 → running IST · 33 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 5 code commit(s) in this window, first: watchdog: drop a commit hash the rebase invalida vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 2 deployed vs no FINDINGS filename carries 63_tB-02 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3; kept change: 1 code commit(s) in this window, first: findings: 18_displacement Google baseline is not vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 1 deployed vs no FINDINGS filename carries 18_dA-02 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
+| Document-moves this run | **0** — 4 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -32,9 +32,55 @@
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 07:02 | **lead** | 0/None | row top (:6662) and cell baseline are not inverses; fix proven on 35_four_typefaces_one_page (dy +3.70 -> 0.00) as a patch, not landed: no slot left for a 214-document re-measure |
+| 08:54 | **lead** | 0/None | The 25 Nov recovery path for the 127 U+FFFD ligatures ('fall back to the glyph name - PDFBox exposes it') is refuted by measurement with the engine's own reader: for 041122-Account_Opening_Form the fo |
+| 08:54 | **lead** | 0/None | Google-side baseline measured for 35_four_typefaces_one_page (the gap the 05:54 run named): dy -1.96..-3.71, so Google does NOT preserve the cell baseline and the w:line patch's 'zero move' premise is |
+| 08:56 | **lead** | 0/None | The falsifier named in the first attempt was run: five Google builds of 35_four_typefaces_one_page (trHeight atLeast/exact 380/377, cell w:line natural, cell w:before 373). Google's row height is a QU |
 
 ## Why nothing moved, in this run's own words
+
+> > **The decision, and its reason.** `classpick.py` suggested `05_chars_extra` (an open lead) and the
+> > previous run left `18_displacement` with a named next step and one gap: *"there is no Google export of
+> > `35_four_typefaces_one_page` anywhere in the repo, so the Google side of every number is the recorded
+> > verdict, not a measurement I took."* I closed that gap first, because it decided whether the named
+> > patch was worth building at all.
+> >
+> > **The patch was refuted before it was built, which is the cheapest thing that happened.** The 05:54
+> > lead predicted "a zero move in Google if and only if Google already preserves the baseline". Google
+> > does not: −1.96 pt on the first row, −3.71 on the seventh, one-signed. LibreOffice moves the same cells
+> > **+3.70 the other way**. Two renderers, opposite signs: any validation done in `soffice` in this class
+> > is worthless, and the lead's premise was false.
+> >
+> > **Then I asked what else could hold the pitch, and measured it in Google instead of arguing.** Five
+> > builds of the same document, one attribute apart each time: `trHeight` 380 `atLeast` (shipped), 380
+> > `exact`, 377 `exact`, the cell's `w:line` set to its natural box, and the cell's `w:before` moved 5
+> > twips. The rows came back at **18.75, 19.14, 19.14, 20.90, 19.39** against a source pitch of 19.00.
+> > Google lays `atLeast` rows at *content* height — below the floor it was given — and it **quantises**:
+> > 5 twips of `before` moved the row 0.64 pt, and 380 vs 377 exact landed on the same row. There is no
+> > value you can compute that lands on 19.00. That is why this class has survived every attempt: the
+> > `.docx` cannot express the target and the renderer steps over it.
+> >
+> > **The second class was closed the same way, from the other side.** `05_chars_extra`'s open lead said
+> > the 127 `U+FFFD` ligatures could be recovered from the glyph name, "PDFBox exposes it per glyph". With
+> > the engine's own reader: no `post` table, no `cmap` table, no encoding name, and the PDF's own
+> > `/ToUnicode` maps `0x123/0x124/0x126/0x127` to `<FFFD>` by the producer's hand. The name is not there
+> > to fall back to. The only route left is geometric (a ligature's advance width against its components'),
+> > which is an inference and is named as such with its falsifier.
+> >
+> > **Why nothing landed, stated plainly.** Both results are *refutations of a named next step*, not
+> > engine fixes, and a refutation cannot be committed as a change: there is nothing to change. The one
+> > change that was in reach — a cell-spacing patch — is exactly what the five probes measured as
+> > unfixable by numbers. Landing an engine change also needs the full re-measure (16 min convert plus the
+> > render and score), and this slot spent its first 25 minutes on a delegated Google measurement that
+> > returned inside the turn rather than in the background.
+> >
+> > **What I leave behind, and what would overturn it.** Three findings with the raw measurements, four
+> > reproducible probe builds, and a new probe tool (`GlyphProbe2.java`) that answers "what does this font
+> > still know about this glyph" in one command. The next run should not spend a slot on `w:line`/`w:before`
+> > arithmetic in table cells, nor on a glyph-name fallback for `U+FFFD`. What would overturn the first: a
+> > `before` in the 368–373 twip band whose Google export lays 19.00 on all seven rows. What would overturn
+> > the second: a revision of the form whose `/ToUnicode` maps those codes to real characters.
+
+### The run before this one said
 
 > **The decision, and its reason.** The pending list said 62 items open and `classpick.py` refused a new
 > class until they are taken, so I took `18_displacement` - the class the previous run had just root-caused
@@ -76,9 +122,8 @@
 > conversion plus 21 of render plus 6 of scoring, so it is a 46-minute job. Any run that does not start it
 > before minute 30 cannot land anything, whatever it proves. That is the number to plan against, and it is
 > not written anywhere in the tools.
-
-### The run before this one said
-
+>
+>
 > No engine change was made, and that is the decision, not an overrun.
 >
 > Two agents were deployed in the first twenty minutes and both landed a committed finding. Between them
@@ -162,14 +207,16 @@
 > (`620dc85e`, `30121a9a`).
 >
 > Accounts share 16% of their significant words - a different account (the cut is 50%).
+>
+> Accounts share 20% of their significant words - a different account (the cut is 50%).
 
-Accounts share 20% of their significant words - a different account (the cut is 50%).
+Accounts share 21% of their significant words - a different account (the cut is 50%).
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **1.6 h ago** |
+| Measured | **3.5 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -180,17 +227,16 @@ Accounts share 20% of their significant words - a different account (the cut is 
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `18_dA-01` | root cause of cell displacement; landed c8056b8 | 06:04 | - | - |
-| `63_tB-02` | ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc | 06:04 | - | - |
+| `18_dA-02` | take a real Google export of 35_four_typefaces_one_p | 08:56 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 05:54 → running · 1h 09m |
+| Slot window | 08:24 → running · 33 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 20 |
-| Longest silence | **37.4 min** — from 06:13:43, after `lastmessage.py: running a tool for its numbers` |
+| Tool beats | 31 |
+| Longest silence | **16.4 min** — from 08:27:14, after `claimed; deploying agents, then pod-prep` |
 | Silences over 2 min | 4 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
@@ -199,17 +245,12 @@ Accounts share 20% of their significant words - a different account (the cut is 
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **11 min** | `####` |
-| measure or build - a conversion, screen or compile writes no beacon | **50 min** | `#################` |
+| setup - claim, housekeeping, reading the gate | **4 min** | `###` |
+| build - compiling the engine | **3 min** | `##` |
+| fix - diagnose and change the engine | **3 min** | `###` |
+| measure or build - a conversion, screen or compile writes no beacon | **16 min** | `############` |
 | record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **2 min** | `#` |
-| other - not attributed to a tool | **0 min** | `#` |
-
-The unattributed row is 4 distinct beat(s) that matched no phase. They said:
-
-- `relay: both agents landed, implementing cell-top fix`
-- `relay: verifying gate health`
-- `relay: writing the report`
+| report - the report and the chain | **0 min** | `#` |
 ## Best results this round
 
 | Document | Before | After | Change |

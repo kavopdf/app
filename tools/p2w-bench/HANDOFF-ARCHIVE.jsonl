@@ -562,3 +562,8 @@
 {"_list": "notes", "_entry": {"at": "05:31", "text": "attempt 100 on 18_displacement -> lead"}}
 {"_list": "agents", "_entry": {"id": "Expl-02", "class": "Explore:txt failure root cause (8 docs, 12 check-instances; recommended the t01 character unit)", "angle": "", "question": "", "expected": "", "deployed": "05:51", "status": "running", "finding": "", "deployed_at": "2026-11-27T05:51"}}
 {"_list": "notes", "_entry": {"at": "05:44", "text": "attempt 3 on t09_page_furniture -> lead"}}
+{"_list": "notes", "_entry": {"at": "05:46", "text": "attempt 101 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "06:19", "text": "attempt 102 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "07:44", "text": "attempt 103 on 18_displacement -> kept"}}
+{"_list": "notes", "_entry": {"at": "08:12", "text": "agent deployed: 60_text_column_right_edge / A - which engine construct sets a body line's right edge, and which fixes are alread"}}
+{"_list": "agents", "_entry": {"id": "60_tA-01", "class": "60_text_column_right_edge", "angle": "A", "question": "which engine construct sets a body line's right edge, and which fixes are already refuted", "expected": "07:40", "deployed": "08:04", "status": "landed", "finding": "FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md", "deployed_at": "2026-11-27T08:04", "landed_at": "2026-11-27T08:04"}}

@@ -1,18 +1,6 @@
 {
  "agents": [
   {
-   "id": "60_tA-01",
-   "class": "60_text_column_right_edge",
-   "angle": "A",
-   "question": "which engine construct sets a body line's right edge, and which fixes are already refuted",
-   "expected": "07:40",
-   "deployed": "08:04",
-   "status": "landed",
-   "finding": "FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md",
-   "deployed_at": "2026-11-27T08:04",
-   "landed_at": "2026-11-27T08:04"
-  },
-  {
    "id": "gateB-01",
    "class": "gate",
    "angle": "B",
@@ -278,6 +266,17 @@
    "status": "running",
    "finding": "",
    "deployed_at": "2026-11-28T06:04"
+  },
+  {
+   "id": "18_dA-02",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "take a real Google export of 35_four_typefaces_one_page and test whether Google preserves the cell baseline",
+   "expected": "08:31",
+   "deployed": "08:56",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-28T08:56"
   }
  ],
  "history": [
@@ -384,14 +383,6 @@
  ],
  "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "07:44",
-   "text": "attempt 103 on 18_displacement -> kept"
-  },
-  {
-   "at": "08:12",
-   "text": "agent deployed: 60_text_column_right_edge / A - which engine construct sets a body line's right edge, and which fixes are alread"
-  },
   {
    "at": "08:12",
    "text": "agent deployed: gate / B - why does regress.py --check refuse on unmodified HEAD"
@@ -623,6 +614,14 @@
   {
    "at": "08:54",
    "text": "attempt 4 on 05_chars_extra -> lead"
+  },
+  {
+   "at": "08:56",
+   "text": "attempt 124 on 18_displacement -> lead"
+  },
+  {
+   "at": "08:56",
+   "text": "agent deployed: 18_displacement / A - take a real Google export of 35_four_typefaces_one_page and test whether Google "
   }
  ],
  "plan": "",

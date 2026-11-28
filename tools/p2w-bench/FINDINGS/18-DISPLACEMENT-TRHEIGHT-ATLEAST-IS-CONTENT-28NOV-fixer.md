@@ -60,10 +60,34 @@ natural `w:line` (so the content height Google computes is the page's 19.00) and
 `w:before`, which is the 05:54 run's candidate; that candidate is only worth building if the content
 height is what Google uses, and this measurement says it is.
 
-What would prove this wrong: a fourth build of the same document with `w:line` set to the font's natural
-line box (no `exact`, `w:before` reduced by the same amount) whose Google export puts the seven rows at
-19.00 ± 0.05 pitch. If that build lands 18.75 again, the content-height reading is wrong and the row
-pitch is decided somewhere else.
+## The falsifier was run: five builds, and the row height is QUANTISED, not computed
+
+Two more builds of the same document, both changing only the cells' `w:spacing` (35 cell paragraphs):
+
+| build | cell `w:spacing` | content asked | row pitch laid by Google | first row dy vs source |
+|:--|:--|--:|--:|--:|
+| A | `before=368 line=12 exact` (shipped) | 19.00 pt | **18.75** | −1.96 |
+| D | `before=173 line=207 atLeast` (natural box) | 19.00 pt | **20.90** | +1.04 |
+| E | `before=373 line=12 exact` | 19.25 pt | **19.39** | +1.99 |
+| B | `380 exact` rows | — | 19.14 | +1.74 |
+
+Reading the four rows together: Google's line height is not the `w:line` it is given (0.60 pt asked, 0.35 pt
+contributed at `before=368`; 0.74 pt at `before=373`; ~12.25 pt for an `atLeast` natural box under a 9 pt
+face), and the row height is **quantised**: **+5 twips (0.25 pt) of `before` moved the row by 0.64 pt**,
+and 0.15 pt of requested exact height landed on the same row. There is no value of `before` and `line` you
+can *compute* to land on 19.00 pt, because the map from what is written to what Google lays is a step
+function of unknown step, measured here at four points.
+
+**So the class cannot be fixed by writing better numbers into the cell.** It needs either (a) a sweep of
+`before` in ~2-twip steps to find the interval that lays 19.00 — a per-document measurement, which the
+"one rule true of every document" test forbids as a fix — or (b) a construct Google lays exactly, which
+four probes have not found. That is the honest state of `18_displacement`'s row half, and it is why the
+class has survived every attempt: the instrument (our `.docx`) cannot express the target exactly, and the
+renderer quantises what it is given.
+
+What would prove this wrong: a `before` value in the 368–373 twip band whose Google export lays 19.00 on
+all seven rows. The band is 5 twips wide and the map moves 0.64 pt across it, so a value that lands
+exactly on 19.00 is possible only if the quantisation has a step at 19.00 — worth one probe, not a patch.
 
 Evidence kept: the three exported PDFs were compared line by line; the probe `.docx` files are
 reproducible from the recipe above (one attribute changed, nothing else). The two probe Google Docs were

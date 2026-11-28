@@ -16,13 +16,12 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| 60_tA-01 | 60_text_column_right_edge | A | which engine construct sets a body line's right edge, and which fixes  | 08:04 | 07:40 | landed | FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md |
 | gateB-01 | gate | B | why does regress.py --check refuse on unmodified HEAD | 08:04 | 07:41 | landed | FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md |
 | 60_tA-02 | 60_text_column_right_edge | A | which engine construct sets a body line's right edge, and which fixes  | 08:12 | 07:40 | landed | FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md |
 | gateB-02 | gate | B | why does regress.py --check refuse on unmodified HEAD | 08:12 | 07:41 | landed | FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md |
@@ -46,16 +45,13 @@ unfinished work, not as a result.
 | 18_dB-01 | 18_displacement | B | test the 0.961 spacer model at the current engine and quantify the inv | 05:40 | 08:05 | landed | FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md |
 | 18_dA-01 | 18_displacement | A | root cause of cell displacement; landed c8056b8 | 06:04 | landed 06:02 | running |  |
 | 63_tB-02 | 63_table_rows | B | ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc2 | 06:04 | landed 06:26 | running |  |
+| 18_dA-02 | 18_displacement | A | take a real Google export of 35_four_typefaces_one_page and test wheth | 08:56 | 08:31 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `21:08` attempt 116 on 18_displacement -> lead (0/4 moved)
-- `23:07` attempt 1 on 63_table_rows -> lead
-- `23:09` attempt 118 on 18_displacement -> lead
-- `23:17` agent deployed: 63_table_rows / A - which engine commit between d28ca7516c3f9165 and a05b20eb05fe0fc8 broke table ro
 - `23:17` agent deployed: 63_table_rows / B - what exactly differs in the docx for table-with-no-header-row: per-row placement
 - `23:56` attempt 2 on 63_table_rows -> lead
 - `01:27` attempt 3 on 63_table_rows -> reverted
@@ -77,6 +73,10 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `06:04` agent deployed: 18_displacement / A - root cause of cell displacement; landed c8056b8
 - `06:04` agent deployed: 63_table_rows / B - ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc2
 - `07:02` attempt 122 on 18_displacement -> lead
+- `08:54` attempt 123 on 18_displacement -> lead
+- `08:54` attempt 4 on 05_chars_extra -> lead
+- `08:56` attempt 124 on 18_displacement -> lead
+- `08:56` agent deployed: 18_displacement / A - take a real Google export of 35_four_typefaces_one_page and test whether Google 
 
 ## Where the rest of the state lives
 
