@@ -2663,16 +2663,54 @@ def extra_checks2(src, gd, docx_path=None):
     COL_MIN_SHARE = 0.05    # ... or this share of the page's body lines, if larger
     SLACK_CAP = 40.0        # one word wider than this is a token, not a word - see edge()
 
+    GUTTER = 2.0            # a gap this wide inside a "line" is a cell gutter, not kerning
+
     def page_lines(page):
+        """Ink runs, not MuPDF "line" objects.
+
+        A MuPDF line object is whatever the renderer chose to put on one baseline, and
+        Google's PDF export puts a WHOLE TABLE ROW in one: measured on
+        `341_shipping_manifest`, the row is one line object spanning 429.75 -> 513.36
+        whose spans are `34.73` (429.75 -> 447.20), a U+200B, `Corrugated cartons`
+        (453.00 -> 511.10) and a U+200B. Reading that object's bbox as the column's
+        right edge reports +66.36 pt of overrun where the source's own ink at that x is
+        0.18 pt away (513.18 vs 513.36), and the check fails a column that has not moved.
+
+        So a line is split at any internal gap of GUTTER or more, and each run is its own
+        box. The split point is measured, not tuned: over 62 Google exports there are
+        5,843 gaps between consecutive spans inside a line - 5,603 under 0.5 pt (kerning
+        inside a run), then 169 at 3-6 pt and 49 at >= 6 pt, with only 8 in 1-2 pt and 14
+        in 2-3 pt. Any threshold in the empty band 0.5-2 pt gives the same answer.
+
+        The source side is unaffected: a source line's internal gaps are all under 2 pt,
+        because the source draws each cell as its own line object.
+
+        Census, 62 failing documents measured through Google at engine a05b20eb05fe0fc8:
+        52 unchanged, 10 over -> pass, 1 over -> under (still failing). No document goes
+        pass -> fail, because a split can only shrink a box.
+        """
         ls = []
         for blk in page.get_text("dict")["blocks"]:
             if blk.get("type") != 0:
                 continue
             for ln in blk.get("lines", []):
-                if not "".join(sp.get("text", "") for sp in ln.get("spans", [])).strip():
+                spans = [sp for sp in ln.get("spans", [])
+                         if sp.get("text", "").strip()]
+                if not spans:
                     continue
-                ls.append(ln["bbox"])
+                group = [spans[0]]
+                for sp in spans[1:]:
+                    if sp["bbox"][0] - group[-1]["bbox"][2] >= GUTTER:
+                        ls.append(_union(group))
+                        group = [sp]
+                    else:
+                        group.append(sp)
+                ls.append(_union(group))
         return ls
+
+    def _union(spans):
+        return (min(s["bbox"][0] for s in spans), min(s["bbox"][1] for s in spans),
+                max(s["bbox"][2] for s in spans), max(s["bbox"][3] for s in spans))
 
     def columns(page):
         """[(left edge, [line bboxes]), ...] - every column on the page.

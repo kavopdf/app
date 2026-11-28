@@ -2,12 +2,11 @@
  "name": "341_shipping_manifest",
  "status": "ok",
  "rc": 1,
- "at": "2026-11-27T12:47:33",
- "passed": 45,
+ "at": "2026-11-28T00:00:25",
+ "passed": 46,
  "total": 47,
  "failed": [
-  "18_displacement",
-  "60_text_column_right_edge"
+  "18_displacement"
  ],
  "displacement": {
   "med_dy": 2.4,
@@ -19,5 +18,5 @@
   "runs_matched": 304
  },
  "engine": "a05b20eb05fe0fc8",
- "checks": "377699-1795780738"
+ "checks": "379822-1795823876"
 }

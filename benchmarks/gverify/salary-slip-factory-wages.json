@@ -1,13 +1,11 @@
 {
  "name": "salary-slip-factory-wages",
  "status": "ok",
- "rc": 1,
- "at": "2026-11-27T14:47:44",
- "passed": 46,
+ "rc": 0,
+ "at": "2026-11-28T00:00:17",
+ "passed": 47,
  "total": 47,
- "failed": [
-  "60_text_column_right_edge"
- ],
+ "failed": [],
  "displacement": {
   "med_dy": -0.4,
   "worst_dy": 2.5,
@@ -16,5 +14,5 @@
   "runs_matched": 102
  },
  "engine": "a05b20eb05fe0fc8",
- "checks": "377699-1795789156"
+ "checks": "379822-1795823876"
 }
