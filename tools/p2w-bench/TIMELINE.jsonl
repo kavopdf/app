@@ -10841,3 +10841,48 @@
 {"t": 1795842634.664504, "ist": "10:40:34", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795842634.7628036, "ist": "10:40:34", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795842635.4026356, "ist": "10:40:35", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795843830.6011698, "ist": "11:00:30", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795843830.7655277, "ist": "11:00:30", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795843830.8648539, "ist": "11:00:30", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795844045.4702291, "ist": "11:04:05", "ev": "beat", "d": "pod-prep: corpus fetch + jdk + engine compile"}
+{"t": 1795844361.7503731, "ist": "11:09:21", "ev": "beat", "d": "proving the hoist on 305 alone before the corpus pass"}
+{"t": 1795844398.6681957, "ist": "11:09:58", "ev": "beat", "d": "corpus-slice: converting 214 docs with the patched engine"}
+{"t": 1795844612.1483355, "ist": "11:13:32", "ev": "beat", "d": "corpus-slice: 6 of 55 converted"}
+{"t": 1795844612.5462947, "ist": "11:13:32", "ev": "beat", "d": "corpus-slice: 12 of 55 converted"}
+{"t": 1795844613.230438, "ist": "11:13:33", "ev": "beat", "d": "corpus-slice: 18 of 55 converted"}
+{"t": 1795844613.9722788, "ist": "11:13:33", "ev": "beat", "d": "corpus-slice: 24 of 55 converted"}
+{"t": 1795844614.7825215, "ist": "11:13:34", "ev": "beat", "d": "corpus-slice: 30 of 55 converted"}
+{"t": 1795844615.5334833, "ist": "11:13:35", "ev": "beat", "d": "corpus-slice: 36 of 55 converted"}
+{"t": 1795844616.236683, "ist": "11:13:36", "ev": "beat", "d": "corpus-slice: 42 of 55 converted"}
+{"t": 1795844616.858073, "ist": "11:13:36", "ev": "beat", "d": "corpus-slice: 48 of 55 converted"}
+{"t": 1795844626.87394, "ist": "11:13:46", "ev": "beat", "d": "corpus-slice: 54 of 55 converted"}
+{"t": 1795844841.280115, "ist": "11:17:21", "ev": "beat", "d": "corpus-slice: 6 of 57 converted"}
+{"t": 1795844844.0297422, "ist": "11:17:24", "ev": "beat", "d": "corpus-slice: 12 of 57 converted"}
+{"t": 1795844845.341833, "ist": "11:17:25", "ev": "beat", "d": "corpus-slice: 18 of 57 converted"}
+{"t": 1795844846.7373137, "ist": "11:17:26", "ev": "beat", "d": "corpus-slice: 24 of 57 converted"}
+{"t": 1795844848.2493904, "ist": "11:17:28", "ev": "beat", "d": "corpus-slice: 30 of 57 converted"}
+{"t": 1795844849.6686304, "ist": "11:17:29", "ev": "beat", "d": "corpus-slice: 36 of 57 converted"}
+{"t": 1795844850.7556028, "ist": "11:17:30", "ev": "beat", "d": "corpus-slice: 42 of 57 converted"}
+{"t": 1795844852.222262, "ist": "11:17:32", "ev": "beat", "d": "corpus-slice: 48 of 57 converted"}
+{"t": 1795844872.6724415, "ist": "11:17:52", "ev": "beat", "d": "corpus-slice: 54 of 57 converted"}
+{"t": 1795845099.6284237, "ist": "11:21:39", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795845116.4465947, "ist": "11:21:56", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795845118.9510834, "ist": "11:21:58", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795845120.8417757, "ist": "11:22:00", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795845123.952022, "ist": "11:22:03", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795845126.3660986, "ist": "11:22:06", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795845127.2291958, "ist": "11:22:07", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795845128.1790311, "ist": "11:22:08", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795845172.3803918, "ist": "11:22:52", "ev": "beat", "d": "FORCE reconvert: corpus cache excludes TxtWriter.java so a txt fix is invisible to it"}
+{"t": 1795845196.5780349, "ist": "11:23:16", "ev": "beat", "d": "re-converting the 49 stale docs with the patched engine"}
+{"t": 1795845400.7356021, "ist": "11:26:40", "ev": "beat", "d": "corpus-slice: 6 of 49 converted"}
+{"t": 1795845400.9206135, "ist": "11:26:40", "ev": "beat", "d": "corpus-slice: 12 of 49 converted"}
+{"t": 1795845401.0744834, "ist": "11:26:41", "ev": "beat", "d": "corpus-slice: 18 of 49 converted"}
+{"t": 1795845401.2418807, "ist": "11:26:41", "ev": "beat", "d": "corpus-slice: 24 of 49 converted"}
+{"t": 1795845401.3947265, "ist": "11:26:41", "ev": "beat", "d": "corpus-slice: 30 of 49 converted"}
+{"t": 1795845401.5736537, "ist": "11:26:41", "ev": "beat", "d": "corpus-slice: 36 of 49 converted"}
+{"t": 1795845401.7579794, "ist": "11:26:41", "ev": "beat", "d": "corpus-slice: 42 of 49 converted"}
+{"t": 1795845401.9328938, "ist": "11:26:41", "ev": "beat", "d": "corpus-slice: 48 of 49 converted"}
+{"t": 1795845409.4617424, "ist": "11:26:49", "ev": "beat", "d": "restamp_txt: re-scoring all 214 .txt"}
+{"t": 1795845480.8262167, "ist": "11:28:00", "ev": "beat", "d": "regress --check with the txt table re-stamped"}
+{"t": 1795845513.2054296, "ist": "11:28:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
