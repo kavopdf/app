@@ -313,20 +313,9 @@
   "status": "OPEN"
  },
  "18_displacement": {
-  "attempts": 129,
+  "attempts": 130,
   "first_seen": null,
   "history": [
-   {
-    "at": "2026-11-27 16:50",
-    "changed": {
-     "files": [],
-     "last_engine_commit": "p2w fixer 27nov: table gap spent as w:before (70%), pitch-bound rows declared 10 twips und"
-    },
-    "moved": 1,
-    "outcome": "kept",
-    "reason": "18_displacement scored the bbox top (origin minus the rendered face's ascent), so dy was baseline difference + ascent difference. runs() now also publishes roy (origin in reading space) and 18 scores/",
-    "total": null
-   },
    {
     "at": "2026-11-27 17:27",
     "changed": {
@@ -535,6 +524,17 @@
     "outcome": "lead",
     "reason": "footRoom is the false predicate, measured: pitchBinds true on all 21 rows of 320_balance_sheet_statutory, footRoom false on all 21 (clearance 4.25/3.75 pt vs a 5.0 pt threshold). FOOT_ROOM_MIN_TW 100-",
     "total": null
+   },
+   {
+    "at": "2026-11-28 16:44",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "txt: hoist a paragraph the model parked at the end back to its own top"
+    },
+    "moved": null,
+    "outcome": "lead",
+    "reason": "per-row ladder declaration (footRoom 75 + per-row d) measured in Google on 320_balance_sheet_statutory: worst_dy 16.2->4.5 pt, med_dy 7.2->0.4, 18_displacement still fails; reverted, 320 restored at H",
+    "total": null
    }
   ],
   "last": null,
@@ -669,6 +669,7 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
   "park_reason": "no progress in the last 12 attempts (lead, lead, lead, lead, reverted, lead, lead, reverted, reverted, lead, lead, lead)",
@@ -676,7 +677,7 @@
   "pending_moved": 37,
   "ratchet_at": "27 Nov 07:44",
   "ratchet_docs": 213,
-  "reason": "footRoom is the false predicate, measured: pitchBinds true on all 21 rows of 320_balance_sheet_statutory, footRoom false on all 21 (clearance 4.25/3.75 pt vs a 5.0 pt threshold). FOOT_ROOM_MIN_TW 100->75 emits 270/250 twips and, measured in GOOGLE both ways on the same document, worst_dy 16.2 -> 5.2 pt and med_dy 7.2 -> 0.4 pt at 46/47 (18_displacement still fails, so not CLEAN). Not committed: regress.py --check refuses an unmeasured engine and a corpus-wide Google re-measure does not fit a slot; change reverted, gate passes, 320 re-measured at HEAD to keep the table on the tree's engine. Next: 75 twips AND T2's rows to 240 (ladder-inert at 260->250), then measure 320, then stamp.",
+  "reason": "per-row ladder declaration (footRoom 75 + per-row d) measured in Google on 320_balance_sheet_statutory: worst_dy 16.2->4.5 pt, med_dy 7.2->0.4, 18_displacement still fails; reverted, 320 restored at HEAD",
   "reasons": [
    "table-spacer gap moved from w:line(exact) into w:before: MEASURED IN GOOGLE, reverted. Mechanism was named by two agents and looked right - the spacer paragraph writes the whole gap as w:line on a 1 pt mark, Google does not implement lineRule=exact and buys a fraction of it. Applied it (w:before=spacerTw, w:line=1) and measured bank-statement-5-pages through Drive: GOOGLE 40/47 -> 36/47, WORSE, and 27_text_off_page went 0 -> 12 as the extra space overflowed the page. LibreOffice unchanged at 47/47. The reason it cannot work: the spacer is NOT where the 57 pt comes from. Counted in the emitted docx, bank-statement-5-pages carries 9 spacers totalling 81.0 pt across 5 pages, max 16.2 pt - at most 16 pt per page against a measured uniform upward shift of 56.9-57.1 pt on pages 1-4. Forcing the full gap in therefore adds space the page never had and pushes rows off it.",
    "ROOT CAUSE PROVEN, no engine change landed. Controlled probe through Google: w:before on the first paragraph after a w:br w:type=page is DROPPED ENTIRELY by Google Docs (55.15 pt asked, rendered 0.33 pt - the paper's top edge), while LibreOffice places it at 56.80. The engine emits exactly that construct: bank-statement-5-pages carries w:before=1103 twips (55.15 pt) on the first paragraph of each page, and the measured Google dy on its pages 1-4 is -56.9/-57.1/-57.1/-57.1 pt. Same number. The probe also found the construct Google DOES honour at a page top: a 1x1 table row with w:trHeight hRule=exact, 55.83 pt of 55.15 asked, exact in LibreOffice. Ruled out with numbers: the table-spacer paragraph (at most 16.2 pt per page against a 57 pt shift, and moving its gap into w:before took Google 40/47 -> 36/47, LO unchanged - reverted), w:line exact (LO honours it, so it cannot split the two renderers), auto line boxes (face-dependent in both). Next run: emit the page-first gap as a trHeight-exact table row and set that paragraph's w:before to 0. FINDINGS/18_displacement-page-top-before-DROPPED-105000-f1x.md has the probe table.",
@@ -803,7 +804,8 @@
    "Ten Google variants on three documents: Google's table row advance exceeds the source pitch by +0.10 (16.40 src), +0.13 (18.40) and +0.50 (13.00) pt per row, accumulating 3.9-9.2 pt by the bottom of a 24-40 row table, past 18_displacement's 2.8 pt tolerance. w:trHeight is inert (v3/v4 identical to shipped), reducing w:before is inert (v5, bm10 identical), the paragraph mark is inert (v7), w:line=0 reads as single spacing (v8). The previous run's named next step (natural line box in w:line) is refuted by v2: same pitch, table start +11.5 pt. Engine geometry is already exact (trHeight 328 = before 317 + line 11 = the source's 16.40 pt pitch), so there is no engine change to land. Finding committed.",
    "Fourth document: table-inside-two-column-page reproduces the source's 11.8 pt text pitch exactly in Google (11 of 16 gaps 11.8, source identical) because its rows are taller than its text pitch (trHeight 18.5/17.5 vs 11.8). So the +0.10/+0.13/+0.50 pt per-row excess is a property of the single-line-sets-the-row regime, not of tables in general. Its 18_displacement is a different shape: the table lands 69.18 pt short at the bottom with the pitch intact.",
    "Google loop proven end-to-end (42/47 reproduced on bank-statement-5-pages, same 5 failures, engine a05b20eb); ROW_RUNG_UNDER_TW 10->25 refuted as inert on 320_balance_sheet_statutory - all 21 rows emit 280 twips at both settings because the subtraction is guarded by pitchBinds && footRoom, so construct (3) there is reachable from footRoom, not the constant. Engine reverted, gate passes. See FINDINGS/GOOGLE-LOOP-PROVEN-TODAY-AND-RUNG-CONSTANT-INERT-28NOV-fixer.md",
-   "footRoom is the false predicate, measured: pitchBinds true on all 21 rows of 320_balance_sheet_statutory, footRoom false on all 21 (clearance 4.25/3.75 pt vs a 5.0 pt threshold). FOOT_ROOM_MIN_TW 100->75 emits 270/250 twips and, measured in GOOGLE both ways on the same document, worst_dy 16.2 -> 5.2 pt and med_dy 7.2 -> 0.4 pt at 46/47 (18_displacement still fails, so not CLEAN). Not committed: regress.py --check refuses an unmeasured engine and a corpus-wide Google re-measure does not fit a slot; change reverted, gate passes, 320 re-measured at HEAD to keep the table on the tree's engine. Next: 75 twips AND T2's rows to 240 (ladder-inert at 260->250), then measure 320, then stamp."
+   "footRoom is the false predicate, measured: pitchBinds true on all 21 rows of 320_balance_sheet_statutory, footRoom false on all 21 (clearance 4.25/3.75 pt vs a 5.0 pt threshold). FOOT_ROOM_MIN_TW 100->75 emits 270/250 twips and, measured in GOOGLE both ways on the same document, worst_dy 16.2 -> 5.2 pt and med_dy 7.2 -> 0.4 pt at 46/47 (18_displacement still fails, so not CLEAN). Not committed: regress.py --check refuses an unmeasured engine and a corpus-wide Google re-measure does not fit a slot; change reverted, gate passes, 320 re-measured at HEAD to keep the table on the tree's engine. Next: 75 twips AND T2's rows to 240 (ladder-inert at 260->250), then measure 320, then stamp.",
+   "per-row ladder declaration (footRoom 75 + per-row d) measured in Google on 320_balance_sheet_statutory: worst_dy 16.2->4.5 pt, med_dy 7.2->0.4, 18_displacement still fails; reverted, 320 restored at HEAD"
   ],
   "requeues": 0,
   "status": "PARKED"

@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `09:28` attempt 4 on t09_page_furniture -> lead
 - `09:41` attempt 126 on 18_displacement -> lead
 - `09:42` agent deployed: 18_displacement / A - is the cell w:line natural-box rewrite right in GOOGLE on 35_four_typefaces_one_
 - `09:42` agent deployed: 18_displacement / B - census the 19 documents that fail only 18_displacement and test the measured gap
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `15:47` attempt 128 on 18_displacement -> lead
 - `16:27` attempt 129 on 18_displacement -> lead
 - `16:44` attempt 130 on 18_displacement -> lead
+- `16:47` attempt 131 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 
