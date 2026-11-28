@@ -10606,3 +10606,5 @@
 {"t": 1795836921.043421, "ist": "09:05:21", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795836921.4115384, "ist": "09:05:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795836923.4701374, "ist": "09:05:23", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795836955.6371338, "ist": "09:05:55", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795837006.2690642, "ist": "09:06:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
