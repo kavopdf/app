@@ -383,10 +383,6 @@
  "notes": [
   {
    "at": "11:21",
-   "text": "agent deployed: 18dA-03 / 18_displacement - baseline placement inside the hairline exact line box"
-  },
-  {
-   "at": "11:21",
    "text": "agent deployed: 60tB-02 / 60_text_column_right_edge - the right-tab line is split by our own reader"
   },
   {
@@ -620,6 +616,10 @@
   {
    "at": "10:22",
    "text": "agent deployed: --class /  - "
+  },
+  {
+   "at": "10:33",
+   "text": "attempt 10 on 60_text_column_right_edge -> lead"
   }
  ],
  "plan": "",

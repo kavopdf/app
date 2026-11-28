@@ -10809,3 +10809,8 @@
 {"t": 1795841541.697033, "ist": "10:22:21", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795841545.066845, "ist": "10:22:25", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795842203.6008067, "ist": "10:33:23", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795842207.382694, "ist": "10:33:27", "ev": "attempt", "d": "60_text_column_right_edge -> lead"}
+{"t": 1795842207.5117013, "ist": "10:33:27", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795842207.611954, "ist": "10:33:27", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795842208.2006185, "ist": "10:33:28", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795842208.3946843, "ist": "10:33:28", "ev": "beat", "d": "attempt.py: recording an attempt"}
