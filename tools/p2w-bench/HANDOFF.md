@@ -52,8 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `05:39` attempt 9 on 60_text_column_right_edge -> kept
-- `05:40` agent deployed: 60_text_column_right_edge / A - which engine construct sets a body line's right edge - is 60 an engine defect or
 - `05:40` agent landed: 60_text_column_right_edge / A -> FINDINGS/60-THE-LINE-OBJECT-IS-A-TABLE-ROW-28NOV-fixer.md
 - `05:40` agent deployed: 18_displacement / B - test the 0.961 spacer model at the current engine and quantify the inverse corre
 - `05:40` agent landed: 18_displacement / B -> FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md
@@ -77,6 +75,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `10:00` agent deployed: --class /  - 
 - `10:21` attempt 6 on t09_page_furniture -> lead
 - `10:22` agent deployed: --class /  - 
+- `10:33` attempt 10 on 60_text_column_right_edge -> lead
+- `10:33` attempt 11 on 60_text_column_right_edge -> lead
 
 ## Where the rest of the state lives
 

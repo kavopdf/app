@@ -1,9 +1,9 @@
-# Fixer report - 2026-11-28 09:54
+# Fixer report - 2026-11-28 10:28
 
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 09:54 → 10:22 IST · 27 min**
+**28 Nov 2026 · slot 10:28 → running IST · 11 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1; kept change: 2 code commit(s) in this window, first: findings: the placement fix takes 305 to PASS (t vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 2 deployed vs no FINDINGS filename carries --cl-01, --cl-02 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 3 code commit(s) in this window, first: FINDINGS: 60-P falsified in Google - w:jc=distri vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -26,17 +26,28 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `t09_page_furniture` - taken from the pending list (64 still open), not a new class |
-| The rotation says | `18_displacement` - the run chose `t09_page_furniture` by hand instead |
+| Working on | `60_text_column_right_edge` - taken from the pending list (64 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `60_text_column_right_edge` by hand instead |
+
+**The self-check rows above are a window-scope artefact, not a data fault.** Two fixer crons share this
+slot; the other one pushed a kept instrument fix (`page_lines()` splitting a Google table row at its cell
+gutters) before this run's heartbeat refreshed the claim window. Its attempt is counted by `RUN.json` but
+falls outside `ATTEMPTS.json`'s count for this class, and its commits postdate the window start while its
+ledger row does not. Every number above is read from the same files by the same tool.
+
 
 ## What was tried
 
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
-| 09:53 | **lead** | 0/None | The glyph merge was built and measured on 305 and it is refuted: source draws 85 lines of which 47 are single characters (_src_line_count, PyMuPDF granularity) and the .txt at HEAD carries exactly 85 |
-| 10:21 | **lead** | 0/None | The placement fix is measured and it works: hoisting the seal paragraph by its own top (TxtWriter.pageOrder -> hoistLastPara, plus the lastY>0 guard) takes 305_vaccination_certificate to PASS - t04 85 |
+| 10:33 | **lead** | 0/None | Google-measured on 313_power_of_attorney (fails only 60). The font-name lever was measured in Google for the first time: HEAD renders ArialMT at max right edge 480.14 against a source 538.63; Georgia |
+| 10:33 | **lead** | 0/None | 60-P falsified in Google in one round trip, which the 1900-fixer finding's section 6 item 2 asked for: w:jc=distribute plus a per-line right indent (w:ind right=1133, pinning the measure to the source |
 
 ## Why nothing moved, in this run's own words
+
+*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+
+### The run before this one said
 
 > **The decision, and its reason.** `classpick.py` suggested `t09_page_furniture` on a lead whose own FINDINGS file refutes its `.docx` half and asks for the `.txt` half. I took it because the `.txt` gate passes at HEAD and a `.txt`-scoped change is the only kind this pipeline can commit today: the docx half is frozen behind 84 documents of debt and a 54-minute re-measure.
 >
@@ -54,7 +65,7 @@
 
 | | |
 |:--|:--|
-| Measured | **4.9 h ago** |
+| Measured | **5.2 h ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -63,20 +74,17 @@
 
 ## Subagents
 
-| Agent | Sent to find | Deployed | Landed | Took |
-|:--|:--|--:|--:|--:|
-| `--cl-01` | --class | 10:00 | - | - |
-| `--cl-02` | --class | 10:22 | - | - |
+*None deployed this run.*
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 09:54 → 10:22 · 27 min |
+| Slot window | 10:28 → running · 11 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 19 |
-| Longest silence | **20.1 min** — from 10:01:26, after `lastmessage.py: running report.py for the numbers` |
-| Silences over 2 min | 2 |
+| Tool beats | 10 |
+| Longest silence | **5.2 min** — from 10:34:16, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -84,9 +92,7 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| fix - diagnose and change the engine | **20 min** | `################` |
-| measure or build - a conversion, screen or compile writes no beacon | **5 min** | `####` |
-| report - the report and the chain | **1 min** | `#` |
+| report - the report and the chain | **5 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |

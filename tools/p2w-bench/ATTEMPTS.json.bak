@@ -1337,7 +1337,7 @@
   "status": "OPEN"
  },
  "60_text_column_right_edge": {
-  "attempts": 9,
+  "attempts": 10,
   "first_seen": null,
   "history": [
    {
@@ -1418,6 +1418,17 @@
     "outcome": "kept",
     "reason": "instrument fix: page_lines() split a Google table row at its cell gutters; 2 documents CLEAN (salary-slip-factory-wages, table-with-merged-cells), 10 more pass 60, 0 pass->fail in a 62-document census",
     "total": null
+   },
+   {
+    "at": "2026-11-28 10:33",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "Google-measured on 313_power_of_attorney (fails only 60). The font-name lever was measured in Google for the first time: HEAD renders ArialMT at max right edge 480.14 against a source 538.63; Georgia ",
+    "total": null
    }
   ],
   "last": null,
@@ -1433,9 +1444,10 @@
    "reverted",
    "lead",
    "lead",
-   "kept"
+   "kept",
+   "lead"
   ],
-  "reason": "instrument fix: page_lines() split a Google table row at its cell gutters; 2 documents CLEAN (salary-slip-factory-wages, table-with-merged-cells), 10 more pass 60, 0 pass->fail in a 62-document census",
+  "reason": "Google-measured on 313_power_of_attorney (fails only 60). The font-name lever was measured in Google for the first time: HEAD renders ArialMT at max right edge 480.14 against a source 538.63; Georgia 480.49; Noto Serif 505.01; Times New Roman 449.00; Liberation Serif is not in Google's library and falls back to Arial byte-for-byte. Best face closes 33.6 of 58.5 pt, so the name is honoured but is not the fix. w:jc=both on all 29 body paragraphs is INERT (all 30 right edges identical to 0.1 pt) because 29 paragraphs over 30 lines means nearly every line is its own paragraph's last line, which justification does not stretch.",
   "reasons": [
    "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one.",
    "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect.",
@@ -1445,7 +1457,8 @@
    "right-edge pin (w:jc=distribute + w:ind w:right) on 302: Google 41/42 -> 39/42, 60 unchanged (0,1,False), 17 33->21, 26 wrap 2->28; LO identical 42/42 both arms. Reverted; FINDINGS/RIGHT-PIN-WRAPS-IN-GOOGLE-INERT-IN-LO-0126-relay.md",
    "the gate now PASSes on this pod (unmodified engine a4d8fca469bba636, exit 0) after corpus-fetch + pod-prep + 2 corpus-slice calls - the four prior refusals were missing pod prerequisites, not the tree. Landed FINDINGS: 60_edge cause settled (DocxWriter:4444 never writes a line's right extent); three fixes refuted in the record; the surviving proposal is a right tab stop at the source edge (flowRow:3805-3809), ceiling 5 CLEAN, prediction 302_radiology_report 41/42 -> 42/42 edge 543.74 +-1.0. Not built this slot: 27 min of the slot went to two inline agents and 10 to the cold corpus. No document moved.",
    "right tab stop in flowFromBox: Google delivers the trailing word at 309.00 asked / 309.00 and 538.50 asked / 538.61, so the edge IS placeable to 0.11 pt; but page_lines() takes one bbox per PyMuPDF line and a tab splits one visual line into two, so the current reader charges an underrun the render does not have (column edge read 239.54 vs the 309.00 drawn) and 17_matched_runs loses its pairs. With page_lines merging same-baseline fragments, 321 goes 60 FAIL -> 60 PASS on both tab variants and the control is unchanged; the remaining failure is 17_matched_runs, which needs one source run to be satisfiable by consecutive render pieces. Engine change reverted: on the reader as it stands it is 41/42 -> 40/42, a Google regression. FINDINGS/60-RIGHT-TAB-HONOURED-INSTRUMENT-BLIND-27NOV-fixer.md",
-   "instrument fix: page_lines() split a Google table row at its cell gutters; 2 documents CLEAN (salary-slip-factory-wages, table-with-merged-cells), 10 more pass 60, 0 pass->fail in a 62-document census"
+   "instrument fix: page_lines() split a Google table row at its cell gutters; 2 documents CLEAN (salary-slip-factory-wages, table-with-merged-cells), 10 more pass 60, 0 pass->fail in a 62-document census",
+   "Google-measured on 313_power_of_attorney (fails only 60). The font-name lever was measured in Google for the first time: HEAD renders ArialMT at max right edge 480.14 against a source 538.63; Georgia 480.49; Noto Serif 505.01; Times New Roman 449.00; Liberation Serif is not in Google's library and falls back to Arial byte-for-byte. Best face closes 33.6 of 58.5 pt, so the name is honoured but is not the fix. w:jc=both on all 29 body paragraphs is INERT (all 30 right edges identical to 0.1 pt) because 29 paragraphs over 30 lines means nearly every line is its own paragraph's last line, which justification does not stretch."
   ],
   "requeues": 0,
   "status": "OPEN"
@@ -2384,7 +2397,7 @@
   "status": "OPEN"
  },
  "t09_page_furniture": {
-  "attempts": 5,
+  "attempts": 6,
   "first_seen": null,
   "history": [
    {
@@ -2437,6 +2450,17 @@
     "outcome": "lead",
     "reason": "The glyph merge was built and measured on 305 and it is refuted: source draws 85 lines of which 47 are single characters (_src_line_count, PyMuPDF granularity) and the .txt at HEAD carries exactly 85 ",
     "total": null
+   },
+   {
+    "at": "2026-11-28 10:21",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "engine: a single-line cell is written at its row's height, because Google lays the cell"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "The placement fix is measured and it works: hoisting the seal paragraph by its own top (TxtWriter.pageOrder -> hoistLastPara, plus the lastY>0 guard) takes 305_vaccination_certificate to PASS - t04 85",
+    "total": null
    }
   ],
   "last": null,
@@ -2446,15 +2470,17 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "The glyph merge was built and measured on 305 and it is refuted: source draws 85 lines of which 47 are single characters (_src_line_count, PyMuPDF granularity) and the .txt at HEAD carries exactly 85 with 47 single, so the .txt is faithful. Merging takes t08 from 33/32 FAIL to 34/34 pass but breaks t04_structure 85/42 (drift 0.49 under MAX_LINE_DRIFT 1.5) and loses the seal's inter-word spaces, so 305 still FAILs. The real defect is placement not line count: the seal paragraph is appended last in page.blocks while its own top is y=271, so the run lands after a footer at y=777. Next: order that paragraph by top without merging, expect t04 85/85 and t08 33/33. Do not land the merge.",
+  "reason": "The placement fix is measured and it works: hoisting the seal paragraph by its own top (TxtWriter.pageOrder -> hoistLastPara, plus the lastY>0 guard) takes 305_vaccination_certificate to PASS - t04 85/85 unchanged, t08 33/32 -> 33/33, 85 lines and 47 single-char lines preserved, 30 blanks, 3384 bytes; I ran verify_txt.py on the output myself. Corpus probe: the hoist fires on 27 pages of 27 documents, 187 of 214 .txt byte-identical, the other 26 unchanged on t04/t08/pass-count, 305 the only mover. Two hunks are written verbatim into FINDINGS/TXT-SPLITS-A-LETTER-SPACED-LINE-INTO-ONE-LINE-PER-GLYPH-28NOV-relay.md. Not landed: 90+ min into the slot, and a TxtWriter change needs the full 213-doc re-conversion and re-stamp before the gate will take it.",
   "reasons": [
    "verify_txt.py only, no engine change: a furniture key with no letter in it is not furniture (_furniture_key folds digits to '#', so 324's numeric table cells invented 18 owed and 1437 present - 66/1485 -> 48/48), and owed is now counted per drawn occurrence, not per page (gst-invoice-multipage-item-table draws 'Page N of 4' twice per page: 39/43 -> 43/43). Full 213 re-scored with the real verify_txt.compare() on a fresh conversion: head 197 clean, each fault alone 198, zero ok->fail flips on any check of any document. The two landed together; the combination was bounded but not re-scored - 324 can only hold or stay failing. RANKING-TXT.csv is now stale and needs restamp_txt.py.",
    "the band arm the FINDINGS patch uses reads 0 of 29 (the .txt has no form feeds: segs=1), and dropping one-char keys alone leaves Date 6 vs 3; a correct fix needs an aligner plus a full 213-doc .txt re-measure, which did not fit",
    "txt reader: verify_txt.py _txt_lines dropped the form-feed separator line (l.strip() is empty for U+000C), so every multi-page .txt was read as one segment. Patched to keep it and re-scored the whole corpus with txt_rank.py --all: 213 documents, 12 failing check-instances before, 12 after, 0 worse 0 better. The reader is now truthful but no check consumes segmentation, so this unblocks nothing on its own - it corrects the t09 lead's premise ('blocked on an aligner plus a full txt re-measure'): the band arm needs a segment-consuming check that does not exist yet. See FINDINGS/TXT-READER-DROPS-THE-PAGE-SEPARATOR-27NOV-fixer.md",
    "TxtWriter writes a letter-spaced line as one line per glyph while DocxWriter merges it: 305_vaccination_certificate has 47 single-char lines of 85 and fails t08 32/33 because the glyphs land after the body though the page draws them at the top; the two Account forms carry 274 of 1193. Same model, opposite answers, so the merge is writer-local and belongs in TxtWriter.appendPara. Named next step: merge before the line is written, measure 305 alone (expected t08 33/33 PASS), then the full 213-doc txt re-stamp. Not landed: a TxtWriter change needs the full re-conversion and re-stamp and that did not fit the slot.",
-   "The glyph merge was built and measured on 305 and it is refuted: source draws 85 lines of which 47 are single characters (_src_line_count, PyMuPDF granularity) and the .txt at HEAD carries exactly 85 with 47 single, so the .txt is faithful. Merging takes t08 from 33/32 FAIL to 34/34 pass but breaks t04_structure 85/42 (drift 0.49 under MAX_LINE_DRIFT 1.5) and loses the seal's inter-word spaces, so 305 still FAILs. The real defect is placement not line count: the seal paragraph is appended last in page.blocks while its own top is y=271, so the run lands after a footer at y=777. Next: order that paragraph by top without merging, expect t04 85/85 and t08 33/33. Do not land the merge."
+   "The glyph merge was built and measured on 305 and it is refuted: source draws 85 lines of which 47 are single characters (_src_line_count, PyMuPDF granularity) and the .txt at HEAD carries exactly 85 with 47 single, so the .txt is faithful. Merging takes t08 from 33/32 FAIL to 34/34 pass but breaks t04_structure 85/42 (drift 0.49 under MAX_LINE_DRIFT 1.5) and loses the seal's inter-word spaces, so 305 still FAILs. The real defect is placement not line count: the seal paragraph is appended last in page.blocks while its own top is y=271, so the run lands after a footer at y=777. Next: order that paragraph by top without merging, expect t04 85/85 and t08 33/33. Do not land the merge.",
+   "The placement fix is measured and it works: hoisting the seal paragraph by its own top (TxtWriter.pageOrder -> hoistLastPara, plus the lastY>0 guard) takes 305_vaccination_certificate to PASS - t04 85/85 unchanged, t08 33/32 -> 33/33, 85 lines and 47 single-char lines preserved, 30 blanks, 3384 bytes; I ran verify_txt.py on the output myself. Corpus probe: the hoist fires on 27 pages of 27 documents, 187 of 214 .txt byte-identical, the other 26 unchanged on t04/t08/pass-count, 305 the only mover. Two hunks are written verbatim into FINDINGS/TXT-SPLITS-A-LETTER-SPACED-LINE-INTO-ONE-LINE-PER-GLYPH-28NOV-relay.md. Not landed: 90+ min into the slot, and a TxtWriter change needs the full 213-doc re-conversion and re-stamp before the gate will take it."
   ],
   "requeues": 0,
   "status": "OPEN"
