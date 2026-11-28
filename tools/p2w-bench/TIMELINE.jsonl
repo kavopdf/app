@@ -10514,3 +10514,9 @@
 {"t": 1795833026.6590555, "ist": "08:00:26", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795833026.844785, "ist": "08:00:26", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795833027.1888862, "ist": "08:00:27", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795833286.8464565, "ist": "08:04:46", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795833287.0453956, "ist": "08:04:47", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795833287.1468918, "ist": "08:04:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795833362.9718869, "ist": "08:06:02", "ev": "release", "d": "fixer released"}
+{"t": 1795833363.2253017, "ist": "08:06:03", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795833363.3904996, "ist": "08:06:03", "ev": "beat", "d": "pending.py: reading the pending gate"}

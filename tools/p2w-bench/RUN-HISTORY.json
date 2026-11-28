@@ -1,16 +1,5 @@
 [
  {
-  "started": "00:23",
-  "started_ts": 1795632817.7317436,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "started": "01:25",
   "started_ts": 1795636530.7479696,
   "ended": "(never)",
@@ -763,6 +752,17 @@
  {
   "started": "03:57",
   "started_ts": 1795818437.1888268,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "08:04",
+  "started_ts": 1795833277.018062,
   "ended": "(never)",
   "ended_ts": null,
   "attempts": 0,
