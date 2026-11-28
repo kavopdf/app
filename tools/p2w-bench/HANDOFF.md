@@ -9,9 +9,9 @@ unfinished work, not as a result.
 
 | | |
 |---|---|
-| started | 15:08 |
-| ended | 16:29 |
-| how it ended | forced |
+| started | 16:39 |
+| ended | still running |
+| how it ended | - |
 | plan | - |
 
 ## What the next run should do first
@@ -52,7 +52,6 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `09:06` attempt 125 on 18_displacement -> lead
 - `09:28` attempt 4 on t09_page_furniture -> lead
 - `09:41` attempt 126 on 18_displacement -> lead
 - `09:42` agent deployed: 18_displacement / A - is the cell w:line natural-box rewrite right in GOOGLE on 35_four_typefaces_one_
@@ -77,6 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:59` agent deployed: 415_inline_images / zero SSIM - Are 415_inline_images and 411_nested_xobject_transforms a regression, or a misre
 - `15:47` attempt 128 on 18_displacement -> lead
 - `16:27` attempt 129 on 18_displacement -> lead
+- `16:44` attempt 130 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 
