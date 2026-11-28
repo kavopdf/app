@@ -1641,8 +1641,65 @@ changed is still the right gate. Re-baselining to today's state without (1) woul
 of avoidable damage and must not be done. This entry stays open until `regress.py --check` exits 0 on
 `main`.
 
+## 28 Nov 06:20 IST - watchdog: matrix still the one stopped stage, and this clone carries no commit gate at all
+
+**The picture, from the tools.** corpus 214. measure-google done at 214 of 214, 0.5 h. matrix
+**stopped** at 213 of 214, 8.5 h, with 37 of 213 results on the engine in the tree. classify moving,
+3.9 h. fix moving, 6 attempt(s) in 3 h, last activity 0.5 h ago. txt moving, 208 clean and 6 failing,
+0.5 h. `health.py --stalled` exits 1 naming matrix. `round.py --phase` is `measure`, so STEP 4 C did not
+fire - `round.py --reopen` refuses unless the phase is done. `status.py` reads IDLE, no fixer claim, slot
+free, one fixer run started 05:54 and is 18 min in, so STEP 4 D did not fire and `--release-fixer
+--force` was NOT run.
+
+**Matrix has not moved since the 03:05 pass, and nothing available to this pass can move it.** The
+newest LibreOffice result is 8.5 h old while the Google half is 0.5 h old: gverify is firing and its
+LibreOffice half is not. The cause is the one recorded at 21:45 on 27 Nov - `--lo-stale` plans from the
+`.docx` in `/scratch/work/p2w/out`, and this pod holds none of them (`ls /scratch/work/p2w/out` is
+empty) and has no `java`, so no LibreOffice render and no `regress.py --check` can run here at all. The
+escalation the 03:05 pass set was "matrix still reading 37 on engine at a pass 24 h from now"; that pass
+was 3 h ago, so it has not come due. Nothing is parked and nothing is re-opened.
+
+**The trend row, and the one fact in it that matters.** Today's row is docx open 116, txt failing 6,
+google 206, google clean 48 - the first three unchanged from 27 Nov, clean up 2. One row of no movement
+is not the three-row signal the brief names, and the .docx column left 59 only yesterday because the
+table was re-measured, not because documents were fixed. Appended and committed in this pass as
+d33f3852, so the row cannot be lost the way the 21 Nov row was.
+
+**"No commit of any kind can land" is true only of a clone where a run installed the gate.** The 03:5x
+entry says the hook refuses an engine fix, a tool and the run's own report alike. In this clone
+`.git/hooks/pre-commit` does not exist and this pass's progress commit landed, because git does not
+track hooks: `tools/install-gate.sh` is what creates one, and it first runs `pod-prep.sh`, which needs a
+corpus and a JDK this pod does not have. So the wall is real for every run that installs the gate - the
+fixer runs are the ones that do - and absent for every run that does not. I did not install it:
+installing it would refuse the one commit the watchdog exists to make, and the gate's own question is
+the fixer's to answer. This does not weaken the 03:5x entry; it locates it.
+
+**No `cron` tool in this pass.** This watchdog's declared tool list carries no `cron` operation, so STEP
+3 and STEP 4 A and B did not run, no cron was inspected, recreated, paused or resumed, and the matrix
+stage's owner cannot be woken by automation from here. The calls it would have made, exactly:
+
+    cron(action="list")
+    cron(action="runs", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85")   # gverify, from the HEALTH-BRIEF table
+
+and then, only for a stale `next_fire_at` or a zombie run:
+
+    cron(action="pause", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85"); cron(action="resume", cron_id="01M7T6STKQJ2KPZAYFMCZVCG85")
+
+This is a missing tool, not a decision anyone has to make: a `cron` operation has to be in this cron's
+tool list before a paused or zombie cron can be cleared by a run.
+
+**Decision, on the evidence.** Matrix stays open and undecided-against, because the clock the last pass
+set has not run out and the wall is the pod's corpus rather than the engine or the schedule. What would
+overturn that: the matrix row still reading 37 on engine at a pass 24 h after 21:45 on 27 Nov, at which
+point the class of fault is either a corpus-build step no run performs or a gverify half that is not
+firing - and either is decided here rather than recorded again. The commit gate is now the better
+explanation for a flat .docx column than anything in the converter, and it is the next thing to test:
+a fixer slot that installs no gate and lands one measured construct would move `docx open` off 116 and
+close the question.
+
 ## Rows
 
 | date | what | who owns it |
 |:--|:--|:--|
+| 2026-11-28 | The watchdog cron's own tool list carries no `cron` operation, so no paused or zombie cron can be inspected, paused, resumed or recreated by any watchdog run. Recorded again this pass with the exact calls. | whoever owns this agent's cron configuration - add a `cron` operation to the watchdog cron's tool list |
 | 2026-11-28 | A research agent opened public branch `probe/18-displacement-28nov` on `kavopdf/app` (six synthetic probe `.docx` under `probes/`) to reach Drive. It is residue, not evidence. Not deleted, because the brief forbids deleting a branch. | whoever owns the repo - delete it by hand when it is not needed |
