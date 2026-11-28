@@ -790,5 +790,16 @@
   "window_for_claim": 1795849576.8571618,
   "class": "60_text_column_right_edge",
   "ended_how": "killed - slot cleared by a force release"
+ },
+ {
+  "started": "12:30",
+  "started_ts": 1795849218.3360972,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
  }
 ]
