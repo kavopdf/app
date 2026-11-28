@@ -92,6 +92,28 @@ def _finding_landed(a):
     return ""
 
 
+def _retired_files():
+    """The .md names RETIRED.md says describe a pipeline that no longer runs.
+
+    A blocker comparing the live tables against one of these is not a defect in the live pipeline
+    and cannot be closed by any run. round.py already refuses to read them; this is the same guard
+    for pending.py, which was counting them as owed work.
+    """
+    import re
+    out = []
+    try:
+        with open(os.path.join(HERE, "RETIRED.md"), encoding="utf-8") as f:
+            for line in f:
+                if not line.lstrip().startswith("|"):
+                    continue
+                for name in re.findall(r"`([A-Za-z0-9_.-]+[.]md)`", line):
+                    if name not in out:
+                        out.append(name)
+    except Exception:
+        return []
+    return out
+
+
 def _epoch(s):
     """Epoch seconds from "YYYY-MM-DD HH:MM", or 0 when it does not parse."""
     import datetime as _dt
@@ -345,6 +367,19 @@ def collect():
             import re as _re
             _f = _re.search(r"FINDINGS/([A-Za-z0-9_.-]+[.]md)", " ".join(cells))
             if _f and os.path.exists(os.path.join(HERE, "FINDINGS", _f.group(1))):
+                continue
+
+            # AND A BLOCKER THAT IS A COMPARISON AGAINST A RETIRED FILE IS NOT WORK AT ALL.
+            # RETIRED.md lists the documents describing a pipeline that no longer runs, and says of
+            # them: "That guard is why these three can sit here harmlessly; it is not a reason to read
+            # them." round.py has that guard - class_files() returns one live path on purpose.
+            # pending.py did not, so every blocker phrased "X.md vs the tables" against a retired
+            # document counted as owed work no run could ever close, because the thing it measures
+            # against is not the current pipeline. On 28 Nov that was 28 of 64 items and it forced
+            # every slot to release with --force.
+            _blob = " ".join(cells)
+            _ret = _retired_files()
+            if any(r in _blob for r in _ret):
                 continue
             items.append({"kind": "blocker", "who": cells[0],
                             "_ts": _epoch(cells[0]),
