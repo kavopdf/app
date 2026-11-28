@@ -488,11 +488,23 @@ def main(argv):
         return 0 if not items else 1
 
     if "--decisions" in argv:
-        # THE ITEMS A FIXER CANNOT CLOSE ARE NOT THE FIXER'S WORK, AND THEY MUST NOT BE LOST EITHER.
-        # 59 of the 81 items on 23 Nov are blockers whose own "can I fix it" column begins with "no" -
-        # they need a decision from a person. classpick.py does not let them block a run (a gate that
-        # waited for them would never open), so without this view they would sit in BLOCKERS.md and be
-        # read by nobody. This prints only those, so the decisions that are owed stay visible.
+        # THE ITEMS A FIXER CANNOT CLOSE BY AN ENGINE CHANGE ARE NOT LOST, AND THEY ARE NOT ANYONE
+        # ELSE'S EITHER. 59 of the 81 items on 23 Nov are blockers whose own "can I fix it" column
+        # begins with "no". An earlier version of this comment said they "need a decision from a
+        # person" - there is no person. FIXER-BRIEF says so in as many words: "There is no person
+        # behind this pipeline to ask. Decide on evidence." And HEALTH-BRIEF says the same thing from
+        # the other end: "'A person has to decide' is not an outcome - it is a run that stopped
+        # working."
+        #
+        # So this view exists to keep those items VISIBLE, not to hand them to somebody who is not
+        # there. The run that reads it decides each one: park it with classpick.py --exhaust and the
+        # evidence, or replace the approach and say which, or find that the instrument is lying and
+        # fix the instrument. What it may not do is leave it open because it looks like someone
+        # else's call - that is the dead end this category used to create.
+        #
+        # classpick.py already refuses to let them block a run (a gate that waited for them would
+        # never open), and a slot release must never be gated on them either: pending work existing
+        # is the normal state of this pipeline, not a reason to hold a slot.
         dec = [i for i in items
                if i.get("kind") == "blocker"
                and (i.get("why") or "").lower().startswith("can i fix it: no")]
