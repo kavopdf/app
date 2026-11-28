@@ -9,7 +9,6 @@
  "ended": "09:45",
  "ended_ts": 1795839330.2424123,
  "kept": 0,
- "started": "09:28",
- "started_ts": 1795838301.5959125,
- "window_for_claim": 1795838301.5959125
+ "agents": [],
+ "docs_improved": 0
 }

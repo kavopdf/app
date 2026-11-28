@@ -430,7 +430,6 @@
 {"_list": "notes", "_entry": {"at": "03:30", "text": "attempt 44 on 18_displacement -> lead"}}
 {"_list": "agents", "_entry": {"angle": "B", "class": "18_displacement", "deployed": "04:38", "deployed_at": "2026-11-24T04:38", "expected": "10 min", "finding": "step-removal alone reaches 4 documents, all already 42/42 in benchmarks/gverify - the class ceiling is 14, not 40", "id": "18_dB-02", "landed_at": "2026-11-24T04:38", "question": "if the table-top step were removed, which documents become CLEAN", "status": "landed"}}
 {"_list": "agents", "_entry": {"angle": "rowheight-prepass", "class": "18_displacement", "deployed": "06:34", "deployed_at": "2026-11-24T06:34", "expected": "a unified diff that applies and compiles, plus the catch that an all-equal test skips the target document", "finding": "FINDINGS/18_displacement-UNIFORM-PITCH-SNAP-0559-fixer.patch", "id": "18_drowheight-prepass-01", "landed_at": "2026-11-24T06:35", "question": "produce a minimal compilable two-pass emit for the atLeast trHeight that applies the cumulative pixel snap only on a uniform pitch", "status": "landed"}}
-{"_list": "notes", "_entry": {"at": "03:30", "text": "attempt 44 on 18_displacement -> lead"}}
 {"_list": "notes", "_entry": {"at": "04:38", "text": "agent deployed: 18_displacement / B - if the table-top step were removed, which documents become CLEAN"}}
 {"_list": "notes", "_entry": {"at": "04:38", "text": "agent landed: 18_displacement / A -> FINDINGS/18_displacement-STEP-IS-THE-UNSPENDABLE-SPACER-0323.md (memo returned in-run; 13 refuted leads, spacer-guard .patch committed but not applied)"}}
 {"_list": "agents", "_entry": {"angle": "rowpitch-census", "class": "18_displacement", "deployed": "06:34", "deployed_at": "2026-11-24T06:34", "expected": "a CSV and a count per class, so the guard's population is measured rather than assumed", "finding": "no corpus in its sandbox; it built and validated the census tool against four synthetic PDFs with known pitch and reported zero documents rather than inventing numbers. The census was run here on the 211 real .docx instead: 85 documents under guard A, 54 under guard B.", "id": "18_drowpitch-census-01", "landed_at": "2026-11-24T06:35", "question": "census the table row pitch of every corpus PDF and classify uniform-fractional, uniform-whole-pixel, non-uniform", "status": "landed"}}
@@ -460,7 +459,6 @@
 {"_list": "agents", "_entry": {"angle": "A", "class": "18_displacement", "deployed": "14:00", "deployed_at": "2026-11-24T14:00", "expected": "13:16", "finding": "18_displacement-FULL-PASS-DOES-NOT-FIT-A-SLOT-0650-fixer.md", "id": "18_dA-06", "question": "where does the 11 s/doc conversion go, and the smallest change that makes --force incremental", "status": "landed", "why": "finding landed - read it and act; no longer holds the queue"}}
 {"_list": "notes", "_entry": {"at": "12:28", "text": "agent deployed: 04_chars_missing / A - real writer defect or instrument, and how much t01/t12 already explains"}}
 {"_list": "notes", "_entry": {"at": "12:28", "text": "agent landed: 04_chars_missing / A -> FINDINGS/04_chars_missing-REAL-WRITER-DEFECT-1115-fixer.md"}}
-{"_list": "notes", "_entry": {"at": "12:28", "text": "agent landed: 60_text_column_right_edge / B -> FINDINGS/60_text_column_right_edge-VERDICT-MIXED-1115-fixer.md"}}
 {"_list": "notes", "_entry": {"at": "13:07", "text": "attempt 54 on 18_displacement -> lead (0/129 moved)"}}
 {"_list": "notes", "_entry": {"at": "13:59", "text": "attempt 55 on 18_displacement -> lead"}}
 {"_list": "notes", "_entry": {"at": "14:00", "text": "agent deployed: conversion cost /  - "}}
@@ -528,12 +526,6 @@
 {"_list": "agents", "_entry": {"id": "44_hA-01", "class": "44_header_footer", "angle": "A", "question": "is flowFromBox the second anchor site and does the foot-band guard transfer to it", "expected": "17:39", "deployed": "17:43", "status": "running", "finding": "", "deployed_at": "2026-11-26T17:43"}}
 {"_list": "notes", "_entry": {"at": "15:12", "text": "attempt 89 on 18_displacement -> lead"}}
 {"_list": "notes", "_entry": {"at": "15:46", "text": "attempt 90 on 18_displacement -> lead"}}
-{"_list": "notes", "_entry": {"at": "15:48", "text": "attempt 91 on 18_displacement -> lead"}}
-{"_list": "notes", "_entry": {"at": "15:12", "text": "attempt 88 on 18_displacement -> lead"}}
-{"_list": "notes", "_entry": {"at": "15:12", "text": "attempt 89 on 18_displacement -> lead"}}
-{"_list": "agents", "_entry": {"angle": "B", "class": "18_displacement", "deployed": "16:18", "deployed_at": "2026-11-26T16:18", "expected": "15:28", "finding": "FINDINGS/18-displacement-SINGLE-PAGE-SPACER-MEASURED-26NOV-explore.md", "id": "18_dB-01", "landed_at": "2026-11-26T16:18", "question": "single-page half: is the exact-line spacer charged proportionally by Google", "status": "landed"}}
-{"_list": "notes", "_entry": {"at": "15:46", "text": "attempt 90 on 18_displacement -> lead"}}
-{"_list": "agents", "_entry": {"id": "44_hA-01", "class": "44_header_footer", "angle": "A", "question": "is flowFromBox the second anchor site and does the foot-band guard transfer to it", "expected": "17:39", "deployed": "17:43", "status": "running", "finding": "", "deployed_at": "2026-11-26T17:43"}}
 {"_list": "notes", "_entry": {"at": "15:48", "text": "attempt 91 on 18_displacement -> lead"}}
 {"_list": "notes", "_entry": {"at": "17:39", "text": "attempt 3 on 44_header_footer -> lead"}}
 {"_list": "notes", "_entry": {"at": "17:43", "text": "agent deployed: 44_header_footer / A - is flowFromBox the second anchor site and does the foot-band guard transfer to i"}}

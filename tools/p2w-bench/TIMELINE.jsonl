@@ -10743,3 +10743,13 @@
 {"t": 1795839337.9648259, "ist": "09:45:37", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795839338.406354, "ist": "09:45:38", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795839341.0409415, "ist": "09:45:41", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795839805.3065355, "ist": "09:53:25", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795839808.1881618, "ist": "09:53:28", "ev": "attempt", "d": "t09_page_furniture -> lead"}
+{"t": 1795839808.314029, "ist": "09:53:28", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795839808.4144757, "ist": "09:53:28", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795839808.9948123, "ist": "09:53:28", "ev": "beat", "d": "classrow.py: refreshing the class file"}
+{"t": 1795839812.8140974, "ist": "09:53:32", "ev": "beat", "d": "relay: report after the refutation"}
+{"t": 1795839815.0254633, "ist": "09:53:35", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795839817.0861275, "ist": "09:53:37", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
+{"t": 1795839817.4822292, "ist": "09:53:37", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795839819.6268938, "ist": "09:53:39", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}

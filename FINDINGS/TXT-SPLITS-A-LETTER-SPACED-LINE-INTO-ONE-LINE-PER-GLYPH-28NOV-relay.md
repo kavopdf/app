@@ -80,3 +80,45 @@ The source draws it as one line at `y = 20.1`, `x = 28.0` (`_src_pages()` on the
   **That table is not in the repo** — the `b648594972a7682b` stamp is referenced in
   `FINDINGS/ROW-RUNG-IS-A-PER-DOCUMENT-TRADE-NOT-ONE-CONSTANT-28NOV.md` and nowhere else, so landing the
   rung needs its own full re-measure.
+
+---
+
+# CORRECTION, same slot: the merge is not the fix — `t04` proves the `.txt` was faithful
+
+Written after the change in §3 was actually built and measured on 305 (a sub-agent did the build; I ran
+`verify_txt.py` on its output myself, so these are my numbers, not its report).
+
+**The page really does draw 85 lines, and 47 of them are one character.** `_src_line_count()` — PyMuPDF's
+own line granularity, the object `t04_structure` counts — returns **85**, of which **47 are
+single-character**. The `.txt` carries **85** lines, **47** single-character: it is a *faithful
+transcription*, line for line. The 26 Nov census was right and §1 of this file is wrong to call the writer
+unfaithful.
+
+| | non-empty lines | single-char lines | `t04_structure` | `t08_line_order` | verdict |
+|:--|--:|--:|:--|:--|:--|
+| `.txt` at HEAD | **85** | **47** | 85/85 pass | 33/32 **FAIL** | FAIL |
+| merged `.txt` | **42** | 3 | 85/42 **FAIL** (drift 0.49, `MAX_LINE_DRIFT` 1.5) | 34/34 pass | **FAIL** |
+
+The merge fixes `t08` and breaks `t04` by arithmetic: removing 43 lines from an 85-line file halves it,
+and any merge of this family does. **305 does not go clean on the merge; it changes which check it fails.**
+
+Two further facts from the build, both worth keeping:
+
+* The merged line reads `NATIONALIMMUNISATIONREGISTRYGOVERNMENOFINDIA` — the inter-word spaces of the seal
+  are drawn as their own one-character boxes and `rtrim` drops them, so the merge also loses the spaces.
+  A merge that keeps them is a different, larger change.
+* The seal paragraph is *appended last* in `page.blocks` (correct for the `.docx`'s anchored boxes) while
+  its own `top` is y=271, so the glyph run sits after a footer at y=777. That misplacement is the `t08`
+  inversion, and it is a `TxtWriter` **ordering** fact, not a line-splitting one — the same paragraph
+  carries the `Issued: …` line at y=273 and that line lands in the right place.
+
+**What this leaves as the next step, replacing §3.** The construct is a *granularity disagreement*, not a
+writer defect: `t08`'s partner rule keys on `_src_pages` lines and the source's 47 one-character lines
+cannot be ordered by `(text, column)`, while `t04` demands the `.txt` keep all 85. Both checks are
+satisfiable at once only if the `.txt` keeps 85 lines **and** the one-character lines are placed in drawn
+order — i.e. fix the *placement* of the appended paragraph (the ordering half), not the line count. That
+is the measured, narrow target: move the run paragraph by its `top` without merging anything, then `t04`
+stays 85/85 and `t08` should reach 33/33. **Not measured — the build stopped at the merge.**
+
+**Do not land the merge.** It moves `305` from one failing check to another and it makes the `.txt`
+unfaithful to a page that drew 85 lines.
