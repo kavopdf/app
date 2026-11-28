@@ -44,6 +44,16 @@ METHOD_FORMAT = {
     # did not know the method and fell back to "both".
     "TxtWriter.appendTable": "txt",
     "TxtWriter.appendPara": "txt",
+    # pageOrder and its helpers order the .txt's lines and nothing else. pageOrder is private
+    # static in TxtWriter with EXACTLY ONE caller - TxtWriter.java:95, inside write() - and
+    # DocxWriter never calls it (grep -rn pageOrder over app/src/main/java returns lines 95 and
+    # 189 of TxtWriter.java and no other file). hoistLastPara and pageOrderByColumn are the
+    # 28 Nov split of that same method and inherit the same one caller. Without these entries
+    # scope.py falls back to "change outside a known method -> both" and the .txt half is refused
+    # for an unmeasured .docx, which is the wall this table was built to remove.
+    "TxtWriter.pageOrder": "txt",
+    "TxtWriter.pageOrderByColumn": "txt",
+    "TxtWriter.hoistLastPara": "txt",
     "PdfToWord.writeTxt": "txt",
     "DocxWriter.write": "docx",
     "DocxWriter.orderStamps": "both",   # reorders page.blocks, which TxtWriter walks

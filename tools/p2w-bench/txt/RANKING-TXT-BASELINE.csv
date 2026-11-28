@@ -34,7 +34,7 @@ document,applicable,passed,failed,abstained,failed_ids
 302_radiology_report,7,7,0,0,
 303_discharge_summary,7,7,0,0,
 304_package_insert_small_print,9,9,0,0,
-305_vaccination_certificate,7,6,1,0,t08_line_order
+305_vaccination_certificate,7,7,0,0,
 306_clinical_protocol_synopsis,7,7,0,0,
 30_mixed_font_sizes_one_baseline_txtpos,10,10,0,0,
 310_court_judgment,9,9,0,0,

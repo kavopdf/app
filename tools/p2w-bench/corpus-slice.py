@@ -134,6 +134,16 @@ def main(argv):
     # document is not chosen, it is whatever sorts first. --only names it.
     ap.add_argument("--only", default="", metavar="STEM",
                     help="convert just this one document (stem or .pdf name)")
+    # A .txt-SCOPED ENGINE CHANGE IS INVISIBLE TO THIS CACHE, AND THAT IS NOT A THEORY.
+    # cc.engine_now() hashes the engine sources with TxtWriter.java EXCLUDED (corpus-convert.py
+    # DOCX_EXCLUDES) because the cache is a .docx cache and TxtWriter cannot move a .docx byte.
+    # That is right for the .docx and wrong for the .txt: on 28 Nov a TxtWriter patch was compiled
+    # at 05:39, this tool converted the 165 documents it thought were missing, and left the other
+    # 49 - including the one document the patch was written for - on the pre-patch engine. The
+    # slice printed DONE, 214 documents converted, and the .txt of 305 was still the old one.
+    # A run that does not know this measures the old engine and reports that its patch did nothing.
+    ap.add_argument("--force", action="store_true",
+                    help="re-convert every document whose .txt predates the newest engine source")
     a = ap.parse_args(argv)
 
     d = cc.pdf_dir()
@@ -142,6 +152,28 @@ def main(argv):
         return 1
     todo = missing()
     total = len([f for f in os.listdir(d) if f.endswith(".pdf")])
+    if a.force and not a.only:
+        # RESUME BY FILE TIME, NOT BY A BOOKKEEPING FILE. A forced rebuild has to be sliceable, and
+        # "all documents" is not: every slice would redo the first N. The .txt's own mtime answers
+        # "was this output written before the newest engine source", so each slice converts exactly
+        # the stale ones and the next slice sees the rest. crtime is not used - the engine sources'
+        # mtime is the moment the behaviour last changed.
+        eng_src = os.path.join(os.path.dirname(os.path.dirname(HERE)), "app", "src", "main",
+                               "java", "com", "kavopdf", "app", "engine")
+        newest = 0.0
+        for n in os.listdir(eng_src):
+            if n.endswith(".java"):
+                newest = max(newest, os.path.getmtime(os.path.join(eng_src, n)))
+        all_pdfs = sorted(os.path.join(d, f) for f in os.listdir(d) if f.endswith(".pdf"))
+        stale = []
+        for p in all_pdfs:
+            t = os.path.join(cc.CACHE, os.path.basename(p)[:-4] + ".txt")
+            if not os.path.exists(t) or os.path.getmtime(t) < newest:
+                stale.append(p)
+        if a.status:
+            print("  --force : %d of %d .txt predate the newest engine source"
+                  % (len(stale), len(all_pdfs)))
+        todo = stale
     have = total - len(todo)
 
     if a.status:

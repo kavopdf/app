@@ -166,6 +166,41 @@ public final class TxtWriter {
         }
     }
 
+    /** The page's blocks, in the order the .txt should read them: the column order below,
+     *  and then the one paragraph the model parked at the end put back at its own top. */
+    private static List<Object> pageOrder(PdfToWord.Page page) {
+        return hoistLastPara(pageOrderByColumn(page));
+    }
+
+    /** A paragraph the model appended last, put back where its own top says the page drew it.
+     *  MOVE UP ONLY; NEVER ACROSS A TABLE (the run of Paras immediately before it ends at a
+     *  Table); NOTHING IS MERGED (line count must stay 85 for t04). */
+    private static List<Object> hoistLastPara(List<Object> blocks) {
+        if (blocks == null || blocks.size() < 3) return blocks;
+        int last = -1;
+        for (int i = blocks.size() - 1; i >= 0; i--) {
+            if (blocks.get(i) instanceof PdfToWord.Para || blocks.get(i) instanceof PdfToWord.Table) { last = i; break; }
+        }
+        if (last < 0 || !(blocks.get(last) instanceof PdfToWord.Para)) return blocks;
+        PdfToWord.Para para = (PdfToWord.Para) blocks.get(last);
+        float top = para.top;
+        if (Float.isNaN(top) || top <= 0f) return blocks;
+        int run = last;
+        while (run > 0 && blocks.get(run - 1) instanceof PdfToWord.Para) run--;
+        if (run >= last) return blocks;
+        int at = -1;
+        for (int i = run; i < last; i++) {
+            float t = ((PdfToWord.Para) blocks.get(i)).top;
+            if (Float.isNaN(t)) continue;
+            if (t > top) { at = i; break; }
+        }
+        if (at < 0) return blocks;
+        List<Object> out = new ArrayList<>(blocks);
+        out.remove(last);
+        out.add(at, para);
+        return out;
+    }
+
     /** The page's blocks, in the order the .txt should read them.
      *
      * <p>A page that sets a sidebar beside its body draws two columns, and the model keeps
@@ -186,7 +221,7 @@ public final class TxtWriter {
      * contiguously and has no y of its own here, so there is nothing to sort it against, and
      * guessing would risk the pages that are right today.
      */
-    private static List<Object> pageOrder(PdfToWord.Page page) {
+    private static List<Object> pageOrderByColumn(PdfToWord.Page page) {
         List<Object> natural = page.blocks;
         List<PdfToWord.Para> paras = new ArrayList<>();
         for (Object b : natural) {
@@ -555,7 +590,12 @@ public final class TxtWriter {
                 last.x = lx;
                 last.y = ly;
             }
-            lastY = ly;
+            // A LINE WITH NO BASELINE DOES NOT SET THE FLOW'S Y. ly is 0 when the paragraph
+            // carries no lineY at all (the seal case), and letting that 0 become lastY tells
+            // the next paragraph the flow is at the top of the page: measured, hoisting the
+            // seal without this guard inserted ten blank lines before "Verify online" and took
+            // the file from 30 blanks to 37, where the page drew a three-line gap.
+            if (ly > 0f) lastY = ly;
         }
         return lastY;
     }
