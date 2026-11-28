@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 11:59 → running IST · 10 min**
+**28 Nov 2026 · slot 11:59 → 12:15 IST · 16 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -12,7 +12,7 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - .txt age: measured 6.7 h ago vs nothing re-measures it on a schedule; subagents: 1 deployed vs no FINDINGS filename carries 18dA18_displacem - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
+| **Self-check** | **3 disagreement(s)** - kept change: 2 code commit(s) in this window, first: blockers: the drive upload path needs an s3key,  vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; .txt age: measured 6.8 h ago vs nothing re-measures it on a schedule; subagents: 1 deployed vs no FINDINGS filename carries 18dA18_displacem - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
 | Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
@@ -23,7 +23,7 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (63 still open), not a new class |
+| Working on | `-` - taken from the pending list (64 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## Why nothing moved, in this run's own words
@@ -94,7 +94,7 @@ it is not in the tree because its own measurement says it cleans nothing.
 
 | | |
 |:--|:--|
-| Measured | **6.7 h ago** - nothing re-measures this on a schedule; run `txt_gate.py --score 60` |
+| Measured | **6.8 h ago** - nothing re-measures this on a schedule; run `txt_gate.py --score 60` |
 | Scored | **214** of 214 |
 | Clean - every applicable check passes | **209** (97.7%) |
 | Failing at least one check | **5** |
@@ -111,8 +111,17 @@ it is not in the tree because its own measurement says it cleans nothing.
 
 | | |
 |:--|:--|
-| Slot window | 11:59 → running · 10 min |
+| Slot window | 11:59 → 12:15 · 16 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 3 |
-| Silences over 2 min | 0 |
-| Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
+| Tool beats | 8 |
+| Longest silence | **6.0 min** — from 12:09:51, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 1 |
+| Obstacles | 1 cleared · 1 parked, with the evidence to re-open them |
+| Still a wall | cannot reach drive for a NEW engine output: the upload call needs an s3key the sandbox cannot mint, so GOOGLED |
+
+
+### Where the time went
+
+| Phase | Time | |
+|:--|--:|:--|
+| measure or build - a conversion, screen or compile writes no beacon | **6 min** | `######################` |
