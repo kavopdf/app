@@ -1,14 +1,15 @@
 {
   "source": "/scratch/work/p2w/corpus/75_merged_header_cell_three_columns.pdf",
-  "render": "/scratch/tmp/lo-one-vzjjs2kj/75_merged_header_cell_three_columns.pdf",
-  "passed": 44,
+  "render": "/scratch/tmp/lo-one-znj30ckj/75_merged_header_cell_three_columns.pdf",
+  "passed": 43,
   "total": 47,
   "failed": [
     "18_displacement",
+    "59_shape_anchor",
     "64_table_span_across",
     "65_table_span_down"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -56,8 +57,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": 1.8,
-        "worst_dy": 12.2,
+        "med_dy": 6.4,
+        "worst_dy": 11.4,
         "med_dx": 0.8,
         "bad_pages": [
           0
@@ -67,7 +68,7 @@
     },
     "23_line_pitch": {
       "source": 17.0,
-      "render": 17.0,
+      "render": 17.5,
       "ok": true
     },
     "25_invisible_text": {
@@ -122,7 +123,7 @@
     },
     "36_underline_rules": {
       "source": 0,
-      "render": 38,
+      "render": 41,
       "ok": true
     },
     "37_super_subscript": {
@@ -233,8 +234,8 @@
     },
     "59_shape_anchor": {
       "source": 43,
-      "render": 42,
-      "ok": true
+      "render": 2,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 0,
@@ -282,5 +283,5 @@
   },
   "document": "75_merged_header_cell_three_columns",
   "source_file": "/scratch/work/p2w/corpus/75_merged_header_cell_three_columns.pdf",
-  "render_file": "/scratch/tmp/lo-one-vzjjs2kj/75_merged_header_cell_three_columns.pdf"
+  "render_file": "/scratch/tmp/lo-one-znj30ckj/75_merged_header_cell_three_columns.pdf"
 }

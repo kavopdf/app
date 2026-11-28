@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/410_form_xobject_reused.pdf",
-  "render": "/scratch/tmp/lo-one-sfe8iuvo/410_form_xobject_reused.pdf",
+  "render": "/scratch/tmp/lo-one-06a4atb1/410_form_xobject_reused.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 3.4,
-        "worst_dy": 3.4,
+        "med_dy": 0.1,
+        "worst_dy": 0.1,
         "med_dx": -0.1,
         "bad_pages": [],
         "runs_matched": 7
@@ -251,5 +251,5 @@
   },
   "document": "410_form_xobject_reused",
   "source_file": "/scratch/work/p2w/corpus/410_form_xobject_reused.pdf",
-  "render_file": "/scratch/tmp/lo-one-sfe8iuvo/410_form_xobject_reused.pdf"
+  "render_file": "/scratch/tmp/lo-one-06a4atb1/410_form_xobject_reused.pdf"
 }

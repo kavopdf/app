@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/331_pid_diagram.pdf",
-  "render": "/scratch/tmp/lo-one-pr8dknov/331_pid_diagram.pdf",
+  "render": "/scratch/tmp/lo-one-1ikz_e5u/331_pid_diagram.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.2,
-        "worst_dy": 0.3,
+        "med_dy": 0.0,
+        "worst_dy": 0.0,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 26
@@ -251,5 +251,5 @@
   },
   "document": "331_pid_diagram",
   "source_file": "/scratch/work/p2w/corpus/331_pid_diagram.pdf",
-  "render_file": "/scratch/tmp/lo-one-pr8dknov/331_pid_diagram.pdf"
+  "render_file": "/scratch/tmp/lo-one-1ikz_e5u/331_pid_diagram.pdf"
 }

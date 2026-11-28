@@ -1,6 +1,6 @@
 {
   "source": "/scratch/work/p2w/corpus/600_reviewed_invoice_with_annotations.pdf",
-  "render": "/scratch/tmp/lo-one-c1vlwkn3/600_reviewed_invoice_with_annotations.pdf",
+  "render": "/scratch/tmp/lo-one-6la8kb6i/600_reviewed_invoice_with_annotations.pdf",
   "passed": 37,
   "total": 44,
   "failed": [
@@ -12,7 +12,7 @@
     "59_shape_anchor",
     "62_table_columns"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -60,8 +60,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": 104.9,
-        "worst_dy": 125.4,
+        "med_dy": 105.1,
+        "worst_dy": 128.1,
         "med_dx": 0.7,
         "bad_pages": [
           0
@@ -71,7 +71,7 @@
     },
     "23_line_pitch": {
       "source": 16.0,
-      "render": 15.5,
+      "render": 15.9,
       "ok": true
     },
     "25_invisible_text": {
@@ -277,5 +277,5 @@
   },
   "document": "600_reviewed_invoice_with_annotations",
   "source_file": "/scratch/work/p2w/corpus/600_reviewed_invoice_with_annotations.pdf",
-  "render_file": "/scratch/tmp/lo-one-c1vlwkn3/600_reviewed_invoice_with_annotations.pdf"
+  "render_file": "/scratch/tmp/lo-one-6la8kb6i/600_reviewed_invoice_with_annotations.pdf"
 }

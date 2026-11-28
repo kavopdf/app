@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/marksheet-subject-left-marks-right.pdf",
-  "render": "/scratch/tmp/lo-one-a63xyxvf/marksheet-subject-left-marks-right.pdf",
+  "render": "/scratch/tmp/lo-one-twz0j85k/marksheet-subject-left-marks-right.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "18_displacement"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -2.5,
-        "worst_dy": 4.2,
+        "med_dy": -1.3,
+        "worst_dy": 3.4,
         "med_dx": 0.6,
         "bad_pages": [
           0
@@ -280,5 +280,5 @@
   },
   "document": "marksheet-subject-left-marks-right",
   "source_file": "/scratch/work/p2w/corpus/marksheet-subject-left-marks-right.pdf",
-  "render_file": "/scratch/tmp/lo-one-a63xyxvf/marksheet-subject-left-marks-right.pdf"
+  "render_file": "/scratch/tmp/lo-one-twz0j85k/marksheet-subject-left-marks-right.pdf"
 }

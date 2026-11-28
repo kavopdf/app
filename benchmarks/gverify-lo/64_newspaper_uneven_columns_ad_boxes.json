@@ -1,13 +1,11 @@
 {
   "source": "/scratch/work/p2w/corpus/64_newspaper_uneven_columns_ad_boxes.pdf",
-  "render": "/scratch/tmp/lo-one-5p8dvfm_/64_newspaper_uneven_columns_ad_boxes.pdf",
-  "passed": 41,
+  "render": "/scratch/tmp/lo-one-z_c0nsiz/64_newspaper_uneven_columns_ad_boxes.pdf",
+  "passed": 42,
   "total": 42,
-  "failed": [
-    "18_displacement"
-  ],
-  "engine": "d28ca7516c3f9165",
-  "ok": false,
+  "failed": [],
+  "engine": "a05b20eb05fe0fc8",
+  "ok": true,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -51,15 +49,13 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 1,
-      "ok": false,
+      "render": 0,
+      "ok": true,
       "detail": {
-        "med_dy": 2.0,
-        "worst_dy": 3.8,
+        "med_dy": 1.0,
+        "worst_dy": 2.8,
         "med_dx": 0.5,
-        "bad_pages": [
-          0
-        ],
+        "bad_pages": [],
         "runs_matched": 77
       }
     },
@@ -255,5 +251,5 @@
   },
   "document": "64_newspaper_uneven_columns_ad_boxes",
   "source_file": "/scratch/work/p2w/corpus/64_newspaper_uneven_columns_ad_boxes.pdf",
-  "render_file": "/scratch/tmp/lo-one-5p8dvfm_/64_newspaper_uneven_columns_ad_boxes.pdf"
+  "render_file": "/scratch/tmp/lo-one-z_c0nsiz/64_newspaper_uneven_columns_ad_boxes.pdf"
 }

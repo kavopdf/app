@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/340_bill_of_lading.pdf",
-  "render": "/scratch/tmp/lo-one-0s2vekxg/340_bill_of_lading.pdf",
+  "render": "/scratch/tmp/lo-one-qg7ymxie/340_bill_of_lading.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.2,
-        "worst_dy": 0.9,
+        "med_dy": 0.1,
+        "worst_dy": 0.6,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 50
@@ -251,5 +251,5 @@
   },
   "document": "340_bill_of_lading",
   "source_file": "/scratch/work/p2w/corpus/340_bill_of_lading.pdf",
-  "render_file": "/scratch/tmp/lo-one-0s2vekxg/340_bill_of_lading.pdf"
+  "render_file": "/scratch/tmp/lo-one-qg7ymxie/340_bill_of_lading.pdf"
 }

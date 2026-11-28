@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/45_coloured_callout_box.pdf",
-  "render": "/scratch/tmp/lo-one-kzuf04sh/45_coloured_callout_box.pdf",
+  "render": "/scratch/tmp/lo-one-32c6_oj2/45_coloured_callout_box.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 1.0,
-        "worst_dy": 1.2,
+        "med_dy": 0.0,
+        "worst_dy": 0.1,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 19
@@ -251,5 +251,5 @@
   },
   "document": "45_coloured_callout_box",
   "source_file": "/scratch/work/p2w/corpus/45_coloured_callout_box.pdf",
-  "render_file": "/scratch/tmp/lo-one-kzuf04sh/45_coloured_callout_box.pdf"
+  "render_file": "/scratch/tmp/lo-one-32c6_oj2/45_coloured_callout_box.pdf"
 }

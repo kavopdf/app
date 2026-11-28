@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/43_red_stamp_over_black_text.pdf",
-  "render": "/scratch/tmp/lo-one-sn2aube3/43_red_stamp_over_black_text.pdf",
+  "render": "/scratch/tmp/lo-one-t5r0esmm/43_red_stamp_over_black_text.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.9,
-        "worst_dy": 11.6,
+        "med_dy": 0.0,
+        "worst_dy": 0.1,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 26
@@ -253,5 +253,5 @@
   },
   "document": "43_red_stamp_over_black_text",
   "source_file": "/scratch/work/p2w/corpus/43_red_stamp_over_black_text.pdf",
-  "render_file": "/scratch/tmp/lo-one-sn2aube3/43_red_stamp_over_black_text.pdf"
+  "render_file": "/scratch/tmp/lo-one-t5r0esmm/43_red_stamp_over_black_text.pdf"
 }

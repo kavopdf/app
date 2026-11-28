@@ -1,13 +1,15 @@
 {
   "source": "/scratch/work/p2w/corpus/38_faux_bold_italic_synthesised.pdf",
-  "render": "/scratch/tmp/lo-one-elc_eu60/38_faux_bold_italic_synthesised.pdf",
-  "passed": 40,
+  "render": "/scratch/tmp/lo-one-0fp5jcuu/38_faux_bold_italic_synthesised.pdf",
+  "passed": 38,
   "total": 42,
   "failed": [
     "04_chars_missing",
+    "18_displacement",
+    "59_shape_anchor",
     "60_text_column_right_edge"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -52,13 +54,15 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 1.4,
-        "worst_dy": 3.1,
+        "med_dy": 4.1,
+        "worst_dy": 4.9,
         "med_dx": 0.1,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 44
       }
     },
@@ -119,7 +123,7 @@
     },
     "36_underline_rules": {
       "source": 0,
-      "render": 12,
+      "render": 30,
       "ok": true
     },
     "37_super_subscript": {
@@ -230,8 +234,8 @@
     },
     "59_shape_anchor": {
       "source": 30,
-      "render": 30,
-      "ok": true
+      "render": 6,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 1,
@@ -254,5 +258,5 @@
   },
   "document": "38_faux_bold_italic_synthesised",
   "source_file": "/scratch/work/p2w/corpus/38_faux_bold_italic_synthesised.pdf",
-  "render_file": "/scratch/tmp/lo-one-elc_eu60/38_faux_bold_italic_synthesised.pdf"
+  "render_file": "/scratch/tmp/lo-one-0fp5jcuu/38_faux_bold_italic_synthesised.pdf"
 }

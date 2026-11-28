@@ -1,6 +1,6 @@
 {
   "source": "/scratch/work/p2w/corpus/newsletter-3col-header-footer.pdf",
-  "render": "/scratch/tmp/lo-one-q6l5fb0_/newsletter-3col-header-footer.pdf",
+  "render": "/scratch/tmp/lo-one-ewtk3x6h/newsletter-3col-header-footer.pdf",
   "passed": 39,
   "total": 42,
   "failed": [
@@ -8,7 +8,7 @@
     "26_text_overlap",
     "59_shape_anchor"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -56,8 +56,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -0.2,
-        "worst_dy": 28.4,
+        "med_dy": 0.0,
+        "worst_dy": 28.5,
         "med_dx": 0.1,
         "bad_pages": [
           0
@@ -262,5 +262,5 @@
   },
   "document": "newsletter-3col-header-footer",
   "source_file": "/scratch/work/p2w/corpus/newsletter-3col-header-footer.pdf",
-  "render_file": "/scratch/tmp/lo-one-q6l5fb0_/newsletter-3col-header-footer.pdf"
+  "render_file": "/scratch/tmp/lo-one-ewtk3x6h/newsletter-3col-header-footer.pdf"
 }

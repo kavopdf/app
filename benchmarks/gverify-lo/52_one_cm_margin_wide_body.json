@@ -1,11 +1,14 @@
 {
   "source": "/scratch/work/p2w/corpus/52_one_cm_margin_wide_body.pdf",
-  "render": "/scratch/tmp/lo-one-l6trf7oz/52_one_cm_margin_wide_body.pdf",
-  "passed": 42,
+  "render": "/scratch/tmp/lo-one-l12usmdn/52_one_cm_margin_wide_body.pdf",
+  "passed": 40,
   "total": 42,
-  "failed": [],
-  "engine": "d28ca7516c3f9165",
-  "ok": true,
+  "failed": [
+    "18_displacement",
+    "59_shape_anchor"
+  ],
+  "engine": "a05b20eb05fe0fc8",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,13 +52,15 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
         "med_dy": 0.8,
-        "worst_dy": 1.5,
+        "worst_dy": 4.0,
         "med_dx": 0.1,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 38
       }
     },
@@ -116,7 +121,7 @@
     },
     "36_underline_rules": {
       "source": 0,
-      "render": 3,
+      "render": 18,
       "ok": true
     },
     "37_super_subscript": {
@@ -227,8 +232,8 @@
     },
     "59_shape_anchor": {
       "source": 18,
-      "render": 18,
-      "ok": true
+      "render": 6,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 0,
@@ -251,5 +256,5 @@
   },
   "document": "52_one_cm_margin_wide_body",
   "source_file": "/scratch/work/p2w/corpus/52_one_cm_margin_wide_body.pdf",
-  "render_file": "/scratch/tmp/lo-one-l6trf7oz/52_one_cm_margin_wide_body.pdf"
+  "render_file": "/scratch/tmp/lo-one-l12usmdn/52_one_cm_margin_wide_body.pdf"
 }

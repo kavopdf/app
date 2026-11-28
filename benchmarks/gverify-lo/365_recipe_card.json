@@ -1,12 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/365_recipe_card.pdf",
-  "render": "/scratch/tmp/lo-one-ogb75jvn/365_recipe_card.pdf",
-  "passed": 41,
+  "render": "/scratch/tmp/lo-one-qdimjdu_/365_recipe_card.pdf",
+  "passed": 40,
   "total": 42,
   "failed": [
-    "47_margins"
+    "47_margins",
+    "60_text_column_right_edge"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +55,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.3,
-        "worst_dy": 0.8,
+        "med_dy": 2.9,
+        "worst_dy": 2.9,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 45
@@ -63,7 +64,7 @@
     },
     "23_line_pitch": {
       "source": 16.0,
-      "render": 16.0,
+      "render": 18.0,
       "ok": true
     },
     "25_invisible_text": {
@@ -233,9 +234,9 @@
       "ok": true
     },
     "60_text_column_right_edge": {
-      "source": 0,
+      "source": 1,
       "render": 0,
-      "ok": true
+      "ok": false
     },
     "61_blank_not_filled": {
       "source": 0,
@@ -259,5 +260,5 @@
   },
   "document": "365_recipe_card",
   "source_file": "/scratch/work/p2w/corpus/365_recipe_card.pdf",
-  "render_file": "/scratch/tmp/lo-one-ogb75jvn/365_recipe_card.pdf"
+  "render_file": "/scratch/tmp/lo-one-qdimjdu_/365_recipe_card.pdf"
 }

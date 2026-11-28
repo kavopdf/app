@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/payslip-label-left-amount-right.pdf",
-  "render": "/scratch/tmp/lo-one-d_kduvqj/payslip-label-left-amount-right.pdf",
+  "render": "/scratch/tmp/lo-one-yiuowkv3/payslip-label-left-amount-right.pdf",
   "passed": 40,
   "total": 42,
   "failed": [
     "18_displacement",
     "53_embedded_faces"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,8 +55,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -0.6,
-        "worst_dy": 3.9,
+        "med_dy": 2.0,
+        "worst_dy": 5.3,
         "med_dx": 0.1,
         "bad_pages": [
           0
@@ -121,7 +121,7 @@
     },
     "36_underline_rules": {
       "source": 0,
-      "render": 14,
+      "render": 18,
       "ok": true
     },
     "37_super_subscript": {
@@ -256,5 +256,5 @@
   },
   "document": "payslip-label-left-amount-right",
   "source_file": "/scratch/work/p2w/corpus/payslip-label-left-amount-right.pdf",
-  "render_file": "/scratch/tmp/lo-one-d_kduvqj/payslip-label-left-amount-right.pdf"
+  "render_file": "/scratch/tmp/lo-one-yiuowkv3/payslip-label-left-amount-right.pdf"
 }

@@ -1,12 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/326_itr_computation.pdf",
-  "render": "/scratch/tmp/lo-one-ai32tgn5/326_itr_computation.pdf",
-  "passed": 46,
+  "render": "/scratch/tmp/lo-one-6z2f5hui/326_itr_computation.pdf",
+  "passed": 45,
   "total": 47,
   "failed": [
+    "18_displacement",
     "63_table_rows"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -51,13 +52,15 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": -0.0,
-        "worst_dy": 0.7,
+        "med_dy": 0.3,
+        "worst_dy": 3.0,
         "med_dx": 0.1,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 74
       }
     },
@@ -278,5 +281,5 @@
   },
   "document": "326_itr_computation",
   "source_file": "/scratch/work/p2w/corpus/326_itr_computation.pdf",
-  "render_file": "/scratch/tmp/lo-one-ai32tgn5/326_itr_computation.pdf"
+  "render_file": "/scratch/tmp/lo-one-6z2f5hui/326_itr_computation.pdf"
 }

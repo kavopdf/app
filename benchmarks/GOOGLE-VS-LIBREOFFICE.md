@@ -2,34 +2,30 @@
 
 Same source PDF, same instrument. Only the renderer differs.
 
-    LibreOffice : 102 of 206 pass every check offered
-    Google Docs : 46 of 206 pass every check offered
+    LibreOffice : 86 of 206 pass every check offered
+    Google Docs : 48 of 206 pass every check offered
 
 ## Which engine each half was measured on
 
     engine in the tree : a05b20eb05fe0fc8
     Google on it       : 206 of 206 pairs
-    LibreOffice on it  : 35 of 206 pairs
-
-A pair whose two halves were measured on two engines is not a pair: the LibreOffice
-column describes the .docx an older engine wrote. Read a row as a construct Google
-drops only for the 35 pairs where both halves are on the engine above.
+    LibreOffice on it  : 206 of 206 pairs
 
 ## Where they disagree
 
 | check | LibreOffice fails | Google fails | who is stricter |
 |---|---:|---:|---|
 | `04_chars_missing` | 2 | 54 | **Google** |
-| `18_displacement` | 64 | 108 | **Google** |
-| `60_text_column_right_edge` | 18 | 62 | **Google** |
+| `60_text_column_right_edge` | 18 | 59 | **Google** |
 | `45_char_accuracy` | 2 | 33 | **Google** |
 | `13_text_colours` | 1 | 32 | **Google** |
-| `59_shape_anchor` | 23 | 50 | **Google** |
 | `17_matched_runs` | 5 | 30 | **Google** |
+| `18_displacement` | 89 | 108 | **Google** |
 | `44_header_footer` | 0 | 19 | **Google** |
 | `26_text_overlap` | 3 | 19 | **Google** |
 | `27_text_off_page` | 2 | 17 | **Google** |
 | `47_margins` | 15 | 27 | **Google** |
+| `59_shape_anchor` | 39 | 50 | **Google** |
 | `43_within_10pt_x` | 7 | 13 | **Google** |
 | `10_font_sizes` | 0 | 6 | **Google** |
 | `46_text_crossing_rule` | 0 | 6 | **Google** |

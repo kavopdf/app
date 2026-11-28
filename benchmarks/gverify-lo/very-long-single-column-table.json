@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/very-long-single-column-table.pdf",
-  "render": "/scratch/tmp/lo-one-je3_jdj1/very-long-single-column-table.pdf",
+  "render": "/scratch/tmp/lo-one-lml2t8ot/very-long-single-column-table.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "18_displacement"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 3,
       "ok": false,
       "detail": {
-        "med_dy": -6.9,
-        "worst_dy": 138.7,
+        "med_dy": -7.0,
+        "worst_dy": 138.8,
         "med_dx": 0.6,
         "bad_pages": [
           0,
@@ -282,5 +282,5 @@
   },
   "document": "very-long-single-column-table",
   "source_file": "/scratch/work/p2w/corpus/very-long-single-column-table.pdf",
-  "render_file": "/scratch/tmp/lo-one-je3_jdj1/very-long-single-column-table.pdf"
+  "render_file": "/scratch/tmp/lo-one-lml2t8ot/very-long-single-column-table.pdf"
 }

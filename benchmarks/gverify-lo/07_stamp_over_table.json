@@ -1,16 +1,17 @@
 {
   "source": "/scratch/work/p2w/corpus/07_stamp_over_table.pdf",
-  "render": "/scratch/tmp/lo-one-cg1ra1yv/07_stamp_over_table.pdf",
-  "passed": 37,
+  "render": "/scratch/tmp/lo-one-zvue0r95/07_stamp_over_table.pdf",
+  "passed": 36,
   "total": 42,
   "failed": [
     "18_displacement",
     "26_text_overlap",
     "35_rotation",
     "43_within_10pt_x",
-    "47_margins"
+    "47_margins",
+    "59_shape_anchor"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -58,8 +59,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": 0.8,
-        "worst_dy": 14.8,
+        "med_dy": 1.9,
+        "worst_dy": 5.7,
         "med_dx": 0.1,
         "bad_pages": [
           0
@@ -129,7 +130,7 @@
     },
     "36_underline_rules": {
       "source": 0,
-      "render": 6,
+      "render": 54,
       "ok": true
     },
     "37_super_subscript": {
@@ -240,8 +241,8 @@
     },
     "59_shape_anchor": {
       "source": 59,
-      "render": 57,
-      "ok": true
+      "render": 45,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 0,
@@ -270,5 +271,5 @@
   },
   "document": "07_stamp_over_table",
   "source_file": "/scratch/work/p2w/corpus/07_stamp_over_table.pdf",
-  "render_file": "/scratch/tmp/lo-one-cg1ra1yv/07_stamp_over_table.pdf"
+  "render_file": "/scratch/tmp/lo-one-zvue0r95/07_stamp_over_table.pdf"
 }

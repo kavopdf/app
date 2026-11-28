@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/78_mixed_english_devanagari_line.pdf",
-  "render": "/scratch/tmp/lo-one-g84r33zr/78_mixed_english_devanagari_line.pdf",
+  "render": "/scratch/tmp/lo-one-i6z0fgsw/78_mixed_english_devanagari_line.pdf",
   "passed": 40,
   "total": 42,
   "failed": [
     "17_matched_runs",
     "47_margins"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -260,5 +260,5 @@
   },
   "document": "78_mixed_english_devanagari_line",
   "source_file": "/scratch/work/p2w/corpus/78_mixed_english_devanagari_line.pdf",
-  "render_file": "/scratch/tmp/lo-one-g84r33zr/78_mixed_english_devanagari_line.pdf"
+  "render_file": "/scratch/tmp/lo-one-i6z0fgsw/78_mixed_english_devanagari_line.pdf"
 }

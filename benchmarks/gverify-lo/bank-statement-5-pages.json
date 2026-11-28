@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/bank-statement-5-pages.pdf",
-  "render": "/scratch/tmp/lo-one-1qi6dzu2/bank-statement-5-pages.pdf",
+  "render": "/scratch/tmp/lo-one-ij_i4joc/bank-statement-5-pages.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "18_displacement"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 5,
       "ok": false,
       "detail": {
-        "med_dy": -4.9,
-        "worst_dy": 29.3,
+        "med_dy": -5.0,
+        "worst_dy": 29.4,
         "med_dx": 0.6,
         "bad_pages": [
           0,
@@ -284,5 +284,5 @@
   },
   "document": "bank-statement-5-pages",
   "source_file": "/scratch/work/p2w/corpus/bank-statement-5-pages.pdf",
-  "render_file": "/scratch/tmp/lo-one-1qi6dzu2/bank-statement-5-pages.pdf"
+  "render_file": "/scratch/tmp/lo-one-ij_i4joc/bank-statement-5-pages.pdf"
 }

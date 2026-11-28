@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/boq-horizontal-rules-only.pdf",
-  "render": "/scratch/tmp/lo-one-0w4fz9l4/boq-horizontal-rules-only.pdf",
+  "render": "/scratch/tmp/lo-one-d0c7m9v5/boq-horizontal-rules-only.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.1,
-        "worst_dy": 0.2,
+        "med_dy": 0.0,
+        "worst_dy": 0.0,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 152
@@ -251,5 +251,5 @@
   },
   "document": "boq-horizontal-rules-only",
   "source_file": "/scratch/work/p2w/corpus/boq-horizontal-rules-only.pdf",
-  "render_file": "/scratch/tmp/lo-one-0w4fz9l4/boq-horizontal-rules-only.pdf"
+  "render_file": "/scratch/tmp/lo-one-d0c7m9v5/boq-horizontal-rules-only.pdf"
 }

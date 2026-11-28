@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/76_devanagari_table.pdf",
-  "render": "/scratch/tmp/lo-one-58iuu6s6/76_devanagari_table.pdf",
+  "render": "/scratch/tmp/lo-one-5kiort2w/76_devanagari_table.pdf",
   "passed": 45,
   "total": 47,
   "failed": [
     "34a_span_size_match",
     "47_margins"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,8 +55,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.4,
-        "worst_dy": 1.8,
+        "med_dy": 0.9,
+        "worst_dy": 3.7,
         "med_dx": 0.6,
         "bad_pages": [],
         "runs_matched": 65
@@ -230,7 +230,7 @@
     },
     "59_shape_anchor": {
       "source": 51,
-      "render": 19,
+      "render": 17,
       "ok": true
     },
     "60_text_column_right_edge": {
@@ -285,5 +285,5 @@
   },
   "document": "76_devanagari_table",
   "source_file": "/scratch/work/p2w/corpus/76_devanagari_table.pdf",
-  "render_file": "/scratch/tmp/lo-one-58iuu6s6/76_devanagari_table.pdf"
+  "render_file": "/scratch/tmp/lo-one-5kiort2w/76_devanagari_table.pdf"
 }

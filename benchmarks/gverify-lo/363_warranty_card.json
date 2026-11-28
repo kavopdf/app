@@ -1,12 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/363_warranty_card.pdf",
-  "render": "/scratch/tmp/lo-one-7qduq856/363_warranty_card.pdf",
-  "passed": 41,
+  "render": "/scratch/tmp/lo-one-sd5smvv5/363_warranty_card.pdf",
+  "passed": 40,
   "total": 42,
   "failed": [
-    "18_displacement"
+    "18_displacement",
+    "59_shape_anchor"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +55,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -0.2,
-        "worst_dy": 3.7,
+        "med_dy": 1.9,
+        "worst_dy": 5.9,
         "med_dx": 0.1,
         "bad_pages": [
           0
@@ -65,7 +66,7 @@
     },
     "23_line_pitch": {
       "source": 14.0,
-      "render": 13.2,
+      "render": 14.0,
       "ok": true
     },
     "25_invisible_text": {
@@ -231,8 +232,8 @@
     },
     "59_shape_anchor": {
       "source": 18,
-      "render": 18,
-      "ok": true
+      "render": 14,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 0,
@@ -255,5 +256,5 @@
   },
   "document": "363_warranty_card",
   "source_file": "/scratch/work/p2w/corpus/363_warranty_card.pdf",
-  "render_file": "/scratch/tmp/lo-one-7qduq856/363_warranty_card.pdf"
+  "render_file": "/scratch/tmp/lo-one-sd5smvv5/363_warranty_card.pdf"
 }

@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/report-2col-table-spanning-both-columns.pdf",
-  "render": "/scratch/tmp/lo-one-_dg4etqv/report-2col-table-spanning-both-columns.pdf",
+  "render": "/scratch/tmp/lo-one-z3w8pit2/report-2col-table-spanning-both-columns.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.8,
-        "worst_dy": 2.9,
+        "med_dy": -0.5,
+        "worst_dy": 2.5,
         "med_dx": 0.5,
         "bad_pages": [],
         "runs_matched": 90
@@ -276,5 +276,5 @@
   },
   "document": "report-2col-table-spanning-both-columns",
   "source_file": "/scratch/work/p2w/corpus/report-2col-table-spanning-both-columns.pdf",
-  "render_file": "/scratch/tmp/lo-one-_dg4etqv/report-2col-table-spanning-both-columns.pdf"
+  "render_file": "/scratch/tmp/lo-one-z3w8pit2/report-2col-table-spanning-both-columns.pdf"
 }

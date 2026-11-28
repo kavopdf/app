@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/boq-tender-bill-of-quantities.pdf",
-  "render": "/scratch/tmp/lo-one-7ez1__4e/boq-tender-bill-of-quantities.pdf",
+  "render": "/scratch/tmp/lo-one-31cgsh4e/boq-tender-bill-of-quantities.pdf",
   "passed": 45,
   "total": 47,
   "failed": [
     "18_displacement",
     "60_text_column_right_edge"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,8 +55,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -5.1,
-        "worst_dy": 28.6,
+        "med_dy": -5.0,
+        "worst_dy": 28.4,
         "med_dx": 0.6,
         "bad_pages": [
           0
@@ -281,5 +281,5 @@
   },
   "document": "boq-tender-bill-of-quantities",
   "source_file": "/scratch/work/p2w/corpus/boq-tender-bill-of-quantities.pdf",
-  "render_file": "/scratch/tmp/lo-one-7ez1__4e/boq-tender-bill-of-quantities.pdf"
+  "render_file": "/scratch/tmp/lo-one-31cgsh4e/boq-tender-bill-of-quantities.pdf"
 }

@@ -1,16 +1,15 @@
 {
   "source": "/scratch/work/p2w/corpus/360_restaurant_menu.pdf",
-  "render": "/scratch/tmp/lo-one-wruex3ia/360_restaurant_menu.pdf",
-  "passed": 37,
+  "render": "/scratch/tmp/lo-one-9kvk19t8/360_restaurant_menu.pdf",
+  "passed": 38,
   "total": 42,
   "failed": [
     "17_matched_runs",
     "18_displacement",
     "26_text_overlap",
-    "47_margins",
-    "60_text_column_right_edge"
+    "47_margins"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -58,8 +57,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": 17.8,
-        "worst_dy": 31.7,
+        "med_dy": 29.7,
+        "worst_dy": 42.0,
         "med_dx": 0.1,
         "bad_pages": [
           0
@@ -244,9 +243,9 @@
       "ok": true
     },
     "60_text_column_right_edge": {
-      "source": 1,
+      "source": 0,
       "render": 0,
-      "ok": false
+      "ok": true
     },
     "61_blank_not_filled": {
       "source": 0,
@@ -276,5 +275,5 @@
   },
   "document": "360_restaurant_menu",
   "source_file": "/scratch/work/p2w/corpus/360_restaurant_menu.pdf",
-  "render_file": "/scratch/tmp/lo-one-wruex3ia/360_restaurant_menu.pdf"
+  "render_file": "/scratch/tmp/lo-one-9kvk19t8/360_restaurant_menu.pdf"
 }

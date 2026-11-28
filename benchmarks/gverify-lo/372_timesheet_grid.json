@@ -1,13 +1,11 @@
 {
   "source": "/scratch/work/p2w/corpus/372_timesheet_grid.pdf",
-  "render": "/scratch/tmp/lo-one-sr6jdeyf/372_timesheet_grid.pdf",
-  "passed": 46,
+  "render": "/scratch/tmp/lo-one-yqe1wyb9/372_timesheet_grid.pdf",
+  "passed": 47,
   "total": 47,
-  "failed": [
-    "18_displacement"
-  ],
-  "engine": "d28ca7516c3f9165",
-  "ok": false,
+  "failed": [],
+  "engine": "a05b20eb05fe0fc8",
+  "ok": true,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -51,15 +49,13 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 1,
-      "ok": false,
+      "render": 0,
+      "ok": true,
       "detail": {
-        "med_dy": -1.5,
-        "worst_dy": 3.0,
+        "med_dy": -1.2,
+        "worst_dy": 2.7,
         "med_dx": 0.4,
-        "bad_pages": [
-          0
-        ],
+        "bad_pages": [],
         "runs_matched": 68
       }
     },
@@ -280,5 +276,5 @@
   },
   "document": "372_timesheet_grid",
   "source_file": "/scratch/work/p2w/corpus/372_timesheet_grid.pdf",
-  "render_file": "/scratch/tmp/lo-one-sr6jdeyf/372_timesheet_grid.pdf"
+  "render_file": "/scratch/tmp/lo-one-yqe1wyb9/372_timesheet_grid.pdf"
 }

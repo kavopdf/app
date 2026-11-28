@@ -1,11 +1,14 @@
 {
   "source": "/scratch/work/p2w/corpus/80_gstin_pan_cin_ifsc_table.pdf",
-  "render": "/scratch/tmp/lo-one-jmhj34k6/80_gstin_pan_cin_ifsc_table.pdf",
-  "passed": 42,
+  "render": "/scratch/tmp/lo-one-eax4oje9/80_gstin_pan_cin_ifsc_table.pdf",
+  "passed": 40,
   "total": 42,
-  "failed": [],
-  "engine": "d28ca7516c3f9165",
-  "ok": true,
+  "failed": [
+    "18_displacement",
+    "59_shape_anchor"
+  ],
+  "engine": "a05b20eb05fe0fc8",
+  "ok": false,
   "checks": {
     "01_page_count": {
       "source": 1,
@@ -49,19 +52,21 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 0.7,
-        "worst_dy": 2.6,
+        "med_dy": 2.7,
+        "worst_dy": 3.7,
         "med_dx": 0.1,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 68
       }
     },
     "23_line_pitch": {
       "source": 14.0,
-      "render": 14.0,
+      "render": 15.3,
       "ok": true
     },
     "25_invisible_text": {
@@ -227,8 +232,8 @@
     },
     "59_shape_anchor": {
       "source": 65,
-      "render": 55,
-      "ok": true
+      "render": 40,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 0,
@@ -251,5 +256,5 @@
   },
   "document": "80_gstin_pan_cin_ifsc_table",
   "source_file": "/scratch/work/p2w/corpus/80_gstin_pan_cin_ifsc_table.pdf",
-  "render_file": "/scratch/tmp/lo-one-jmhj34k6/80_gstin_pan_cin_ifsc_table.pdf"
+  "render_file": "/scratch/tmp/lo-one-eax4oje9/80_gstin_pan_cin_ifsc_table.pdf"
 }

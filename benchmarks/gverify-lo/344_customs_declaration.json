@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/344_customs_declaration.pdf",
-  "render": "/scratch/tmp/lo-one-_s_w214g/344_customs_declaration.pdf",
+  "render": "/scratch/tmp/lo-one-br2j4x1l/344_customs_declaration.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "18_displacement"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -1.4,
-        "worst_dy": 3.5,
+        "med_dy": -1.1,
+        "worst_dy": 2.8,
         "med_dx": 0.4,
         "bad_pages": [
           0
@@ -280,5 +280,5 @@
   },
   "document": "344_customs_declaration",
   "source_file": "/scratch/work/p2w/corpus/344_customs_declaration.pdf",
-  "render_file": "/scratch/tmp/lo-one-_s_w214g/344_customs_declaration.pdf"
+  "render_file": "/scratch/tmp/lo-one-br2j4x1l/344_customs_declaration.pdf"
 }

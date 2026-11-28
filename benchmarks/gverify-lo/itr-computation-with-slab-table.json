@@ -1,6 +1,6 @@
 {
   "source": "/scratch/work/p2w/corpus/itr-computation-with-slab-table.pdf",
-  "render": "/scratch/tmp/lo-one-jy5ncuid/itr-computation-with-slab-table.pdf",
+  "render": "/scratch/tmp/lo-one-gesfvnj6/itr-computation-with-slab-table.pdf",
   "passed": 44,
   "total": 47,
   "failed": [
@@ -8,7 +8,7 @@
     "32_stroke_lines",
     "63_table_rows"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -56,8 +56,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -2.5,
-        "worst_dy": 14.8,
+        "med_dy": -1.8,
+        "worst_dy": 13.1,
         "med_dx": 0.6,
         "bad_pages": [
           0
@@ -282,5 +282,5 @@
   },
   "document": "itr-computation-with-slab-table",
   "source_file": "/scratch/work/p2w/corpus/itr-computation-with-slab-table.pdf",
-  "render_file": "/scratch/tmp/lo-one-jy5ncuid/itr-computation-with-slab-table.pdf"
+  "render_file": "/scratch/tmp/lo-one-gesfvnj6/itr-computation-with-slab-table.pdf"
 }

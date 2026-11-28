@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/magazine-2col-pullquote-spanning.pdf",
-  "render": "/scratch/tmp/lo-one-25rrcsf9/magazine-2col-pullquote-spanning.pdf",
+  "render": "/scratch/tmp/lo-one-awzrwd0v/magazine-2col-pullquote-spanning.pdf",
   "passed": 40,
   "total": 42,
   "failed": [
     "43_within_10pt_x",
     "47_margins"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,8 +55,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.2,
-        "worst_dy": 1.2,
+        "med_dy": 0.0,
+        "worst_dy": 0.5,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 54
@@ -260,5 +260,5 @@
   },
   "document": "magazine-2col-pullquote-spanning",
   "source_file": "/scratch/work/p2w/corpus/magazine-2col-pullquote-spanning.pdf",
-  "render_file": "/scratch/tmp/lo-one-25rrcsf9/magazine-2col-pullquote-spanning.pdf"
+  "render_file": "/scratch/tmp/lo-one-awzrwd0v/magazine-2col-pullquote-spanning.pdf"
 }

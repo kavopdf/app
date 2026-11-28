@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/09_stamp_font_not_embedded.pdf",
-  "render": "/scratch/tmp/lo-one-68b7gq2y/09_stamp_font_not_embedded.pdf",
+  "render": "/scratch/tmp/lo-one-ipc5usbk/09_stamp_font_not_embedded.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "35_rotation"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 1.0,
-        "worst_dy": 12.2,
+        "med_dy": 0.0,
+        "worst_dy": 2.1,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 23
@@ -253,5 +253,5 @@
   },
   "document": "09_stamp_font_not_embedded",
   "source_file": "/scratch/work/p2w/corpus/09_stamp_font_not_embedded.pdf",
-  "render_file": "/scratch/tmp/lo-one-68b7gq2y/09_stamp_font_not_embedded.pdf"
+  "render_file": "/scratch/tmp/lo-one-ipc5usbk/09_stamp_font_not_embedded.pdf"
 }

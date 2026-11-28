@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/two-tables-stacked-with-no-gap.pdf",
-  "render": "/scratch/tmp/lo-one-vwrruj3e/two-tables-stacked-with-no-gap.pdf",
+  "render": "/scratch/tmp/lo-one-ms5jal37/two-tables-stacked-with-no-gap.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "18_displacement"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -2.4,
-        "worst_dy": 5.6,
+        "med_dy": -2.5,
+        "worst_dy": 5.5,
         "med_dx": 0.6,
         "bad_pages": [
           0
@@ -280,5 +280,5 @@
   },
   "document": "two-tables-stacked-with-no-gap",
   "source_file": "/scratch/work/p2w/corpus/two-tables-stacked-with-no-gap.pdf",
-  "render_file": "/scratch/tmp/lo-one-vwrruj3e/two-tables-stacked-with-no-gap.pdf"
+  "render_file": "/scratch/tmp/lo-one-ms5jal37/two-tables-stacked-with-no-gap.pdf"
 }

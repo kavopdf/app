@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/54_two_column_body_full_width_header_footer.pdf",
-  "render": "/scratch/tmp/lo-one-1psruse1/54_two_column_body_full_width_header_footer.pdf",
+  "render": "/scratch/tmp/lo-one-h78s78jr/54_two_column_body_full_width_header_footer.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.9,
-        "worst_dy": 1.2,
+        "med_dy": 0.0,
+        "worst_dy": 0.0,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 29
@@ -251,5 +251,5 @@
   },
   "document": "54_two_column_body_full_width_header_footer",
   "source_file": "/scratch/work/p2w/corpus/54_two_column_body_full_width_header_footer.pdf",
-  "render_file": "/scratch/tmp/lo-one-1psruse1/54_two_column_body_full_width_header_footer.pdf"
+  "render_file": "/scratch/tmp/lo-one-h78s78jr/54_two_column_body_full_width_header_footer.pdf"
 }

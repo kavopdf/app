@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/58_header_rule_footer_rule.pdf",
-  "render": "/scratch/tmp/lo-one-bq31u9i2/58_header_rule_footer_rule.pdf",
+  "render": "/scratch/tmp/lo-one-t7hkgwr3/58_header_rule_footer_rule.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.9,
-        "worst_dy": 1.1,
+        "med_dy": -0.0,
+        "worst_dy": 0.1,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 21
@@ -251,5 +251,5 @@
   },
   "document": "58_header_rule_footer_rule",
   "source_file": "/scratch/work/p2w/corpus/58_header_rule_footer_rule.pdf",
-  "render_file": "/scratch/tmp/lo-one-bq31u9i2/58_header_rule_footer_rule.pdf"
+  "render_file": "/scratch/tmp/lo-one-t7hkgwr3/58_header_rule_footer_rule.pdf"
 }

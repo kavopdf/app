@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/71_invoice_space_aligned_no_rules.pdf",
-  "render": "/scratch/tmp/lo-one-7wr2pwer/71_invoice_space_aligned_no_rules.pdf",
+  "render": "/scratch/tmp/lo-one-akllrih4/71_invoice_space_aligned_no_rules.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "18_displacement"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": 2.3,
-        "worst_dy": 24.4,
+        "med_dy": 3.3,
+        "worst_dy": 28.5,
         "med_dx": 0.1,
         "bad_pages": [
           0
@@ -65,7 +65,7 @@
     },
     "23_line_pitch": {
       "source": 18.0,
-      "render": 18.0,
+      "render": 18.1,
       "ok": true
     },
     "25_invisible_text": {
@@ -255,5 +255,5 @@
   },
   "document": "71_invoice_space_aligned_no_rules",
   "source_file": "/scratch/work/p2w/corpus/71_invoice_space_aligned_no_rules.pdf",
-  "render_file": "/scratch/tmp/lo-one-7wr2pwer/71_invoice_space_aligned_no_rules.pdf"
+  "render_file": "/scratch/tmp/lo-one-akllrih4/71_invoice_space_aligned_no_rules.pdf"
 }

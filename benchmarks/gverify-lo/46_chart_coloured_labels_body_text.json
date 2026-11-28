@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/46_chart_coloured_labels_body_text.pdf",
-  "render": "/scratch/tmp/lo-one-8t2oo0zb/46_chart_coloured_labels_body_text.pdf",
+  "render": "/scratch/tmp/lo-one-ycenv2tu/46_chart_coloured_labels_body_text.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 1.0,
-        "worst_dy": 1.6,
+        "med_dy": 0.2,
+        "worst_dy": 1.4,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 43
@@ -251,5 +251,5 @@
   },
   "document": "46_chart_coloured_labels_body_text",
   "source_file": "/scratch/work/p2w/corpus/46_chart_coloured_labels_body_text.pdf",
-  "render_file": "/scratch/tmp/lo-one-8t2oo0zb/46_chart_coloured_labels_body_text.pdf"
+  "render_file": "/scratch/tmp/lo-one-ycenv2tu/46_chart_coloured_labels_body_text.pdf"
 }

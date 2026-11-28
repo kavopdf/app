@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/412_page_labels_roman.pdf",
-  "render": "/scratch/tmp/lo-one-iixm_ywr/412_page_labels_roman.pdf",
+  "render": "/scratch/tmp/lo-one-na0dmvhy/412_page_labels_roman.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 3.0,
-        "worst_dy": 3.8,
+        "med_dy": 0.0,
+        "worst_dy": 0.0,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 15
@@ -251,5 +251,5 @@
   },
   "document": "412_page_labels_roman",
   "source_file": "/scratch/work/p2w/corpus/412_page_labels_roman.pdf",
-  "render_file": "/scratch/tmp/lo-one-iixm_ywr/412_page_labels_roman.pdf"
+  "render_file": "/scratch/tmp/lo-one-na0dmvhy/412_page_labels_roman.pdf"
 }

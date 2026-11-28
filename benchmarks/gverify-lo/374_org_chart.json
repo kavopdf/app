@@ -1,13 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/374_org_chart.pdf",
-  "render": "/scratch/tmp/lo-one-eiwugwmn/374_org_chart.pdf",
+  "render": "/scratch/tmp/lo-one-a3z3_lu0/374_org_chart.pdf",
   "passed": 40,
   "total": 42,
   "failed": [
     "18_displacement",
     "59_shape_anchor"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,8 +55,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": 1.4,
-        "worst_dy": 4.5,
+        "med_dy": 2.0,
+        "worst_dy": 6.6,
         "med_dx": 0.1,
         "bad_pages": [
           0
@@ -232,7 +232,7 @@
     },
     "59_shape_anchor": {
       "source": 18,
-      "render": 12,
+      "render": 9,
       "ok": false
     },
     "60_text_column_right_edge": {
@@ -256,5 +256,5 @@
   },
   "document": "374_org_chart",
   "source_file": "/scratch/work/p2w/corpus/374_org_chart.pdf",
-  "render_file": "/scratch/tmp/lo-one-eiwugwmn/374_org_chart.pdf"
+  "render_file": "/scratch/tmp/lo-one-a3z3_lu0/374_org_chart.pdf"
 }

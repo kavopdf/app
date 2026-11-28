@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/product-catalogue-code-left-price-right.pdf",
-  "render": "/scratch/tmp/lo-one-4o6_8axg/product-catalogue-code-left-price-right.pdf",
+  "render": "/scratch/tmp/lo-one-y4fqkxid/product-catalogue-code-left-price-right.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.2,
-        "worst_dy": 0.7,
+        "med_dy": -0.0,
+        "worst_dy": 0.0,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 126
@@ -251,5 +251,5 @@
   },
   "document": "product-catalogue-code-left-price-right",
   "source_file": "/scratch/work/p2w/corpus/product-catalogue-code-left-price-right.pdf",
-  "render_file": "/scratch/tmp/lo-one-4o6_8axg/product-catalogue-code-left-price-right.pdf"
+  "render_file": "/scratch/tmp/lo-one-y4fqkxid/product-catalogue-code-left-price-right.pdf"
 }

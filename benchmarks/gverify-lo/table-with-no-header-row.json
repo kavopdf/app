@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/table-with-no-header-row.pdf",
-  "render": "/scratch/tmp/lo-one-tn7fews3/table-with-no-header-row.pdf",
+  "render": "/scratch/tmp/lo-one-5e9jcc8v/table-with-no-header-row.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "18_displacement"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": -4.9,
-        "worst_dy": 101.4,
+        "med_dy": -5.0,
+        "worst_dy": 101.5,
         "med_dx": 0.6,
         "bad_pages": [
           0
@@ -280,5 +280,5 @@
   },
   "document": "table-with-no-header-row",
   "source_file": "/scratch/work/p2w/corpus/table-with-no-header-row.pdf",
-  "render_file": "/scratch/tmp/lo-one-tn7fews3/table-with-no-header-row.pdf"
+  "render_file": "/scratch/tmp/lo-one-5e9jcc8v/table-with-no-header-row.pdf"
 }

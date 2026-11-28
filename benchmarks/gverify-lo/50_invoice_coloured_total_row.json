@@ -1,12 +1,14 @@
 {
   "source": "/scratch/work/p2w/corpus/50_invoice_coloured_total_row.pdf",
-  "render": "/scratch/tmp/lo-one-p1q6t3sh/50_invoice_coloured_total_row.pdf",
-  "passed": 41,
+  "render": "/scratch/tmp/lo-one-a04tk43l/50_invoice_coloured_total_row.pdf",
+  "passed": 39,
   "total": 42,
   "failed": [
+    "18_displacement",
+    "59_shape_anchor",
     "60_text_column_right_edge"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -51,13 +53,15 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 0.8,
-        "worst_dy": 1.6,
+        "med_dy": 2.0,
+        "worst_dy": 3.9,
         "med_dx": 0.1,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 53
       }
     },
@@ -118,7 +122,7 @@
     },
     "36_underline_rules": {
       "source": 0,
-      "render": 0,
+      "render": 25,
       "ok": true
     },
     "37_super_subscript": {
@@ -229,8 +233,8 @@
     },
     "59_shape_anchor": {
       "source": 37,
-      "render": 37,
-      "ok": true
+      "render": 17,
+      "ok": false
     },
     "60_text_column_right_edge": {
       "source": 1,
@@ -253,5 +257,5 @@
   },
   "document": "50_invoice_coloured_total_row",
   "source_file": "/scratch/work/p2w/corpus/50_invoice_coloured_total_row.pdf",
-  "render_file": "/scratch/tmp/lo-one-p1q6t3sh/50_invoice_coloured_total_row.pdf"
+  "render_file": "/scratch/tmp/lo-one-a04tk43l/50_invoice_coloured_total_row.pdf"
 }

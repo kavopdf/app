@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/324_loan_amortisation_schedule.pdf",
-  "render": "/scratch/tmp/lo-one-5qk2izus/324_loan_amortisation_schedule.pdf",
+  "render": "/scratch/tmp/lo-one-qv1jdjmt/324_loan_amortisation_schedule.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -53,7 +53,7 @@
       "ok": true,
       "detail": {
         "med_dy": 0.4,
-        "worst_dy": 0.5,
+        "worst_dy": 0.4,
         "med_dx": 0.5,
         "bad_pages": [],
         "runs_matched": 1496
@@ -276,5 +276,5 @@
   },
   "document": "324_loan_amortisation_schedule",
   "source_file": "/scratch/work/p2w/corpus/324_loan_amortisation_schedule.pdf",
-  "render_file": "/scratch/tmp/lo-one-5qk2izus/324_loan_amortisation_schedule.pdf"
+  "render_file": "/scratch/tmp/lo-one-qv1jdjmt/324_loan_amortisation_schedule.pdf"
 }

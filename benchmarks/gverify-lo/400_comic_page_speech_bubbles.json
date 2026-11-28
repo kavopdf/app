@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/400_comic_page_speech_bubbles.pdf",
-  "render": "/scratch/tmp/lo-one-3woe2vjy/400_comic_page_speech_bubbles.pdf",
+  "render": "/scratch/tmp/lo-one-gvm7zu61/400_comic_page_speech_bubbles.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "14_filled_shapes"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.3,
-        "worst_dy": 0.4,
+        "med_dy": 0.0,
+        "worst_dy": 0.0,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 26
@@ -253,5 +253,5 @@
   },
   "document": "400_comic_page_speech_bubbles",
   "source_file": "/scratch/work/p2w/corpus/400_comic_page_speech_bubbles.pdf",
-  "render_file": "/scratch/tmp/lo-one-3woe2vjy/400_comic_page_speech_bubbles.pdf"
+  "render_file": "/scratch/tmp/lo-one-gvm7zu61/400_comic_page_speech_bubbles.pdf"
 }

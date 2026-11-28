@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/24_address_block_indents_txtpos.pdf",
-  "render": "/scratch/tmp/lo-one-6d5ndat2/24_address_block_indents_txtpos.pdf",
+  "render": "/scratch/tmp/lo-one-hn7j9zf4/24_address_block_indents_txtpos.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.9,
-        "worst_dy": 1.3,
+        "med_dy": 0.0,
+        "worst_dy": 0.2,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 29
@@ -251,5 +251,5 @@
   },
   "document": "24_address_block_indents_txtpos",
   "source_file": "/scratch/work/p2w/corpus/24_address_block_indents_txtpos.pdf",
-  "render_file": "/scratch/tmp/lo-one-6d5ndat2/24_address_block_indents_txtpos.pdf"
+  "render_file": "/scratch/tmp/lo-one-hn7j9zf4/24_address_block_indents_txtpos.pdf"
 }

@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/381_incident_report_timeline.pdf",
-  "render": "/scratch/tmp/lo-one-5zx2z2gm/381_incident_report_timeline.pdf",
+  "render": "/scratch/tmp/lo-one-x2ljykqt/381_incident_report_timeline.pdf",
   "passed": 47,
   "total": 47,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.1,
-        "worst_dy": 0.5,
+        "med_dy": 0.4,
+        "worst_dy": 0.8,
         "med_dx": 0.5,
         "bad_pages": [],
         "runs_matched": 65
@@ -276,5 +276,5 @@
   },
   "document": "381_incident_report_timeline",
   "source_file": "/scratch/work/p2w/corpus/381_incident_report_timeline.pdf",
-  "render_file": "/scratch/tmp/lo-one-5zx2z2gm/381_incident_report_timeline.pdf"
+  "render_file": "/scratch/tmp/lo-one-x2ljykqt/381_incident_report_timeline.pdf"
 }

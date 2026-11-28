@@ -1,6 +1,6 @@
 {
   "source": "/scratch/work/p2w/corpus/601_fillable_admission_form.pdf",
-  "render": "/scratch/tmp/lo-one-v4w8xvgh/601_fillable_admission_form.pdf",
+  "render": "/scratch/tmp/lo-one-od_xoe5w/601_fillable_admission_form.pdf",
   "passed": 37,
   "total": 42,
   "failed": [
@@ -10,7 +10,7 @@
     "53_embedded_faces",
     "59_shape_anchor"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -58,8 +58,8 @@
       "render": 1,
       "ok": false,
       "detail": {
-        "med_dy": 29.3,
-        "worst_dy": 229.8,
+        "med_dy": 27.1,
+        "worst_dy": 237.1,
         "med_dx": -0.1,
         "bad_pages": [
           0
@@ -259,5 +259,5 @@
   },
   "document": "601_fillable_admission_form",
   "source_file": "/scratch/work/p2w/corpus/601_fillable_admission_form.pdf",
-  "render_file": "/scratch/tmp/lo-one-v4w8xvgh/601_fillable_admission_form.pdf"
+  "render_file": "/scratch/tmp/lo-one-od_xoe5w/601_fillable_admission_form.pdf"
 }

@@ -1,12 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/333_datasheet_spec_tables.pdf",
-  "render": "/scratch/tmp/lo-one-p9ooam9z/333_datasheet_spec_tables.pdf",
-  "passed": 46,
+  "render": "/scratch/tmp/lo-one-j2j53hoi/333_datasheet_spec_tables.pdf",
+  "passed": 45,
   "total": 47,
   "failed": [
+    "18_displacement",
     "66_table_cell_width"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -51,13 +52,15 @@
     },
     "18_displacement": {
       "source": 0,
-      "render": 0,
-      "ok": true,
+      "render": 1,
+      "ok": false,
       "detail": {
-        "med_dy": 0.3,
-        "worst_dy": 0.6,
+        "med_dy": 0.7,
+        "worst_dy": 3.1,
         "med_dx": 0.4,
-        "bad_pages": [],
+        "bad_pages": [
+          0
+        ],
         "runs_matched": 122
       }
     },
@@ -278,5 +281,5 @@
   },
   "document": "333_datasheet_spec_tables",
   "source_file": "/scratch/work/p2w/corpus/333_datasheet_spec_tables.pdf",
-  "render_file": "/scratch/tmp/lo-one-p9ooam9z/333_datasheet_spec_tables.pdf"
+  "render_file": "/scratch/tmp/lo-one-j2j53hoi/333_datasheet_spec_tables.pdf"
 }

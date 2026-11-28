@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/property-tax-receipt.pdf",
-  "render": "/scratch/tmp/lo-one-qty8u765/property-tax-receipt.pdf",
+  "render": "/scratch/tmp/lo-one-pnbg398r/property-tax-receipt.pdf",
   "passed": 46,
   "total": 47,
   "failed": [
     "18_displacement"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -55,7 +55,7 @@
       "ok": false,
       "detail": {
         "med_dy": -3.5,
-        "worst_dy": 8.6,
+        "worst_dy": 8.5,
         "med_dx": 0.6,
         "bad_pages": [
           0
@@ -280,5 +280,5 @@
   },
   "document": "property-tax-receipt",
   "source_file": "/scratch/work/p2w/corpus/property-tax-receipt.pdf",
-  "render_file": "/scratch/tmp/lo-one-qty8u765/property-tax-receipt.pdf"
+  "render_file": "/scratch/tmp/lo-one-pnbg398r/property-tax-receipt.pdf"
 }

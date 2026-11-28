@@ -1,12 +1,12 @@
 {
   "source": "/scratch/work/p2w/corpus/407_id_card_front_back.pdf",
-  "render": "/scratch/tmp/lo-one-0jwr2qu9/407_id_card_front_back.pdf",
+  "render": "/scratch/tmp/lo-one-y4zacqcd/407_id_card_front_back.pdf",
   "passed": 41,
   "total": 42,
   "failed": [
     "14_filled_shapes"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,8 +54,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.2,
-        "worst_dy": 0.4,
+        "med_dy": 0.0,
+        "worst_dy": 0.1,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 15
@@ -253,5 +253,5 @@
   },
   "document": "407_id_card_front_back",
   "source_file": "/scratch/work/p2w/corpus/407_id_card_front_back.pdf",
-  "render_file": "/scratch/tmp/lo-one-0jwr2qu9/407_id_card_front_back.pdf"
+  "render_file": "/scratch/tmp/lo-one-y4zacqcd/407_id_card_front_back.pdf"
 }

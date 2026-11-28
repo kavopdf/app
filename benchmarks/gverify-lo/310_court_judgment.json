@@ -1,10 +1,10 @@
 {
   "source": "/scratch/work/p2w/corpus/310_court_judgment.pdf",
-  "render": "/scratch/tmp/lo-one-yd2bh5u0/310_court_judgment.pdf",
+  "render": "/scratch/tmp/lo-one-qpp6tvox/310_court_judgment.pdf",
   "passed": 42,
   "total": 42,
   "failed": [],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": true,
   "checks": {
     "01_page_count": {
@@ -52,8 +52,8 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": -0.5,
-        "worst_dy": 0.5,
+        "med_dy": -0.1,
+        "worst_dy": 0.2,
         "med_dx": 0.1,
         "bad_pages": [],
         "runs_matched": 30
@@ -251,5 +251,5 @@
   },
   "document": "310_court_judgment",
   "source_file": "/scratch/work/p2w/corpus/310_court_judgment.pdf",
-  "render_file": "/scratch/tmp/lo-one-yd2bh5u0/310_court_judgment.pdf"
+  "render_file": "/scratch/tmp/lo-one-qpp6tvox/310_court_judgment.pdf"
 }

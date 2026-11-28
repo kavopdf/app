@@ -1,12 +1,13 @@
 {
   "source": "/scratch/work/p2w/corpus/table-of-contents-dot-leaders.pdf",
-  "render": "/scratch/tmp/lo-one-nuh9c2h0/table-of-contents-dot-leaders.pdf",
-  "passed": 41,
+  "render": "/scratch/tmp/lo-one-j_lrrv7q/table-of-contents-dot-leaders.pdf",
+  "passed": 40,
   "total": 42,
   "failed": [
-    "47_margins"
+    "47_margins",
+    "60_text_column_right_edge"
   ],
-  "engine": "d28ca7516c3f9165",
+  "engine": "a05b20eb05fe0fc8",
   "ok": false,
   "checks": {
     "01_page_count": {
@@ -54,7 +55,7 @@
       "render": 0,
       "ok": true,
       "detail": {
-        "med_dy": 0.4,
+        "med_dy": 0.5,
         "worst_dy": 1.2,
         "med_dx": 0.1,
         "bad_pages": [],
@@ -233,9 +234,9 @@
       "ok": true
     },
     "60_text_column_right_edge": {
-      "source": 0,
+      "source": 1,
       "render": 0,
-      "ok": true
+      "ok": false
     },
     "61_blank_not_filled": {
       "source": 0,
@@ -259,5 +260,5 @@
   },
   "document": "table-of-contents-dot-leaders",
   "source_file": "/scratch/work/p2w/corpus/table-of-contents-dot-leaders.pdf",
-  "render_file": "/scratch/tmp/lo-one-nuh9c2h0/table-of-contents-dot-leaders.pdf"
+  "render_file": "/scratch/tmp/lo-one-j_lrrv7q/table-of-contents-dot-leaders.pdf"
 }
