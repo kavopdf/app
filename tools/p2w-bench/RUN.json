@@ -1,18 +1,11 @@
 {
- "agents": [],
- "attempts": 3,
- "docs_improved": 3,
- "ended": null,
+ "started_ts": 1795858055.1203706,
+ "started": "14:57",
+ "window_for_claim": 1795858055.1203706,
  "ended_ts": null,
- "kept": 1,
- "started": "14:35",
- "started_ts": 1795856751.8704543,
- "window_for_claim": 1795856751.8704543,
- "class": "60_text_column_right_edge",
- "counted": [
-  [
-   "60_text_column_right_edge",
-   3
-  ]
- ]
+ "ended": null,
+ "attempts": 1,
+ "kept": 0,
+ "agents": [],
+ "docs_improved": 0
 }
