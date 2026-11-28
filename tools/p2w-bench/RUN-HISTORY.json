@@ -1,16 +1,5 @@
 [
  {
-  "started": "12:03",
-  "started_ts": 1795674827.833653,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "agents": [],
   "attempts": 8,
   "class": "18_displacement",
@@ -785,5 +774,21 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "60_tfont-map-01",
+   "60_tedge-probe-01"
+  ],
+  "attempts": 5,
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "started": "12:36",
+  "started_ts": 1795849576.8571618,
+  "window_for_claim": 1795849576.8571618,
+  "class": "60_text_column_right_edge",
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

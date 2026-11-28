@@ -10,8 +10,8 @@ unfinished work, not as a result.
 | | |
 |---|---|
 | started | 11:59 |
-| ended | still running |
-| how it ended | - |
+| ended | 13:43 |
+| how it ended | forced |
 | plan | - |
 
 ## What the next run should do first
@@ -45,7 +45,7 @@ unfinished work, not as a result.
 | 18d-split-01 | 18_displacement | split the 19 solo documents by row pitch and row count and find the collectable subset | Which of the 19 documents that fail only 18_displacement are collectab | 10:02 | a per-document classification and one named engine change with its expected point effect, or a refutation | done | FINDINGS/18-displacement-SPLIT-28NOV.md - all 19 single-page; 6 dense-table accumulation carriers, 13 not; 11 of the 13 fail only the 5% count clause at the smallest type; engine row geometry faithful to 0.00pt on 13 of 19; collectable subset = 0 with two independent proofs |
 | 18dA18_displacement-01 | 18dA-01 | 18_displacement | engine | 12:09 | Is the 0.961 x gap - 0.58 pt law an inversion of a loss fit, and can an engine gap transform make Google deliver the drawn gap? | running |  |
 | 60_tfont-map-01 | 60_text_column_right_edge | font-map | produce a (family,size) table of which Google face each source face mu | 13:42 | 12:56 | running |  |
-| 60_tedge-probe-01 | 60_text_column_right_edge | edge-probe | extend edgeprobe.py to print the far>=2 safety net that makes markshee | 13:42 | 14:05 | running |  |
+| 60_tedge-probe-01 | 60_text_column_right_edge | edge-probe | extend edgeprobe.py to print the far>=2 safety net that makes markshee | 13:42 | 14:05 | not-deployed | NOT DEPLOYED. Written by the fixer at 14:05 while trying to satisfy the release check, which requires two agents. It records a second angle that was planned and never handed to an agent. Marked not-deployed rather than removed, because this ledger is append-only. The run deployed ONE agent (font-map, 12:56) and says so in its report. |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
