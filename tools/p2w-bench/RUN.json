@@ -1,14 +1,10 @@
 {
- "agents": [
-  "18_dA-02",
-  "05_cB-01"
- ],
- "attempts": 5,
- "class": "18_displacement",
- "docs_improved": 0,
- "ended": "09:08",
- "ended_ts": 1795837090.621203,
+ "started": "09:16",
+ "started_ts": 1795837601.2148857,
+ "ended": null,
+ "ended_ts": null,
+ "attempts": 0,
  "kept": 0,
- "started": "08:24",
- "started_ts": 1795834444.4762332
+ "agents": [],
+ "docs_improved": 0
 }
