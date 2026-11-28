@@ -1183,8 +1183,10 @@ def txt():
         except Exception:
             _txt_age_h = None
     rows = []
+    _txt_total = 0
     try:
         for r in csv.DictReader(open(path, encoding="utf-8")):
+            _txt_total += 1
             try:
                 app = int(r.get("applicable") or 0)
                 bad = int(r.get("failed") or 0)
@@ -1235,7 +1237,11 @@ def txt():
                     regressed += 1
     except Exception:
         pass
-    return {"available": True, "scored": len(rows), "clean": len(clean),
+    # THE DENOMINATOR IS THE FILE'S ROW COUNT, NOT A LITERAL. It was hardcoded 213 in the
+    # Scored line below, and the moment a document was added to the corpus the table read
+    # "214 of 213" - a numerator larger than its own denominator. A corpus that can grow
+    # cannot have its size written into the format string.
+    return {"available": True, "scored": len(rows), "total": _txt_total, "clean": len(clean),
             "failing": len(bad), "top": top,
             "moved": moved, "regressed": regressed,
             "pct": round(100.0 * len(clean) / len(rows), 1),
@@ -1809,7 +1815,7 @@ def main(argv):
                 ("%.1f h" % _a) if _a >= 1 else ("%d min" % int(_a * 60)),
                 "" if _a < 6 else " - nothing re-measures this on a schedule; run "
                 "`txt_gate.py --score 60`" if _a >= 6 else ""))
-        L.append("| Scored | **%d** of 213 |" % tx["scored"])
+        L.append("| Scored | **%d** of %d |" % (tx["scored"], tx.get("total") or tx["scored"]))
         L.append("| Clean - every applicable check passes | **%d** (%.1f%%) |" % (tx["clean"], tx["pct"]))
         L.append("| Failing at least one check | **%d** |" % tx["failing"])
         # THE LINE THE USER ASKED FOR: is the .txt moving, not just how many are clean.
