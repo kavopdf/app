@@ -1,15 +1,13 @@
 {
- "agents": [
-  "60_tfont-map-01",
-  "60_tedge-probe-01"
- ],
- "attempts": 5,
+ "agents": [],
+ "attempts": 1,
+ "class": "",
  "docs_improved": 0,
- "ended": "13:43",
- "ended_ts": 1795853581.5898404,
+ "ended": null,
+ "ended_ts": null,
  "kept": 0,
- "started": "12:36",
- "started_ts": 1795849576.8571618,
- "window_for_claim": 1795849576.8571618,
- "class": "60_text_column_right_edge"
+ "needs_human": 0,
+ "obstacles_cleared": 0,
+ "started": "13:53",
+ "started_ts": 1795854230.961514
 }

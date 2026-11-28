@@ -10965,3 +10965,14 @@
 {"t": 1795853580.986261, "ist": "13:43:00", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
 {"t": 1795853581.0762854, "ist": "13:43:01", "ev": "beat", "d": "pending.py: reading the pending gate"}
 {"t": 1795853581.5889838, "ist": "13:43:01", "ev": "killed", "d": "dead claim cleared by force release"}
+{"t": 1795854230.1743016, "ist": "13:53:50", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795854230.352427, "ist": "13:53:50", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795854230.4482327, "ist": "13:53:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795854551.7918816, "ist": "13:59:11", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795854554.9785085, "ist": "13:59:14", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795854558.3820279, "ist": "13:59:18", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795856365.6229622, "ist": "14:29:25", "ev": "beat", "d": "diagnosing 18_displacement on docs that fail only it"}
+{"t": 1795856390.5807073, "ist": "14:29:50", "ev": "beat", "d": "txt t12_word_invention: 4 docs fail it, TxtWriter-only change is cheap to measure"}
+{"t": 1795856550.783568, "ist": "14:32:30", "ev": "beat", "d": "measuring both annotation doors together on 600"}
+{"t": 1795856735.984226, "ist": "14:35:35", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795856746.4106011, "ist": "14:35:46", "ev": "beat", "d": "attempt.py: recording an attempt"}
