@@ -1,6 +1,6 @@
 # P2W Classifier - Run Report
 
-**28 Nov 2026 · 07:55 IST**
+**28 Nov 2026 · 08:06 IST**
 
 > 35 classes cover 158 failing documents across 206 measured in Google.
 
