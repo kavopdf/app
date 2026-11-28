@@ -278,11 +278,6 @@
  ],
  "history": [
   {
-   "at": "09:15",
-   "how": "forced",
-   "plan": ""
-  },
-  {
    "at": "09:47",
    "how": "forced",
    "plan": ""
@@ -374,6 +369,11 @@
   },
   {
    "at": "10:40",
+   "how": "forced",
+   "plan": ""
+  },
+  {
+   "at": "11:30",
    "how": "forced",
    "plan": ""
   }
@@ -624,7 +624,7 @@
  "plan": "",
  "run": {
   "started": "11:00",
-  "ended": null,
-  "ended_how": null
+  "ended": "11:30",
+  "ended_how": "forced"
  }
 }

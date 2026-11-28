@@ -1,16 +1,5 @@
 [
  {
-  "started": "11:48",
-  "started_ts": 1795673896.058953,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "agents": [
    {
     "id": "5K6VD2QX509EHTJ0N4AJ1RAQKX",
@@ -785,5 +774,29 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "t08_aAudit-01",
+   "t08_bGate-01"
+  ],
+  "attempts": 2,
+  "class": "t08_line_order",
+  "docs_improved": 1,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 1,
+  "needs_human": 0,
+  "obstacles_cleared": 0,
+  "started": "11:00",
+  "started_ts": 1795843831.3859441,
+  "ratchets": 1,
+  "counted": [
+   [
+    "t08_line_order",
+    1
+   ]
+  ],
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]

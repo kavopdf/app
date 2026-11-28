@@ -1,10 +1,13 @@
 {
- "agents": [],
+ "agents": [
+  "t08_aAudit-01",
+  "t08_bGate-01"
+ ],
  "attempts": 2,
  "class": "t08_line_order",
  "docs_improved": 1,
- "ended": null,
- "ended_ts": null,
+ "ended": "11:30",
+ "ended_ts": 1795845633.8124542,
  "kept": 1,
  "needs_human": 0,
  "obstacles_cleared": 0,
