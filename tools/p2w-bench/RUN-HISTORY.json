@@ -1,16 +1,5 @@
 [
  {
-  "started": "12:03",
-  "started_ts": 1795674827.833653,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "agents": [],
   "attempts": 8,
   "class": "18_displacement",
@@ -778,6 +767,17 @@
  {
   "started": "11:59",
   "started_ts": 1795847363.763795,
+  "ended": "(never)",
+  "ended_ts": null,
+  "attempts": 0,
+  "kept": 0,
+  "agents": [],
+  "docs_improved": 0,
+  "ended_how": "killed - never released the slot"
+ },
+ {
+  "started": "12:56",
+  "started_ts": 1795850780.7795565,
   "ended": "(never)",
   "ended_ts": null,
   "attempts": 0,

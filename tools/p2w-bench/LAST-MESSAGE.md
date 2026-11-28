@@ -1,6 +1,6 @@
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 12:36 → running IST · 1 min**
+**28 Nov 2026 · slot 12:56 → running IST · 0 min**
 
 > No change was kept this run. The numbers below say what was tried.
 
@@ -12,8 +12,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **3 disagreement(s)** - kept change: 1 code commit(s) in this window, first: 60_text_column_right_edge: the justify-pin is re vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; .txt age: measured 7.2 h ago vs nothing re-measures it on a schedule; run window: RUN.json says this run began at 12:36 vs TIMELINE.jsonl records the claim at 11:59, so the window was reset and the duration is short |
-| Document-moves this run | **0** — 1 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - .txt age: measured 7.5 h ago vs nothing re-measures it on a schedule |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -23,17 +23,14 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `-` - taken from the pending list (64 still open), not a new class |
+| Working on | `-` - taken from the pending list (65 still open), not a new class |
 | The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 12:34 | **lead** | 0/None | Google round trip refutes the justify-pin: 313 41/42 HEAD vs 40/42 pinned, 60 still FAIL (under-run 60.97pt -> 57.92pt, tolerance 48), plus a new 18_displacement. Cause is face substitution: source De |
-| 12:36 | **lead** | 0/None | Google round trip (6 probes): face substitution is the cause. 313 HEAD 41/42 (60 FAIL, edge 477.66 vs src 538.63) -> Verdana face 42/42 PASS (edge 536.15); 302 HEAD 41/42 -> Verdana 42/42 PASS. Georgi |
-
 ## Why nothing moved, in this run's own words
+
+*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+
+### The run before this one said
 
 > The slot did not land a document because the honest measurement said the change on the table would
 > cost one, and then a different change turned out to be right but too large to prove inside the slot.
@@ -67,21 +64,20 @@
 > the round trip, because a face that is right at 10 pt may be wrong at 8 or 14 and the mapping has to
 > be keyed on family and size rather than applied globally; then the mapping in the engine; then the
 > corpus pass. The falsifier is written into the findings file so the next run can fail it on purpose.
-
-### The run before this one said
-
+>
+>
 > | At | Outcome | Moved | What it measured |
 > |--:|:--|--:|:--|
 > | 12:34 | **lead** | 0/None | Google round trip refutes the justify-pin: 313 41/42 HEAD vs 40/42 pinned, 60 still FAIL (under-run 60.97pt -> 57.92pt, tolerance 48), plus a new 18_displacement. Cause is face substitution: source De |
 > | 12:36 | **lead** | 0/None | Google round trip (6 probes): face substitution is the cause. 313 HEAD 41/42 (60 FAIL, edge 477.66 vs src 538.63) -> Verdana face 42/42 PASS (edge 536.15); 302 HEAD 41/42 -> Verdana 42/42 PASS. Georgi |
-
-Accounts share 7% of their significant words - a different account (the cut is 50%).
+>
+> Accounts share 7% of their significant words - a different account (the cut is 50%).
 
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **7.2 h ago** - nothing re-measures this on a schedule; run `txt_gate.py --score 60` |
+| Measured | **7.5 h ago** - nothing re-measures this on a schedule; run `txt_gate.py --score 60` |
 | Scored | **214** of 214 |
 | Clean - every applicable check passes | **209** (97.7%) |
 | Failing at least one check | **5** |
@@ -96,18 +92,12 @@ Accounts share 7% of their significant words - a different account (the cut is 5
 
 | | |
 |:--|:--|
-| Slot window | 12:36 → running · 1 min |
+| Slot window | 12:56 → running · 0 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 6 |
+| Tool beats | 3 |
 | Silences over 2 min | 0 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
-
-### Where the time went
-
-| Phase | Time | |
-|:--|--:|:--|
-| report - the report and the chain | **1 min** | `######################` |
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -120,7 +110,7 @@ Accounts share 7% of their significant words - a different account (the cut is 5
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 35 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
