@@ -10886,3 +10886,4 @@
 {"t": 1795845409.4617424, "ist": "11:26:49", "ev": "beat", "d": "restamp_txt: re-scoring all 214 .txt"}
 {"t": 1795845480.8262167, "ist": "11:28:00", "ev": "beat", "d": "regress --check with the txt table re-stamped"}
 {"t": 1795845513.2054296, "ist": "11:28:33", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795845539.977779, "ist": "11:28:59", "ev": "beat", "d": "attempt.py: recording an attempt"}
