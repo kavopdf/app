@@ -3,9 +3,9 @@
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 15:08 → running IST · 40 min**
+**28 Nov 2026 · slot 15:08 → running IST · 46 min**
 
-> No change was kept this run. The numbers below say what was tried.
+> **1 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
 
 ## Progress
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 2 vs ATTEMPTS.json history 1 |
-| Document-moves this run | **0** — 2 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3 |
+| Document-moves this run | **1** — 4 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -33,8 +33,14 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 15:47 | **lead** | None/None | Google loop proven end-to-end (42/47 reproduced on bank-statement-5-pages, same 5 failures, engine a05b20eb); ROW_RUNG_UNDER_TW 10->25 refuted as inert on 320_balance_sheet_statutory - all 21 rows emi |
+| 15:51 | **kept** | 1/None | 59_shape_anchor charged the box corner instead of the text's place inside the box; centre-based origin, measured through Google on 9 documents rendered today: 48_form_coloured_border_coloured_values 4 |
+| 15:51 | **lead** | 0/None | 18_displacement keys its candidate assignment on ry (bbox top = baseline - ascent) but charges roy (baseline). Constructed on the repo's own compare(): identical baselines, render ascent 19.19 vs 11.1 |
 
 ## Why nothing moved, in this run's own words
+
+*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+
+### The run before this one said
 
 > **Two things were measured and neither moved a document, and that is the honest shape of this slot.**
 >
@@ -75,7 +81,7 @@
 
 | | |
 |:--|:--|
-| Measured | **2.0 h ago** |
+| Measured | **2.1 h ago** |
 | Scored | **214** of 214 |
 | Clean - every applicable check passes | **209** (97.7%) |
 | Failing at least one check | **5** |
@@ -90,11 +96,11 @@
 
 | | |
 |:--|:--|
-| Slot window | 15:08 → running · 40 min |
+| Slot window | 15:08 → running · 46 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 23 |
+| Tool beats | 33 |
 | Longest silence | **9.9 min** — from 15:32:15, after `reconverting corpus back to HEAD engine for the gate` |
-| Silences over 2 min | 7 |
+| Silences over 2 min | 9 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -103,12 +109,13 @@
 | Phase | Time | |
 |:--|--:|:--|
 | setup - claim, housekeeping, reading the gate | **4 min** | `##` |
-| fix - diagnose and change the engine | **5 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **24 min** | `##############` |
+| fix - diagnose and change the engine | **8 min** | `####` |
+| measure or build - a conversion, screen or compile writes no beacon | **24 min** | `############` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| other - not attributed to a tool | **4 min** | `###` |
+| report - the report and the chain | **3 min** | `##` |
+| other - not attributed to a tool | **4 min** | `##` |
 
-The unattributed row is 3 distinct beat(s) that matched no phase. They said:
+The unattributed row is 4 distinct beat(s) that matched no phase. They said:
 
 - `proving google loop on bank-statement-5-pages`
 - `attempt: row rung under 10->25 twips on 320`
@@ -125,7 +132,7 @@ The unattributed row is 3 distinct beat(s) that matched no phase. They said:
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 37 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 36 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*
