@@ -1,9 +1,11 @@
 {
-  "baseline_started": 0,
+  "baseline_started": 1795837619.9406466,
   "classifier_started": 0,
+  "fixer_doing": "corpus-slice: 48 of 53 converted",
+  "fixer_doing_since": 1795841636.695117,
   "fixer_engine_at_claim": "33863086",
-  "fixer_last_beat": 1795838309.5209403,
-  "fixer_started": 0,
+  "fixer_last_beat": 1795841636.6951177,
+  "fixer_started": 1795841882.348376,
   "history": [
     {
       "at": "2026-11-28 06:52",
