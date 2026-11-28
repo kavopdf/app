@@ -2689,6 +2689,16 @@ def extra_checks2(src, gd, docx_path=None):
         52 unchanged, 10 over -> pass, 1 over -> under (still failing). No document goes
         pass -> fail, because a split can only shrink a box.
         """
+        return [b for b, _t in page_lines_t(page)]
+
+    def page_lines_t(page):
+        """The same runs as page_lines(), each with the text it carries.
+
+        page_lines() throws the text away, and 60 needs it: two runs are the same line
+        when they say the same thing, and text is the one correspondence a face
+        substitution cannot break. One implementation, so the two lists are the same
+        runs in the same order by construction rather than by assertion.
+        """
         ls = []
         for blk in page.get_text("dict")["blocks"]:
             if blk.get("type") != 0:
@@ -2701,11 +2711,11 @@ def extra_checks2(src, gd, docx_path=None):
                 group = [spans[0]]
                 for sp in spans[1:]:
                     if sp["bbox"][0] - group[-1]["bbox"][2] >= GUTTER:
-                        ls.append(_union(group))
+                        ls.append((_union(group), "".join(s["text"] for s in group)))
                         group = [sp]
                     else:
                         group.append(sp)
-                ls.append(_union(group))
+                ls.append((_union(group), "".join(s["text"] for s in group)))
         return ls
 
     def _union(spans):
@@ -2791,6 +2801,86 @@ def extra_checks2(src, gd, docx_path=None):
         one_word = w[len(w) // 2] if w else 0.0
         return v[-1], min(SLACK_CAP, one_word)
 
+    ZW = dict.fromkeys(map(ord, "\u200b\u200c\u200d\u2060\ufeff\u00ad"), None)
+
+    def _key(t):
+        return " ".join(t.translate(ZW).split())
+
+    def _src_column(bbox, cols):
+        for j, (_a, ls) in enumerate(cols):
+            for b in ls:
+                if b == bbox:
+                    return j
+        return None
+
+    def render_columns(s_lines, sc, g_lines, gc):
+        """{source column index: [render line boxes]} - the render filed under its own lines.
+
+        WHY THE RENDER IS NOT BUCKETED BY columns() ANY MORE. A column is a cluster of LEFT
+        EDGES, and columns() buckets by `b[0] - seed <= 10`. The source and the render are
+        bucketed INDEPENDENTLY, so a line that moves one point across that boundary changes
+        column on one side only, and the check then compares one column's edge against a
+        different column's.
+
+        MEASURED on gst-invoice-3line-items, engine a05b20eb05fe0fc8, Google export of
+        28 Nov: the company masthead sits at x0 = 73.69 in the source and 73.50 in the
+        render, and the table's Description column starts at 62.92 / 63.75. In the SOURCE
+        73.69 - 62.92 = 10.77 > 10, so the masthead is its own column; in the RENDER
+        73.50 - 63.75 = 9.75 <= 10, so it joins Description. Description's widest line then
+        read 174.79 against 335.97 and the check charged +161.18 pt, where the widest line
+        had moved +2.47 pt and the page inset +0.75 pt. The same boundary did the same to
+        purchase-order (+103.36) and delivery-challan (+77.21).
+
+        So a render line is filed under the column of the SOURCE line it is the same line
+        as, matched on text with the zero-width characters the engine appends removed.
+        Text survives the width change that moved the bucket; a left edge does not.
+
+        A render line that matches no source line - a line the source wrapped differently,
+        or two cells merged into one run - is filed by the SOURCE line it starts over: the
+        source run whose left edge is nearest its own, within the same 10 pt. If the source
+        has no ink at that left edge, or that ink belongs to no column, the render line is
+        not evidence about any column's edge and is left out - a line that is not in a
+        source column cannot overrun one. The page-level `far` net below still catches gross
+        overrun from ink no column holds.
+
+        Nothing is excused: the same line is still judged on the same estimator and the same
+        slack, only against its own column.
+        """
+        # EVERY source line is in this map, including the ones no column holds, because
+        # "I found my own source line and it is not in a column" and "I found nothing" are
+        # different answers: the first means the line cannot evidence any column's edge.
+        all_text = {}
+        src_pts = []
+        for b, t in s_lines:
+            j = _src_column(b, sc)
+            src_pts.append((b[0], j))
+            k = _key(t)
+            if not k:
+                continue
+            all_text.setdefault(k, []).append((b[0], j))
+        out = {}
+        for b, t in g_lines:
+            j = None
+            cand = all_text.get(_key(t))
+            if cand:
+                best = min(cand, key=lambda c: abs(c[0] - b[0]))
+                # THE SAME TEXT AT A DIFFERENT LEFT EDGE IS A DIFFERENT LINE. The word
+                # "Total" is a row label at 62.92 and a column head at 536.83 in
+                # gst-invoice-3line-items; the column head belongs to no column (one line
+                # is not a cluster), so a bare text match handed the row's right-hand
+                # 551.28 pt figure to the label's column and charged +376.49 pt. A pair
+                # more than one bucket apart is not a pair.
+                if abs(best[0] - b[0]) <= 10:
+                    j = best[1]          # None when its own line is in no column
+            else:
+                near = [(abs(x - b[0]), k2) for x, k2 in src_pts
+                        if k2 is not None and abs(x - b[0]) <= 10]
+                if near:
+                    j = min(near, key=lambda h: h[0])[1]
+            if j is not None:
+                out.setdefault(j, []).append(b)
+        return out
+
     over = under = 0
     for i in range(min(src.page_count, gd.page_count)):
         sc, gc = columns(src[i]), columns(gd[i])
@@ -2800,11 +2890,14 @@ def extra_checks2(src, gd, docx_path=None):
         # than per column.
         s_words = [w for w in src[i].get_text("words") if w[4].strip()]
         g_words = [w for w in gd[i].get_text("words") if w[4].strip()]
-        for a, s_col in sc:
-            hit = [(abs(a - b2), c2) for b2, c2 in gc if abs(a - b2) <= 10]
-            if not hit:
-                continue                      # the column is gone: 04/05 own that
-            g_col = min(hit, key=lambda t: t[0])[1]
+        g_by_src = render_columns(page_lines_t(src[i]), sc, page_lines_t(gd[i]), gc)
+        for j, (a, s_col) in enumerate(sc):
+            g_col = g_by_src.get(j)
+            if not g_col:
+                hit = [(abs(a - b2), c2) for b2, c2 in gc if abs(a - b2) <= 10]
+                if not hit:
+                    continue                  # the column is gone: 04/05 own that
+                g_col = min(hit, key=lambda t: t[0])[1]
             (rs, slack), rg = (edge(s_col, a, s_words),
                                edge(g_col, a, g_words)[0])
             # The single-line defence is now the slack, not the estimator: one word of
