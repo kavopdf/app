@@ -1,11 +1,11 @@
 {
   "baseline_started": 1795848001.7969687,
   "classifier_started": 0,
-  "fixer_doing": "corpus-slice: 18 of 18 converted",
-  "fixer_doing_since": 1795853240.0190794,
+  "fixer_doing": "gate + ledger + report",
+  "fixer_doing_since": 1795853318.5334096,
   "fixer_engine_at_claim": "99fefe2a",
-  "fixer_last_beat": 1795853240.0190802,
-  "fixer_started": 1795850780.7784927,
+  "fixer_last_beat": 1795853318.5334103,
+  "fixer_started": 1795853309.0037274,
   "history": [
     {
       "at": "2026-11-28 06:52",
