@@ -11041,3 +11041,22 @@
 {"t": 1795858510.3503964, "ist": "15:05:10", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795858510.5342963, "ist": "15:05:10", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
 {"t": 1795858535.8731313, "ist": "15:05:35", "ev": "beat", "d": "lastmessage.py: running a tool for its numbers"}
+{"t": 1795858690.0352883, "ist": "15:08:10", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795858690.7858927, "ist": "15:08:10", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795858691.02225, "ist": "15:08:11", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795858705.0941324, "ist": "15:08:25", "ev": "beat", "d": "pod-prep: corpus+jdk+engine"}
+{"t": 1795859052.2650502, "ist": "15:14:12", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795859060.141747, "ist": "15:14:20", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795859207.6656754, "ist": "15:16:47", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795859208.649138, "ist": "15:16:48", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795859209.752184, "ist": "15:16:49", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795859210.951778, "ist": "15:16:50", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795859247.2512383, "ist": "15:17:27", "ev": "beat", "d": "proving google loop on bank-statement-5-pages"}
+{"t": 1795859254.9269102, "ist": "15:17:34", "ev": "beat", "d": "converting bank-statement for google probe"}
+{"t": 1795859494.4479792, "ist": "15:21:34", "ev": "beat", "d": "collecting google render"}
+{"t": 1795859519.8862529, "ist": "15:21:59", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795859567.4316285, "ist": "15:22:47", "ev": "beat", "d": "attempt: row rung under 10->25 twips on 320"}
+{"t": 1795859855.3561826, "ist": "15:27:35", "ev": "beat", "d": "reconverting corpus for rung-25 engine"}
+{"t": 1795860135.201136, "ist": "15:32:15", "ev": "beat", "d": "reconverting corpus back to HEAD engine for the gate"}
+{"t": 1795860728.7503314, "ist": "15:42:08", "ev": "beat", "d": "finishing corpus reconvert"}
+{"t": 1795861073.072658, "ist": "15:47:53", "ev": "beat", "d": "attempt.py: recording an attempt"}
