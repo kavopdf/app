@@ -85,9 +85,29 @@ four probes have not found. That is the honest state of `18_displacement`'s row 
 class has survived every attempt: the instrument (our `.docx`) cannot express the target exactly, and the
 renderer quantises what it is given.
 
-What would prove this wrong: a `before` value in the 368–373 twip band whose Google export lays 19.00 on
-all seven rows. The band is 5 twips wide and the map moves 0.64 pt across it, so a value that lands
-exactly on 19.00 is possible only if the quantisation has a step at 19.00 — worth one probe, not a patch.
+## The band was swept: 19.00 is not on Google's grid at all
+
+Two more probes, `before` = 370 and 371 twips (everything else identical, `line=12 exact`, rows
+`380 atLeast`):
+
+| cell `before` | before (pt) | row pitch laid by Google | first row dy vs source |
+|--:|--:|--:|--:|
+| 368 (shipped) | 18.40 | **18.75** | −1.96 |
+| 370 | 18.50 | **19.24** | +1.84 |
+| 371 | 18.55 | **19.29** | +1.89 |
+| 373 | 18.65 | **19.39** | +1.99 |
+
+Above the step the map is exactly linear and one twip of `before` is one twip of pitch (370→371 is
++0.05 pt), with the line box contributing **0.74 pt for the 0.60 asked**. Below it, at the shipped 368,
+the line contributes 0.35. So there is a **discontinuity between 368 and 370 of 0.49 pt, and the source's
+19.00 pt falls inside it**: the reachable set jumps 18.75 → 19.24 and no value of `before` in the band
+lands on 19.00. The target is not on Google's grid for this row.
+
+That is the answer to the class's central question, and it is a renderer answer, not an engine answer:
+**the row pitch this document needs cannot be expressed in `w:trHeight` + cell `w:spacing` such that
+Google lays it.** Any patch in this axis converts a −0.25 pt/row error into a +0.24 pt/row error — the
+same size, opposite sign — which is exactly the trade the gate exists to refuse. The class needs a
+different construct for the row (or a page-positioned table), not a better number.
 
 Evidence kept: the three exported PDFs were compared line by line; the probe `.docx` files are
 reproducible from the recipe above (one attribute changed, nothing else). The two probe Google Docs were
