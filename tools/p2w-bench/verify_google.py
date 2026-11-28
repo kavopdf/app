@@ -2523,8 +2523,22 @@ def extra_checks2(src, gd, docx_path=None):
             # 0.01 pt. dy stays on the bbox, as 18_displacement takes it, so the ascent
             # sensitivity is the house standard's and not this check's own.
             gxl = min(gruns[j]["xink"] for j in js)
-            dx = (gxl - gb.x0) - (sruns[i]["xink"] - sb.x0)
-            dy = (gy - gb.y0) - (sy - sb.y0)
+            # THE ORIGIN IS THE BOX'S CENTRE, NOT ITS CORNER. _same_box admits two
+            # rectangles as one object when every corner is within ANCHOR_RECT_TOL
+            # (2.0 pt), and the subtraction below then spends that allowance: a box
+            # reproduced 1.9 pt off its source corner, holding its text exactly where
+            # it was, reads dy = 1.9 against a 3.0 pt tolerance - a 1.0 pt budget for
+            # a question that is about the text, not the outline. Measured on the
+            # Google export of 28 Nov (FINDINGS/59-CHARGE-ORIGIN-...-relay.md): the
+            # page frame reads 20.0,20.0,575.3,821.9 against 19.0,19.0,576.2,823.0 and
+            # every reported dx was the frame's own 1.00 pt with the ink at 0.00.
+            # A centre is zero on a perfect reproduction whatever the box's size error,
+            # and a box that really slides takes its centre with it, so the check's own
+            # defect (outline moved, text stayed) is still convicted.
+            scx, scy = (sb.x0 + sb.x1) / 2.0, (sb.y0 + sb.y1) / 2.0
+            gcx, gcy = (gb.x0 + gb.x1) / 2.0, (gb.y0 + gb.y1) / 2.0
+            dx = (gxl - gcx) - (sruns[i]["xink"] - scx)
+            dy = (gy - gcy) - (sy - scy)
             # AGREEMENT IS NEVER A DEFECT, whatever box it was measured against. Two
             # rectangles that differ still put the text in the same place inside
             # themselves, and a number that reads 0 is not evidence of drift. So the
