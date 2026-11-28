@@ -1,11 +1,11 @@
-# Fixer report - 2026-11-28 04:58
+# Fixer report - 2026-11-28 05:54
 
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 04:58 → 05:42 IST · 43 min**
+**28 Nov 2026 · slot 05:54 → running IST · 10 min**
 
-> **2 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **2 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; subagents: 4 deployed vs no FINDINGS filename carries 18prize-01, 61rank-02 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
-| Document-moves this run | **2** — 3 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **2 disagreement(s)** - kept change: 2 code commit(s) in this window, first: findings: 18_displacement is a 0.6pt line box, a vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; subagents: 2 deployed vs no FINDINGS filename carries 63_tB-02 - the work may be on disk under a topic name, and the next run cannot find it by id; rename it with the id first |
+| Document-moves this run | **0** — 0 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -26,16 +26,53 @@
 | Not scored - page count did not match | **8** of the 214 gverify saw - a document that drew the wrong number of pages cannot be compared line by line, and it is a defect, not a pass |
 | Moved but still open | **30** — improved, not fixed |
 | Classes solved | 0 of 35 clear — 35 class(es) still have an OPEN document |
-| Working on | `18_displacement` - taken from the pending list (61 still open), not a new class |
-
-## What was tried
-
-| At | Outcome | Moved | What it measured |
-|--:|:--|--:|:--|
-| 05:39 | **kept** | 2/None | instrument fix: page_lines() split a Google table row at its cell gutters; 2 documents CLEAN (salary-slip-factory-wages, table-with-merged-cells), 10 more pass 60, 0 pass->fail in a 62-document census |
-| 05:41 | **error** | 0/None | spacer-gap model (shift=0.961*gap-0.58) refuted at a05b20eb05fe0fc8: measured 0.2288, r=1.0000; page-break leg binary at -59.03 pt regardless of gap; the inverse correction moves the probe 0.29 pt and |
+| Working on | `-` - taken from the pending list (62 still open), not a new class |
+| The rotation says | `18_displacement` - the run chose `-` by hand instead |
 
 ## Why nothing moved, in this run's own words
+
+> No engine change was made, and that is the decision, not an overrun.
+>
+> Two agents were deployed in the first twenty minutes and both landed a committed finding. Between them
+> they closed the question this run was set up to answer, and the answer was "do not make the change".
+>
+> Agent A (18_displacement) proposed: the row's top edge is invented from a pitch while the cell's
+> baseline is written from a box, so text lands (1 - LINE_BASE) x before low; fix it by writing
+> w:before = 0 and w:line = the row's pitch. Its evidence was LibreOffice, +3.70 pt on
+> 35_four_typefaces_one_page.
+>
+> I read the .docx the engine actually writes for that document and for 71_invoice_space_aligned_no_rules,
+> and the pair is already self-consistent: before = 368 tw, w:line = 12 tw, and the renderer puts the
+> baseline back at before + 0.8 x box = 18.88 pt, which is the position the engine chose. The anomaly is
+> not `before` at all - it is that `w:line` is 12 twips, a 0.60 pt exact line box under a 12 pt font. The
+> baseline is 96% `before` and 4% box, so a renderer that floors a sub-glyph exact line box moves the text
+> by a constant and never by a ramp. That is exactly the constant +0.62..+4.72 pt agent B measured, with no
+> drift, on a table at the top of a page and a table 210 pt down it.
+>
+> Agent B settled the other half in the same hour: ROW_RUNG_UNDER_TW is a deliberate Google compensation,
+> not a bug. Two later attempts to revert it are on record and 6865f403 measured that rung = 0 drops both
+> cross-checked documents from 47/47 to 46/47 in Google. So the row rung stays.
+>
+> Landing agent A's fix would move every cell's baseline in GOOGLE by 18.40 pt on one document and 17.40 pt
+> on the other - in the renderer the score is taken in, on rows Google currently reads at med_dy 0.1, 47/47.
+> That is not a fix, it is the same LibreOffice-looking trade the rung history records twice. The gate
+> would be right to refuse it and I would have spent the slot producing a commit that had to be reverted.
+>
+> So the attempt is recorded as `lead`, and the next attempt is named: the candidate is `w:line`, not
+> `w:before` - give the cell the font's natural line box and move the identical difference into `before` so
+> the baseline is preserved by construction, and neither term is sub-glyph. That predicts a zero move in
+> Google if and only if Google is already preserving the baseline today, and it is falsifiable in one
+> document.
+>
+> What this run leaves behind: three committed findings (two agents, one mine), one attempt recorded as a
+> lead with its next step named, and a class that will not be re-tried along a dead axis.
+>
+> The gap I could not close in the slot, stated plainly: there is no Google export of
+> 35_four_typefaces_one_page anywhere in the repo, so the Google side of every number above is the recorded
+> verdict (med_dy 0.1, 47/47), not a measurement I took. The next run should take one before it trusts the
+> w:line hypothesis.
+
+### The run before this one said
 
 > **Something did move: two documents, measured through Google.** This section is here because the tool
 > asks for the reasoning, not because the run was empty.
@@ -77,11 +114,13 @@
 > `--claim-fixer` now refuses. The kept change was committed, measured and pushed before that happened
 > (`620dc85e`, `30121a9a`).
 
+Accounts share 16% of their significant words - a different account (the cut is 50%).
+
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **15 min ago** |
+| Measured | **37 min ago** |
 | Scored | **214** of 213 |
 | Clean - every applicable check passes | **208** (97.2%) |
 | Failing at least one check | **6** |
@@ -92,20 +131,18 @@
 
 | Agent | Sent to find | Deployed | Landed | Took |
 |:--|:--|--:|--:|--:|
-| `60_tA-01` | which engine construct sets a body line's right edge | 08:04 | - | not recorded |
-| `18prize-01` | which documents would become CLEAN if 18_displacemen | 04:05 | 04:12 | 7 min |
-| `61rank-02` | among the 61 genuine losses, which single Google che | 04:31 | 04:32 | 1 min |
-| `18_dB-01` | test the 0.961 spacer model at the current engine an | 05:40 | - | not recorded |
+| `18_dA-01` | root cause of cell displacement; landed c8056b8 | 06:04 | - | - |
+| `63_tB-02` | ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc | 06:04 | - | - |
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 04:58 → 05:42 · 43 min |
+| Slot window | 05:54 → running · 10 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 53 |
-| Longest silence | **20.1 min** — from 05:07:43, after `pending.py: reading the pending gate` |
-| Silences over 2 min | 4 |
+| Tool beats | 14 |
+| Longest silence | **6.0 min** — from 05:57:09, after `relay: verifying gate health` |
+| Silences over 2 min | 1 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -113,19 +150,16 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **0 min** | `#` |
-| build - compiling the engine | **4 min** | `##` |
-| fix - diagnose and change the engine | **4 min** | `###` |
-| measure or build - a conversion, screen or compile writes no beacon | **24 min** | `##############` |
-| record - attempt, handoff, class rows | **1 min** | `#` |
-| report - the report and the chain | **1 min** | `#` |
-| other - not attributed to a tool | **2 min** | `#` |
+| measure or build - a conversion, screen or compile writes no beacon | **6 min** | `################` |
+| record - attempt, handoff, class rows | **0 min** | `##` |
+| report - the report and the chain | **0 min** | `##` |
+| other - not attributed to a tool | **0 min** | `##` |
 
-The unattributed row is 5 distinct beat(s) that matched no phase. They said:
+The unattributed row is 3 distinct beat(s) that matched no phase. They said:
 
-- `applying instrument fix to 60_text_column_right_edge`
-- `60_text_column_right_edge -> kept`
-- `heartbeat before any claim: attempt 2: 18_displacement per-line drift`
+- `relay: both agents landed, implementing cell-top fix`
+- `relay: verifying gate health`
+- `relay: writing the report`
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -138,7 +172,7 @@ The unattributed row is 5 distinct beat(s) that matched no phase. They said:
 
 ## Next run
 
-READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below.
+READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below.
 
 ---
 *Every number read from ROUND.json, RUN.json, ATTEMPTS.json, HANDOFF.json, BLOCKERS.md, TIMELINE.jsonl, benchmarks/RANKING.csv and benchmarks/RANKING-BASELINE.csv. Never remembered, never estimated.*

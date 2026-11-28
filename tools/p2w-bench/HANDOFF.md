@@ -16,14 +16,12 @@ unfinished work, not as a result.
 
 ## What the next run should do first
 
-> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. 
+> READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because "no .docx output directory" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. 
 
 ## Agents deployed and not yet accounted for
 
 | id | class | angle | question | deployed | expected | status | finding |
 |---|---|---|---|---|---|---|---|
-| Expl-01 | Explore:docx construct ranking by documents-cleared (10-row table, rung rule named first) |  |  | 05:51 |  | running |  |
-| Expl-02 | Explore:txt failure root cause (8 docs, 12 check-instances; recommended the t01 character unit) |  |  | 05:51 |  | running |  |
 | 60_tA-01 | 60_text_column_right_edge | A | which engine construct sets a body line's right edge, and which fixes  | 08:04 | 07:40 | landed | FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md |
 | gateB-01 | gate | B | why does regress.py --check refuse on unmodified HEAD | 08:04 | 07:41 | landed | FINDINGS/GATE-PREREQUISITES-ARE-THE-REAL-BLOCKER-27NOV-fixer.md |
 | 60_tA-02 | 60_text_column_right_edge | A | which engine construct sets a body line's right edge, and which fixes  | 08:12 | 07:40 | landed | FINDINGS/RIGHT-TAB-POSITION-60-EDGE-27NOV-fixer.md |
@@ -46,14 +44,14 @@ unfinished work, not as a result.
 | 61rank-02 | 18_displacement | B | among the 61 genuine losses, which single Google check would clean the | 04:31 | 04:35 | landed | FINDINGS/61rank-02-SIXTY-ONE-LOSSES-RANKED-BY-CHECK-28NOV-agent.md |
 | 60_tA-03 | 60_text_column_right_edge | A | which engine construct sets a body line's right edge - is 60 an engine | 05:40 | 08:05 | landed | FINDINGS/60-THE-LINE-OBJECT-IS-A-TABLE-ROW-28NOV-fixer.md |
 | 18_dB-01 | 18_displacement | B | test the 0.961 spacer model at the current engine and quantify the inv | 05:40 | 08:05 | landed | FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md |
+| 18_dA-01 | 18_displacement | A | root cause of cell displacement; landed c8056b8 | 06:04 | landed 06:02 | running |  |
+| 63_tB-02 | 63_table_rows | B | ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc2 | 06:04 | landed 06:26 | running |  |
 
 A finding lands as a file in tools/p2w-bench/FINDINGS/. Read it even if the agent
 that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
-- `19:56` attempt 22 on t01_word_accuracy -> kept (3/6 moved)
-- `20:52` attempt 114 on 18_displacement -> lead (1/2 moved)
 - `20:57` attempt 115 on 18_displacement -> lead (0/1 moved)
 - `21:08` attempt 116 on 18_displacement -> lead (0/4 moved)
 - `23:07` attempt 1 on 63_table_rows -> lead
@@ -77,6 +75,8 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `05:40` agent deployed: 18_displacement / B - test the 0.961 spacer model at the current engine and quantify the inverse corre
 - `05:40` agent landed: 18_displacement / B -> FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md
 - `05:41` attempt 121 on 18_displacement -> error
+- `06:04` agent deployed: 18_displacement / A - root cause of cell displacement; landed c8056b8
+- `06:04` agent deployed: 63_table_rows / B - ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc2
 
 ## Where the rest of the state lives
 

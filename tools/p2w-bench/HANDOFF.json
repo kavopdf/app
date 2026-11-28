@@ -1,28 +1,6 @@
 {
  "agents": [
   {
-   "id": "Expl-01",
-   "class": "Explore:docx construct ranking by documents-cleared (10-row table, rung rule named first)",
-   "angle": "",
-   "question": "",
-   "expected": "",
-   "deployed": "05:51",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T05:51"
-  },
-  {
-   "id": "Expl-02",
-   "class": "Explore:txt failure root cause (8 docs, 12 check-instances; recommended the t01 character unit)",
-   "angle": "",
-   "question": "",
-   "expected": "",
-   "deployed": "05:51",
-   "status": "running",
-   "finding": "",
-   "deployed_at": "2026-11-27T05:51"
-  },
-  {
    "id": "60_tA-01",
    "class": "60_text_column_right_edge",
    "angle": "A",
@@ -278,6 +256,28 @@
    "finding": "FINDINGS/18-DISPLACEMENT-SPACER-MODEL-REFUTED-DRIFT-IS-THE-LEAD-28NOV-fixer.md",
    "deployed_at": "2026-11-28T05:40",
    "landed_at": "2026-11-28T05:40"
+  },
+  {
+   "id": "18_dA-01",
+   "class": "18_displacement",
+   "angle": "A",
+   "question": "root cause of cell displacement; landed c8056b8",
+   "expected": "landed 06:02",
+   "deployed": "06:04",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-28T06:04"
+  },
+  {
+   "id": "63_tB-02",
+   "class": "63_table_rows",
+   "angle": "B",
+   "question": "ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc2",
+   "expected": "landed 06:26",
+   "deployed": "06:04",
+   "status": "running",
+   "finding": "",
+   "deployed_at": "2026-11-28T06:04"
   }
  ],
  "history": [
@@ -382,16 +382,8 @@
    "plan": ""
   }
  ],
- "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 33 item(s) you can close - run pending.py and take them in its order before the class below. ",
+ "next": "READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-AGENTS-24NOV.md - every open class root-caused, with the measurement that proves it. CORPUS: regress.py --check now builds the converted corpus itself (corpus-slice.py, 240 s a slice - a COLD pod needs TWO gate calls, the first fills one slice and ends at the 290 s ceiling, the second finishes and writes the stamp) - do not convert by hand, and do not skip the gate because \"no .docx output directory\" was ever the reason it could not run. PENDING FIRST: 34 item(s) you can close - run pending.py and take them in its order before the class below. ",
  "notes": [
-  {
-   "at": "03:28",
-   "text": "attempt 99 on 18_displacement -> lead"
-  },
-  {
-   "at": "05:31",
-   "text": "attempt 100 on 18_displacement -> lead"
-  },
   {
    "at": "05:44",
    "text": "attempt 3 on t09_page_furniture -> lead"
@@ -623,6 +615,14 @@
   {
    "at": "05:41",
    "text": "attempt 121 on 18_displacement -> error"
+  },
+  {
+   "at": "06:04",
+   "text": "agent deployed: 18_displacement / A - root cause of cell displacement; landed c8056b8"
+  },
+  {
+   "at": "06:04",
+   "text": "agent deployed: 63_table_rows / B - ROW_RUNG_UNDER_TW bug or compensation; landed 0b15dc2"
   }
  ],
  "plan": "",

@@ -557,3 +557,7 @@
 {"_list": "agents", "_entry": {"id": "ssimB-01", "class": "ssim", "angle": "B", "question": "what caps the 99 percent SSIM goal - is the deficit concentrated or uniform", "expected": "19:00", "deployed": "01:12", "status": "running", "finding": "", "deployed_at": "2026-11-27T01:12"}}
 {"_list": "notes", "_entry": {"at": "02:24", "text": "attempt 97 on 18_displacement -> lead"}}
 {"_list": "notes", "_entry": {"at": "02:26", "text": "attempt 98 on 18_displacement -> lead"}}
+{"_list": "notes", "_entry": {"at": "03:28", "text": "attempt 99 on 18_displacement -> lead"}}
+{"_list": "agents", "_entry": {"id": "Expl-01", "class": "Explore:docx construct ranking by documents-cleared (10-row table, rung rule named first)", "angle": "", "question": "", "expected": "", "deployed": "05:51", "status": "running", "finding": "", "deployed_at": "2026-11-27T05:51"}}
+{"_list": "notes", "_entry": {"at": "05:31", "text": "attempt 100 on 18_displacement -> lead"}}
+{"_list": "agents", "_entry": {"id": "Expl-02", "class": "Explore:txt failure root cause (8 docs, 12 check-instances; recommended the t01 character unit)", "angle": "", "question": "", "expected": "", "deployed": "05:51", "status": "running", "finding": "", "deployed_at": "2026-11-27T05:51"}}
