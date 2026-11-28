@@ -1,13 +1,12 @@
 {
  "agents": [],
- "attempts": 2,
- "class": "60_text_column_right_edge",
+ "attempts": 3,
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
- "needs_human": 0,
- "obstacles_cleared": 0,
- "started": "09:55",
- "started_ts": 1795839944.7290347
+ "started": "10:28",
+ "started_ts": 1795841882.348376,
+ "window_for_claim": 1795841882.348376,
+ "class": "60_text_column_right_edge"
 }

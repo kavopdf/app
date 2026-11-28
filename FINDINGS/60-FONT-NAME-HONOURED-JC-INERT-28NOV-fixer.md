@@ -82,6 +82,40 @@ the line's last word placed on it (`DocxWriter.java:3806-3812` already emits exa
 to table rows; the 28 Nov census measured Google honouring it to **0.11 pt**). That is the next attempt,
 and it is the same construct the census named.
 
+
+## 2b. `w:jc="distribute"` + a per-line right indent is inert too — 60-P's load-bearing assumption is FALSE
+
+`tools/p2w-bench/FINDINGS/18-60-59-THREE-CLASSES-ROOT-CAUSED-AND-THE-LEVER-THAT-CANNOT-REACH-1900-fixer.md`
+§6 item 2 asks for exactly one thing: *"60-P falsified in one Google round trip on `302` (does
+`distribute` pin a one-line paragraph?)"*. 60-P measured **−42.09 pt → +0.38 pt** and 42/42 on five
+documents **in LibreOffice**, and the assumption under it was never tested in Google.
+
+Measured here, on `313`, same `.docx`, `word/document.xml` only. 60-P as specified: `w:jc="distribute"`
+plus a right indent that pins the paragraph's measure to the source's column (`w:ind right="1133"` =
+595.3 − 538.63 pt, so the measure becomes the source's 481.9 pt).
+
+| | pages | lines | max right edge | lines at 538.63 ± 0.6 |
+|:--|--:|--:|--:|--:|
+| source | 1 | 30 | **538.63** | **10** |
+| HEAD | 1 | 30 | 480.14 | 0 |
+| `w:jc="both"` ×29 | 1 | 30 | 480.14 | 0 |
+| **60-P: `w:jc="distribute"` ×29 + `w:ind right="1133"`** | 1 | 30 | **480.14** | **0** |
+
+**All three variants export the same render, to 0.1 pt on all 30 lines.** The right indent is consistent
+with the measurement rather than contradicting it — the substitute face's longest line is 480.1 pt and
+the pinned measure is 481.9 pt, so nothing re-breaks, which is what is seen. But `distribute` had a 1.8 pt
+stretch available and took **none** of it.
+
+**Verdict: 60-P must not be landed.** Its whole effect in LibreOffice comes from a construct Google does
+not apply to a one-line paragraph. Recording this here so the next run does not spend a slot on it, which
+is what §6 item 2 was asking for.
+
+**What this does not establish.** It does not show Google ignores `w:jc` in general — it shows that on a
+document where every line is its own paragraph's last line, neither `both` nor `distribute` moves the
+right edge in the exported PDF. The mechanism (normalisation on import, or the interaction with
+`w:line` exact and `w:snapToGrid w:val="0"`) was not isolated, and a probe that separates them would be
+the next step if anyone wants to reopen it.
+
 ## 3. What did NOT move, so the next run does not re-measure it
 
 * Line breaking is already exact. Left edge 57.0 vs source 56.7 (**0.3 pt**), the same 30 lines in the
