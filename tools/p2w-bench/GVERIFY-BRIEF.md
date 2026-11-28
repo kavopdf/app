@@ -3,6 +3,43 @@
 You measure. You do not fix. The fixer cron is the only cron that changes engine code, and this
 cron's job is to give it a truthful table to work from.
 
+## IF THE PROMPT NAMES A TOOL WITHOUT UNDERSCORES, THE PROMPT IS WRONG
+
+**The cron prompt for this run has been seen to name tools that do not exist. Verified against the live tool
+list on 28 Nov 2026:**
+
+    PROMPT SAYS (wrong)                          REAL NAME
+    GOOGLEDRIVEUPLOADFILE                    ->  GOOGLEDRIVE_UPLOAD_FILE
+    GOOGLEDRIVEEXPORTGOOGLEWORKSPACE_FILE    ->  GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE
+    GOOGLEDRIVECREATEFILE                    ->  GOOGLEDRIVE_CREATE_FILE
+    from sarvamtools import ...              ->  from sarvam_tools import ...
+
+**Every one of them has underscores, and the module name does too.** A `from sarvamtools import` line fails at
+import and a `GOOGLEDRIVEUPLOADFILE(...)` call fails at the call.
+
+**The prompt is also wrong about the flow: it gives two calls, and the flow is three.** It says upload then
+export. **Uploading stores the .docx as a blob, and a blob cannot be exported** - `BLOCKERS.md` records that
+failing with "Failed to retrieve uploaded file content". The middle step is the one that makes the Doc.
+
+**The three calls that work, and this file and `gverify.py` both already carry them:**
+
+    upload(path="/scratch/output/gv/<name>.docx",
+           tool_slug="GOOGLEDRIVE_CREATE_FILE", toolkit="googledrive")        # -> s3key
+    GOOGLEDRIVE_CREATE_FILE(name=<name>, mimeType="application/vnd.google-apps.document",
+                            file_to_upload={name, mimetype, s3key},
+                            parent_folder_id="1OoSHtsv-qEUwk8CnNa9d5hsCKu8PFeij")
+    GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE(fileId=<id>, mimeType="application/pdf")
+
+**`upload` is a platform tool and is NOT importable.** `GOOGLEDRIVE_CREATE_FILE` and
+`GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE` are, from `sarvam_tools`.
+
+**The upload also has a 5 MB ceiling per file.** A .docx over it is refused, so a large document needs splitting
+or a different route - do not spend the slot retrying it.
+
+**When a name has moved, `tool_search` finds the current one in one call, and the paragraph in the prompt that
+was wrong should be corrected in the same run.** The prompt itself says a prompt naming a tool that does not
+exist costs the run that discovers it, every time - so fixing it is part of the run, not a distraction from it.
+
 ## Why this exists
 
 The pipeline measured with `soffice --headless` for months. `verify_google.py` has said since 13 Nov
