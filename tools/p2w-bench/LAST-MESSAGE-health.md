@@ -5,9 +5,9 @@
 | stage | state | age |
 |:--|:--|:--|
 | measure-google | done, 214 of 214 | 3.5 h |
-| matrix | done, 214 of 214 | 1.6 h |
-| classify | superseded | 1.0 h |
-| fix | moving, 5 attempt(s) in 3 h | 0.0 h |
+| matrix | done, 214 of 214 | 1.7 h |
+| classify | superseded | 1.1 h |
+| fix | moving, 5 attempt(s) in 3 h | 0.1 h |
 | txt | moving, 208 clean, 6 failing | 2.3 h |
 
 Matrix is the change since the last pass: it read stopped and now reads 214 of 214 with
