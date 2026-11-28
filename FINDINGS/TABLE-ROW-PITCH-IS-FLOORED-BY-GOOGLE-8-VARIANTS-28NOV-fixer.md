@@ -104,6 +104,28 @@ fail nothing else. Measured on the source PDFs themselves, those 19 split by the
 seven have fewer rows and may still be reachable.** The next run should not treat the 19 as one class:
 measure each one's row count and pitch first, and expect the dense half to be charged by the renderer.
 
+
+## The fourth document: the excess is NOT universal (added 09:48)
+
+`table-inside-two-column-page`, 17 baselines, source rows **11.8 pt** apart, shipped `w:trHeight 370/350`
+(18.5/17.5 pt — taller than the text pitch, because each cell holds more than one line):
+
+| | rows | first | last | span | dominant pitch |
+|---|---:|---:|---:|---:|---|
+| source | 17 | 55.35 | 816.38 | 761.03 | **11.8** (11 of 16 gaps) |
+| Google | 17 | 55.59 | 747.20 | 691.61 | **11.8** (11 of 16 gaps) |
+
+**The text pitch is reproduced exactly.** So the excess measured on the other three is not a property of
+"tables in Google" — it is a property of the regime where **one text line sets the row height**. This
+document's rows are taller than its text pitch and Google honours both.
+
+That splits the class a second time, and it is the correction this finding needed: the drift is not
+"Google adds 0.1-0.5 pt per row to every table", it is "where a single line of text defines the row, the
+delivered row is taller than the line, by +0.10 (16.40 src), +0.13 (18.40) and +0.50 (13.00, 6 pt text)".
+This document also lands its table **69.18 pt short** at the bottom (747.20 vs 816.38) with the pitch
+intact, which is a different defect — a page-layout difference, not a per-row one — and it is the shape
+`18_displacement` takes on a two-column page.
+
 ## What would prove this wrong
 
 * A Google render of any 20+ row table whose measured pitch equals its source pitch to within 0.05 pt.
