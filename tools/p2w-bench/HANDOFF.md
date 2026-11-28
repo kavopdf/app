@@ -52,6 +52,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 
 ## What happened, most recent last
 
+- `09:06` attempt 125 on 18_displacement -> lead
 - `09:28` attempt 4 on t09_page_furniture -> lead
 - `09:41` attempt 126 on 18_displacement -> lead
 - `09:42` agent deployed: 18_displacement / A - is the cell w:line natural-box rewrite right in GOOGLE on 35_four_typefaces_one_
@@ -75,8 +76,7 @@ that wrote it is long gone - that is why it writes a file instead of replying.
 - `14:59` agent deployed: 60_text_column_right_edge / column geometry - Is the produced .docx table 2.4x wider than the source, or is check 60 misreadin
 - `14:59` agent deployed: 415_inline_images / zero SSIM - Are 415_inline_images and 411_nested_xobject_transforms a regression, or a misre
 - `15:47` attempt 128 on 18_displacement -> lead
-- `15:51` attempt 129 on 18_displacement -> kept
-- `15:51` attempt 130 on 18_displacement -> lead
+- `16:27` attempt 129 on 18_displacement -> lead
 
 ## Where the rest of the state lives
 

@@ -92,3 +92,50 @@ The change was reverted and the engine left byte-identical to HEAD; `regress.py 
 `320` without clipping the rows it protects. That is the experiment the next run should run first — the
 Google loop above makes it a one-document measurement, and 19 documents currently fail `18_displacement`
 **alone**, so a construct that lands turns 19 documents CLEAN rather than moving them.
+
+---
+
+## 3. `footRoom` is the lever, and it is worth 11 pt of drift on `320` — measured in Google, both ways
+
+The run above said the lever was `footRoom` but had not tested it. It has now been tested, end to end, in
+Google, on `320_balance_sheet_statutory`.
+
+**Which predicate is false, per row, instrumented (not read off the code).** `pitchBinds` is **true on all
+21 rows**; `footRoom` is **false on all 21**. The row loop reports, for each row:
+
+| table | rows | text need | clearance below the lowest baseline | `footRoom` wants | verdict |
+|---|--:|--:|--:|--:|---|
+| T1 | 16 | 195 tw (9.75 pt) | 4.25 pt | 5.0 pt | **false** |
+| T2 | 5 | 185 tw (9.25 pt) | 3.75 pt | 5.0 pt | **false** |
+
+The guard misses by **0.75 pt on T1 and 1.25 pt on T2** — it is refusing rows that have 4.25 pt and 3.75 pt
+of room under their own text, because its threshold is 5.0 pt. A threshold of 75 twips (3.75 pt) flips both
+tables; 85 twips would flip T1 only.
+
+**The change:** `FOOT_ROOM_MIN_TW = 100 -> 75`. All 21 rows then emit `w:trHeight` **270** (T1) and **250**
+(T2) instead of `280`/`260`, and the rung subtraction finally runs.
+
+**Measured in Google, same document, same day, same three-call loop, both engines:**
+
+| | passed | `med_dy` | `worst_dy` | engine |
+|---|:--|--:|--:|---|
+| HEAD (`FOOT_ROOM_MIN_TW = 100`) | 46/47 | **7.2** | **16.2** | `a05b20eb05fe0fc8` |
+| `FOOT_ROOM_MIN_TW = 75` | 46/47 | **0.4** | **5.2** | `31324da9a1c1672e` |
+
+**`worst_dy` 16.2 -> 5.2 pt and `med_dy` 7.2 -> 0.4 pt.** The class did not close — `18_displacement` still
+fails, so the document is not CLEAN and this is a **lead, not a kept change** — but the drift construct (3)
+describes is now spent, and the residual is the one the agent predicted: T2's five rows are **ladder-inert**,
+because 260 and 250 both land on 13.50 pt on Google's `0.75 * (round(d/0.75) + 1)` ladder. Those rows need a
+**240-twip** declaration (12.75 pt) to move at all.
+
+**Why it is not committed.** `regress.py --check` refuses an unmeasured engine: the table is stamped on
+`a05b20eb` and the changed tree is `31324da9`. Landing it needs a corpus-wide Google re-measure and
+`--stamp`, which is 206 documents x 3 Drive calls and does not fit in one slot. The change was reverted, the
+corpus reconverted for HEAD, the gate re-run and passing, and the stored `320` row re-measured at HEAD so the
+table still describes the engine in the tree (46/47, `med_dy 7.2`, `worst_dy 16.2`, engine `a05b20eb`).
+
+**What the next run should do, in this order.** (1) Re-apply `FOOT_ROOM_MIN_TW = 75` **and** take T2's rows to
+240 twips in the same change, so the ladder moves on both tables. (2) Measure `320` in Google first — one
+document, ~3 minutes with the loop in section 1 — and expect `18_displacement` to pass if `worst_dy` goes
+under the check's tolerance. (3) Only then pay the corpus-wide re-measure and `--stamp`. 19 documents fail
+`18_displacement` alone; this is the construct most likely to turn them CLEAN.

@@ -1,11 +1,27 @@
 {
- "agents": [],
- "attempts": 2,
+ "agents": [
+  {
+   "name": "drive-unblock-01",
+   "class": "-",
+   "angle": "google-loop",
+   "question": "Can a locally built .docx reach Google Drive without an s3key?",
+   "result": "yes via the platform upload tool (mints s3key for a file already in a saved location); a local path is refused before any Drive call. Loop proven end to end: bank-statement-5-pages 42/47 reproduced."
+  },
+  {
+   "name": "footRoom-lever-01",
+   "class": "18_displacement",
+   "angle": "row-pitch",
+   "question": "Which of pitchBinds/footRoom is false on every row of 320_balance_sheet_statutory, and does relaxing footRoom clip the text?",
+   "result": "footRoom false on all 21 rows (clearance 4.25/3.75 pt vs 5.0 threshold); pitchBinds true on all 21. FOOT_ROOM_MIN_TW 100->75 emits 270/250 twips, no clipping (word sequence identical in LibreOffice, +3.75/+3.25 pt clearance after the rung). Google A/B on the fixer side: worst_dy 16.2 -> 5.2, med_dy 7.2 -> 0.4."
+  }
+ ],
+ "attempts": 3,
  "docs_improved": 0,
  "ended": null,
  "ended_ts": null,
  "kept": 0,
  "started": "15:47",
  "started_ts": 1795861077.1609952,
- "window_for_claim": 1795861077.1609952
+ "window_for_claim": 1795861077.1609952,
+ "class": "18_displacement"
 }

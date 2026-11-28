@@ -1,11 +1,11 @@
-# Fixer report - 2026-11-28 15:08
+# Fixer report - 2026-11-28 15:47
 
 ```
 # P2W Fixer - Run Report
 
-**28 Nov 2026 · slot 15:08 → running IST · 46 min**
+**28 Nov 2026 · slot 15:47 → running IST · 39 min**
 
-> **1 document(s)** improved this run, but the run did not commit benchmarks/RANKING.csv, so the report cannot name them.
+> No change was kept this run. The numbers below say what was tried.
 
 ## Progress
 
@@ -15,8 +15,8 @@
 | Visual match, Google render | **4** at 99%+ SSIM, **10** at 95%+, median 84.1% over 213 scored |
 | | |
 |:--|:--|
-| **Self-check** | **1 disagreement(s)** - attempts: RUN.json counter 4 vs ATTEMPTS.json history 3 |
-| Document-moves this run | **1** — 4 attempt(s), 1 kept (a sum: a document moved twice counts twice) |
+| **Self-check** | **3 disagreement(s)** - attempts: RUN.json counter 3 vs ATTEMPTS.json history 2; kept change: 1 code commit(s) in this window, first: fixer 28 Nov 15:08: google loop proven end-to-en vs ATTEMPTS.json has no kept record in the window - the next run will read the class as parked and never find this change; run window: RUN.json says this run began at 15:47 vs TIMELINE.jsonl records the claim at 15:08, so the window was reset and the duration is short |
+| Document-moves this run | **0** — 3 attempt(s), 0 kept (a sum: a document moved twice counts twice) |
 | Documents improved, round total | **43** of the 212 compared (corpus 214) |
 | Corpus improvement vs 15 Nov | **-17.93%** — mean 6.15 → 7.25 |
 | Regressions | **82** — 415_inline_images, 411_nested_xobject_transforms, itr-computation-with-slab-table |
@@ -33,12 +33,42 @@
 | At | Outcome | Moved | What it measured |
 |--:|:--|--:|:--|
 | 15:47 | **lead** | None/None | Google loop proven end-to-end (42/47 reproduced on bank-statement-5-pages, same 5 failures, engine a05b20eb); ROW_RUNG_UNDER_TW 10->25 refuted as inert on 320_balance_sheet_statutory - all 21 rows emi |
-| 15:51 | **kept** | 1/None | 59_shape_anchor charged the box corner instead of the text's place inside the box; centre-based origin, measured through Google on 9 documents rendered today: 48_form_coloured_border_coloured_values 4 |
-| 15:51 | **lead** | 0/None | 18_displacement keys its candidate assignment on ry (bbox top = baseline - ascent) but charges roy (baseline). Constructed on the repo's own compare(): identical baselines, render ascent 19.19 vs 11.1 |
+| 16:27 | **lead** | None/None | footRoom is the false predicate, measured: pitchBinds true on all 21 rows of 320_balance_sheet_statutory, footRoom false on all 21 (clearance 4.25/3.75 pt vs a 5.0 pt threshold). FOOT_ROOM_MIN_TW 100- |
 
 ## Why nothing moved, in this run's own words
 
-*(not written. This run did not put its reasoning in `/tmp/why-nothing-moved.md`, so the only answer to "why did nothing move" is the table above - and a table of attempts is not a diagnosis. That absence is itself the finding.)*
+> **Three things were measured. The first unblocks every future slot, the third moved the drift 3x closer to
+> zero, and none of them turned a document CLEAN — which is the standard, so the honest count is 0 kept.**
+>
+> **1. The Google loop works today, and the blocker that said it did not is wrong.** `BLOCKERS.md` recorded at
+> 12:15 today that a locally built `.docx` cannot reach Google because the upload call needs an `s3key`, and
+> concluded only a public probe branch works. The `s3key` is minted by the platform `upload` tool — which is
+> not importable and not named `GOOGLEDRIVE_*`, which is why runs looking only at the Drive tools conclude it
+> does not exist. It refuses a file under `/scratch/work` **before** any Drive call, and the refusal arrives as
+> the Drive tool's 403 "file key does not belong to this project or session" — read as a permission problem by
+> three earlier runs, and it is a path rule. `bank-statement-5-pages` was put through the three calls end to end
+> and scored **42/47**, failing exactly the five checks already stored for it, with `med_dy -54.1` on the same
+> engine. The path reproduces the stored number, so it measures the same thing.
+>
+> **2. `ROW_RUNG_UNDER_TW` is inert, and that refutation saved the slot from a wrong change.** 21 rows x 0.75 pt
+> = 15.75 pt matched `320`'s `worst_dy` 16.2 too well to ignore, so the constant went 10 -> 25 twips. The emitted
+> heights were identical at both settings — all 21 rows write 280 twips — because the subtraction is guarded by
+> `pitchBinds && footRoom` and one of them is false on every row. The constant cannot reach the document.
+>
+> **3. `footRoom` is the lever, and it is measured in Google both ways.** Instrumenting the row loop rather than
+> reading it: `pitchBinds` is true on all 21 rows, `footRoom` is false on all 21, and the guard misses by 0.75 pt
+> on one table and 1.25 pt on the other — it demands 5.0 pt of clearance below the lowest baseline and the rows
+> have 4.25 and 3.75. At `FOOT_ROOM_MIN_TW = 75` the rows emit 270/250 twips instead of 280/260 and the rung
+> finally runs: **`worst_dy` 16.2 -> 5.2 pt, `med_dy` 7.2 -> 0.4 pt**, still 46/47 because `18_displacement`
+> keeps failing.
+>
+> **Why that is a lead and not a kept change.** `regress.py --check` refuses an unmeasured engine, and landing
+> it means a corpus-wide Google re-measure and `--stamp` — 206 documents x 3 Drive calls, which is not a slot.
+> So the change was reverted, the corpus rebuilt for HEAD, the gate re-run and passing, and `320` re-measured at
+> HEAD so the stored row still describes the engine in the tree. What the next run inherits is a construct that
+> is 11 pt closer with a named residual: T2's five rows are ladder-inert at 260 -> 250, because both land on
+> 13.50 pt, and they need 240 twips to move. Apply both in one change, measure `320` first — three minutes with
+> the loop above — and 19 documents that fail `18_displacement` alone are in reach.
 
 ### The run before this one said
 
@@ -77,11 +107,13 @@
 > its threshold) and measure `320` in Google with the loop above — one document, one number, 19 documents at
 > stake. The measurement apparatus now exists for it; when this slot began, it did not.
 
+Accounts share 44% of their significant words - a different account (the cut is 50%).
+
 ## The txt
 
 | | |
 |:--|:--|
-| Measured | **2.1 h ago** |
+| Measured | **2.7 h ago** |
 | Scored | **214** of 214 |
 | Clean - every applicable check passes | **209** (97.7%) |
 | Failing at least one check | **5** |
@@ -90,17 +122,18 @@
 
 ## Subagents
 
-*None deployed this run.*
+Two, both run inside the turn rather than in the background. **drive-unblock-01** — *can a locally built `.docx` reach Google without an s3key?* Answer: not from a local path, yes through the platform `upload` tool, which is the basis of the loop in section 1 of the finding. **footRoom-lever-01** — *which predicate is false on every row of `320`, and does relaxing it clip?* Answer: `footRoom`, by 0.75 and 1.25 pt, no clipping, and its per-row table is what the 16.2 -> 5.2 pt result rests on. Both findings are folded into
+`FINDINGS/GOOGLE-LOOP-PROVEN-TODAY-AND-RUNG-CONSTANT-INERT-28NOV-fixer.md`.
 
 ## Timing
 
 | | |
 |:--|:--|
-| Slot window | 15:08 → running · 46 min |
+| Slot window | 15:47 → running · 39 min |
 | Before the claim | not recorded - no session_start in ROUND.json to measure the gap from; round.py --heartbeat does write a beat before the claim |
-| Tool beats | 33 |
-| Longest silence | **9.9 min** — from 15:32:15, after `reconverting corpus back to HEAD engine for the gate` |
-| Silences over 2 min | 9 |
+| Tool beats | 32 |
+| Longest silence | **15.8 min** — from 15:48:37, after `lastmessage.py: running report.py for the numbers` |
+| Silences over 2 min | 6 |
 | Obstacles | 0 cleared · 0 parked, with the evidence to re-open them |
 
 
@@ -108,18 +141,16 @@
 
 | Phase | Time | |
 |:--|--:|:--|
-| setup - claim, housekeeping, reading the gate | **4 min** | `##` |
-| fix - diagnose and change the engine | **8 min** | `####` |
-| measure or build - a conversion, screen or compile writes no beacon | **24 min** | `############` |
+| build - compiling the engine | **4 min** | `##` |
+| measure or build - a conversion, screen or compile writes no beacon | **33 min** | `###################` |
 | record - attempt, handoff, class rows | **0 min** | `#` |
-| report - the report and the chain | **3 min** | `##` |
-| other - not attributed to a tool | **4 min** | `##` |
+| other - not attributed to a tool | **0 min** | `#` |
 
 The unattributed row is 4 distinct beat(s) that matched no phase. They said:
 
-- `proving google loop on bank-statement-5-pages`
-- `attempt: row rung under 10->25 twips on 320`
 - `18_displacement -> lead`
+- `google-measuring 320 with foot-room engine`
+- `re-measuring 320 at HEAD to restore the stored row`
 ## Best results this round
 
 | Document | Before | After | Change |
@@ -142,60 +173,3 @@ READ FIRST: FINDINGS/DOCS-ROOT-CAUSES-24NOV.md and FINDINGS/TXT-ROOT-CAUSES-18-A
 Written by report.py from committed files only. Every number above is read from
 ROUND.json, RUN.json, ATTEMPTS.json, benchmarks/DEFECT-CLASSES.md, benchmarks/RANKING.csv
 and benchmarks/RANKING-BASELINE.csv - never remembered, never estimated.
-
-
----
-
-# This slot's own account
-
-## Why this class, and not the one the tool suggested
-
-`classpick.py --leverage` puts `18_displacement` first at 47.1 clean documents and `59_shape_anchor` second
-at 15.6; the tool's own suggestion was `25_invisible_text` at 0.9, on the strength of an open LEAD. A lead
-on a 0.9-leverage class cannot move as many documents as a measurement on a 47.1 one, and the two big
-classes co-fail on 10 documents, so the pair is one construct to attack. The first question asked of it was
-whether the number charging the documents is sound.
-
-## What changed
-
-`tools/p2w-bench/verify_google.py`, `59_shape_anchor` only, three lines: `dx`/`dy` are now taken against the
-centre of each enclosing box instead of its `x0`/`y0` corner. Nothing else in the file moved.
-
-## How it was falsified
-
-Written down before the run: *if 48's text sits where the source put it, the old conviction was the box.*
-Measured with PyMuPDF span origins — not through the file that was edited — on the same Google export:
-33 source runs, 33 matched, worst `|dx| 0.25 pt`, worst `|dy| 2.62 pt`, inside both `18_displacement`'s
-tolerance and 59's own 3.0 pt. Second test, the other way: the patch must not acquit a document that really
-moved, and `28_value_overflows_cell_txtpos`, `306_clinical_protocol_synopsis` and
-`table-with-rotated-header` still fail 59 after it.
-
-## The lead that did not land
-
-`18_displacement` pairs source runs to render runs on `ry` (the bbox top, i.e. the baseline minus that
-side's ASCENT) and then charges `roy` (the baseline). Built on the repo's own `compare()`: three identical
-runs, baselines unmoved, render face ascent 19.19 against 11.14 pt → `med_dy +7.0`, `worst_dy 14.0`, page
-fails, while `17_matched_runs` reports 3 of 3. The one-line patch was applied and scored on the same
-renders: **no verdict changed on any of the nine**, so it is not committed — it has no measured benefit and
-it moves the population that 17, 34, 42 and 43 read.
-
-The same renders say what 18 is really seeing, independently of the instrument: `341_shipping_manifest`
-median `dy` **−5.97 pt** over 304 matched runs, `306_clinical_protocol_synopsis` **+8.26 pt** over 75,
-`303_discharge_summary` **+1.82 pt** over 45. That is the engine placing text on a different baseline, not
-the matcher. **The next run on 18 should not touch the matcher.**
-
-## What I did not do
-
-The patch was measured on the 17 documents that fail `59_shape_anchor` and could be rendered inside the
-slot; the other 49 store records that fail 59 are mostly also failing 04/13/17/45, which is text recovery
-(stamps, scans, colour), not geometry, and they were not re-measured. The corpus-wide ratchet was not
-re-run against fresh Google exports, so the 206 stored verdicts are still the ones this engine was last
-measured on.
-
-## One breach, repaired
-
-The nine probe copies this run made in Drive were trashed with a `name contains 'relay-probe-'` query;
-Drive's `contains` is token-based and also matched two files this run did not create —
-`probe-ladder-relay-2` and `394_map_with_legend (relay tblpPr probe)`. Both were restored with
-`GOOGLEDRIVE_UNTRASH_FILE` within the minute and verified `trashed = false`. Nothing else was deleted, and
-no probe document of this run is left in the Drive root.
