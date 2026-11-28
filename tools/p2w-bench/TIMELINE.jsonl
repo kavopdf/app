@@ -10937,3 +10937,66 @@
 {"t": 1795849670.3606887, "ist": "12:37:50", "ev": "beat", "d": "lastmessage.py: checking a tool's output"}
 {"t": 1795849671.117453, "ist": "12:37:51", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
 {"t": 1795849674.803306, "ist": "12:37:54", "ev": "beat", "d": "lastmessage.py: running report.py for the numbers"}
+{"t": 1795850783.7741408, "ist": "12:56:23", "ev": "claim", "d": "fixer claimed the slot"}
+{"t": 1795850783.9922302, "ist": "12:56:23", "ev": "beat", "d": "handoff.py: reading or writing the handoff"}
+{"t": 1795850784.100851, "ist": "12:56:24", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795850793.4134524, "ist": "12:56:33", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795850796.3870497, "ist": "12:56:36", "ev": "beat", "d": "pending.py: reading the pending gate"}
+{"t": 1795851437.5682614, "ist": "13:07:17", "ev": "beat", "d": "pod-prep: fetching corpus+jdk+libs (can take 15 min)"}
+{"t": 1795851642.442529, "ist": "13:10:42", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795851644.0629468, "ist": "13:10:44", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795851656.811156, "ist": "13:10:56", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795851657.0211673, "ist": "13:10:57", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795851657.2209208, "ist": "13:10:57", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795851657.4390287, "ist": "13:10:57", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795851657.6430566, "ist": "13:10:57", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795851657.8040214, "ist": "13:10:57", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795851662.59886, "ist": "13:11:02", "ev": "beat", "d": "corpus convert slice 2"}
+{"t": 1795851854.4535384, "ist": "13:14:14", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795851854.6160052, "ist": "13:14:14", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795851854.79687, "ist": "13:14:14", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795851854.9711974, "ist": "13:14:14", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795851855.1685715, "ist": "13:14:15", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795851855.386574, "ist": "13:14:15", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795851855.5917573, "ist": "13:14:15", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795851855.7544243, "ist": "13:14:15", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795851950.5846763, "ist": "13:15:50", "ev": "beat", "d": "engine patched, recompiling"}
+{"t": 1795852202.526357, "ist": "13:20:02", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795852202.7568645, "ist": "13:20:02", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795852202.971797, "ist": "13:20:02", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795852203.1599982, "ist": "13:20:03", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795852203.3702495, "ist": "13:20:03", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795852203.519313, "ist": "13:20:03", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795852203.687671, "ist": "13:20:03", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795852203.8643284, "ist": "13:20:03", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795852243.7445538, "ist": "13:20:43", "ev": "beat", "d": "recompile with dejaVuFace helper"}
+{"t": 1795852494.5677364, "ist": "13:24:54", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795852494.766694, "ist": "13:24:54", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795852494.9892986, "ist": "13:24:54", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795852495.1964817, "ist": "13:24:55", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795852495.381047, "ist": "13:24:55", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795852495.5459511, "ist": "13:24:55", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795852495.715756, "ist": "13:24:55", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795852495.9268723, "ist": "13:24:55", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795852605.0127923, "ist": "13:26:45", "ev": "beat", "d": "font map refuted; reverted engine; recompiling HEAD"}
+{"t": 1795852852.7894368, "ist": "13:30:52", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795852852.9681935, "ist": "13:30:52", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795852853.1440992, "ist": "13:30:53", "ev": "beat", "d": "corpus-slice: 18 of 53 converted"}
+{"t": 1795852853.3005617, "ist": "13:30:53", "ev": "beat", "d": "corpus-slice: 24 of 53 converted"}
+{"t": 1795852853.4688056, "ist": "13:30:53", "ev": "beat", "d": "corpus-slice: 30 of 53 converted"}
+{"t": 1795852853.6763241, "ist": "13:30:53", "ev": "beat", "d": "corpus-slice: 36 of 53 converted"}
+{"t": 1795852853.8501225, "ist": "13:30:53", "ev": "beat", "d": "corpus-slice: 42 of 53 converted"}
+{"t": 1795852853.9935353, "ist": "13:30:53", "ev": "beat", "d": "corpus-slice: 48 of 53 converted"}
+{"t": 1795852863.0740664, "ist": "13:31:03", "ev": "beat", "d": "corpus convert to finish (70 to go)"}
+{"t": 1795853071.842517, "ist": "13:34:31", "ev": "beat", "d": "corpus-slice: 6 of 53 converted"}
+{"t": 1795853073.4571161, "ist": "13:34:33", "ev": "beat", "d": "corpus-slice: 12 of 53 converted"}
+{"t": 1795853227.877443, "ist": "13:37:07", "ev": "beat", "d": "corpus-slice: 6 of 18 converted"}
+{"t": 1795853231.3425474, "ist": "13:37:11", "ev": "beat", "d": "corpus-slice: 12 of 18 converted"}
+{"t": 1795853240.0183017, "ist": "13:37:20", "ev": "beat", "d": "corpus-slice: 18 of 18 converted"}
+{"t": 1795853260.0843244, "ist": "13:37:40", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795853281.5391223, "ist": "13:38:01", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795853288.6176474, "ist": "13:38:08", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795853292.2507315, "ist": "13:38:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795853292.593293, "ist": "13:38:12", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795853294.8190024, "ist": "13:38:14", "ev": "beat", "d": "attempt.py: recording an attempt"}
+{"t": 1795853306.384593, "ist": "13:38:26", "ev": "beat", "d": "attempt.py: recording an attempt"}

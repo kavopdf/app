@@ -1337,7 +1337,7 @@
   "status": "OPEN"
  },
  "60_text_column_right_edge": {
-  "attempts": 13,
+  "attempts": 14,
   "first_seen": null,
   "history": [
    {
@@ -1462,6 +1462,17 @@
     "outcome": "lead",
     "reason": "Google round trip (6 probes): face substitution is the cause. 313 HEAD 41/42 (60 FAIL, edge 477.66 vs src 538.63) -> Verdana face 42/42 PASS (edge 536.15); 302 HEAD 41/42 -> Verdana 42/42 PASS. Georgi",
     "total": null
+   },
+   {
+    "at": "2026-11-28 13:38",
+    "changed": {
+     "files": [],
+     "last_engine_commit": "txt: hoist a paragraph the model parked at the end back to its own top"
+    },
+    "moved": 0,
+    "outcome": "lead",
+    "reason": "DejaVu face map, measured through Google on 12 documents. The Verdana rename makes 60 PASS on 5 of 5 target documents (313, 302, 316, 370, 321) and makes 53_embedded_faces FAIL on all 12 - including 5",
+    "total": null
    }
   ],
   "last": null,
@@ -1481,9 +1492,10 @@
    "lead",
    "lead",
    "lead",
+   "lead",
    "lead"
   ],
-  "reason": "Google round trip (6 probes): face substitution is the cause. 313 HEAD 41/42 (60 FAIL, edge 477.66 vs src 538.63) -> Verdana face 42/42 PASS (edge 536.15); 302 HEAD 41/42 -> Verdana 42/42 PASS. Georgia control moved 0.35pt. sz23 fixes 60 but breaks 34a_span_size_match. Engine mapping + 54min corpus docx pass owed. FINDINGS/60-JUSTIFY-PIN-REFUTED-IN-GOOGLE-28NOV-fixer.md",
+  "reason": "DejaVu face map, measured through Google on 12 documents. The Verdana rename makes 60 PASS on 5 of 5 target documents (313, 302, 316, 370, 321) and makes 53_embedded_faces FAIL on all 12 - including 5 documents that were clean before (304, 315, 362, 33_sans, 340, the last two also losing 46/59 and 18). 53's own rule 2 forbids any width-changing rename and DejaVu Serif has no metric-identical serif on Google, so 60 and 53 cannot both pass on a DejaVu document. Zero clean gained, five clean lost: reverted, no engine change. Evidence: FINDINGS/FONT-MAP-REFUTED-53-FORBIDS-ANY-WIDTH-CHANGING-RENAME-28NOV-fixer.md. Also closed blocker #5: the Drive measurement path works (VERIFY-GOOGLE.md, the path that works).",
   "reasons": [
    "stale-engine hypothesis for the 24 one-check documents refuted on the 4 that share 60_text_column_right_edge: re-measured 302/313/316/321 on the current engine, all four still 41,46,41,41 with 60_text_column_right_edge and render=1 vs source=0. The table was accurate. Records re-stamped to b7699196 so the class is now a current-engine class, not a stale one.",
    "the check fires UNDER not over: all four report source=0 render=1 and the render's column is 58-66 pt NARROWER. Cause measured: docx declares DejaVuSerif/DejaVuSans, Google substitutes Arial, median line width drops 10-15%. Margins are zero and the page is A4, so it is a font-substitution defect, not a column defect.",
@@ -1497,7 +1509,8 @@
    "Google-measured on 313_power_of_attorney (fails only 60). The font-name lever was measured in Google for the first time: HEAD renders ArialMT at max right edge 480.14 against a source 538.63; Georgia 480.49; Noto Serif 505.01; Times New Roman 449.00; Liberation Serif is not in Google's library and falls back to Arial byte-for-byte. Best face closes 33.6 of 58.5 pt, so the name is honoured but is not the fix. w:jc=both on all 29 body paragraphs is INERT (all 30 right edges identical to 0.1 pt) because 29 paragraphs over 30 lines means nearly every line is its own paragraph's last line, which justification does not stretch.",
    "60-P falsified in Google in one round trip, which the 1900-fixer finding's section 6 item 2 asked for: w:jc=distribute plus a per-line right indent (w:ind right=1133, pinning the measure to the source's 481.9 pt) on all 29 body paragraphs of 313 exports the SAME render as HEAD - all 30 right edges identical to 0.1 pt, max 480.14. The LibreOffice measurement (-42.09 -> +0.38 pt, 42/42 on five documents) does not transfer. Do not land 60-P.",
    "Google round trip refutes the justify-pin: 313 41/42 HEAD vs 40/42 pinned, 60 still FAIL (under-run 60.97pt -> 57.92pt, tolerance 48), plus a new 18_displacement. Cause is face substitution: source DejaVuSerif 10pt, Google has none, draws 14.6% narrower. See FINDINGS/60-JUSTIFY-PIN-REFUTED-IN-GOOGLE-28NOV-fixer.md",
-   "Google round trip (6 probes): face substitution is the cause. 313 HEAD 41/42 (60 FAIL, edge 477.66 vs src 538.63) -> Verdana face 42/42 PASS (edge 536.15); 302 HEAD 41/42 -> Verdana 42/42 PASS. Georgia control moved 0.35pt. sz23 fixes 60 but breaks 34a_span_size_match. Engine mapping + 54min corpus docx pass owed. FINDINGS/60-JUSTIFY-PIN-REFUTED-IN-GOOGLE-28NOV-fixer.md"
+   "Google round trip (6 probes): face substitution is the cause. 313 HEAD 41/42 (60 FAIL, edge 477.66 vs src 538.63) -> Verdana face 42/42 PASS (edge 536.15); 302 HEAD 41/42 -> Verdana 42/42 PASS. Georgia control moved 0.35pt. sz23 fixes 60 but breaks 34a_span_size_match. Engine mapping + 54min corpus docx pass owed. FINDINGS/60-JUSTIFY-PIN-REFUTED-IN-GOOGLE-28NOV-fixer.md",
+   "DejaVu face map, measured through Google on 12 documents. The Verdana rename makes 60 PASS on 5 of 5 target documents (313, 302, 316, 370, 321) and makes 53_embedded_faces FAIL on all 12 - including 5 documents that were clean before (304, 315, 362, 33_sans, 340, the last two also losing 46/59 and 18). 53's own rule 2 forbids any width-changing rename and DejaVu Serif has no metric-identical serif on Google, so 60 and 53 cannot both pass on a DejaVu document. Zero clean gained, five clean lost: reverted, no engine change. Evidence: FINDINGS/FONT-MAP-REFUTED-53-FORBIDS-ANY-WIDTH-CHANGING-RENAME-28NOV-fixer.md. Also closed blocker #5: the Drive measurement path works (VERIFY-GOOGLE.md, the path that works)."
   ],
   "requeues": 0,
   "status": "OPEN"
