@@ -1,10 +1,11 @@
 # P2W Baseline - Run Report
 
-**28 Nov 2026 · 06:50 IST**
+**28 Nov 2026 · 08:00 IST**
 
 > 98 of 214 documents are at or under 1% share@5px in LibreOffice. The corpus is -24.3% closer to the 15 Nov baseline than it started.
 
-This run started from an empty pod: it downloaded the corpus, converted every document with the current engine, measured the whole set, and refreshed the .txt table against the same build. The census and the ranking were published from that measurement, and the ratchet compared it against the committed baseline before anything was committed.
+The phase was already past measure when this run started, so instead of publishing a new table it refreshed the .txt half: the corpus was rebuilt and re-measured to confirm the committed table still holds against the engine as it stands, and the .txt named checks were then re-scored with the current verifier. The verdicts did not move - the table was already current - and the restamp evidence is committed. The .txt failures the tables list are real and still open for the fixer.
+
 
 ## Corpus
 
