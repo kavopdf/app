@@ -4,6 +4,40 @@
 half: how the Google-rendered PDF is produced, in batches, without leaving anything
 behind in the user's Drive.
 
+## THE PATH THAT WORKS (measured 28 Nov 2026) - no s3key, no probe branch needed for the upload
+
+Blocker #5 said "the upload call needs an s3key the s3 key does not belong to this project", and three
+runs lost their `.docx` measurement to it. It is not a blocker. Two routes work, and the first needs
+nothing but a local file:
+
+    A. LOCAL FILE -> s3key -> Google Doc
+       1. copy the .docx into /scratch/output (the platform `upload` tool refuses /scratch/work)
+       2. upload(path=/scratch/output/x.docx, tool_slug="GOOGLEDRIVE_CREATE_FILE", toolkit="googledrive")
+          -> {name, mimetype, s3key}
+       3. GOOGLEDRIVE_CREATE_FILE(name=..., mimeType="application/vnd.google-apps.document",
+              parents=["11-mkegjnnIOmVdO7c44nDSgxrw2qkWn6"], file_to_upload={name,mimetype,s3key})
+          -> {id}
+       Measured: 313_power_of_attorney converted and exported clean this way.
+
+    B. PUBLIC URL -> Google Doc  (the one to use for a BATCH: every call is an MCP tool, so a whole
+       probe set runs inside ONE run_program with asyncio.gather)
+       1. push the .docx to a probe branch - the corpus PDFs are already public release assets, so
+          publishing a converted .docx publishes nothing new. Delete the branch after the measurement.
+       2. GOOGLEDRIVE_UPLOAD_FROM_URL(source_url=<raw.githubusercontent.com URL>, name=...,
+              mime_type="application/vnd.google-apps.document",
+              parent_folder_id="11-mkegjnnIOmVdO7c44nDSgxrw2qkWn6")
+          -> {id}            (converts on upload; no s3key involved)
+       3. GOOGLEDRIVE_EXPORT_GOOGLE_WORKSPACE_FILE(fileId=id, mimeType="application/pdf")
+          -> artifacts[0].workspace_path is the downloaded PDF, already on disk
+
+    12 documents through route B took ONE program call and about 4 minutes, export included.
+    The KavoPDF-Verify folder id is 11-mkegjnnIOmVdO7c44nDSgxrw2qkWn6.
+
+    ALWAYS pass --docx to verify_google.py. Without it 53_embedded_faces and 54_image_dpi pass
+    unmeasured, and a face change then reads as "42 of 42" when the full instrument says 41/42. That
+    exact hole is what made the font-map lead look landed on 27 Nov - see
+    FINDINGS/FONT-MAP-REFUTED-53-FORBIDS-ANY-WIDTH-CHANGING-RENAME-28NOV-fixer.md.
+
 ## Why the Drive half is not in the script
 
 The Drive calls are MCP operations, not shell commands. A plain Python script cannot
