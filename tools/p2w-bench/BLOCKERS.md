@@ -1662,8 +1662,8 @@ was 3 h ago, so it has not come due. Nothing is parked and nothing is re-opened.
 **The trend row, and the one fact in it that matters.** Today's row is docx open 116, txt failing 6,
 google 206, google clean 48 - the first three unchanged from 27 Nov, clean up 2. One row of no movement
 is not the three-row signal the brief names, and the .docx column left 59 only yesterday because the
-table was re-measured, not because documents were fixed. Appended and committed in this pass as
-d33f3852, so the row cannot be lost the way the 21 Nov row was.
+table was re-measured, not because documents were fixed. Appended, committed and pushed in this pass,
+so the row cannot be lost the way the 21 Nov row was.
 
 **"No commit of any kind can land" is true only of a clone where a run installed the gate.** The 03:5x
 entry says the hook refuses an engine fix, a tool and the run's own report alike. In this clone
