@@ -6,8 +6,8 @@
  "attempts": 5,
  "class": "18_displacement",
  "docs_improved": 0,
- "ended": null,
- "ended_ts": null,
+ "ended": "09:08",
+ "ended_ts": 1795837090.621203,
  "kept": 0,
  "started": "08:24",
  "started_ts": 1795834444.4762332

@@ -1,16 +1,5 @@
 [
  {
-  "started": "01:25",
-  "started_ts": 1795636530.7479696,
-  "ended": "(never)",
-  "ended_ts": null,
-  "attempts": 0,
-  "kept": 0,
-  "agents": [],
-  "docs_improved": 0,
-  "ended_how": "killed - never released the slot"
- },
- {
   "agents": [],
   "attempts": 6,
   "class": "59_shape_anchor",
@@ -770,5 +759,20 @@
   "agents": [],
   "docs_improved": 0,
   "ended_how": "killed - never released the slot"
+ },
+ {
+  "agents": [
+   "18_dA-02",
+   "05_cB-01"
+  ],
+  "attempts": 5,
+  "class": "18_displacement",
+  "docs_improved": 0,
+  "ended": "(never)",
+  "ended_ts": null,
+  "kept": 0,
+  "started": "08:24",
+  "started_ts": 1795834444.4762332,
+  "ended_how": "killed - slot cleared by a force release"
  }
 ]
