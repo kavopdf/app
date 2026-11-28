@@ -92,3 +92,25 @@ The probe copies created in Drive were trashed with `GOOGLEDRIVE_FIND_FILE(query
 not create — `probe-ladder-relay-2` and `394_map_with_legend (relay tblpPr probe)`. Both were trashed and
 both were **restored with `GOOGLEDRIVE_UNTRASH_FILE` within the same minute**; verified `trashed = false`.
 Nine probe documents of this run were trashed and left in trash. Nothing else was deleted.
+
+## Breadth: 17 documents through Google, not 9
+
+The eight other documents that fail `59_shape_anchor` on the store were rendered through Google the same
+way and scored with the pristine verifier (`73cf88a:tools/p2w-bench/verify_google.py`) and with the
+patched one. **Every one is unchanged, in both directions:**
+
+| document | pristine | patched |
+|:--|:--|:--|
+| `08_two_overlapping_stamps` | 36/42 | 36/42 |
+| `09_stamp_font_not_embedded` | 38/42 | 38/42 |
+| `15_stamp_on_scanned_page` | 33/42 | 33/42 |
+| `331_pid_diagram` | 33/42 | 33/42 |
+| `371_experience_certificate` | 36/42 | 36/42 |
+| `400_comic_page_speech_bubbles` | 35/42 | 35/42 |
+| `65_two_col_full_width_figure_caption` | 35/42 | 35/42 |
+| `policy-2col-spanning-section-heading` | 34/42 | 34/42 |
+
+So over **17 Google renders, 1 document cleared, 0 new failures, 0 verdicts changed in the other 16.**
+The patch is narrow: it fixes the corner-versus-centre arithmetic and leaves a real box error convicted.
+The other 49 documents the store fails 59 on are not all instrument — most are also failing 04/13/17/45,
+which is a text-recovery problem (stamps, scans, colour), not a geometry one.
